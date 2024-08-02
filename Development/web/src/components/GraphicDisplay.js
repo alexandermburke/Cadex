@@ -17,7 +17,7 @@ export default function GraphicDisplay(props) {
                 <iframe
     width="100%"
     height="500px"
-    src="https://www.youtube.com/embed/QYrrCNVTDKY" 
+    src="https://www.youtube.com/embed/vT6TMuOqT8g" 
     title="YouTube video player"
     frameBorder="0"
     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
