@@ -6,7 +6,7 @@ const data = {
     labels: ['Before Cadex AI', 'After Cadex AI'],
     datasets: [
         {
-            label: 'Success Rate (%)',
+            label: 'Success Rate Percentage',
             data: [60, 90],
             backgroundColor: ['#ffcc00', '#ff9900'],
         },

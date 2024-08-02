@@ -17,7 +17,7 @@ export default function Hero() {
                     </h2>
                 </div>
                 <p className='text-base sm:text-lg md:text-xl lg:max-w-[80%] lg:mr-auto'>
-                    Cadex AI helps <span className='font-medium goldGradient'>simulate real-life legal scenarios</span> to enhance your practice, based on our Database of every known State or Federal case.
+                    Cadex AI helps <span className='font-medium goldGradient'>simulate real-life legal scenarios</span> to enhance your practice&#44; based on our Database of every known State or Federal case
                 </p>
                 
                 <div className='flex flex-col flex-1 items-center gap-5 text-center lg:text-left mx-auto w-full'>
