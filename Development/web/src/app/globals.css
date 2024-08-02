@@ -25,6 +25,12 @@ html {
   transition: transform 0.5s ease-in-out;
 }
 
+.carousel-image {
+  width: 300px;
+  height: 200px;
+  object-fit: cover;
+}
+
 .hexigon {
   clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
 }
