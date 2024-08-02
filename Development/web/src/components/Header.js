@@ -35,8 +35,8 @@ export default function Header() {
 
     let navActions = (
         <nav className='hidden items-stretch md:flex'>
-            <Link href={'/browse'} className='border border-solid duration-200 border-transparent hover:border-gold-100 px-4 grid place-items-center rounded-full'>
-                <p>Practice</p>
+            <Link href={'/Practice'} className='border border-solid duration-200 border-transparent hover:border-gold-100 px-4 grid place-items-center rounded-full'>
+                <p>Practice Cases</p>
             </Link>
             <Link href={'/#about'} className='border border-solid duration-200 border-transparent hover:border-gold-100 px-4 grid place-items-center rounded-full'>
                 <p>Stats</p>
@@ -55,7 +55,7 @@ export default function Header() {
 
     let menuActions = (
         <nav className='flex flex-col gap-2'>
-            <Link className='p-2 rounded-lg border-solid border border-gold-50 hover:opacity-60 duration-200' href={'/browse'}><p>Practice</p></Link>
+            <Link className='p-2 rounded-lg border-solid border border-gold-50 hover:opacity-60 duration-200' href={'/practice'}><p>Practice</p></Link>
             <Link className='p-2 rounded-lg border-solid border border-gold-50 hover:opacity-60 duration-200' href={'/#about'}><p>Stats</p></Link>
             <Link className='p-2 rounded-lg border-solid border border-gold-50 hover:opacity-60 duration-200' href={'/admin'}><p>{currentUser ? 'Dashboard' : 'Login'}</p></Link>
             <Button clickHandler={() => { router.push('/register') }} text="Sign up free" />
@@ -67,8 +67,8 @@ export default function Header() {
             <>
                 <p className={'capitalize flex-1 ' + poppins.className}>Welcome <span>{currentUser.displayName}</span></p>
                 <div className='hidden items-stretch md:flex'>
-                    <Link href={'/browse'} className='border border-solid duration-200 border-transparent hover:border-gold-100 px-4 grid place-items-center rounded-full'>
-                        <p>Browse</p>
+                    <Link href={'/practice'} className='border border-solid duration-200 border-transparent hover:border-gold-100 px-4 grid place-items-center rounded-full'>
+                        <p>Practice</p>
                     </Link>
                     <Link href={'/admin'} className='border border-solid duration-200 border-transparent hover:border-gold-100 px-4 grid place-items-center rounded-full'>
                         <p>Dashboard</p>
@@ -85,7 +85,7 @@ export default function Header() {
         );
         menuActions = (
             <nav className='flex flex-col gap-2'>
-                <Link href={'/browse'} className='p-2 rounded-lg border-solid border border-gold-50 hover:opacity-60 duration-200'><p>Practice</p></Link>
+                <Link href={'/practice'} className='p-2 rounded-lg border-solid border border-gold-50 hover:opacity-60 duration-200'><p>Practice</p></Link>
                 <Link href={'/admin'} className='p-2 rounded-lg border-solid border border-gold-50 hover:opacity-60 duration-200'><p>Dashboard</p></Link>
                 <Link href={'/admin/account'} className='p-2 rounded-lg border-solid border border-gold-50 hover:opacity-60 duration-200'><p>Account</p></Link>
                 <button className='p-2 text-left rounded-lg border-solid border border-gold-50 hover:opacity-60 duration-200' onClick={logout}><p>Logout</p></button>

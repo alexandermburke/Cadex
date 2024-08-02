@@ -25,6 +25,8 @@
     "react-dom": "^18",
     "react-dropzone": "^14.2.3",
     "react-responsive-carousel": "^3.2.23",
+    "react-slick": "^0.30.2",
+    "slick-carousel": "^1.8.1",
     "stripe": "^14.18.0"
   },
   "devDependencies": {

@@ -3,7 +3,7 @@ import Link from 'next/link';
 import Hero from './Hero';
 import Footer from './Footer';
 import Header from './Header';
-import ChartComponent from './ChartComponent';
+import CarouselComponent from './Carousel';
 
 export default function Home() {
     return (
@@ -40,16 +40,17 @@ export default function Home() {
                 </div>
                 <div className='flex justify-center mt-8'>
                     <Link href='/login' className='before:ease relative h-12 w-40 overflow-hidden rounded-lg border border-slate-900 bg-slate-900 text-white shadow-2xl transition-all before:absolute before:right-0 before:top-0 before:h-12 before:w-6 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-40'>
-                      <div className='text-center leading-loose'> 
-                      Login to Cadex
+                    <div className='flex items-center justify-center h-full'> 
+                    Login to Cadex
                       </div>
                     </Link>
                 </div>
             </section>
             <section className='flex flex-col items-center py-12 px-4 md:px-8 lg:px-16'>
                 <div className='max-w-5xl w-full'>
-                    <h3 className='text-2xl lg:text-4xl font-semibold my-4'>The Benefits of Using Cadex AI</h3>
-                  
+                    <h3 className='text-2xl lg:text-4xl font-semibold my-4'>Universities we work with</h3>
+                    <CarouselComponent />
+
                 </div>
             </section>
            

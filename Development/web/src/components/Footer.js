@@ -11,7 +11,7 @@ export default function Footer() {
                 <div className='flex flex-col w-fit shrink-0 gap-4 whitespace-nowrap text-center'>
                     <div className='flex flex-col mx-auto w-fit'>
                         <Link href={'/'}>
-                            <h1 className={'text-xl px-3 sm:text-2xl sm:px-4 ' + poppins.className}>Cadex Law</h1>
+                            <h1 className={'text-xl px-3 sm:text-2xl sm:px-4 ' + poppins.className}>Cadex Law Simulation</h1>
                         </Link>
                     </div>
                     <p className='mx-auto text-sm'>Copyright © 2024 Alexander Burke</p>
@@ -20,7 +20,7 @@ export default function Footer() {
                     <div className='flex flex-col gap-4 w-fit'>
                         <h3 className='font-bold'>Navigation</h3>
                         <div className='flex flex-col gap-1 text-sm'>
-                            <Link className='relative w-fit overflow-hidden after:absolute after:right-full after:bottom-0 after:h-[1px] after:bg-white after:w-full after:duration-200 hover:after:translate-x-full' href={'/browse'}><p>Browse</p></Link>
+                            <Link className='relative w-fit overflow-hidden after:absolute after:right-full after:bottom-0 after:h-[1px] after:bg-white after:w-full after:duration-200 hover:after:translate-x-full' href={'/practice'}><p>Practice</p></Link>
                             <Link className='relative w-fit overflow-hidden after:absolute after:right-full after:bottom-0 after:h-[1px] after:bg-white after:w-full after:duration-200 hover:after:translate-x-full' href={'/admin'}><p>Login</p></Link>
                             <Link className='relative w-fit overflow-hidden after:absolute after:right-full after:bottom-0 after:h-[1px] after:bg-white after:w-full after:duration-200 hover:after:translate-x-full' href={'/register'}><p>Join</p></Link>
                         </div>
@@ -34,7 +34,7 @@ export default function Footer() {
                             </Link>
                             <div className='flex items-center gap-2 relative w-fit overflow-hidden after:absolute after:right-full after:bottom-0 after:h-[1px] after:bg-white after:w-full after:duration-200 hover:after:translate-x-full'>
                                 <i className="fa-solid fa-at"></i>
-                                <p>support@cadexlaw.app</p>
+                                <p>support@cadexlaw.com</p>
                             </div>
                         </div>
                     </div>
