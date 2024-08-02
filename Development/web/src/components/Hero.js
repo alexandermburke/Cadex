@@ -16,14 +16,19 @@ export default function Hero() {
                         <span className='goldGradient'>Empowering Your Legal Practice</span> with AI
                     </h2>
                 </div>
-                <div />
                 <p className='text-base sm:text-lg md:text-xl lg:max-w-[80%] lg:mr-auto'>
-                    Cadex AI helps <span className='font-medium goldGradient'>simulate real-life legal scenarios</span> to enhance your practice.
+                    Cadex AI helps <span className='font-medium goldGradient'>simulate real-life legal scenarios</span> to enhance your practice, based on our Database of every known State or Federal case.
                 </p>
-                <div />
-                <button className="before:ease relative h-12 w-40 overflow-hidden rounded-lg border border-slate-900 bg-slate-900 text-white shadow-2xl transition-all before:absolute before:right-0 before:top-0 before:h-12 before:w-6 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-15 before:duration-700 hover:shadow-black hover:before:-translate-x-40">
+                
+                <div className='flex flex-col flex-1 items-center gap-5 text-center lg:text-left mx-auto w-full'>
+                    <div />
+                    <div />
+                   
+              
+                <button className="before:ease relative h-12 w-40 overflow-hidden rounded-lg border border-slate-900 bg-slate-900 text-white shadow-2xl transition-all before:absolute before:right-0 before:top-0 before:h-12 before:w-6 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-40">
                     Start Practicing
                 </button>
+                </div>
             </div>
 
             <GraphicDisplay />

@@ -1,15 +1,14 @@
-'use client'
 import React from 'react';
 import Link from 'next/link';
 import Hero from './Hero';
 import Footer from './Footer';
 import Header from './Header';
-import ChartComponent from './Chart';
+import ChartComponent from './ChartComponent';
 
 export default function Home() {
     return (
         <div className='flex flex-col flex-1 bg-white'>
-    
+
             <section className='flex flex-col items-center py-12 px-4 md:px-8 lg:px-16'>
                 <div className='max-w-5xl'>
                     <h3 className='text-2xl lg:text-4xl font-semibold my-4'>About Cadex AI</h3>
@@ -24,9 +23,8 @@ export default function Home() {
                     </p>
                 </div>
                 <div className='flex flex-wrap gap-8 justify-center mt-8'>
-                    <img src="/law-image1.png" alt="Legal Practice" className='w-full md:w-1/3 rounded-lg shadow-lg' />
-                    <img src="/law-image2.png" alt="Courtroom Simulation" className='w-full md:w-1/3 rounded-lg shadow-lg' />
-                    <img src="/law-image3.png" alt="Legal Documentation" className='w-full md:w-1/3 rounded-lg shadow-lg' />
+                   <img src="/law-image1.png" alt="Legal Practice" className='w-full md:w-1/3 rounded-lg shadow-lg' />
+                   <img src="/law-image3.png" alt="Legal Documentation" className='w-full md:w-1/3 rounded-lg shadow-lg' />
                 </div>
             </section>
             <section className='flex flex-col items-center py-12 px-4 md:px-8 lg:px-16 bg-gray-100'>
@@ -41,18 +39,20 @@ export default function Home() {
                     </ul>
                 </div>
                 <div className='flex justify-center mt-8'>
-                    <Link href='/login' className='text-white py-2 px-4 relative h-12 w-40 overflow-hidden rounded-lg border border-slate-900 bg-slate-900 shadow-2xl transition-all shadow-black hover:bg-white hover:text-slate-900 hover:shadow-none'>
-                        Login to Cadex
+                    <Link href='/login' className='before:ease relative h-12 w-40 overflow-hidden rounded-lg border border-slate-900 bg-slate-900 text-white shadow-2xl transition-all before:absolute before:right-0 before:top-0 before:h-12 before:w-6 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-40'>
+                      <div className='text-center leading-loose'> 
+                      Login to Cadex
+                      </div>
+                      
                     </Link>
                 </div>
             </section>
             <section className='flex flex-col items-center py-12 px-4 md:px-8 lg:px-16'>
                 <div className='max-w-5xl w-full'>
                     <h3 className='text-2xl lg:text-4xl font-semibold my-4'>The Benefits of Using Cadex AI</h3>
-                    <ChartComponent />
+                
                 </div>
             </section>
-        
         </div>
     );
 }
