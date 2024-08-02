@@ -8,8 +8,7 @@ import ChartComponent from './ChartComponent';
 export default function Home() {
     return (
         <div className='flex flex-col flex-1 bg-white'>
-            <Header />
-            <Hero />
+        
             <section className='flex flex-col items-center py-12 px-4 md:px-8 lg:px-16'>
                 <div className='max-w-5xl'>
                     <h3 className='text-2xl lg:text-4xl font-semibold my-4'>About Cadex AI</h3>
@@ -50,10 +49,10 @@ export default function Home() {
             <section className='flex flex-col items-center py-12 px-4 md:px-8 lg:px-16'>
                 <div className='max-w-5xl w-full'>
                     <h3 className='text-2xl lg:text-4xl font-semibold my-4'>The Benefits of Using Cadex AI</h3>
-                    <ChartComponent />
+                  
                 </div>
             </section>
-            <Footer />
+           
         </div>
     );
 }
