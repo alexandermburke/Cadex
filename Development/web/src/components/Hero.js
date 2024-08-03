@@ -23,12 +23,20 @@ export default function Hero() {
                 <div className='flex flex-col flex-1 items-center gap-5 text-center lg:text-left mx-auto w-full'>
                     <div />
                     <div />
-                   
+                    <div className="flex space-x-4">
+                         <button className="before:ease relative h-12 w-40 overflow-hidden rounded-lg text-yellow-500 shadow-2xl transition-all before:absolute before:right-0 before:top-0 before:h-12 before:w-6 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-40 before:duration-700 hover:before:-translate-x-40">
+                                 Join Our Team
+                        </button>
+  <button className="before:ease relative h-12 w-40 overflow-hidden rounded-lg goldBackground text-white shadow-2xl transition-all before:absolute before:right-0 before:top-0 before:h-12 before:w-6 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-40">
+    Learn More Today
+  </button>
+ 
+</div>
+
+
+
+                </div>     
               
-                <button className="before:ease relative h-12 w-40 overflow-hidden rounded-lg border border-slate-900 bg-slate-900 text-white shadow-2xl transition-all before:absolute before:right-0 before:top-0 before:h-12 before:w-6 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-40">
-                    Start Practicing
-                </button>
-                </div>
             </div>
 
             <GraphicDisplay />

@@ -75,13 +75,13 @@ html {
 }
 
 .goldGradient {
-  background: -webkit-linear-gradient(30deg, #D4B44A, #D4B44A);
+  background: -webkit-linear-gradient(30deg, #D4B44A, #f1dd9b);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
 .goldBackground {
-  background: linear-gradient(30deg, #D4B44A, #D4B44A);
+  background: linear-gradient(30deg, #D4B44A, #f1dd9b);
 }
 
 .unstyled {

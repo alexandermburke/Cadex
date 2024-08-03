@@ -8,8 +8,14 @@ import CarouselComponent from './Carousel';
 export default function Home() {
     return (
         <div className='flex flex-col flex-1 bg-white'>
+            
         
             <section className='flex flex-col items-center py-12 px-4 md:px-8 lg:px-16'>
+
+            <div
+                    className="mx-auto w-[1.5px] h-12 sm:h-16 md:h-20 bg-gradient-to-b from-transparent to-yellow-400"
+                />
+              
                 <div className='max-w-5xl'>
                     <h3 className='text-2xl lg:text-4xl font-semibold my-4'>About Cadex AI</h3>
                     <p className='text-base sm:text-lg md:text-xl my-2'>
@@ -26,7 +32,11 @@ export default function Home() {
                     <img src='/law-image1.png' alt='Legal Practice' className='w-full md:w-1/3 rounded-lg shadow-lg' />
                     <img src='/law-image3.png' alt='Legal Documentation' className='w-full md:w-1/3 rounded-lg shadow-lg' />
                 </div>
+                <div />
+                
+           
             </section>
+            
             <section className='flex flex-col items-center py-12 px-4 md:px-8 lg:px-16 bg-gray-100'>
                 <div className='max-w-5xl'>
                     <h3 className='text-2xl lg:text-4xl font-semibold my-4'>Features</h3>
@@ -39,7 +49,7 @@ export default function Home() {
                     </ul>
                 </div>
                 <div className='flex justify-center mt-8'>
-                    <Link href='/login' className='before:ease relative h-12 w-40 overflow-hidden rounded-lg border border-slate-900 bg-slate-900 text-white shadow-2xl transition-all before:absolute before:right-0 before:top-0 before:h-12 before:w-6 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-40'>
+                    <Link href='/login' className='before:ease relative h-12 w-40 overflow-hidden rounded-lg bg-gradient-to-r from-slate-900 to-slate-700 text-white shadow-2xl transition-all before:absolute before:right-0 before:top-0 before:h-12 before:w-6 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-40'>
                     <div className='flex items-center justify-center h-full'> 
                     Login to Cadex
                       </div>
