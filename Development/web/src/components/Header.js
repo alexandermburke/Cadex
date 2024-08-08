@@ -35,18 +35,18 @@ export default function Header() {
 
     let navActions = (
         <nav className='hidden items-stretch md:flex'>
-        <Link href={'/admin'} className='mx-2 p-1 px-5 grid place-items-center relative z-10 rounded-lg duration-200 bg-slate-200 text-black before:ease overflow-hidden shadow-2xl transition-all before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-40'>
+        <Link href={'/admin'} className='mx-2 p-2 px-5 grid place-items-center relative z-10 rounded-lg duration-200 bg-slate-200 text-black before:ease overflow-hidden shadow-2xl transition-all before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-40'>
             <p>Practice</p>
         </Link>
-        <Link href={'/stats'} className='mx-2 p-1 px-5 grid place-items-center relative z-10 rounded-lg duration-200 bg-slate-200 text-black before:ease overflow-hidden shadow-2xl transition-all before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-40'>
+        <Link href={'/stats'} className='mx-2 p-2 px-5 grid place-items-center relative z-10 rounded-lg duration-200 bg-slate-200 text-black before:ease overflow-hidden shadow-2xl transition-all before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-40'>
             <p>Analytics</p>
         </Link>
-        <Link href={'/admin'} className='mx-2 p-1 px-5 grid place-items-center relative z-10 rounded-lg duration-200 bg-slate-200 text-black before:ease overflow-hidden shadow-2xl transition-all before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-40'>
+        <Link href={'/admin'} className='mx-2 p-2 px-5 grid place-items-center relative z-10 rounded-lg duration-200 bg-slate-200 text-black before:ease overflow-hidden shadow-2xl transition-all before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-40'>
             <p>{currentUser ? 'Dashboard' : 'Login'}</p>
         </Link>
         <Link href={'/careers'} className='mx-2 ml-4 duration-200 overflow-hidden p-0.5 rounded-lg relative'>
             <div className='absolute inset-0 goldBackground' />
-            <div className='p-1 grid place-items-center relative z-10 bg-transparent rounded-lg duration-200 text-white before:ease overflow-hidden goldBackground shadow-2xl transition-all before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-40'>
+            <div className='p-2 grid place-items-center relative z-10 bg-transparent rounded-lg duration-200 text-white before:ease overflow-hidden goldBackground shadow-2xl transition-all before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-40'>
                 <p>Open Positions</p>
             </div>
         </Link>
