@@ -12,33 +12,33 @@ const poppins = Poppins({ subsets: ["latin"], weight: ['400', '100', '200', '300
 const plans = [
     {
         name: 'Free',
-        description: 'For your personal browsing',
+        description: 'For individual legal practice',
         price: 'Free',
         interval: 'Free, Forever',
         features: [
-            'Browse all listings available',
-            'Message any seller to negotiate',
-            'Manage 1 listing with watermark',
+            'Access to basic legal case simulations',
+            'Join public case discussions',
+            'Manage 1 simulated case',
             'No Ads',
         ],
         recommended: false
     },
     {
         name: 'Pro',
-        description: 'For Dealerships & sellers',
+        description: 'For Law Firms & Professional Use',
         price: '$50 USD',
         interval: 'Per month',
         disclaimer: 'Subject to change based on demand',
         features: [
             'Everything in the Free plan',
-            '5 listings shared to all Social Media per month',
-            'Locked in rate that will never change',
-            'Remove the enthusiastlist watermark',
-            'Listing will be made a priority',
+            'Unlimited access to all case simulations',
+            '10 case simulations shared to all team members per month',
+            'Priority support and feature requests',
         ],
         recommended: true
     },
 ]
+
 
 export default function Plans() {
 
@@ -83,7 +83,7 @@ export default function Plans() {
     return (
         <>
             <div className='flex flex-col gap-6'>
-                <h2 className={'text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-semibold text-center  ' + poppins.className}>Find the <span className='blueGradient'>plan</span> for you</h2>
+                <h2 className={'text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-semibold text-center  ' + poppins.className}>Find the <span className='goldGradient'>plan</span> for you</h2>
                 <p className='text-center'>You can change at anytime.</p>
             </div>
             <div className='grid grid-cols-1 sm:grid-cols-2 sm:mx-auto gap-8'>

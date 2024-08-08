@@ -2,7 +2,7 @@ import Dashboard from '@/components/Dashboard'
 import React from 'react'
 
 export const metadata = {
-    title: "enthusiastlist.app ⋅ Admin",
+    title: "CadexLaw.com ⋅ Dashboard",
 };
 
 export default function AdminPage() {

@@ -31,10 +31,17 @@ export default function Login() {
 
   return (
     <>
-      <div className='flex flex-col gap-6'>
-        <h2 className={'text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-semibold text-center  ' + poppins.className}> <span className='blueGradient'>enthusiastlist.app</span></h2>
-        <p className='text-center'>Login to your account! </p>
-      </div>
+   <div className='flex flex-col gap-6 items-center sm:flex-row sm:justify-center sm:items-center py-10'>
+    <img src="/header.png" alt="Cadex Law Logo" className='w-24 h-24 sm:mr-4' />
+    <div className='text-center sm:text-left'>
+        <h2 className={'text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-semibold ' + poppins.className}>
+            <span className='goldGradient'>Cadex Law Simulation</span>
+        </h2>
+    </div>
+</div>
+<div className='flex flex-col gap-2 items-center sm:flex-row sm:justify-center sm:items-center'>
+<p>Login to your account!</p>
+</div>
       <div className='flex flex-col gap-4 text-base sm:text-lg'>
         {error && (<AuthError errMessage={error} />)}
         <input value={email} onChange={(e) => setEmail(e.target.value)} className='flex-1 bg-white rounded-full max-w-[600px] mx-auto w-full outline-none border border-solid border-white p-4 ' placeholder='Email' />

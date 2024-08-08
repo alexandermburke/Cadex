@@ -8,7 +8,7 @@ const CarouselComponent = () => {
     const settings = {
         centerMode: true,
         infinite: true,
-        centerPadding: '60px',
+        centerPadding: '0px', // Adjust this to remove the padding causing overflow
         slidesToShow: 1,
         speed: 500,
         autoplay: true,
@@ -28,7 +28,12 @@ const CarouselComponent = () => {
                 {images.map((src, index) => (
                     <div key={index} className="p-4">
                         <div className="bg-white p-6 rounded-lg shadow-lg text-center">
-                            <img src={src} alt={`slide-${index}`} className="carousel-image rounded-lg mx-auto" />
+                            <img 
+                                src={src} 
+                                alt={`slide-${index}`} 
+                                className="carousel-image rounded-lg mx-auto max-w-full h-auto" 
+                                style={{maxHeight: '300px', objectFit: 'contain'}}
+                            />
                         </div>
                     </div>
                 ))}

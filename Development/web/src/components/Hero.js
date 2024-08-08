@@ -1,3 +1,4 @@
+'use client'
 import { Poppins } from 'next/font/google';
 import Link from 'next/link';
 import React from 'react';
@@ -24,22 +25,24 @@ export default function Hero() {
                     <div />
                     <div />
                     <div className="flex space-x-4">
-                         <button className="before:ease relative h-12 w-40 overflow-hidden rounded-lg text-yellow-500 shadow-2xl transition-all before:absolute before:right-0 before:top-0 before:h-12 before:w-6 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-40 before:duration-700 hover:before:-translate-x-40">
-                                 Join Our Team
-                        </button>
-  <button className="before:ease relative h-12 w-40 overflow-hidden rounded-lg goldBackground text-white shadow-2xl transition-all before:absolute before:right-0 before:top-0 before:h-12 before:w-6 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-40">
-    Learn More Today
-  </button>
+                        <Link href='/careers' className='before:ease relative h-12 w-40 overflow-hidden rounded-lg text-yellow-500 shadow-2xl transition-all before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 before:rotate-6 before:bg-yellow-500 before:opacity-10 before:duration-700 hover:before:-translate-x-40'>
+                        <div className='flex items-center justify-center h-full'>
+                        Join Our Team
+                        </div>
+                    </Link>
+                    <Link href='/#about' className='before:ease relative h-12 w-40 overflow-hidden rounded-lg goldBackground text-white shadow-2xl transition-all before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-40'>
+                        <div className='flex items-center justify-center h-full'>
+                        Learn More Today
+                        </div>
+                    </Link>
  
-</div>
-
-
-
+                    </div>
                 </div>     
-              
             </div>
 
-            <GraphicDisplay />
+            <div className='flex flex-wrap gap-8 justify-center mt-8'>
+                    <img src='/law-image3.png' alt='Legal Practice' className='w-full rounded-lg shadow-lg' />
+                </div>
         </section>
     );
 }
