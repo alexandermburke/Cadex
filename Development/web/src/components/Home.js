@@ -8,10 +8,11 @@ import CarouselComponent from './Carousel';
 
 export default function Home() {
     const [stats, setStats] = useState({ cases: 671, newUsers: 491, statsProvided: 102 });
+    const [loaded, setLoaded] = useState(false);
 
     const animateStats = (start, end, setter) => {
         let startTime;
-        const duration = 10000; // 2 seconds
+        const duration = 10000; // 10 seconds
 
         const step = (timestamp) => {
             if (!startTime) startTime = timestamp;
@@ -40,12 +41,14 @@ export default function Home() {
 
         const intervalId = setInterval(incrementStats, 24 * 60 * 60 * 1000); // Every 24 hours
 
+        setLoaded(true);
+
         return () => clearInterval(intervalId);
     }, []);
 
     return (
         <div className='flex flex-col flex-1 bg-white'>
-            <section className='flex flex-col items-center py-12 px-4 md:px-8 lg:px-16'>
+            <section className={`flex flex-col items-center py-12 px-4 md:px-8 lg:px-16 transform transition-transform duration-700 ${loaded ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
                 <div className="mx-auto w-[1.5px] h-12 sm:h-16 md:h-20 bg-gradient-to-b from-transparent to-black mb-10" />
                 <div className='max-w-5xl'>
                     <h3 className='text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-semibold my-4 text-center goldGradienttwo'>About Cadex Law</h3>
@@ -75,10 +78,10 @@ export default function Home() {
                 </div>
             </section>  
     
-            <div className="mx-auto w-[1.5px] h-12 sm:h-16 md:h-20 bg-gradient-to-b from-transparent to-black mb-4" />    
-            <section className='flex flex-col items-center py-12 px-4 md:px-8 lg:px-16 bg-white'>
+            <div className={`mx-auto w-[1.5px] h-12 sm:h-16 md:h-20 bg-gradient-to-b from-transparent to-black mb-4 transform transition-transform duration-700 ${loaded ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`} />    
+            <section className={`flex flex-col items-center py-12 px-4 md:px-8 lg:px-16 bg-white transform transition-transform duration-700 ${loaded ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
                 <div className='max-w-5xl'>
-                    <h3 className='text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-semibold my-4 text-center goldGradienttwo'>Features</h3>
+                    <h3 className='text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-semibold text-center goldGradienttwo'>Features</h3>
                     <ul className='list-disc pl-5 my-14'>
                         <li className='text-base sm:text-lg md:text-xl my-2'>Interactive legal simulations for defendants, plaintiffs, and judges.</li>
                         <li className='text-base sm:text-lg md:text-xl my-2'>Instant feedback and performance analysis.</li>
@@ -95,7 +98,7 @@ export default function Home() {
                     </Link>
                 </div>
             </section>
-            <section className='flex flex-col items-center py-10 px-4 md:px-8 lg:px-16'>
+            <section className={`flex flex-col items-center py-10 px-4 md:px-8 lg:px-16 transform transition-transform duration-700 ${loaded ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
                 <div className='max-w-5xl w-full'>
                     <h3 className='text-2xl lg:text-4xl font-semibold my-4 text-center'>Universities we work with</h3>
                     <CarouselComponent />
