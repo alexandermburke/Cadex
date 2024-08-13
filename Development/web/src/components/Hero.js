@@ -1,7 +1,7 @@
 'use client'
 import { Poppins } from 'next/font/google';
 import Link from 'next/link';
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import RegisterBtn from './RegisterButton';
 import SearchBtn from './SearchButton';
 import GraphicDisplay from './GraphicDisplay';
@@ -9,40 +9,52 @@ import GraphicDisplay from './GraphicDisplay';
 const poppins = Poppins({ subsets: ["latin"], weight: ['400', '100', '200', '300', '500', '600', '700'] });
 
 export default function Hero() {
+    const [loaded, setLoaded] = useState(false);
+
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setLoaded(true);
+        }, 100); // Adjust delay as needed
+        return () => clearTimeout(timer);
+    }, []);
+
     return (
-        <section className='flex flex-col flex-1 grid grid-cols-1 lg:grid-cols-2 gap-10 md:gap-16 w-full mx-auto'>
-            <div className='flex flex-col flex-1 items-center gap-8 text-center lg:text-left mx-auto w-full'>
-                <div className='flex items-center gap-4'>
-                    <h2 className={'text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-semibold text-center lg:text-left ' + poppins.className}>
-                        <span className='goldGradient'>Empowering Your Legal Practice</span> with AI
+        <section className='flex flex-col flex-1 grid grid-cols-1 lg:grid-cols-1 gap-10 md:gap-16 w-full mx-auto'>
+            <div className={`flex flex-col flex-1 items-center gap-8 text-center lg:text-left mx-auto w-full transform transition-transform duration-700 ${loaded ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
+                <div className='flex items-center gap-4 max-w-xl'>
+                    <h2 className={'text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-semibold text-center lg:text-center ' + poppins.className}>
+                    Empowering  <span className='goldGradient'>Your Legal Practice</span> with AI
                     </h2>
                 </div>
-                <p className='text-base sm:text-lg md:text-xl lg:max-w-[80%] lg:mr-auto'>
-                    Cadex AI helps <span className='font-medium goldGradient'>simulate real-life legal scenarios</span> to enhance your practice&#44; based on our Database of every known State or Federal case
-                </p>
-                
+                <div className='flex flex-col flex-1 grid grid-cols-1 max-w-xl'>
+                    <p className='text-center sm:text-lg md:text-xl lg:mr-auto text-gray-400'>
+                        Cadex AI helps simulate real-life legal scenarios to enhance your practice&#44; based on our Database of every known State or Federal case
+                    </p>
+                </div>
                 <div className='flex flex-col flex-1 items-center gap-5 text-center lg:text-left mx-auto w-full'>
                     <div />
                     <div />
                     <div className="flex space-x-4">
-                        <Link href='/careers' className='before:ease relative h-12 w-40 overflow-hidden rounded-lg text-yellow-500 shadow-2xl transition-all before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 before:rotate-6 before:bg-yellow-500 before:opacity-10 before:duration-700 hover:before:-translate-x-40'>
-                        <div className='flex items-center justify-center h-full'>
-                        Join Our Team
-                        </div>
-                    </Link>
-                    <Link href='/#about' className='before:ease relative h-12 w-40 overflow-hidden rounded-lg goldBackground text-white shadow-2xl transition-all before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-40'>
-                        <div className='flex items-center justify-center h-full'>
-                        Learn More Today
-                        </div>
-                    </Link>
- 
+                        <Link href='/#about' className='relative rounded px-5 py-2.5 overflow-hidden group bg-gradient-to-r from-slate-900 to-slate-700 text-white hover:ring-2 hover:ring-offset-2 hover:ring-black transition-all ease-out duration-300'>
+                            <div className='flex items-center justify-center h-full'>
+                                Learn More Today
+                                <i className=" px-2 fa-solid fa-arrow-right"></i>
+                            </div>
+                        </Link>
                     </div>
-                </div>     
+                </div>
             </div>
 
-            <div className='flex flex-wrap gap-8 justify-center mt-8'>
-                    <img src='/law-image3.png' alt='Legal Practice' className='w-full rounded-lg shadow-lg' />
-                </div>
+            <div className={`flex flex-wrap gap-8 justify-center mt-8 transform transition-transform duration-700 ${loaded ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
+                <video 
+                    src="https://www.ninjachat.ai/nArea.mp4" 
+                    autoPlay 
+                    muted 
+                    loop 
+                    className="w-full rounded-lg shadow-lg"
+                    playsInline
+                ></video>
+            </div>
         </section>
     );
 }

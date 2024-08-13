@@ -34,14 +34,14 @@ export default function Header() {
     );
 
     let navActions = (
-        <nav className='hidden items-stretch md:flex'>
-        <Link href={'/admin'} className='mx-2 p-2 px-5 grid place-items-center relative z-10 rounded-lg duration-200 bg-slate-200 text-black before:ease overflow-hidden shadow-2xl transition-all before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-40'>
+        <nav className='hidden items-stretch md:flex '>
+        <Link href={'/admin'} className='mx-2 p-2 px-2 grid place-items-center relative z-10 rounded-lg bg-transparent'>
             <p>Practice</p>
         </Link>
-        <Link href={'/stats'} className='mx-2 p-2 px-5 grid place-items-center relative z-10 rounded-lg duration-200 bg-slate-200 text-black before:ease overflow-hidden shadow-2xl transition-all before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-40'>
+        <Link href={'/stats'} className='mx-2 p-2 px-2 grid place-items-center relative z-10 rounded-lg bg-transparent'>
             <p>Analytics</p>
         </Link>
-        <Link href={'/admin'} className='mx-2 p-2 px-5 grid place-items-center relative z-10 rounded-lg duration-200 bg-slate-200 text-black before:ease overflow-hidden shadow-2xl transition-all before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-40'>
+        <Link href={'/admin'} className='mx-2 p-2 px-2 grid place-items-center relative z-10 rounded-lg bg-transparent'>
             <p>{currentUser ? 'Dashboard' : 'Login'}</p>
         </Link>
         <Link href={'/careers'} className='mx-2 ml-4 duration-200 overflow-hidden p-0.5 rounded-lg relative'>
@@ -51,8 +51,7 @@ export default function Header() {
             </div>
         </Link>
     </nav>
-    
-    );
+   );
 
     let menuActions = (
         <nav className='flex flex-col gap-2'>
@@ -97,7 +96,7 @@ export default function Header() {
     }
 
     return (
-        <header className='z-[100] fixed top-0 left-0 right-0 px-4 bg-white shadow-md'>
+        <header className='z-[100] fixed top-0 left-0 right-0 px-4 bg-white'>
             <div className='flex items-center justify-between gap-4 max-w-[1200px] mx-auto w-full overflow-hidden p-2 goldShadow rounded-lg'>
                 <Link href={'/'}>
                     <div className='flex items-center gap-2'>
@@ -116,7 +115,7 @@ export default function Header() {
             </div>
 
             {showMenu && (
-                <div className='absolute flex flex-col left-4 right-4 md:hidden top-full pt-4'>
+                <div className='absolute flex flex-col left-4 right-4 md:hidden top-full pt-4 bg-white '>
                     <div className='flex flex-col bg-white dropShadow rounded-2xl p-4'>
                         {menuActions}
                     </div>

@@ -46,21 +46,21 @@ export default function Home() {
     return (
         <div className='flex flex-col flex-1 bg-white'>
             <section className='flex flex-col items-center py-12 px-4 md:px-8 lg:px-16'>
-                <div className="mx-auto w-[1.5px] h-12 sm:h-16 md:h-20 bg-gradient-to-b from-transparent to-yellow-400" />
+                <div className="mx-auto w-[1.5px] h-12 sm:h-16 md:h-20 bg-gradient-to-b from-transparent to-black mb-10" />
                 <div className='max-w-5xl'>
-                    <h3 className='text-2xl lg:text-4xl font-semibold my-4'>About Cadex AI</h3>
-                    <p className='text-base sm:text-lg md:text-xl my-2'>
+                    <h3 className='text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-semibold my-4 text-center goldGradienttwo'>About Cadex Law</h3>
+                    <p className='text-base sm:text-lg md:text-xl my-14 text-center'>
                         Cadex AI is an advanced platform designed to simulate real-life legal scenarios, providing a comprehensive tool for legal practitioners, students, and educators. Our AI-powered simulations enable users to engage in interactive, realistic courtroom experiences.
                     </p>
-                    <p className='text-base sm:text-lg md:text-xl my-2'>
+                    <p className='text-base sm:text-lg md:text-xl my-14 text-center'>
                         Whether you&apos;re preparing for the bar exam, enhancing your litigation skills, or teaching law, Cadex AI offers a unique and effective way to practice and improve. Our simulations cover various legal roles, including defendants, plaintiffs, and judges, allowing for a well-rounded learning experience.
                     </p>
-                    <p className='text-base sm:text-lg md:text-xl my-2'>
+                    <p className='text-base sm:text-lg md:text-xl my-2 text-center'>
                         Our platform also provides instant feedback and analysis on your performance, helping you to identify strengths and areas for improvement. Join Cadex AI today and take your legal practice to the next level with cutting-edge technology.
                     </p>
                 </div>
                 <div className="flex flex-col lg:flex-row justify-around bg-white shadow-lg rounded-lg p-6 mt-8 w-full">
-                <div className='text-center'>
+                    <div className='text-center'>
                         <h4 className='text-3xl font-bold goldGradient'>{stats.cases}</h4>
                         <p className='text-xl text-gray-600'>Cases</p>
                     </div>
@@ -73,17 +73,13 @@ export default function Home() {
                         <p className='text-xl text-gray-600'>Reviews</p>
                     </div>
                 </div>
-               
             </section>  
     
-            <div className="mx-auto w-[1.5px] h-12 sm:h-16 md:h-20 bg-gradient-to-b from-transparent to-yellow-400" />
-            
-
+            <div className="mx-auto w-[1.5px] h-12 sm:h-16 md:h-20 bg-gradient-to-b from-transparent to-black mb-4" />    
             <section className='flex flex-col items-center py-12 px-4 md:px-8 lg:px-16 bg-white'>
-                
                 <div className='max-w-5xl'>
-                    <h3 className='text-2xl lg:text-4xl font-semibold my-4'>Features</h3>
-                    <ul className='list-disc pl-5'>
+                    <h3 className='text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-semibold my-4 text-center goldGradienttwo'>Features</h3>
+                    <ul className='list-disc pl-5 my-14'>
                         <li className='text-base sm:text-lg md:text-xl my-2'>Interactive legal simulations for defendants, plaintiffs, and judges.</li>
                         <li className='text-base sm:text-lg md:text-xl my-2'>Instant feedback and performance analysis.</li>
                         <li className='text-base sm:text-lg md:text-xl my-2'>Realistic courtroom experiences.</li>
@@ -99,9 +95,9 @@ export default function Home() {
                     </Link>
                 </div>
             </section>
-            <section className='flex flex-col items-center py-12 px-4 md:px-8 lg:px-16'>
+            <section className='flex flex-col items-center py-10 px-4 md:px-8 lg:px-16'>
                 <div className='max-w-5xl w-full'>
-                    <h3 className='text-2xl lg:text-4xl font-semibold my-4'>Universities we work with</h3>
+                    <h3 className='text-2xl lg:text-4xl font-semibold my-4 text-center'>Universities we work with</h3>
                     <CarouselComponent />
                 </div>
             </section>

@@ -75,13 +75,19 @@ html {
 }
 
 .goldGradient {
-  background: -webkit-linear-gradient(30deg, #D4B44A, #f1dd9b);
+  background: -webkit-linear-gradient(30deg, #D4B44A, #ecddaa);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.goldGradienttwo {
+  background: -webkit-linear-gradient(30deg, #D4B44A, #f3f3e1);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
 .goldBackground {
-  background: linear-gradient(30deg, #D4B44A, #f1dd9b);
+  background: linear-gradient(30deg, #D4B44A, #ecddaa);
 }
 
 .unstyled {
