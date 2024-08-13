@@ -21,12 +21,12 @@ export default function Hero() {
     return (
         <section className='flex flex-col flex-1 grid grid-cols-1 lg:grid-cols-1 gap-10 md:gap-16 w-full mx-auto'>
             <div className={`flex flex-col flex-1 items-center gap-8 text-center lg:text-left mx-auto w-full transform transition-transform duration-700 ${loaded ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
-                <div className='flex items-center gap-4 max-w-xl'>
-                    <h2 className={'text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-semibold text-center lg:text-center ' + poppins.className}>
+                <div className='flex items-center gap-4 max-w-3xl'>
+                    <h2 className={'text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-semibold text-center lg:text-center py-8' + poppins.className}>
                     Empowering  <span className='goldGradient'>Your Legal Practice</span> with AI
                     </h2>
                 </div>
-                <div className='flex flex-col flex-1 grid grid-cols-1 max-w-xl'>
+                <div className='flex flex-col flex-1 grid grid-cols-1 max-w-2xl'>
                     <p className='text-center sm:text-lg md:text-xl lg:mr-auto text-gray-400'>
                         Cadex AI helps simulate real-life legal scenarios to enhance your practice&#44; based on our Database of every known State or Federal case
                     </p>
