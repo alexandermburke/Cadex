@@ -38,7 +38,7 @@ export default function Hero() {
                         <Link href='/#about' className='relative rounded px-5 py-2.5 overflow-hidden group bg-gradient-to-r from-slate-900 to-slate-700 text-white hover:ring-2 hover:ring-offset-2 hover:ring-black transition-all ease-out duration-300'>
                             <div className='flex items-center justify-center h-full'>
                                 Learn More Today
-                                <i className=" px-2 fa-solid fa-arrow-right"></i>
+                                <i className="ml-8 fa-solid fa-arrow-right"></i>
                             </div>
                         </Link>
                     </div>

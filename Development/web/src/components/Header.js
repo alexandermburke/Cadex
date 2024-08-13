@@ -35,13 +35,13 @@ export default function Header() {
 
     let navActions = (
         <nav className='hidden items-stretch md:flex '>
-        <Link href={'/admin'} className='mx-2 p-2 px-2 grid place-items-center relative z-10 rounded-lg bg-transparent'>
+        <Link href={'/admin'} className='mx-2 p-2 px-2 grid place-items-center relative z-10 rounded-lg bg-transparent hover:text-slate-200'>
             <p>Practice</p>
         </Link>
-        <Link href={'/stats'} className='mx-2 p-2 px-2 grid place-items-center relative z-10 rounded-lg bg-transparent'>
+        <Link href={'/stats'} className='mx-2 p-2 px-2 grid place-items-center relative z-10 rounded-lg bg-transparent hover:text-slate-200'>
             <p>Analytics</p>
         </Link>
-        <Link href={'/admin'} className='mx-2 p-2 px-2 grid place-items-center relative z-10 rounded-lg bg-transparent'>
+        <Link href={'/admin'} className='mx-2 p-2 px-2 grid place-items-center relative z-10 rounded-lg bg-transparent hover:text-slate-200'>
             <p>{currentUser ? 'Dashboard' : 'Login'}</p>
         </Link>
         <Link href={'/careers'} className='mx-2 ml-4 duration-200 overflow-hidden p-0.5 rounded-lg relative'>
@@ -96,7 +96,7 @@ export default function Header() {
     }
 
     return (
-        <header className='z-[100] fixed top-0 left-0 right-0 px-4 bg-white'>
+        <header className='z-[100] fixed top-0 left-0 right-0 px-4 my-2 bg-gradient-to-r from-white to-slate-100 dropShadow rounded-xl'>
             <div className='flex items-center justify-between gap-4 max-w-[1200px] mx-auto w-full overflow-hidden p-2 goldShadow rounded-lg'>
                 <Link href={'/'}>
                     <div className='flex items-center gap-2'>
@@ -105,17 +105,20 @@ export default function Header() {
                     </div>
                 </Link>
                 {navActions}
-                <button onClick={() => { setShowMenu(!showMenu) }} className='grid md:hidden place-items-center p-4 duration-200 rounded-lg'>
-                    {showMenu ? (
-                        <i className="fa-solid fa-xmark text-lg"></i>
-                    ) : (
-                        <i className="fa-solid fa-bars text-lg"></i>
-                    )}
-                </button>
+                <button
+    onClick={() => { setShowMenu(!showMenu) }}
+    className='grid md:hidden place-items-center p-4 duration-200 rounded-lg'
+>
+    {showMenu ? (
+        <i className="fa-solid fa-xmark text-lg icon-transition icon-xmark"></i>
+    ) : (
+        <i className="fa-solid fa-bars text-lg icon-transition icon-bars"></i>
+    )}
+</button>
             </div>
 
             {showMenu && (
-                <div className='absolute flex flex-col left-4 right-4 md:hidden top-full pt-4 bg-white '>
+                <div className='absolute flex flex-col left-4 right-4 md:hidden top-full pt-4 bg-white rounded-sm'>
                     <div className='flex flex-col bg-white dropShadow rounded-2xl p-4'>
                         {menuActions}
                     </div>

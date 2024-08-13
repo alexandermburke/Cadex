@@ -20,6 +20,18 @@ html {
   object-fit: cover;
 }
 
+.icon-transition {
+  transition: transform 0.3s ease;
+}
+
+.icon-bars {
+  transform: rotate(0deg);
+}
+
+.icon-xmark {
+  transform: rotate(180deg);
+}
+
 .slider {
   display: flex;
   transition: transform 0.5s ease-in-out;
@@ -35,8 +47,8 @@ html {
   clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
 }
 
-.blueShadow {
-  box-shadow: 0px 14px 55px rgba(255, 215, 0, 0.35);
+.goldShadow {
+  box-shadow: 0px 10px 25px rgba(236, 221, 170, 0.1);
 }
 
 .dropShadow {
