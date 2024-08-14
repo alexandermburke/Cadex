@@ -52,7 +52,7 @@ export default function Hero() {
                         <img className="w-10 h-10 rounded-full border-2 border-white" src="/avatar4.png" alt="User Avatar 4"/>
                     </div>
                     {/* Text */}
-                    <p className="ml-4 text-gray-600">Join 10,000+ happy users</p>
+                    <p className="ml-4 text-gray-600">Join 1,000+ happy users</p>
                 </div>
             </div>
 
