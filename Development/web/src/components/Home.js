@@ -52,11 +52,11 @@ export default function Home() {
                 <div className="mx-auto w-[1.5px] h-12 sm:h-16 md:h-20 bg-gradient-to-b from-transparent to-blue-950 mb-10" />
                 <div className='max-w-5xl'>
                     <h3 className='text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-semibold my-4 text-center goldGradienttwo'>About Cadex Law</h3>
-                    <p className='text-base sm:text-lg md:text-xl my-14 text-center'>
-                        Cadex AI is an advanced platform designed to simulate real-life legal scenarios, providing a comprehensive tool for legal practitioners, students, and educators. Our AI-powered simulations enable users to engage in interactive, realistic courtroom experiences.
+                    <p className='text-base sm:text-lg md:text-xl my-14 text-left text-gray-400'>
+                        Cadex Law is an advanced platform designed to simulate real-life legal scenarios, providing a comprehensive tool for legal practitioners, students, and educators. Our AI-powered simulations enable users to engage in interactive, realistic courtroom experiences.
                     </p>
-                    <p className='text-base sm:text-lg md:text-xl my-14 text-center'>
-                        Whether you&apos;re preparing for the bar exam, enhancing your litigation skills, or teaching law, Cadex AI offers a unique and effective way to practice and improve. Our simulations cover various legal roles, including defendants, plaintiffs, and judges, allowing for a well-rounded learning experience.Our platform also provides instant feedback and analysis on your performance, helping you to identify strengths and areas for improvement. Join Cadex AI today and take your legal practice to the next level with cutting-edge technology.
+                    <p className='text-base sm:text-lg md:text-xl my-14 text-left text-gray-400'>
+                        Whether you&apos;re preparing for the bar exam, enhancing your litigation skills, or teaching law, Cadex Law offers a unique and effective way to practice and improve. Our simulations cover various legal roles, including defendants, plaintiffs, and judges, allowing for a well-rounded learning experience.Our platform also provides instant feedback and analysis on your performance, helping you to identify strengths and areas for improvement. Join Cadex Law today and take your legal practice to the next level with cutting-edge technology.
                     </p>
                 </div>
                 <div className="flex flex-col lg:flex-row justify-around bg-white shadow-lg rounded-lg p-6 mt-8 w-full">
@@ -73,6 +73,7 @@ export default function Home() {
                         <p className='text-xl text-gray-600'>Reviews</p>
                     </div>
                 </div>
+             
             </section>  
     
             <div className={`mx-auto w-[1.5px] my-16 h-12 sm:h-16 md:h-20 bg-gradient-to-b from-transparent to-blue-950 mb-4 transform transition-transform duration-700 ${loaded ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`} />    
