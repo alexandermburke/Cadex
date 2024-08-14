@@ -108,7 +108,7 @@ export default function Header() {
             <div className='flex items-center justify-between gap-4 max-w-[1400px] mx-auto w-full overflow-hidden p-2 drop-shadow-sm'>
                 <Link href={'/'}>
                     <div className='flex items-center gap-2'>
-                        <img src="/header.png" alt="Cadex Law Logo" className={`w-10 h-10 ${logoLoaded ? 'logo-animation' : ''}`} />
+                        <img src="/header.png" alt="Cadex Law Logo" className={`w-11 h-11 ${logoLoaded ? 'logo-animation' : ''}`} />
                         <h1 className={'text-xl sm:text-2xl goldGradient font-medium ' + poppins.className}>Cadex Law Simulation</h1>
                     </div>
                 </Link>
