@@ -97,7 +97,7 @@ export default function Header() {
 
     return (
         <header className='z-[100] fixed top-0 left-0 right-0 bg-white'>
-            <div className='flex items-center justify-between gap-4 max-w-[1400px] mx-auto w-full overflow-hidden p-2 goldShadow drop-shadow-sm'>
+            <div className='flex items-center justify-between gap-4 max-w-[1400px] mx-auto w-full overflow-hidden p-2 drop-shadow-sm'>
                 <Link href={'/'}>
                     <div className='flex items-center gap-2'>
                         <img src="/header.png" alt="Cadex Law Logo" className='w-10 h-10' />
