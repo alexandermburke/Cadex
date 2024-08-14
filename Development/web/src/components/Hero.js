@@ -22,7 +22,7 @@ export default function Hero() {
         <section className='flex flex-col flex-1 grid grid-cols-1 lg:grid-cols-1 gap-10 md:gap-16 w-full mx-auto my-20'>
             <div className={`flex flex-col flex-1 items-center gap-8 text-center lg:text-left mx-auto w-full transform transition-transform duration-700 ${loaded ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
                 <div className='flex items-center gap-4 max-w-3xl'>
-                    <h2 className={'text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-semibold text-center lg:text-center py-8' + poppins.className}>
+                    <h2 className={'text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-semibold text-center lg:text-center py-8 ' + poppins.className}>
                     Empowering  <span className='goldGradient'>Your Legal Practice</span> with AI
                     </h2>
                 </div>
@@ -35,13 +35,24 @@ export default function Hero() {
                     <div />
                     <div />
                     <div className="flex space-x-4">
-                        <Link href='/#about' className='relative rounded px-5 py-2.5 overflow-hidden group bg-gradient-to-r from-slate-900 to-slate-700 text-white hover:ring-2 hover:ring-offset-2 hover:ring-black transition-all ease-out duration-300'>
+                        <Link href='/#about' className='relative rounded px-5 py-2.5 overflow-hidden group bg-gradient-to-r from-blue-950 to-slate-700 text-white hover:ring-2 hover:ring-offset-2 hover:ring-black transition-all ease-out duration-300'>
                             <div className='flex items-center justify-center h-full'>
                                 Learn More Today
                                 <i className="ml-8 fa-solid fa-arrow-right"></i>
                             </div>
                         </Link>
                     </div>
+                </div>
+                <div className="flex items-center justify-center mt-4">
+                    {/* Avatars */}
+                    <div className="flex -space-x-3">
+                        <img className="w-10 h-10 rounded-full border-2 border-white" src="/avatar1.png" alt="User Avatar 1"/>
+                        <img className="w-10 h-10 rounded-full border-2 border-white" src="/avatar2.png" alt="User Avatar 2"/>
+                        <img className="w-10 h-10 rounded-full border-2 border-white" src="/avatar3.png" alt="User Avatar 3"/>
+                        <img className="w-10 h-10 rounded-full border-2 border-white" src="/avatar4.png" alt="User Avatar 4"/>
+                    </div>
+                    {/* Text */}
+                    <p className="ml-4 text-gray-600">Join 10,000+ happy users</p>
                 </div>
             </div>
 

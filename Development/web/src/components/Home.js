@@ -91,7 +91,7 @@ export default function Home() {
                     </ul>
                 </div>
                 <div className='flex justify-center mt-8'>
-                    <Link href='/admin' className='before:ease relative h-12 w-40 overflow-hidden rounded-lg bg-gradient-to-r from-slate-900 to-slate-700 text-white shadow-2xl transition-all before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-40'>
+                    <Link href='/admin' className='before:ease relative h-12 w-40 overflow-hidden rounded-lg bg-gradient-to-r from-blue-950 to-slate-700 text-white shadow-2xl transition-all before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-40'>
                         <div className='flex items-center justify-center h-full'>
                             Login to Cadex
                         </div>

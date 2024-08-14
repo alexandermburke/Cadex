@@ -17,8 +17,12 @@ export default function Header() {
     const router = useRouter();
 
     useEffect(() => {
-        setLogoLoaded(true);
-    }, []);
+        if (pathname === '/') {
+            setLogoLoaded(true);
+        } else {
+            setLogoLoaded(false);
+        }
+    }, [pathname]);
 
     async function copyToClipboard() {
         setShowText(true);
