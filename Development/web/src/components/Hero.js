@@ -43,7 +43,7 @@ export default function Hero() {
                         </Link>
                     </div>
                 </div>
-                <div className="flex items-center justify-center mt-4">
+                <div className="flex items-center justify-center mt-14">
                     {/* Avatars */}
                     <div className="flex -space-x-3">
                         <img className="w-10 h-10 rounded-full border-2 border-white" src="/avatar1.png" alt="User Avatar 1"/>
