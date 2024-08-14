@@ -1,6 +1,20 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+@keyframes fadeInSlide {
+    0% {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.logo-animation {
+    animation: fadeInSlide 1s ease-out forwards;
+}
 
 html {
   scroll-behavior: smooth;
@@ -127,4 +141,19 @@ html {
   to {
     opacity: 0;
   }
+}
+
+@keyframes fadeInSlide {
+  0% {
+      opacity: 0;
+      transform: translateY(-20px);
+  }
+  100% {
+      opacity: 1;
+      transform: translateY(0);
+  }
+}
+
+.logo-animation {
+  animation: fadeInSlide 1s ease-out forwards;
 }
