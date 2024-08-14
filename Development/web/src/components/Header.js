@@ -54,8 +54,8 @@ export default function Header() {
                 <p>{currentUser ? 'Dashboard' : 'Login'}</p>
             </Link>
             <Link href={'/careers'} className='mx-2 ml-4 duration-200 overflow-hidden p-0.5 rounded-lg relative'>
-                <div className='absolute inset-0 goldBackground' />
-                <div className='p-2 grid place-items-center relative z-10 bg-transparent rounded-lg duration-200 text-white before:ease overflow-hidden goldBackground shadow-2xl transition-all before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-40'>
+                <div className='absolute inset-0' />
+                <div className='p-2 grid place-items-center relative z-10 bg-transparent rounded duration-200 text-white before:ease h-10 w-40 overflow-hidden bg-gradient-to-r from-blue-950 to-slate-700 shadow-2xl transition-all before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-40'>
                     <p>Open Positions</p>
                 </div>
             </Link>

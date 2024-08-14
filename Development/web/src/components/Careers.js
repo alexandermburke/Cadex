@@ -52,7 +52,7 @@ export default function Careers() {
                     <div className='flex justify-center'>
                         <button 
                             type='submit' 
-                            className='before:ease relative h-12 w-40 overflow-hidden rounded-lg goldBackground text-white shadow-2xl transition-all before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-40'
+                            className='before:ease relative h-12 w-56 overflow-hidden rounded goldBackground text-white shadow-2xl transition-all before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-56'
                         >
                             Submit Application
                         </button>

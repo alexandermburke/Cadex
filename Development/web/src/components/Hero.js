@@ -21,7 +21,7 @@ export default function Hero() {
     return (
         <section className='flex flex-col flex-1 grid grid-cols-1 lg:grid-cols-1 gap-10 md:gap-16 w-full mx-auto my-20'>
             <div className={`flex flex-col flex-1 items-center gap-8 text-center lg:text-left mx-auto w-full transform transition-transform duration-700 ${loaded ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
-                <div className='flex items-center gap-4 max-w-3xl'>
+                <div className='flex items-center gap-4 max-w-4xl'>
                     <h2 className={'text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-semibold text-center lg:text-center py-8 ' + poppins.className}>
                     Empowering  <span className='goldGradient'>Your Legal Practice</span> with AI
                     </h2>
@@ -35,7 +35,7 @@ export default function Hero() {
                     <div />
                     <div />
                     <div className="flex space-x-4">
-                        <Link href='/#about' className='relative rounded px-5 py-2.5 overflow-hidden group bg-gradient-to-r from-blue-950 to-slate-700 text-white hover:ring-2 hover:ring-offset-2 hover:ring-black transition-all ease-out duration-300'>
+                        <Link href='/#about' className='before:ease relative h-12 w-56 overflow-hidden rounded bg-gradient-to-r from-blue-950 to-slate-700 text-white shadow-2xl transition-all before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-56'>
                             <div className='flex items-center justify-center h-full'>
                                 Learn More Today
                                 <i className="ml-8 fa-solid fa-arrow-right"></i>

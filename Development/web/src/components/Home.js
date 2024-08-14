@@ -51,7 +51,7 @@ export default function Home() {
             <section className={`flex flex-col items-center py-0 px-4 md:px-8 lg:px-16 transform transition-transform duration-700 ${loaded ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
                 <div className="mx-auto w-[1.5px] h-12 sm:h-16 md:h-20 bg-gradient-to-b from-transparent to-blue-950 mb-10" />
                 <div className='max-w-5xl'>
-                    <h3 className='text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-semibold my-4 text-center goldGradienttwo'>About Cadex Law</h3>
+                    <h3 className='text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-semibold my-4 text-center'>About Cadex Law</h3>
                     <p className='text-base sm:text-lg md:text-xl my-14 text-left text-gray-400'>
                         Cadex Law is an advanced platform designed to simulate real-life legal scenarios, providing a comprehensive tool for legal practitioners, students, and educators. Our AI-powered simulations enable users to engage in interactive, realistic courtroom experiences.
                     </p>
@@ -79,7 +79,7 @@ export default function Home() {
             <div className={`mx-auto w-[1.5px] my-16 h-12 sm:h-16 md:h-20 bg-gradient-to-b from-transparent to-blue-950 mb-4 transform transition-transform duration-700 ${loaded ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`} />    
             <section className={`flex flex-col items-center py-12 px-4 md:px-8 lg:px-16 bg-white transform transition-transform duration-700 ${loaded ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
                 <div className='max-w-5xl'>
-                    <h3 className='text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-semibold text-center goldGradienttwo'>Features</h3>
+                    <h3 className='text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-semibold text-center'>Features</h3>
                     <ul className='list-disc pl-5 my-14'>
                         <li className='text-base sm:text-lg md:text-xl my-2'>Interactive legal simulations for defendants, plaintiffs, and judges.</li>
                         <li className='text-base sm:text-lg md:text-xl my-2'>Instant feedback and performance analysis.</li>
@@ -89,7 +89,7 @@ export default function Home() {
                     </ul>
                 </div>
                 <div className='flex justify-center mt-8'>
-                    <Link href='/admin' className='before:ease relative h-12 w-40 overflow-hidden rounded-lg bg-gradient-to-r from-blue-950 to-slate-700 text-white shadow-2xl transition-all before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-40'>
+                    <Link href='/admin' className='before:ease relative h-12 w-56 overflow-hidden rounded bg-gradient-to-r from-blue-950 to-slate-700 text-white shadow-2xl transition-all before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-56'>
                         <div className='flex items-center justify-center h-full'>
                             Login to Cadex
                         </div>
@@ -98,7 +98,7 @@ export default function Home() {
             </section>
             <section className={`flex flex-col items-center py-10 px-4 md:px-8 lg:px-16 transform transition-transform duration-700 ${loaded ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
                 <div className='max-w-5xl w-full'>
-                    <h3 className='text-2xl lg:text-4xl font-semibold my-4 text-center'>Universities we work with</h3>
+                    <h3 className='text-3xl lg:text-7xl font-semibold my-14 text-center'>Universities we work with</h3>
                     <CarouselComponent />
                 </div>
             </section>
