@@ -96,11 +96,11 @@ export default function Header() {
     }
 
     return (
-        <header className='z-[100] fixed top-0 left-0 right-0 px-4 my-2 bg-white dropShadow rounded-xl'>
-            <div className='flex items-center justify-between gap-4 max-w-[1200px] mx-auto w-full overflow-hidden p-2 goldShadow rounded-lg'>
+        <header className='z-[100] fixed top-0 left-0 right-0 bg-white'>
+            <div className='flex items-center justify-between gap-4 max-w-[1400px] mx-auto w-full overflow-hidden p-2 goldShadow drop-shadow-sm'>
                 <Link href={'/'}>
                     <div className='flex items-center gap-2'>
-                        <img src="/header.png" alt="Cadex Law Logo" className='w-8 h-8' />
+                        <img src="/header.png" alt="Cadex Law Logo" className='w-10 h-10' />
                         <h1 className={'text-xl sm:text-2xl goldGradient font-medium ' + poppins.className}>Cadex Law Simulation</h1>
                     </div>
                 </Link>
