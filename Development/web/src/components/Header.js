@@ -67,7 +67,7 @@ export default function Header() {
             <Link className='p-2 rounded-lg border-solid border border-gold-50 hover:opacity-60 duration-200' href={'/admin'}><p>Practice</p></Link>
             <Link className='p-2 rounded-lg border-solid border border-gold-50 hover:opacity-60 duration-200' href={'/about'}><p>Analytics</p></Link>
             <Link className='p-2 rounded-lg border-solid border border-gold-50 hover:opacity-60 duration-200' href={'/admin'}><p>Login</p></Link>
-            <Link className='p-2 grid place-items-center relative z-10 goldBackground rounded-lg duration-200 text-white before:ease overflow-hidden goldBackground shadow-2xl transition-all before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-40' href={'/careers'}><p>{'Open Positions'}</p></Link>
+            <Link className='p-2 rounded-lg grid place-items-center relative z-10 bg-gradient-to-r from-blue-950 to-slate-700 duration-200 text-white before:ease overflow-hidden  shadow-2xl transition-all before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-40' href={'/careers'}><p>{'Open Positions'}</p></Link>
         </nav>
     );
 
