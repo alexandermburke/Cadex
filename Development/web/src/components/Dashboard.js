@@ -173,8 +173,8 @@ export default function Dashboard() {
                                         return;
                                     }
                                     setInstruction(`${stepIndex}`);
-                                }} className={'flex items-center duration-200 group gap-4 p-2 pr-4 rounded-full border border-solid ' + (stepIndex == instruction ? ' border-yellow-400' : ' border-yellow-100 hover:border-yellow-400')} key={stepIndex}>
-                                    <div className={'px-2 aspect-square rounded-full grid duration-200 place-items-center text-white ' + (stepIndex == instruction ? ' bg-yellow-400' : ' bg-yellow-200 group-hover:bg-yellow-400')}>
+                                }} className={'flex items-center duration-200 group gap-4 p-2 pr-4 rounded-full border border-solid ' + (stepIndex == instruction ? ' border-blue-950' : ' border-blue-950 hover:border-blue-800')} key={stepIndex}>
+                                    <div className={'px-2 aspect-square rounded-full grid duration-200 place-items-center text-white ' + (stepIndex == instruction ? ' bg-blue-950' : ' bg-blue-950 group-hover:bg-blue-800')}>
                                         <i className={step[1]} />
                                     </div>
                                     <p className='whitespace-nowrap'>{step[0]}</p>
@@ -193,7 +193,7 @@ export default function Dashboard() {
                 <ActionCard title={'Cases'} actions={numberOfCases >= 20 ? null : (
                     <div className='flex items-center gap-4'>
                         {numberOfCases < 20 && (
-                            <button onClick={handleCreateCase} className='flex items-center justify-center gap-4 border border-solid border-yellow-200 px-4 py-2 rounded-full text-xs sm:text-sm text-yellow-400 duration-200 hover:opacity-50'>
+                            <button onClick={handleCreateCase} className='flex items-center justify-center gap-4 border border-solid border-blue-950 px-4 py-2 rounded-full text-xs sm:text-sm text-blue-950 duration-200 hover:opacity-50'>
                                 <p className=''>Create new</p>
                             </button>
                         )}
@@ -240,11 +240,11 @@ export default function Dashboard() {
                     </div>
                 </ActionCard>
                 <div className='grid grid-cols-2 sm:w-fit gap-4'>
-                    <button onClick={handleSaveCase} className='flex items-center justify-center gap-2 border border-solid border-white bg-white p-4 rounded-full text-yellow-400 duration-200 hover:opacity-50'>
+                    <button onClick={handleSaveCase} className='flex items-center justify-center gap-2 border border-solid border-blue-950 bg-white p-4 rounded-full text-blue-950 duration-200 hover:opacity-50'>
                         <p className=''>{savingCase ? 'Saving ...' : 'Save Case'}</p>
                         <i className="fa-solid fa-floppy-disk"></i>
                     </button>
-                    <Link href={'/case?user=' + currentUser.displayName} target='_blank' className={'flex items-center justify-center gap-2 border border-solid border-yellow-100 bg-white p-4 rounded-full text-yellow-400 duration-200 hover:opacity-50 '}>
+                    <Link href={'/case?user=' + currentUser.displayName} target='_blank' className={'flex items-center justify-center gap-2 border border-solid border-blue-950 bg-white p-4 rounded-full text-blue-950 duration-200 hover:opacity-50'}>
                         <p className=''>PDF Viewer</p>
                         <i className="fa-solid fa-arrow-up-right-from-square"></i>
                     </Link>

@@ -49,7 +49,7 @@ export default function Login() {
         <div className={'flex items-stretch gap-4 max-w-[600px] mx-auto w-full duration-200 ' + (authenticating ? ' cursor-not-allowed opacity-60 ' : ' ')}>
           <Button text={'Submit'} saving={authenticating ? 'Submitting' : ''} clickHandler={handleSubmit} />
         </div>
-        <p className='mx-auto text-sm sm:text-base'>Don&apos;t have an account? <Link className='blueGradient pl-2' href={'/register'}>Sign up</Link></p>
+        <p className='mx-auto text-sm sm:text-base'>Don&apos;t have an account? <Link className='goldGradient pl-2' href={'/register'}>Sign up</Link></p>
       </div>
     </>
   )

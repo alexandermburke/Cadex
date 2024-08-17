@@ -35,7 +35,7 @@ export default function Header() {
         <div className='flex flex-col relative'>    
             <button onClick={() => copyToClipboard()} className='ml-4 duration-200 overflow-hidden p-0.5 rounded-lg relative'>
                 <div className='absolute inset-0 goldBackground' />
-                <div className='p-2 flex items-center justify-center gap-4 relative z-10 bg-transparent rounded-lg hover:bg-transparent duration-200 hover:text-white'>
+                <div className='p-2 flex items-center justify-center gap-4 relative z-10 bg-transparent rounded-lg hover:bg-transparent duration-200 text-white hover:text-slate-900'>
                     <p className=''>{showText ? 'Link copied' : 'Share link'}</p>
                 </div>
             </button>

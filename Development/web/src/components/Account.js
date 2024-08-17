@@ -13,14 +13,14 @@ export default function Account() {
         'email': currentUser.email,
         'username': currentUser.displayName,
         'listings': Object.keys(userDataObj?.listings || {}).length,
-        'link': 'www.enthusiastlist.app/' + currentUser.displayName,
+        'link': 'www.cadexlaw.com/' + currentUser.displayName,
     }
 
     const billingObj = {
         'current_plan': userDataObj?.billing?.plan || 'Free',
         'status': userDataObj?.billing?.status ? 'Active' : 'Inactive',
         'actions': (
-            <Link href={isPaid ? '/admin/billing/cancel_subscription' : '/admin/billing'} className='duration-200 hover:opacity-60 text-yellow-400'><p>{isPaid ? 'Cancel plan' : 'Upgrade account'} &rarr;</p></Link>
+            <Link href={isPaid ? '/admin/billing/cancel_subscription' : '/admin/billing'} className='duration-200 hover:opacity-60 goldGradient'><p>{isPaid ? 'Cancel plan' : 'Upgrade account'} &rarr;</p></Link>
         )
     }
 
