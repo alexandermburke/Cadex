@@ -1,4 +1,4 @@
-'use client'
+'use client';
 import React, { useState, useEffect } from 'react';
 import { useDropzone } from 'react-dropzone';
 import ActionCard from './ActionCard';
@@ -8,7 +8,7 @@ import Button from './Button';
 import LogoFiller from './LogoFiller';
 import { useAuth } from '@/context/AuthContext';
 import { db, storage } from '@/firebase';
-import { doc, updateDoc, setDoc, collection, deleteDoc } from 'firebase/firestore';
+import { doc, updateDoc, setDoc, deleteDoc } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Modal from './Modal';
@@ -110,12 +110,16 @@ export default function CaseApplication() {
             const newData = { ...currData, cases: { ...(currData.cases || {}), ...newCase } };
             localStorage.setItem('cases', JSON.stringify(newData));
             setUserDataObj(curr => ({ ...curr, cases: newData.cases }));
+
+            // Redirect to simulation page
+            router.push('/admin/simulation');
         } catch (err) {
             console.error('Failed to save data:', err);
         } finally {
             setIsLoading(false);
         }
     }
+
     const placeholderTexts = {
         caseTitle: 'Enter the title of the case',
         caseDescription: 'Enter a description for the case',

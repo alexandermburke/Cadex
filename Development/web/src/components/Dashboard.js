@@ -70,7 +70,7 @@ export default function Dashboard() {
     }
 
     function handleCreateCase() {
-        if (numberOfCases >= 20) {
+        if (numberOfCases >= 1) {
             return;
         }
         if (isPaid) {
@@ -120,7 +120,7 @@ export default function Dashboard() {
                 <p className=''><i>Please either delete some cases, or upgrade your account to continue.</i></p>
                 <p className='flex-1'>Upgrading your account allows you to manage up to <b>5</b> cases, and gives you access to auto <b> case reposting.</b></p>
                 <div className='flex items-center gap-4'>
-                    <button onClick={() => { setShowModal(null) }} className=' w-fit p-4 rounded-full mx-auto bg-white border border-solid border-yellow-100 px-8 duration-200 hover:opacity-60'>Go back</button>
+                    <button onClick={() => { setShowModal(null) }} className=' w-fit p-4 rounded-full mx-auto bg-white border border-solid border-blue-950 px-8 duration-200 hover:opacity-60'>Go back</button>
                     <Button text={'Upgrade Account'} clickHandler={() => { router.push('/admin/billing') }} />
                 </div>
             </div>
@@ -132,7 +132,7 @@ export default function Dashboard() {
                     <p className=''><i>Deleting a case is permanent!</i></p>
                     <p className='flex-1 capitalize'><b>Case ID</b> {caseToDelete.replaceAll('_', ' ')}</p>
                     <div className='flex items-center gap-4'>
-                        <button onClick={() => { setShowModal(null) }} className=' p-4 rounded-full mx-auto bg-white border border-solid border-yellow-100 text-yellow-400  px-8 duration-200 hover:opacity-60'>Go back</button>
+                        <button onClick={() => { setShowModal(null) }} className=' p-4 rounded-full mx-auto bg-white border border-solid border-blue-950 text-blue-950  px-8 duration-200 hover:opacity-60'>Go back</button>
                         <button onClick={handleDeleteCase} className=' flex-1 p-4 text-pink-400 rounded-full mx-auto bg-white border border-solid border-pink-400 px-8 duration-200 hover:opacity-60'>Confirm Delete</button>
                     </div>
                 </div>
@@ -163,33 +163,7 @@ export default function Dashboard() {
                 </Modal>
             )}
             <div className='flex flex-col gap-8 flex-1'>
-                <ActionCard title={'Setup your case listing'}>
-                    <div className='flex items-stretch gap-5 overflow-x-scroll '>
-                        {completionSteps.map((step, stepIndex) => {
-                            return (
-                                <button onClick={() => {
-                                    if (instruction === `${stepIndex}`) {
-                                        setInstruction(null);
-                                        return;
-                                    }
-                                    setInstruction(`${stepIndex}`);
-                                }} className={'flex items-center duration-200 group gap-4 p-2 pr-4 rounded-full border border-solid ' + (stepIndex == instruction ? ' border-blue-950' : ' border-blue-950 hover:border-blue-800')} key={stepIndex}>
-                                    <div className={'px-2 aspect-square rounded-full grid duration-200 place-items-center text-white ' + (stepIndex == instruction ? ' bg-blue-950' : ' bg-blue-950 group-hover:bg-blue-800')}>
-                                        <i className={step[1]} />
-                                    </div>
-                                    <p className='whitespace-nowrap'>{step[0]}</p>
-                                </button>
-                            );
-                        })}
-                    </div>
-                    {instruction && (<ul className='flex list-disc rounded-2xl border border-solid border-yellow-100 p-4 list-inside flex-col'>
-                        {completionSteps[instruction][2].split('. ').map((element, elementIndex) => {
-                            return (
-                                <li key={elementIndex} className='text-slate-600'>{element.replaceAll('.', '')}.</li>
-                            );
-                        })}
-                    </ul>)}
-                </ActionCard>
+
                 <ActionCard title={'Cases'} actions={numberOfCases >= 20 ? null : (
                     <div className='flex items-center gap-4'>
                         {numberOfCases < 20 && (
@@ -220,9 +194,9 @@ export default function Dashboard() {
                                     }} className='flex items-center justify-center gap-4 rounded-full text-xs sm:text-sm text-pink-400 duration-200 absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 group-hover:opacity-100 opacity-0 hover:text-pink-200'>
                                         <i className="fa-regular fa-trash-can"></i>
                                     </button>
-                                    <Link href={'/admin/case?id=' + (caseMeta?.id || caseName)} className='grid shrink-0 capitalize grid-cols-4 border border-solid border-yellow-50 duration-200 hover:bg-yellow-50 rounded-lg overflow-hidden '>
+                                    <Link href={'/admin/case?id=' + (caseMeta?.id || caseName)} className='grid shrink-0 capitalize grid-cols-4 border border-solid border-blue-100 duration-200 hover:bg-blue-50 rounded-lg overflow-hidden '>
                                         <div className='p-2'>
-                                            <p className='truncate hover:text-yellow-400'>{caseMeta?.id}</p>
+                                            <p className='truncate hover:text-blue-950'>{caseMeta?.id}</p>
                                         </div>
                                         <div className='p-2'>
                                             <p className='truncate'>{caseMeta?.caseTitle}</p>
@@ -244,7 +218,7 @@ export default function Dashboard() {
                         <p className=''>{savingCase ? 'Saving ...' : 'Save Case'}</p>
                         <i className="fa-solid fa-floppy-disk"></i>
                     </button>
-                    <Link href={'/case?user=' + currentUser.displayName} target='_blank' className={'flex items-center justify-center gap-2 border border-solid border-blue-950 bg-white p-4 rounded-full text-blue-950 duration-200 hover:opacity-50'}>
+                    <Link href={'/case?user=' + currentUser.displayName} target='_blank' className={'flex items-center justify-center gap-2 border border-solid border-blue-950 bg-white p-4 rounded-full text-blue-950 duration-200 hover:opacity-50 '}>
                         <p className=''>PDF Viewer</p>
                         <i className="fa-solid fa-arrow-up-right-from-square"></i>
                     </Link>
