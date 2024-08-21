@@ -18,7 +18,7 @@ const plans = [
         features: [
             'Access to basic legal case simulations',
             'Join public case discussions',
-            'Manage 1 simulated case',
+            'Manage 2 simulated cases',
             'No Ads, ever',
             'Cancel any time',
         ],
@@ -84,12 +84,12 @@ export default function Plans() {
         <>
             <div className='flex flex-col gap-6'>
                 <h2 className={'text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-semibold text-center  ' + poppins.className}>Find the <span className='goldGradient'>plan</span> for you</h2>
-                <p className='text-center'>You can change at anytime.</p>
+         
             </div>
             <div className='grid grid-cols-1 sm:grid-cols-2 sm:mx-auto gap-8'>
                 {plans.map((plan, planIndex) => {
                     return (
-                        <button onClick={() => setSelectedPlan(plan.name)} key={planIndex} className={"p-4 outline-none focus:outline-none sm:p-8 border border-solid  rounded-2xl duration-200 hover:scale-[102%] sm:hover:scale-[105%] bg-white dropShadow w-full sm:w-96 max-w-full flex flex-col gap-4 " + (selectedPlan === plan.name ? ' border-blue-400' : ' border-blue-200')}>
+                        <button onClick={() => setSelectedPlan(plan.name)} key={planIndex} className={"p-4 outline-none focus:outline-none sm:p-8 border border-solid  rounded-2xl duration-200 hover:scale-[102%] sm:hover:scale-[105%] bg-white goldShadow w-full sm:w-96 max-w-full flex flex-col gap-4 " + (selectedPlan === plan.name ? ' border-blue-400' : ' border-blue-200')}>
                             <div className='flex items-center justify-between gap-4 w-full'>
                                 <h3 className={'font-medium text-lg sm:text-xl md:text-2xl ' + (selectedPlan === plan.name ? ' blueGradient ' : ' ') + poppins.className}>{plan.name}</h3>
                                 {plan.name === 'Pro' && (

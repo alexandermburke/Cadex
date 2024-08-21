@@ -35,7 +35,7 @@ export default function Header() {
         <div className='flex flex-col relative'>    
             <button onClick={() => copyToClipboard()} className='ml-4 duration-200 overflow-hidden p-0.5 rounded-lg relative'>
                 <div className='absolute inset-0 goldBackground' />
-                <div className='p-2 flex items-center justify-center gap-4 relative z-10 bg-transparent rounded-lg hover:bg-transparent duration-200 text-white hover:text-slate-900'>
+                <div className='p-2 flex items-center justify-center gap-4 relative w-full z-10 bg-transparent rounded-lg hover:bg-transparent duration-200 text-white hover:text-blue-900'>
                     <p className=''>{showText ? 'Link copied' : 'Share link'}</p>
                 </div>
             </button>
@@ -94,10 +94,10 @@ export default function Header() {
         );
         menuActions = (
             <nav className='flex flex-col gap-2'>
-                <Link href={'/admin'} className='p-2 rounded-lg border-solid border border-gold-50 hover:opacity-60 duration-200'><p>Practice</p></Link>
-                <Link href={'/admin'} className='p-2 rounded-lg border-solid border border-gold-50 hover:opacity-60 duration-200'><p>Dashboard</p></Link>
-                <Link href={'/admin/account'} className='p-2 rounded-lg border-solid border border-gold-50 hover:opacity-60 duration-200'><p>Account</p></Link>
-                <button className='p-2 text-left rounded-lg border-solid border border-gold-50 hover:opacity-60 duration-200' onClick={logout}><p>Logout</p></button>
+                <Link href={'/admin'} className='p-2 rounded-lg border-solid border border-gold-50 hover:opacity-60 duration-200 border-blue-950 border-x-4 border-y-4'><p>Practice</p></Link>
+                <Link href={'/admin'} className='p-2 rounded-lg border-solid border border-gold-50 hover:opacity-60 duration-200 border-blue-950 border-x-4 border-y-4'><p>Dashboard</p></Link>
+                <Link href={'/admin/account'} className='p-2 rounded-lg border-solid border border-gold-50 hover:opacity-60 duration-200 border-blue-950 border-x-4 border-y-4'><p>Account</p></Link>
+                <button className='p-2 text-left rounded-lg border-solid border border-gold-50 hover:opacity-60 duration-200 border-blue-950 border-x-4 border-y-4' onClick={logout}><p>Logout</p></button>
                 {shareBtn}
             </nav>
         );
@@ -126,8 +126,8 @@ export default function Header() {
             </div>
 
             {showMenu && (
-                <div className='absolute flex flex-col left-4 right-4 md:hidden top-full pt-4 bg-white rounded-sm'>
-                    <div className='flex flex-col bg-white dropShadow rounded-2xl p-4'>
+                <div className='absolute flex flex-col left-4 right-4 md:hidden top-full pt-4 bg-transparent rounded'>
+                    <div className='flex flex-col bg-transparent rounded-2xl p-4'>
                         {menuActions}
                     </div>
                 </div>

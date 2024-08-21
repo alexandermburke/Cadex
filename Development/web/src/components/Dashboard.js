@@ -7,7 +7,6 @@ import { db } from '@/firebase';
 import Link from 'next/link';
 import ActionCard from './ActionCard';
 import LogoFiller from './LogoFiller';
-import sortResumeSections from '@/utils';
 import Modal from './Modal';
 import Button from './Button';
 import { useRouter } from 'next/navigation';
@@ -16,12 +15,6 @@ const poppins = Poppins({ subsets: ["latin"], weight: ['400', '100', '200', '300
 const opensans = Open_Sans({
     subsets: ["latin"], weight: ['400', '300', '500', '600', '700'], style: ['normal', 'italic'],
 });
-
-const completionSteps = [
-    ['Complete your case', 'fa-solid fa-pen-to-square', 'Fill out your case details in the display below by adding all the sections relevant to the case. You can view your case by selecting the PDF Viewer button below, and can print the web page to a PDF that you can save to your local device. Be sure to adjust the print scale to get the perfect PDF fit.'],
-    ['Upload attachments', 'fa-solid fa-scroll', 'Once you have completed your case details, add any relevant attachments. Once you have added the details and attachments, you can generate your perfect case and make any final adjustments.'],
-    ['Share your link', 'fa-solid fa-share', 'With your case details complete and saved, you can publish your case and share a live version at your special link. You can share this link with anyone!']
-];
 
 export default function Dashboard() {
     const [completedSteps, setCompletedSteps] = useState([]);
@@ -35,7 +28,7 @@ export default function Dashboard() {
     const [instruction, setInstruction] = useState(null);
     const [savingUserDetails, setSavingUserDetails] = useState(false);
     const [savingCase, setSavingCase] = useState(false);
-    const [publishingCase, setPublishingCase] = useState(false); // show in modal
+    const [publishingCase, setPublishingCase] = useState(false);
     const [nextFocusElement, setNextFocusElement] = useState(null);
 
     const router = useRouter();
@@ -168,7 +161,7 @@ export default function Dashboard() {
                     <div className='flex items-center gap-4'>
                         {numberOfCases < 20 && (
                             <button onClick={handleCreateCase} className='flex items-center justify-center gap-4 border border-solid border-x-2 border-y-2 border-blue-950 px-4 py-2 rounded text-xs sm:text-sm text-blue-950 duration-200 hover:bg-blue-950 hover:text-white'>
-                                <p className=''>Create New</p>
+                                <p className=''>Create new</p>
                             </button>
                         )}
                     </div>
@@ -213,21 +206,28 @@ export default function Dashboard() {
                         })}
                     </div>
                 </ActionCard>
-                <div className='grid grid-cols-2 sm:w-fit gap-4'>
-                <button onClick={handleSaveCase} className='relative flex items-center justify-center h-12 w-56 overflow-hidden rounded bg-gradient-to-r from-blue-950 to-slate-700 text-white shadow-2xl transition-all before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-56'>
-                  <div className='flex items-center space-x-1'>
-               <p>{savingCase ? 'Saving ...' : 'Save Case'}</p>
-              <i className="fa-solid fa-floppy-disk ml-8"></i>
-             </div>
-        </button>
+                <div className='grid grid-cols-2 gap-4'>
+    <button
+        onClick={handleSaveCase}
+        className='relative flex items-center justify-center h-12 w-full sm:w-56 overflow-hidden rounded bg-gradient-to-r from-blue-950 to-slate-700 text-white shadow-2xl transition-all before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-56'
+    >
+        <div className='flex items-center space-x-1'>
+            <p>{savingCase ? 'Saving ...' : 'Save Case'}</p>
+            <i className="fa-solid fa-floppy-disk ml-1"></i>
+        </div>
+    </button>
+    <Link
+        href={'/case?user=' + currentUser.displayName}
+        target='_blank'
+        className='relative flex items-center justify-center h-12 w-full sm:w-56 overflow-hidden rounded bg-gradient-to-r from-blue-950 to-slate-700 text-white shadow-2xl transition-all before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-56'
+    >
+        <div className='flex items-center space-x-1'>
+            <p>PDF Viewer</p>
+            <i className="fa-solid fa-arrow-up-right-from-square ml-1"></i>
+        </div>
+    </Link>
+</div>
 
-
-
-                    <Link href={'/case?user=' + currentUser.displayName} target='_blank' className={'relative flex items-center justify-center h-12 w-56 overflow-hidden rounded bg-gradient-to-r from-blue-950 to-slate-700 text-white shadow-2xl transition-all before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-56'}>
-                        <p className=''>PDF Viewer</p>
-                        <i className="fa-solid fa-arrow-up-right-from-square ml-8"></i>
-                    </Link>
-                </div>
             </div>
             <LogoFiller />
         </>
