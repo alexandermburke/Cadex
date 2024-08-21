@@ -11,15 +11,16 @@ const poppins = Poppins({ subsets: ["latin"], weight: ['400', '100', '200', '300
 
 const plans = [
     {
-        name: 'Free',
-        description: 'For individual legal practice',
-        price: 'Free',
-        interval: 'Free, Forever',
+        name: 'Basic',
+        description: 'For Individual Legal Practice',
+        price: '$5 USD',
+        interval: 'Per week',
         features: [
             'Access to basic legal case simulations',
             'Join public case discussions',
             'Manage 1 simulated case',
-            'No Ads',
+            'No Ads, ever',
+            'Cancel any time',
         ],
         recommended: false
     },
@@ -28,7 +29,6 @@ const plans = [
         description: 'For Law Firms & Professional Use',
         price: '$50 USD',
         interval: 'Per month',
-        disclaimer: 'Subject to change based on demand',
         features: [
             'Everything in the Free plan',
             'Unlimited access to all case simulations',
@@ -109,12 +109,15 @@ export default function Plans() {
                                         <i className="fa-solid fa-check  text-emerald-400"></i>
                                         <p>{feature}</p>
                                     </div>
+                                 
                                 )
                             })}
                         </button>
                     )
                 })}
-
+                                     <div className=''> 
+                     <p className='text-xs sm:text-sm pt-2 text-center'>{"all transactions are handled by Stripe."}</p>
+                                    </div>
             </div>
             {selectedPlan && (
                 <div className='flex flex-col max-w-[600px] mx-auto w-full'>

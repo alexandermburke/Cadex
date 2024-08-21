@@ -47,8 +47,8 @@ export default function Header() {
             <Link href={'/admin'} className='mx-2 p-2 px-2 grid place-items-center relative z-10 rounded-lg bg-transparent hover:text-slate-200'>
                 <p>Practice</p>
             </Link>
-            <Link href={'/stats'} className='mx-2 p-2 px-2 grid place-items-center relative z-10 rounded-lg bg-transparent hover:text-slate-200'>
-                <p>Analytics</p>
+            <Link href={'/pricing'} className='mx-2 p-2 px-2 grid place-items-center relative z-10 rounded-lg bg-transparent hover:text-slate-200'>
+                <p>Pricing</p>
             </Link>
             <Link href={'/admin'} className='mx-2 p-2 px-2 grid place-items-center relative z-10 rounded-lg bg-transparent hover:text-slate-200'>
                 <p>{currentUser ? 'Dashboard' : 'Login'}</p>

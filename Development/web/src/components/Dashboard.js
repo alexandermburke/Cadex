@@ -167,8 +167,8 @@ export default function Dashboard() {
                 <ActionCard title={'Cases'} actions={numberOfCases >= 20 ? null : (
                     <div className='flex items-center gap-4'>
                         {numberOfCases < 20 && (
-                            <button onClick={handleCreateCase} className='flex items-center justify-center gap-4 border border-solid border-blue-950 px-4 py-2 rounded-full text-xs sm:text-sm text-blue-950 duration-200 hover:opacity-50'>
-                                <p className=''>Create new</p>
+                            <button onClick={handleCreateCase} className='flex items-center justify-center gap-4 border border-solid border-x-2 border-y-2 border-blue-950 px-4 py-2 rounded text-xs sm:text-sm text-blue-950 duration-200 hover:bg-blue-950 hover:text-white'>
+                                <p className=''>Create New</p>
                             </button>
                         )}
                     </div>
@@ -214,13 +214,18 @@ export default function Dashboard() {
                     </div>
                 </ActionCard>
                 <div className='grid grid-cols-2 sm:w-fit gap-4'>
-                    <button onClick={handleSaveCase} className='flex items-center justify-center gap-2 border border-solid border-blue-950 bg-white p-4 rounded-full text-blue-950 duration-200 hover:opacity-50'>
-                        <p className=''>{savingCase ? 'Saving ...' : 'Save Case'}</p>
-                        <i className="fa-solid fa-floppy-disk"></i>
-                    </button>
-                    <Link href={'/case?user=' + currentUser.displayName} target='_blank' className={'flex items-center justify-center gap-2 border border-solid border-blue-950 bg-white p-4 rounded-full text-blue-950 duration-200 hover:opacity-50 '}>
+                <button onClick={handleSaveCase} className='relative flex items-center justify-center h-12 w-56 overflow-hidden rounded bg-gradient-to-r from-blue-950 to-slate-700 text-white shadow-2xl transition-all before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-56'>
+                  <div className='flex items-center space-x-1'>
+               <p>{savingCase ? 'Saving ...' : 'Save Case'}</p>
+              <i className="fa-solid fa-floppy-disk ml-8"></i>
+             </div>
+        </button>
+
+
+
+                    <Link href={'/case?user=' + currentUser.displayName} target='_blank' className={'relative flex items-center justify-center h-12 w-56 overflow-hidden rounded bg-gradient-to-r from-blue-950 to-slate-700 text-white shadow-2xl transition-all before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-56'}>
                         <p className=''>PDF Viewer</p>
-                        <i className="fa-solid fa-arrow-up-right-from-square"></i>
+                        <i className="fa-solid fa-arrow-up-right-from-square ml-8"></i>
                     </Link>
                 </div>
             </div>

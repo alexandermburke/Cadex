@@ -189,10 +189,10 @@ export default function CaseApplication() {
                     </div>
                     <input value={caseID} onChange={(e) => { setCaseID(e.target.value) }} className='bg-white border rounded-lg border-solid border-blue-950 w-full outline-none p-2' placeholder='Enter the Case ID here' />
                     <div className='flex items-stretch justify-between gap-4'>
-                        <Link href={'/admin'} className='flex items-center mr-auto justify-center gap-4 bg-white border border-solid border-blue-950 px-4 py-2 rounded-full test-blue-950 duration-200 hover:opacity-50'>
+                        <Link href={'/admin'} className='flex items-center mr-auto justify-center gap-4 bg-white border border-solid border-blue-950 px-4 py-2 rounded border-x-2 border-y-2 test-blue-950 duration-200 hover:bg-blue-950 hover:text-white'>
                             <p className=''>&larr; Back</p>
                         </Link>
-                        <button onClick={handleSubmitCase} className='flex items-center justify-center gap-2 border border-solid border-white bg-slate-50 px-3 py-2 rounded-full test-blue-950 duration-200 hover:opacity-50'>
+                        <button onClick={handleSubmitCase} className='flex items-center justify-center gap-2 border border-solid border-white bg-slate-50 px-3 py-2 rounded test-blue-950 duration-200 hover:bg-blue-950 hover:text-white '>
                             <p className=''>Create</p>
                             <i className="fa-regular fa-circle-check"></i>
                         </button>
@@ -239,10 +239,10 @@ export default function CaseApplication() {
             )}
             <div className='flex flex-col gap-8 flex-1'>
                 <div className='flex items-center justify-between gap-4'>
-                    <Link href={'/admin'} className='flex items-center mr-auto justify-center gap-4 bg-white px-4 py-2 rounded-full text-blue-950 duration-200 hover:opacity-50'>
+                    <Link href={'/admin'} className='flex items-center mr-auto justify-center gap-4 bg-white px-4 py-2 rounded border-x-2 border-y-2 text-blue-950 duration-200 hover:opacity-50'>
                         <p className=''>&larr; Back</p>
                     </Link>
-                    <button onClick={handleSaveCase} className='flex items-center justify-center gap-2 border border-solid border-white bg-slate-50 px-3 py-2 rounded-full text-blue-950 duration-200 hover:opacity-50'>
+                    <button onClick={handleSaveCase} className='flex items-center justify-center gap-2 border border-solid border-white bg-slate-50 px-3 py-2 rounded text-blue-950 duration-200 hover:opacity-50'>
                         <p className=''>{isLoading ? 'Saving' : 'Start'}</p>
                         <i className="fa-solid fa-upload"></i>
                     </button>
