@@ -115,15 +115,17 @@ export default function Plans() {
                         </button>
                     )
                 })}
-                                     <div className=''> 
-                     <p className='text-xs sm:text-sm pt-2 text-center'>{"all transactions are handled by Stripe."}</p>
-                                    </div>
+                                          
             </div>
             {selectedPlan && (
                 <div className='flex flex-col max-w-[600px] mx-auto w-full'>
                     <Button text={`Get ${selectedPlan}`} clickHandler={handleUpdatePlan} />
                 </div>
             )}
+          <div className='flex flex-col gap-6'>
+                 <p className='text-center'>All transactions are handled by Stripe</p>
+            </div>
         </>
+        
     )
 }
