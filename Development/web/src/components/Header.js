@@ -33,7 +33,7 @@ export default function Header() {
 
     let shareBtn = (
         <div className='flex flex-col relative'>    
-            <button onClick={() => copyToClipboard()} className='ml-4 duration-200 overflow-hidden p-0.5 rounded-lg relative'>
+            <button onClick={() => copyToClipboard()} className='ml duration-200 overflow-hidden p-0.5 rounded-lg relative'>
                 <div className='absolute inset-0 goldBackground' />
                 <div className='p-2 flex items-center justify-center gap-4 relative w-full z-10 bg-transparent rounded-lg hover:bg-transparent duration-200 text-white hover:text-blue-900'>
                     <p className=''>{showText ? 'Link copied' : 'Share link'}</p>
@@ -64,9 +64,9 @@ export default function Header() {
 
     let menuActions = (
         <nav className='flex flex-col gap-2'>
-            <Link className='p-2 rounded-lg border-solid border border-gold-50 hover:opacity-60 duration-200 text-lg border-blue-950 border-x-4 border-y-4' href={'/admin'}><p>Practice</p></Link>
-            <Link className='p-2 rounded-lg border-solid border border-gold-50 hover:opacity-60 duration-200 text-lg border-blue-950 border-x-4 border-y-4' href={'/pricing'}><p>Pricing</p></Link>
-            <Link className='p-2 rounded-lg border-solid border border-gold-50 hover:opacity-60 duration-200 text-lg border-blue-950 border-x-4 border-y-4' href={'/admin'}><p>Login</p></Link>
+            <Link className='p-2 rounded-lg border-solid border hover:opacity-60 duration-200 text-lg border-blue-950 border-x-4 border-y-4' href={'/admin'}><p>Practice</p></Link>
+            <Link className='p-2 rounded-lg border-solid border hover:opacity-60 duration-200 text-lg border-blue-950 border-x-4 border-y-4' href={'/pricing'}><p>Pricing</p></Link>
+            <Link className='p-2 rounded-lg border-solid hover:opacity-60 duration-200 text-lg border-blue-950 border-x-4 border-y-4' href={'/admin'}><p>Login</p></Link>
             <Link className='p-2 rounded-lg grid place-items-center relative z-10 bg-gradient-to-r from-blue-950 to-slate-700 duration-200 text-white before:ease overflow-hidden  shadow-2xl transition-all before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-40' href={'/careers'}><p>{'Open Positions'}</p></Link>
         </nav>
     );
@@ -94,10 +94,10 @@ export default function Header() {
         );
         menuActions = (
             <nav className='flex flex-col gap-2'>
-                <Link href={'/admin'} className='p-2 rounded border-solid border  hover:opacity-60 duration-200 border-blue-950 border-x-4 border-y-4'><p>Practice</p></Link>
-                <Link href={'/admin'} className='p-2 rounded border-solid border  hover:opacity-60 duration-200 border-blue-950 border-x-4 border-y-4'><p>Dashboard</p></Link>
-                <Link href={'/admin/account'} className='p-2 rounded border-solid border  hover:opacity-60 duration-200 border-blue-950 border-x-4 border-y-4'><p>Account</p></Link>
-                <button className='p-2 text-left rounded border-solid border  hover:opacity-60 duration-200 border-blue-950 border-x-4 border-y-4' onClick={logout}><p>Logout</p></button>
+                <Link href={'/admin'} className='p-2 rounded border-solid border  hover:opacity-60 duration-200 text-lg border-blue-950 border-x-4 border-y-4'><p>Practice</p></Link>
+                <Link href={'/admin'} className='p-2 rounded border-solid border  hover:opacity-60 duration-200 text-lg border-blue-950 border-x-4 border-y-4'><p>Dashboard</p></Link>
+                <Link href={'/admin/account'} className='p-2 rounded border-solid border  hover:opacity-60 duration-200 text-lg border-blue-950 border-x-4 border-y-4'><p>Account</p></Link>
+                <button className='p-2 text-left rounded border-solid border  hover:opacity-60 duration-200 text-lg border-blue-950 border-x-4 border-y-4' onClick={logout}><p>Logout</p></button>
                 {shareBtn}
             </nav>
         );
@@ -126,8 +126,8 @@ export default function Header() {
             </div>
 
             {showMenu && (
-                <div className={`absolute flex flex-col left-4 right-4 md:hidden top-full pt-4 bg-transparent rounded drop-down-animation`}>
-                    <div className='flex flex-col bg-transparent rounded-2xl p-4'>
+                <div className={`absolute flex flex-col left-4 right-4 md:hidden top-full pt-4 bg-white rounded drop-down-animation`}>
+                    <div className='flex flex-col bg-white rounded-2xl p-4'>
                         {menuActions}
                     </div>
                 </div>
