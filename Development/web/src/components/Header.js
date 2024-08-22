@@ -64,7 +64,7 @@ export default function Header() {
 
     let menuActions = (
         <nav className='flex flex-col gap-2'>
-            <Link className='p-2 rounded-lg border-solid border hover:opacity-60 duration-200 text- hover:bg-blue-950 border-blue-950 border-x-4 border-y-4' href={'/admin'}><p>Practice</p></Link>
+            <Link className='p-2 rounded-lg border-solid border hover:opacity-60 duration-200 text-lg hover:bg-blue-950 border-blue-950 border-x-4 border-y-4' href={'/admin'}><p>Practice</p></Link>
             <Link className='p-2 rounded-lg border-solid border hover:opacity-60 duration-200 text-lg hover:bg-blue-950 border-blue-950 border-x-4 border-y-4' href={'/pricing'}><p>Pricing</p></Link>
             <Link className='p-2 rounded-lg border-solid hover:opacity-60 duration-200 text-lg hover:bg-blue-950 border-blue-950 border-x-4 border-y-4' href={'/admin'}><p>Login</p></Link>
             <Link className='p-2 rounded-lg grid place-items-center relative z-10 bg-gradient-to-r hover:bg-blue-950 from-blue-950 to-slate-700 duration-200 text-white before:ease overflow-hidden  shadow-2xl transition-all before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-40' href={'/careers'}><p>{'Open Positions'}</p></Link>
