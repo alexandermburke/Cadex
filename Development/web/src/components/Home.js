@@ -7,18 +7,25 @@ import Header from './Header';
 import CarouselComponent from './Carousel';
 
 export default function Home() {
-    // Initialize stats with random numbers between 1 and 1000
+    // Set target values for the stats
+    const targetStats = {
+        cases: 400,        // Number between 300-500
+        newUsers: 1250,    // Number between 1000-1500
+        statsProvided: 45, // Number between 30-60
+    };
+
+    // Initialize state with 0 for animation start
     const [stats, setStats] = useState({
-        cases: Math.floor(Math.random() * 201) + 200,
-        newUsers: Math.floor(Math.random() * 201) + 1000,
-        statsProvided: Math.floor(Math.random() * 100) + 1,
+        cases: 0,
+        newUsers: 0,
+        statsProvided: 0,
     });
 
     const [loaded, setLoaded] = useState(false);
 
     const animateStats = (start, end, setter) => {
         let startTime;
-        const duration = 10000; // 10 seconds
+        const duration = 2000; // 2 seconds for the animation
 
         const step = (timestamp) => {
             if (!startTime) startTime = timestamp;
@@ -33,24 +40,12 @@ export default function Home() {
     };
 
     useEffect(() => {
-        const incrementStats = () => {
-            setStats((prevStats) => ({
-                cases: prevStats.cases + Math.floor(Math.random() * 41) + 10,
-                newUsers: prevStats.newUsers + Math.floor(Math.random() * 41) + 10,
-                statsProvided: prevStats.statsProvided + Math.floor(Math.random() * 41) + 10,
-            }));
-        };
-
-        animateStats(0, stats.cases, (value) => setStats((prevStats) => ({ ...prevStats, cases: value })));
-        animateStats(0, stats.newUsers, (value) => setStats((prevStats) => ({ ...prevStats, newUsers: value })));
-        animateStats(0, stats.statsProvided, (value) => setStats((prevStats) => ({ ...prevStats, statsProvided: value })));
-
-        const intervalId = setInterval(incrementStats, 24 * 60 * 60 * 1000); // Every 24 hours
-
         setLoaded(true);
 
-        return () => clearInterval(intervalId);
-    }, []);
+        animateStats(0, targetStats.cases, (value) => setStats((prevStats) => ({ ...prevStats, cases: value })));
+        animateStats(0, targetStats.newUsers, (value) => setStats((prevStats) => ({ ...prevStats, newUsers: value })));
+        animateStats(0, targetStats.statsProvided, (value) => setStats((prevStats) => ({ ...prevStats, statsProvided: value })));
+    }, [targetStats.cases, targetStats.newUsers, targetStats.statsProvided]); // Added targetStats dependencies
 
     return (
         <div className='flex flex-col flex-1 bg-white'>
@@ -79,6 +74,7 @@ export default function Home() {
                         <p className='text-xl text-gray-600'>Reviews</p>
                     </div>
                 </div>
+                <p className='text-center text-gray-500 mt-4'>Average Daily Stats</p> {/* Added average daily stats text */}
             </section>  
     
             <div className={`mx-auto w-[1.5px] my-16 h-12 sm:h-16 md:h-20 bg-gradient-to-b from-transparent to-blue-950 mb-4 transform transition-transform duration-700 ${loaded ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`} />    

@@ -2,6 +2,7 @@
 import { Poppins } from 'next/font/google';
 import Link from 'next/link';
 import React, { useState, useEffect } from 'react';
+import Image from 'next/image';
 import RegisterBtn from './RegisterButton';
 import SearchBtn from './SearchButton';
 import GraphicDisplay from './GraphicDisplay';
@@ -19,7 +20,7 @@ export default function Hero() {
     }, []);
 
     return (
-        <section className='flex flex-col flex-1 grid grid-cols-1 lg:grid-cols-1 gap-10 md:gap-16 w-full mx-auto my-0'>
+        <section className='flex-col flex-1 grid grid-cols-1 lg:grid-cols-1 gap-10 md:gap-16 w-full mx-auto my-0'>
             <div className={`flex flex-col flex-1 items-center gap-8 text-center lg:text-left mx-auto w-full transform transition-transform duration-700 ${loaded ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
                 <div className='flex items-center gap-4 max-w-4xl'>
                     <h2 className={'text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-semibold text-center lg:text-center py-8 ' + poppins.className}>
@@ -46,10 +47,10 @@ export default function Hero() {
                 <div className="flex items-center justify-center mt-14">
                     {/* Avatars */}
                     <div className="flex -space-x-3">
-                        <img className="w-10 h-10 rounded-full border-2 border-white" src="/avatar1.png" alt="User Avatar 1"/>
-                        <img className="w-10 h-10 rounded-full border-2 border-white" src="/avatar2.png" alt="User Avatar 2"/>
-                        <img className="w-10 h-10 rounded-full border-2 border-white" src="/avatar3.png" alt="User Avatar 3"/>
-                        <img className="w-10 h-10 rounded-full border-2 border-white" src="/avatar4.png" alt="User Avatar 4"/>
+                        <Image className="w-10 h-10 rounded-full border-2 border-white" src="/avatar1.png" alt="User Avatar 1" width={40} height={40} />
+                        <Image className="w-10 h-10 rounded-full border-2 border-white" src="/avatar2.png" alt="User Avatar 2" width={40} height={40} />
+                        <Image className="w-10 h-10 rounded-full border-2 border-white" src="/avatar3.png" alt="User Avatar 3" width={40} height={40} />
+                        <Image className="w-10 h-10 rounded-full border-2 border-white" src="/avatar4.png" alt="User Avatar 4" width={40} height={40} />
                     </div>
                     {/* Text */}
                     <p className="ml-4 text-gray-600">Join 1,000+ happy users</p>
