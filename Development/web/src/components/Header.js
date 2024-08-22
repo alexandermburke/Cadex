@@ -81,7 +81,7 @@ export default function Header() {
                         <p>Practice</p>
                     </Link>
                     <Link href={'/admin'} className='border border-solid duration-200 border-transparent hover:text-slate-200 px-4 grid place-items-center rounded'>
-                        <p>Dashboard</p>
+                        <p>Tools</p>
                     </Link>
                     <Link href={'/admin/account'} className='border border-solid duration-200 border-transparent hover:text-slate-200 px-4 grid place-items-center rounded'>
                         <p>Account</p>

@@ -206,28 +206,27 @@ export default function Dashboard() {
                         })}
                     </div>
                 </ActionCard>
-                <div className='grid grid-cols-2 gap-4'>
-    <button
-        onClick={handleSaveCase}
-        className='relative flex items-center justify-center h-12 w-full sm:w-56 overflow-hidden rounded bg-gradient-to-r from-blue-950 to-slate-700 text-white shadow-2xl transition-all before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-56'
-    >
-        <div className='flex items-center space-x-1'>
-            <p>{savingCase ? 'Saving ...' : 'Save Case'}</p>
-            <i className="fa-solid fa-floppy-disk ml-1"></i>
-        </div>
-    </button>
-    <Link
-        href={'/case?user=' + currentUser.displayName}
-        target='_blank'
-        className='relative flex items-center justify-center h-12 w-full sm:w-56 overflow-hidden rounded bg-gradient-to-r from-blue-950 to-slate-700 text-white shadow-2xl transition-all before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-56'
-    >
-        <div className='flex items-center space-x-1'>
-            <p>PDF Viewer</p>
-            <i className="fa-solid fa-arrow-up-right-from-square ml-1"></i>
-        </div>
-    </Link>
-</div>
-
+                <div className='flex flex-col sm:flex-row gap-2'>
+                    <button
+                        onClick={handleSaveCase}
+                        className='relative flex items-center justify-center h-12 w-full sm:w-56 overflow-hidden rounded bg-gradient-to-r from-blue-950 to-slate-700 text-white shadow-2xl transition-all before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-56'
+                    >
+                        <div className='flex items-center space-x-1'>
+                            <p>{savingCase ? 'Saving ...' : 'Save Case'}</p>
+                            <i className="fa-solid fa-floppy-disk ml-1"></i>
+                        </div>
+                    </button>
+                    <Link
+                        href={'/case?user=' + currentUser.displayName}
+                        target='_blank'
+                        className='relative flex items-center justify-center h-12 w-full sm:w-56 overflow-hidden rounded bg-gradient-to-r from-blue-950 to-slate-700 text-white shadow-2xl transition-all before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-56'
+                    >
+                        <div className='flex items-center space-x-1'>
+                            <p>PDF Viewer</p>
+                            <i className="fa-solid fa-arrow-up-right-from-square ml-1"></i>
+                        </div>
+                    </Link>
+                </div>
             </div>
             <LogoFiller />
         </>

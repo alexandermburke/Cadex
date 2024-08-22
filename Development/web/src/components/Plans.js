@@ -91,7 +91,7 @@ export default function Plans() {
                     return (
                         <button onClick={() => setSelectedPlan(plan.name)} key={planIndex} className={"p-4 outline-none focus:outline-none sm:p-8 border border-solid  rounded-2xl duration-200 hover:scale-[102%] sm:hover:scale-[105%] bg-white goldShadow w-full sm:w-96 max-w-full flex flex-col gap-4 " + (selectedPlan === plan.name ? ' border-blue-400' : ' border-blue-200')}>
                             <div className='flex items-center justify-between gap-4 w-full'>
-                                <h3 className={'font-medium text-lg sm:text-xl md:text-2xl ' + (selectedPlan === plan.name ? ' blueGradient ' : ' ') + poppins.className}>{plan.name}</h3>
+                                <h3 className={'font-medium text-lg sm:text-xl md:text-2xl ' + (selectedPlan === plan.name ? ' goldGradient ' : ' ') + poppins.className}>{plan.name}</h3>
                                 {plan.name === 'Pro' && (
                                     <p className='bg-emerald-400 text-white px-2 py-1 rounded-lg text-xs sm:text-sm'>Recommended</p>
                                 )}
