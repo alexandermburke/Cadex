@@ -9,9 +9,9 @@ import CarouselComponent from './Carousel';
 export default function Home() {
     // Initialize stats with random numbers between 1 and 1000
     const [stats, setStats] = useState({
-        cases: Math.floor(Math.random() * 1000) + 1,
-        newUsers: Math.floor(Math.random() * 1000) + 1,
-        statsProvided: Math.floor(Math.random() * 1000) + 1
+        cases: Math.floor(Math.random() * 201) + 200,
+        newUsers: Math.floor(Math.random() * 201) + 1000,
+        statsProvided: Math.floor(Math.random() * 100) + 1,
     });
 
     const [loaded, setLoaded] = useState(false);

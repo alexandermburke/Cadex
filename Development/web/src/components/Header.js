@@ -64,10 +64,10 @@ export default function Header() {
 
     let menuActions = (
         <nav className='flex flex-col gap-2'>
-            <Link className='p-2 rounded-lg border-solid border hover:opacity-60 duration-200 text-lg border-blue-950 border-x-4 border-y-4' href={'/admin'}><p>Practice</p></Link>
-            <Link className='p-2 rounded-lg border-solid border hover:opacity-60 duration-200 text-lg border-blue-950 border-x-4 border-y-4' href={'/pricing'}><p>Pricing</p></Link>
-            <Link className='p-2 rounded-lg border-solid hover:opacity-60 duration-200 text-lg border-blue-950 border-x-4 border-y-4' href={'/admin'}><p>Login</p></Link>
-            <Link className='p-2 rounded-lg grid place-items-center relative z-10 bg-gradient-to-r from-blue-950 to-slate-700 duration-200 text-white before:ease overflow-hidden  shadow-2xl transition-all before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-40' href={'/careers'}><p>{'Open Positions'}</p></Link>
+            <Link className='p-2 rounded-lg border-solid border hover:opacity-60 duration-200 text- hover:bg-blue-950 border-blue-950 border-x-4 border-y-4' href={'/admin'}><p>Practice</p></Link>
+            <Link className='p-2 rounded-lg border-solid border hover:opacity-60 duration-200 text-lg hover:bg-blue-950 border-blue-950 border-x-4 border-y-4' href={'/pricing'}><p>Pricing</p></Link>
+            <Link className='p-2 rounded-lg border-solid hover:opacity-60 duration-200 text-lg hover:bg-blue-950 border-blue-950 border-x-4 border-y-4' href={'/admin'}><p>Login</p></Link>
+            <Link className='p-2 rounded-lg grid place-items-center relative z-10 bg-gradient-to-r hover:bg-blue-950 from-blue-950 to-slate-700 duration-200 text-white before:ease overflow-hidden  shadow-2xl transition-all before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-40' href={'/careers'}><p>{'Open Positions'}</p></Link>
         </nav>
     );
 
@@ -76,16 +76,16 @@ export default function Header() {
             <>
                 <p className={'capitalize flex-1 ' + poppins.className}>Welcome <span>{currentUser.displayName}</span></p>
                 <div className='hidden items-stretch md:flex'>
-                    <Link href={'/admin/practice'} className='border border-solid duration-200 border-transparent hover:border-gold-100 px-4 grid place-items-center rounded-lg'>
+                    <Link href={'/admin'} className='border border-solid duration-200 border-transparent hover:text-slate-200 px-4 grid place-items-center rounded'>
                         <p>Practice</p>
                     </Link>
-                    <Link href={'/admin'} className='border border-solid duration-200 border-transparent hover:border-gold-100 px-4 grid place-items-center rounded-lg'>
+                    <Link href={'/admin'} className='border border-solid duration-200 border-transparent hover:text-slate-200 px-4 grid place-items-center rounded'>
                         <p>Dashboard</p>
                     </Link>
-                    <Link href={'/admin/account'} className='border border-solid duration-200 border-transparent hover:border-gold-100 px-4 grid place-items-center rounded-lg'>
+                    <Link href={'/admin/account'} className='border border-solid duration-200 border-transparent hover:text-slate-200 px-4 grid place-items-center rounded'>
                         <p>Account</p>
                     </Link>
-                    <button onClick={logout} className='border border-solid duration-200 border-transparent hover:border-gold-100 px-4 grid place-items-center rounded-lg'>
+                    <button onClick={logout} className='border border-solid duration-200 border-transparent hover:text-slate-200 px-4 grid place-items-center rounded'>
                         <p>Logout</p>
                     </button>
                     {shareBtn}
@@ -94,10 +94,10 @@ export default function Header() {
         );
         menuActions = (
             <nav className='flex flex-col gap-2'>
-                <Link href={'/admin'} className='p-2 rounded border-solid border  hover:opacity-60 duration-200 text-lg border-blue-950 border-x-4 border-y-4'><p>Practice</p></Link>
-                <Link href={'/admin'} className='p-2 rounded border-solid border  hover:opacity-60 duration-200 text-lg border-blue-950 border-x-4 border-y-4'><p>Dashboard</p></Link>
-                <Link href={'/admin/account'} className='p-2 rounded border-solid border  hover:opacity-60 duration-200 text-lg border-blue-950 border-x-4 border-y-4'><p>Account</p></Link>
-                <button className='p-2 text-left rounded border-solid border  hover:opacity-60 duration-200 text-lg border-blue-950 border-x-4 border-y-4' onClick={logout}><p>Logout</p></button>
+                <Link href={'/admin'} className='p-2 rounded border-solid border duration-200 text-lg hover:bg-blue-950 border-blue-950 border-x-4 border-y-4'><p>Practice</p></Link>
+                <Link href={'/admin'} className='p-2 rounded border-solid border duration-200 text-lg hover:bg-blue-950 border-blue-950 border-x-4 border-y-4'><p>Dashboard</p></Link>
+                <Link href={'/admin/account'} className='p-2 rounded border-solid border duration-200 hover:bg-blue-950 text-lg border-blue-950 border-x-4 border-y-4'><p>Account</p></Link>
+                <button className='p-2 text-left rounded border-solid border duration-200 hover:bg-blue-950 text-lg border-blue-950 border-x-4 border-y-4' onClick={logout}><p>Logout</p></button>
                 {shareBtn}
             </nav>
         );

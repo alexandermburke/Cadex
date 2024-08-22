@@ -161,7 +161,7 @@ export default function Dashboard() {
                     <div className='flex items-center gap-4'>
                         {numberOfCases < 20 && (
                             <button onClick={handleCreateCase} className='flex items-center justify-center gap-4 border border-solid border-x-2 border-y-2 border-blue-950 px-4 py-2 rounded text-xs sm:text-sm text-blue-950 duration-200 hover:bg-blue-950 hover:text-white'>
-                                <p className=''>Create new</p>
+                                <p className=''>Create New</p>
                             </button>
                         )}
                     </div>

@@ -26,7 +26,7 @@ export default function Hero() {
                     Empowering  <span className='goldGradient'>Your Legal Practice</span> with AI
                     </h2>
                 </div>
-                <div className='flex flex-col flex-1 grid grid-cols-1 max-w-2xl'>
+                <div className='flex-col flex-1 grid grid-cols-1 max-w-2xl'>
                     <p className='text-center sm:text-lg md:text-xl lg:mr-auto text-black'>
                         Cadex helps simulate real-life legal scenarios to enhance your practice&#44; based on our Database of every known State or Federal case
                     </p>
