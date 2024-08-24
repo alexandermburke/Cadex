@@ -3,32 +3,31 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
-export default function Simulation() {
-    const [chatHistory, setChatHistory] = useState([]);
-    const [userInput, setUserInput] = useState('');
+export default function LawResearch() {
+    const [searchQuery, setSearchQuery] = useState('');
+    const [searchResults, setSearchResults] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
     const router = useRouter();
 
-    const handleSend = async () => {
-        if (!userInput.trim()) return;
+    const handleSearch = async () => {
+        if (!searchQuery.trim()) return;
 
-        const userMessage = { role: 'user', content: userInput };
-        const updatedChatHistory = [...chatHistory, userMessage];
-
-        setChatHistory(updatedChatHistory);
-        setUserInput('');
         setIsLoading(true);
 
         try {
             // Mocking the API call with a timeout
             await new Promise(res => setTimeout(res, 1000)); 
 
-            const aiMessage = { role: 'assistant', content: 'AI Response: This is a simulated response from the AI.' };
-            setChatHistory([...updatedChatHistory, aiMessage]);
+            // Example search result
+            const results = [
+                { title: 'Case 1: Roe v. Wade', summary: 'A landmark decision by the U.S. Supreme Court...' },
+                { title: 'Case 2: Brown v. Board of Education', summary: 'A pivotal case in the Civil Rights Movement...' }
+            ];
 
-            // Save chat history function should be here (if implemented)
+            setSearchResults(results);
+
         } catch (error) {
-            console.error("Error fetching response from ChatGPT API:", error);
+            console.error("Error fetching legal research results:", error);
         } finally {
             setIsLoading(false);
         }
@@ -42,7 +41,7 @@ export default function Simulation() {
                     <section className="flex flex-col gap-4">
                         <h2 className="text-lg font-semibold text-gray-700">Law Tools</h2>
                         <nav className="flex flex-col gap-2">
-                            <Link href="/lawtools/research" className={`flex items-center gap-4 p-2 rounded hover:bg-blue-100 ${router.pathname === '/legal-research' ? 'bg-blue-100 text-blue-950' : 'text-gray-700'}`}>
+                            <Link href="/legal-research" className={`flex items-center gap-4 p-2 rounded bg-blue-100 ${router.pathname === '/legal-research' ? 'bg-blue-100 text-blue-950' : 'text-gray-700'}`}>
                                 <i className="fa-solid fa-gavel text-gray-600"></i>
                                 <span>Legal Research</span>
                             </Link>
@@ -76,7 +75,7 @@ export default function Simulation() {
                     <section className="flex flex-col gap-4">
                         <h2 className="text-lg font-semibold text-gray-700">AI Law Simulation</h2>
                         <nav className="flex flex-col gap-2">
-                            <Link href="/admin" className={`flex items-center gap-4 p-2 rounded bg-blue-100 ${router.pathname === '/ai-law-simulation' ? 'bg-blue-100 text-blue-950' : 'text-gray-700'}`}>
+                            <Link href="/admin" className={`flex items-center gap-4 p-2 rounded hover:bg-blue-100 ${router.pathname === '/ai-law-simulation' ? 'hover:bg-blue-100 text-blue-950' : 'text-gray-700'}`}>
                                 <i className="fa-solid fa-flask text-gray-600"></i>
                                 <span>Simulate a Case</span>
                             </Link>
@@ -94,42 +93,38 @@ export default function Simulation() {
                     >
                         <p className=''>&larr; Back</p>
                     </button>
-                    <button
-                        onClick={handleSend}
-                        className='flex items-center justify-center gap-2 border border-solid border-white bg-slate-50 px-3 py-2 rounded text-blue-950 duration-200 hover:bg-blue-950 hover:text-white'
-                    >
-                        <p className=''>{isLoading ? 'Saving' : 'Save'}</p>
-                        <i className="fa-solid fa-floppy-disk"></i>
-                    </button>
                 </header>
                 <div className="flex-1 w-full max-w-4xl p-4 bg-gray-100 rounded-lg shadow-md">
                     <div className="flex flex-col h-full">
-                        <div className="flex-1 overflow-y-scroll p-4 rounded bg-white">
-                            {chatHistory.map((msg, index) => (
-                                <div key={index} className={`mb-4 ${msg.role === 'user' ? 'text-right' : 'text-left'}`}>
-                                    <p className={`inline-block p-2 rounded-lg ${msg.role === 'user' ? 'bg-blue-500 text-white' : 'bg-gray-300 text-black'}`}>
-                                        {msg.content}
-                                    </p>
-                                </div>
-                            ))}
-                        </div>
-                        <div className="mt-4 flex items-center">
+                        <div className="flex items-center mb-4">
                             <input
                                 type="text"
                                 className="flex-1 p-2 border border-gray-300 rounded"
-                                value={userInput}
-                                onChange={(e) => setUserInput(e.target.value)}
-                                onKeyDown={(e) => e.key === 'Enter' && handleSend()}
-                                placeholder="Enter your response as an attorney..."
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                                placeholder="Enter search terms..."
                                 disabled={isLoading}
                             />
                             <button
-                                onClick={handleSend}
+                                onClick={handleSearch}
                                 className="ml-4 p-2 bg-blue-500 text-white rounded"
                                 disabled={isLoading}
                             >
-                                {isLoading ? 'Loading...' : 'Send'}
+                                {isLoading ? 'Searching...' : 'Search'}
                             </button>
+                        </div>
+                        <div className="flex-1 overflow-y-scroll p-4 rounded bg-white">
+                            {searchResults.length > 0 ? (
+                                searchResults.map((result, index) => (
+                                    <div key={index} className="mb-4 p-4 border border-gray-300 rounded-lg">
+                                        <h3 className="text-lg font-semibold text-blue-600">{result.title}</h3>
+                                        <p className="text-gray-700">{result.summary}</p>
+                                    </div>
+                                ))
+                            ) : (
+                                <p className="text-gray-500">{isLoading ? 'Searching for legal cases...' : 'No results found. Try a different search term.'}</p>
+                            )}
                         </div>
                     </div>
                 </div>

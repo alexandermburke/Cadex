@@ -1,6 +1,7 @@
 'use client'
 import { Poppins } from 'next/font/google';
 import React, { useState } from 'react';
+import Image from 'next/image'; // Import the Image component
 
 const poppins = Poppins({ subsets: ["latin"], weight: ['400', '100', '200', '300', '500', '600', '700'] });
 
@@ -15,9 +16,6 @@ export default function Careers() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        // Handle the form submission logic here
-        // You can send the form data to your backend server for processing
-        // For this example, we'll just display a success message
         setMessage('Your application has been submitted successfully!');
     };
 
@@ -25,7 +23,14 @@ export default function Careers() {
         <section className='flex flex-col items-center justify-center gap-10 md:gap-16 w-full mx-auto py-10'>
             <div className='flex flex-col items-center gap-8 text-center w-full lg:max-w-2xl'>
                 <div className='flex flex-col items-center'>
-                    <img src="/header.png" alt="Cadex Law Logo" className='w-24 h-24 sm:mr-4 mb-4' />
+                    <Image
+                        src="/header.png" 
+                        alt="Cadex Law Logo"
+                        width={96} // Adjust the width
+                        height={96} // Adjust the height
+                        className='w-24 h-24 sm:mr-4 mb-4'
+                        priority // Ensures this image is prioritized in loading
+                    />
                     <h2 className={'text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-semibold ' + poppins.className}>
                         <span className='goldGradient'>Join Our Team</span> and Shape the Future of Legal Practice
                     </h2>
@@ -41,13 +46,13 @@ export default function Careers() {
                         value={email} 
                         onChange={(e) => setEmail(e.target.value)} 
                         required
-                        className='w-full p-3 border border-gray-300 rounded-lg'
+                        className='w-full p-3 border border-gray-300 rounded'
                     />
                     <input 
                         type='file' 
                         onChange={handleFileChange} 
                         required
-                        className='w-full p-3 border border-gray-300 rounded-lg'
+                        className='w-full p-3 border border-gray-300 rounded'
                     />
                     <div className='flex justify-center'>
                         <button 

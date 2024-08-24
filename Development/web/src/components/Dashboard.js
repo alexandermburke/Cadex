@@ -213,7 +213,7 @@ export default function Dashboard() {
                     >
                         <div className='flex items-center space-x-1'>
                             <p>{savingCase ? 'Saving ...' : 'Save Case'}</p>
-                            <i className="fa-solid fa-floppy-disk ml-1"></i>
+                            <i className="fa-solid fa-floppy-disk"></i>
                         </div>
                     </button>
                     <Link
@@ -223,7 +223,7 @@ export default function Dashboard() {
                     >
                         <div className='flex items-center space-x-1'>
                             <p>PDF Viewer</p>
-                            <i className="fa-solid fa-arrow-up-right-from-square ml-1"></i>
+                            <i className="fa-solid fa-arrow-up-right-from-square"></i>
                         </div>
                     </Link>
                 </div>

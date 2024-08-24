@@ -80,7 +80,7 @@ export default function Header() {
                     <Link href={'/admin'} className='border border-solid duration-200 border-transparent hover:text-slate-200 px-4 grid place-items-center rounded'>
                         <p>Practice</p>
                     </Link>
-                    <Link href={'/admin'} className='border border-solid duration-200 border-transparent hover:text-slate-200 px-4 grid place-items-center rounded'>
+                    <Link href={'/lawtools/research'} className='border border-solid duration-200 border-transparent hover:text-slate-200 px-4 grid place-items-center rounded'>
                         <p>Tools</p>
                     </Link>
                     <Link href={'/admin/account'} className='border border-solid duration-200 border-transparent hover:text-slate-200 px-4 grid place-items-center rounded'>
@@ -95,10 +95,10 @@ export default function Header() {
         );
         menuActions = (
             <nav className='flex flex-col gap-2'>
-                <Link href={'/admin'} className='p-2 rounded border-solid border duration-200 text-lg hover:bg-blue-950 border-blue-950 border-x-4 border-y-4'><p>Practice</p></Link>
-                <Link href={'/admin'} className='p-2 rounded border-solid border duration-200 text-lg hover:bg-blue-950 border-blue-950 border-x-4 border-y-4'><p>Dashboard</p></Link>
-                <Link href={'/admin/account'} className='p-2 rounded border-solid border duration-200 hover:bg-blue-950 text-lg border-blue-950 border-x-4 border-y-4'><p>Account</p></Link>
-                <button className='p-2 text-left rounded border-solid border duration-200 hover:bg-blue-950 text-lg border-blue-950 border-x-4 border-y-4' onClick={logout}><p>Logout</p></button>
+                <Link href={'/admin'} className='p-2 rounded border-solid border duration-200 text-lg hover:text-white hover:bg-blue-950 border-blue-950 border-x-4 border-y-4'><p>Practice</p></Link>
+                <Link href={'/admin'} className='p-2 rounded border-solid border duration-200 text-lg hover:text-white hover:bg-blue-950 border-blue-950 border-x-4 border-y-4'><p>Dashboard</p></Link>
+                <Link href={'/admin/account'} className='p-2 rounded border-solid border duration-200 hover:text-white hover:bg-blue-950 text-lg border-blue-950 border-x-4 border-y-4'><p>Account</p></Link>
+                <button className='p-2 text-left rounded border-solid border duration-200 hover:text-white hover:bg-blue-950 text-lg border-blue-950 border-x-4 border-y-4' onClick={logout}><p>Logout</p></button>
                 {shareBtn}
             </nav>
         );

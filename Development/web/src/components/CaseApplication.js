@@ -240,8 +240,8 @@ export default function SimulationCase() {
                         onChange={(e) => {
                             setCaseID(e.target.value);
                         }}
-                        className='bg-white border rounded-lg border-solid border-blue-950 w-full outline-none p-2'
-                        placeholder='Enter your Simulation Case ID'
+                        className='bg-white border rounded border-solid border-blue-950 w-full outline-none p-2'
+                        placeholder='Enter your Simulation Case name'
                     />
                     <div className='flex items-stretch justify-between gap-4'>
                         <Link
