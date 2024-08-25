@@ -15,7 +15,7 @@ export default function Hero() {
     useEffect(() => {
         const timer = setTimeout(() => {
             setLoaded(true);
-        }, 100); // Adjust delay as needed
+        }, 500); // Adjust delay as needed
         return () => clearTimeout(timer);
     }, []);
 

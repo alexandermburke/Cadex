@@ -1,5 +1,5 @@
 import React from 'react'
-import CareerPage from '@/components/Plans'
+import CareerPage from '@/components/Pricing'
 import CoolLayout from '@/components/CoolLayout'
 import Main from '@/components/Main'
 
