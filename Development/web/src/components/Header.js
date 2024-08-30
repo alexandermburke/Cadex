@@ -46,7 +46,7 @@ export default function Header() {
     let navActions = (
         <nav className='hidden items-stretch md:flex'>
             <Link href={'/admin'} className='mx-2 p-2 px-2 grid place-items-center relative z-10 rounded-lg bg-transparent hover:text-slate-200'>
-                <p>Practice</p>
+                <p>Simulation</p>
             </Link>
             <Link href={'/pricing'} className='mx-2 p-2 px-2 grid place-items-center relative z-10 rounded-lg bg-transparent hover:text-slate-200'>
                 <p>Pricing</p>
@@ -65,7 +65,7 @@ export default function Header() {
 
     let menuActions = (
         <nav className='flex flex-col gap-2'>
-            <Link className='p-2 rounded-lg border-solid border duration-200 text-lg hover:text-white hover:bg-blue-950 border-blue-950 border-x-4 border-y-4' href={'/admin'}><p>Practice</p></Link>
+            <Link className='p-2 rounded-lg border-solid border duration-200 text-lg hover:text-white hover:bg-blue-950 border-blue-950 border-x-4 border-y-4' href={'/admin'}><p>Dashboard</p></Link>
             <Link className='p-2 rounded-lg border-solid border duration-200 text-lg hover:text-white hover:bg-blue-950 border-blue-950 border-x-4 border-y-4' href={'/pricing'}><p>Pricing</p></Link>
             <Link className='p-2 rounded-lg border-solid duration-200 text-lg hover:text-white hover:bg-blue-950 border-blue-950 border-x-4 border-y-4' href={'/admin'}><p>Login</p></Link>
             <Link className='p-2 rounded-lg grid place-items-center relative z-10 bg-gradient-to-r hover:text-white hover:bg-blue-950 from-blue-950 to-slate-700 duration-200 text-white before:ease overflow-hidden  shadow-2xl transition-all before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-40' href={'/careers'}><p>{'Open Positions'}</p></Link>
@@ -78,7 +78,7 @@ export default function Header() {
                 <p className={'capitalize flex-1 ' + poppins.className}>Welcome <span>{currentUser.displayName}</span></p>
                 <div className='hidden items-stretch md:flex'>
                     <Link href={'/admin'} className='border border-solid duration-200 border-transparent hover:text-slate-200 px-4 grid place-items-center rounded'>
-                        <p>Practice</p>
+                        <p>Dashboard</p>
                     </Link>
                     <Link href={'/lawtools/research'} className='border border-solid duration-200 border-transparent hover:text-slate-200 px-4 grid place-items-center rounded'>
                         <p>Tools</p>
