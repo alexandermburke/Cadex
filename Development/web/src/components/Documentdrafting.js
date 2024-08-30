@@ -3,39 +3,33 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
-export default function LawResearch() {
-    const [searchQuery, setSearchQuery] = useState('');
-    const [searchResults, setSearchResults] = useState([]);
-    const [isLoading, setIsLoading] = useState(false);
+export default function DocumentDrafting() {
+    const [docTitle, setDocTitle] = useState('');
+    const [docContent, setDocContent] = useState('');
+    const [docList, setDocList] = useState([]);
     const [isSidebarVisible, setIsSidebarVisible] = useState(true); // State to manage sidebar visibility
+    const [selectedDoc, setSelectedDoc] = useState(null); // State to manage the selected document
     const router = useRouter();
 
-    const handleSearch = async () => {
-        if (!searchQuery.trim()) return;
+    const handleAddDocument = () => {
+        if (!docTitle.trim() || !docContent.trim()) return;
 
-        setIsLoading(true);
-
-        try {
-            // Mocking the API call with a timeout
-            await new Promise(res => setTimeout(res, 1000)); 
-
-            // Example search result
-            const results = [
-                { title: 'Case 1: Roe v. Wade', summary: 'A landmark decision by the U.S. Supreme Court...' },
-                { title: 'Case 2: Brown v. Board of Education', summary: 'A pivotal case in the Civil Rights Movement...' }
-            ];
-
-            setSearchResults(results);
-
-        } catch (error) {
-            console.error("Error fetching legal research results:", error);
-        } finally {
-            setIsLoading(false);
-        }
+        const newDocument = { title: docTitle, content: docContent };
+        setDocList([...docList, newDocument]);
+        setDocTitle('');
+        setDocContent('');
     };
 
     const toggleSidebar = () => {
         setIsSidebarVisible(!isSidebarVisible);
+    };
+
+    const openDocument = (doc) => {
+        setSelectedDoc(doc);
+    };
+
+    const closeDocument = () => {
+        setSelectedDoc(null);
     };
 
     return (
@@ -47,7 +41,7 @@ export default function LawResearch() {
                         <section className="flex flex-col gap-4">
                             <h2 className="text-lg font-semibold text-gray-700">Law Tools</h2>
                             <nav className="flex flex-col gap-2">
-                                <Link href="/legal-research" className={`flex items-center gap-4 p-2 rounded bg-blue-100 ${router.pathname === '/legal-research' ? 'bg-blue-100 text-blue-950' : 'text-gray-700'}`}>
+                                <Link href="/lawtools/research" className={`flex items-center gap-4 p-2 rounded hover:bg-blue-100 ${router.pathname === '/legal-research' ? 'bg-blue-100 text-blue-950' : 'text-gray-700'}`}>
                                     <i className="fa-solid fa-gavel text-gray-600"></i>
                                     <span>Legal Research</span>
                                 </Link>
@@ -55,7 +49,7 @@ export default function LawResearch() {
                                     <i className="fa-solid fa-folder-open text-gray-600"></i>
                                     <span>Case Management</span>
                                 </Link>
-                                <Link href="/lawtools/documentdrafting" className={`flex items-center gap-4 p-2 rounded hover:bg-blue-100 ${router.pathname === '/document-drafting' ? 'bg-blue-100 text-blue-950' : 'text-gray-700'}`}>
+                                <Link href="/lawtools/documentdrafting" className={`flex items-center gap-4 p-2 rounded bg-blue-100 ${router.pathname === '/document-drafting' ? 'bg-blue-100 text-blue-950' : 'text-gray-700'}`}>
                                     <i className="fa-solid fa-file-alt text-gray-600"></i>
                                     <span>Document Drafting</span>
                                 </Link>
@@ -100,7 +94,6 @@ export default function LawResearch() {
                     >
                         {isSidebarVisible ? 'Hide' : 'Show'}
                     </button>
-                 
                 </header>
                 <div className="flex-1 w-full max-w-4xl p-4 bg-gray-100 rounded-lg shadow-md">
                     <div className="flex flex-col h-full">
@@ -108,35 +101,61 @@ export default function LawResearch() {
                             <input
                                 type="text"
                                 className="flex-1 p-2 border border-gray-300 rounded"
-                                value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
-                                onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-                                placeholder="Enter search terms..."
-                                disabled={isLoading}
+                                value={docTitle}
+                                onChange={(e) => setDocTitle(e.target.value)}
+                                placeholder="Enter document title..."
                             />
-                            <button
-                                onClick={handleSearch}
-                                className="ml-4 p-2 border border-solid border-blue-950 border-x-2 border-y-2 bg-white text-blue-950 px-4 py-2 rounded-md duration-200 hover:bg-blue-950 hover:text-white"
-                                disabled={isLoading}
-                            >
-                                {isLoading ? 'Searching...' : 'Search'}
-                            </button>
                         </div>
-                        <div className="flex-1 overflow-y-scroll p-4 rounded bg-white">
-                            {searchResults.length > 0 ? (
-                                searchResults.map((result, index) => (
-                                    <div key={index} className="mb-4 p-4 border border-gray-300 rounded-lg">
-                                        <h3 className="text-lg font-semibold text-blue-600">{result.title}</h3>
-                                        <p className="text-gray-700">{result.summary}</p>
+                        <div className="flex items-center mb-4">
+                            <textarea
+                                className="flex-1 p-2 border border-gray-300 rounded"
+                                value={docContent}
+                                onChange={(e) => setDocContent(e.target.value)}
+                                placeholder="Enter document content..."
+                                rows="8"
+                            ></textarea>
+                        </div>
+                        <button
+                            onClick={handleAddDocument}
+                            className=" border border-solid border-blue-950 border-x-2 border-y-2 bg-white text-blue-950 px-4 py-2 rounded-md duration-200 hover:bg-blue-950 hover:text-white"
+                        >
+                            Add Document
+                        </button>
+                        <div className="flex-1 overflow-y-scroll p-4 mt-4 rounded bg-white">
+                            {docList.length > 0 ? (
+                                docList.map((doc, index) => (
+                                    <div
+                                        key={index}
+                                        className="mb-4 p-4 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-100"
+                                        onClick={() => openDocument(doc)}
+                                    >
+                                        <h3 className="text-lg font-semibold text-blue-600">{doc.title}</h3>
+                                        <p className="text-gray-700 truncate">{doc.content}</p>
                                     </div>
                                 ))
                             ) : (
-                                <p className="text-gray-500">{isLoading ? 'Searching for legal cases...' : 'No results found. Try a different search term.'}</p>
+                                <p className="text-gray-500">No documents drafted yet. Start by drafting a new document.</p>
                             )}
                         </div>
                     </div>
                 </div>
             </main>
+
+            {/* Document Details Modal */}
+            {selectedDoc && (
+                <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+                    <div className="bg-white p-6 rounded-lg shadow-lg max-w-lg w-full">
+                        <h2 className="text-2xl font-bold mb-4">{selectedDoc.title}</h2>
+                        <p className="text-gray-700 mb-4 whitespace-pre-wrap">{selectedDoc.content}</p>
+                        <button
+                            onClick={closeDocument}
+                            className="mt-4 p-2 border border-solid border-blue-950 border-x-2 border-y-2 bg-blue-950 text-white px-4 py-2 rounded-md duration-200 hover:bg-white hover:text-blue-950"
+                        >
+                            Close
+                        </button>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

@@ -3,39 +3,33 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
-export default function LawResearch() {
-    const [searchQuery, setSearchQuery] = useState('');
-    const [searchResults, setSearchResults] = useState([]);
-    const [isLoading, setIsLoading] = useState(false);
+export default function CaseManagement() {
+    const [caseTitle, setCaseTitle] = useState('');
+    const [caseDetails, setCaseDetails] = useState('');
+    const [caseList, setCaseList] = useState([]);
     const [isSidebarVisible, setIsSidebarVisible] = useState(true); // State to manage sidebar visibility
+    const [selectedCase, setSelectedCase] = useState(null); // State to manage the selected case
     const router = useRouter();
 
-    const handleSearch = async () => {
-        if (!searchQuery.trim()) return;
+    const handleAddCase = () => {
+        if (!caseTitle.trim() || !caseDetails.trim()) return;
 
-        setIsLoading(true);
-
-        try {
-            // Mocking the API call with a timeout
-            await new Promise(res => setTimeout(res, 1000)); 
-
-            // Example search result
-            const results = [
-                { title: 'Case 1: Roe v. Wade', summary: 'A landmark decision by the U.S. Supreme Court...' },
-                { title: 'Case 2: Brown v. Board of Education', summary: 'A pivotal case in the Civil Rights Movement...' }
-            ];
-
-            setSearchResults(results);
-
-        } catch (error) {
-            console.error("Error fetching legal research results:", error);
-        } finally {
-            setIsLoading(false);
-        }
+        const newCase = { title: caseTitle, details: caseDetails };
+        setCaseList([...caseList, newCase]);
+        setCaseTitle('');
+        setCaseDetails('');
     };
 
     const toggleSidebar = () => {
         setIsSidebarVisible(!isSidebarVisible);
+    };
+
+    const openCase = (caseItem) => {
+        setSelectedCase(caseItem);
+    };
+
+    const closeCase = () => {
+        setSelectedCase(null);
     };
 
     return (
@@ -47,11 +41,11 @@ export default function LawResearch() {
                         <section className="flex flex-col gap-4">
                             <h2 className="text-lg font-semibold text-gray-700">Law Tools</h2>
                             <nav className="flex flex-col gap-2">
-                                <Link href="/legal-research" className={`flex items-center gap-4 p-2 rounded bg-blue-100 ${router.pathname === '/legal-research' ? 'bg-blue-100 text-blue-950' : 'text-gray-700'}`}>
+                                <Link href="/lawtools/research" className={`flex items-center gap-4 p-2 rounded hover:bg-blue-100 ${router.pathname === '/legal-research' ? 'bg-blue-100 text-blue-950' : 'text-gray-700'}`}>
                                     <i className="fa-solid fa-gavel text-gray-600"></i>
                                     <span>Legal Research</span>
                                 </Link>
-                                <Link href="/lawtools/casemanagement" className={`flex items-center gap-4 p-2 rounded hover:bg-blue-100 ${router.pathname === '/case-management' ? 'bg-blue-100 text-blue-950' : 'text-gray-700'}`}>
+                                <Link href="/lawtools/casemanagement" className={`flex items-center gap-4 p-2 rounded bg-blue-100 ${router.pathname === '/case-management' ? 'bg-blue-100 text-blue-950' : 'text-gray-700'}`}>
                                     <i className="fa-solid fa-folder-open text-gray-600"></i>
                                     <span>Case Management</span>
                                 </Link>
@@ -100,7 +94,6 @@ export default function LawResearch() {
                     >
                         {isSidebarVisible ? 'Hide' : 'Show'}
                     </button>
-                 
                 </header>
                 <div className="flex-1 w-full max-w-4xl p-4 bg-gray-100 rounded-lg shadow-md">
                     <div className="flex flex-col h-full">
@@ -108,35 +101,61 @@ export default function LawResearch() {
                             <input
                                 type="text"
                                 className="flex-1 p-2 border border-gray-300 rounded"
-                                value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
-                                onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-                                placeholder="Enter search terms..."
-                                disabled={isLoading}
+                                value={caseTitle}
+                                onChange={(e) => setCaseTitle(e.target.value)}
+                                placeholder="Enter case title..."
                             />
-                            <button
-                                onClick={handleSearch}
-                                className="ml-4 p-2 border border-solid border-blue-950 border-x-2 border-y-2 bg-white text-blue-950 px-4 py-2 rounded-md duration-200 hover:bg-blue-950 hover:text-white"
-                                disabled={isLoading}
-                            >
-                                {isLoading ? 'Searching...' : 'Search'}
-                            </button>
                         </div>
-                        <div className="flex-1 overflow-y-scroll p-4 rounded bg-white">
-                            {searchResults.length > 0 ? (
-                                searchResults.map((result, index) => (
-                                    <div key={index} className="mb-4 p-4 border border-gray-300 rounded-lg">
-                                        <h3 className="text-lg font-semibold text-blue-600">{result.title}</h3>
-                                        <p className="text-gray-700">{result.summary}</p>
+                        <div className="flex items-center mb-4">
+                            <textarea
+                                className="flex-1 p-2 border border-gray-300 rounded"
+                                value={caseDetails}
+                                onChange={(e) => setCaseDetails(e.target.value)}
+                                placeholder="Enter case details..."
+                                rows="4"
+                            ></textarea>
+                        </div>
+                        <button
+                            onClick={handleAddCase}
+                            className=" border border-solid border-blue-950 border-x-2 border-y-2 bg-white text-blue-950 px-4 py-2 rounded-md duration-200 hover:bg-blue-950 hover:text-white"
+                        >
+                            Add Case
+                        </button>
+                        <div className="flex-1 overflow-y-scroll p-4 mt-4 rounded bg-white">
+                            {caseList.length > 0 ? (
+                                caseList.map((c, index) => (
+                                    <div
+                                        key={index}
+                                        className="mb-4 p-4 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-100"
+                                        onClick={() => openCase(c)}
+                                    >
+                                        <h3 className="text-lg font-semibold text-blue-600">{c.title}</h3>
+                                        <p className="text-gray-700">{c.details}</p>
                                     </div>
                                 ))
                             ) : (
-                                <p className="text-gray-500">{isLoading ? 'Searching for legal cases...' : 'No results found. Try a different search term.'}</p>
+                                <p className="text-gray-500">No cases added yet. Start by adding a new case.</p>
                             )}
                         </div>
                     </div>
                 </div>
             </main>
+
+            {/* Case Details Modal */}
+            {selectedCase && (
+                <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+                    <div className="bg-white p-6 rounded-lg shadow-lg max-w-lg w-full">
+                        <h2 className="text-2xl font-bold mb-4">{selectedCase.title}</h2>
+                        <p className="text-gray-700 mb-4">{selectedCase.details}</p>
+                        <button
+                            onClick={closeCase}
+                            className="mt-4 p-2 border border-solid border-blue-950 border-x-2 border-y-2 bg-blue-950 text-white px-4 py-2 rounded-md duration-200 hover:bg-white hover:text-blue-950"
+                        >
+                            Close
+                        </button>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

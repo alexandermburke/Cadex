@@ -19,7 +19,7 @@ const plans = [
             'Access to basic legal case simulations',
             'Join public case discussions',
             'Manage 2 simulated cases',
-            'No Ads, ever',
+            'No Ads',
             'Cancel any time',
         ],
         recommended: false
@@ -49,7 +49,7 @@ export default function Plans() {
     async function handleUpdatePlan() {
         if (!selectedPlan || isPaid) { return }
         let billing = { plan: 'free', status: false }
-        router.push('/register')
+        router.push('/admin/billing')
 
         if (selectedPlan === 'Pro') {
             billing.plan = 'Pro'
@@ -59,7 +59,7 @@ export default function Plans() {
         // if the selected plan is pro, send to checkout
         if (selectedPlan === 'Pro') {
           
-            router.push('/register')
+            router.push('/admin/billing')
         }
 
     }

@@ -19,7 +19,7 @@ const plans = [
             'Access to basic legal case simulations',
             'Join public case discussions',
             'Manage 2 simulated cases',
-            'No Ads, ever',
+            'No Ads',
             'Cancel any time',
         ],
         recommended: false
