@@ -1,10 +1,10 @@
-import Documentdrafting from '@/components/tools/DocumentDrafting'
+import Research from '@/components/tools/Predictive'
 import CoolLayout from '@/components/CoolLayout'
 import Main from '@/components/Main'
 import React from 'react'
 
 export default function ApplicationPage() {
     return (
-        <Documentdrafting />
+        <Research />
     )
 }

@@ -3,33 +3,33 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
-export default function DocumentDrafting() {
-    const [docTitle, setDocTitle] = useState('');
-    const [docContent, setDocContent] = useState('');
-    const [docList, setDocList] = useState([]);
+export default function CaseManagement() {
+    const [caseTitle, setCaseTitle] = useState('');
+    const [caseDetails, setCaseDetails] = useState('');
+    const [caseList, setCaseList] = useState([]);
     const [isSidebarVisible, setIsSidebarVisible] = useState(true); // State to manage sidebar visibility
-    const [selectedDoc, setSelectedDoc] = useState(null); // State to manage the selected document
+    const [selectedCase, setSelectedCase] = useState(null); // State to manage the selected case
     const router = useRouter();
 
-    const handleAddDocument = () => {
-        if (!docTitle.trim() || !docContent.trim()) return;
+    const handleAddCase = () => {
+        if (!caseTitle.trim() || !caseDetails.trim()) return;
 
-        const newDocument = { title: docTitle, content: docContent };
-        setDocList([...docList, newDocument]);
-        setDocTitle('');
-        setDocContent('');
+        const newCase = { title: caseTitle, details: caseDetails };
+        setCaseList([...caseList, newCase]);
+        setCaseTitle('');
+        setCaseDetails('');
     };
 
     const toggleSidebar = () => {
         setIsSidebarVisible(!isSidebarVisible);
     };
 
-    const openDocument = (doc) => {
-        setSelectedDoc(doc);
+    const openCase = (caseItem) => {
+        setSelectedCase(caseItem);
     };
 
-    const closeDocument = () => {
-        setSelectedDoc(null);
+    const closeCase = () => {
+        setSelectedCase(null);
     };
 
     return (
@@ -45,11 +45,11 @@ export default function DocumentDrafting() {
                                     <i className="fa-solid fa-gavel text-gray-600"></i>
                                     <span>Legal Research</span>
                                 </Link>
-                                <Link href="/lawtools/casemanagement" className={`flex items-center gap-4 p-2 rounded hover:bg-blue-100 ${router.pathname === '/case-management' ? 'bg-blue-100 text-blue-950' : 'text-gray-700'}`}>
+                                <Link href="/lawtools/casemanagement" className={`flex items-center gap-4 p-2 rounded bg-blue-100 ${router.pathname === '/case-management' ? 'bg-blue-100 text-blue-950' : 'text-gray-700'}`}>
                                     <i className="fa-solid fa-folder-open text-gray-600"></i>
                                     <span>Case Management</span>
                                 </Link>
-                                <Link href="/lawtools/documentdrafting" className={`flex items-center gap-4 p-2 rounded bg-blue-100 ${router.pathname === '/document-drafting' ? 'bg-blue-100 text-blue-950' : 'text-gray-700'}`}>
+                                <Link href="/lawtools/documentdrafting" className={`flex items-center gap-4 p-2 rounded hover:bg-blue-100 ${router.pathname === '/document-drafting' ? 'bg-blue-100 text-blue-950' : 'text-gray-700'}`}>
                                     <i className="fa-solid fa-file-alt text-gray-600"></i>
                                     <span>Document Drafting</span>
                                 </Link>
@@ -58,15 +58,15 @@ export default function DocumentDrafting() {
                         <section className="flex flex-col gap-4">
                             <h2 className="text-lg font-semibold text-gray-700">AI Law Tools</h2>
                             <nav className="flex flex-col gap-2">
-                                <Link href="/ai-legal-analysis" className={`flex items-center gap-4 p-2 rounded hover:bg-blue-100 ${router.pathname === '/ai-legal-analysis' ? 'bg-blue-100 text-blue-950' : 'text-gray-700'}`}>
+                                <Link href="/ailawtools/analysis" className={`flex items-center gap-4 p-2 rounded hover:bg-blue-100 ${router.pathname === '/ai-legal-analysis' ? 'bg-blue-100 text-blue-950' : 'text-gray-700'}`}>
                                     <i className="fa-solid fa-brain text-gray-600"></i>
                                     <span>AI Legal Analysis</span>
                                 </Link>
-                                <Link href="/ai-contract-review" className={`flex items-center gap-4 p-2 rounded hover:bg-blue-100 ${router.pathname === '/ai-contract-review' ? 'bg-blue-100 text-blue-950' : 'text-gray-700'}`}>
+                                <Link href="/ailawtools/contractreview" className={`flex items-center gap-4 p-2 rounded hover:bg-blue-100 ${router.pathname === '/ai-contract-review' ? 'bg-blue-100 text-blue-950' : 'text-gray-700'}`}>
                                     <i className="fa-solid fa-robot text-gray-600"></i>
                                     <span>AI Contract Review</span>
                                 </Link>
-                                <Link href="/ai-predictive-analytics" className={`flex items-center gap-4 p-2 rounded hover:bg-blue-100 ${router.pathname === '/ai-predictive-analytics' ? 'bg-blue-100 text-blue-950' : 'text-gray-700'}`}>
+                                <Link href="/ailawtools/predictive" className={`flex items-center gap-4 p-2 rounded hover:bg-blue-100 ${router.pathname === '/ai-predictive-analytics' ? 'bg-blue-100 text-blue-950' : 'text-gray-700'}`}>
                                     <i className="fa-solid fa-chart-line text-gray-600"></i>
                                     <span>AI Predictive Analytics</span>
                                 </Link>
@@ -101,54 +101,54 @@ export default function DocumentDrafting() {
                             <input
                                 type="text"
                                 className="flex-1 p-2 border border-gray-300 rounded"
-                                value={docTitle}
-                                onChange={(e) => setDocTitle(e.target.value)}
-                                placeholder="Enter document title..."
+                                value={caseTitle}
+                                onChange={(e) => setCaseTitle(e.target.value)}
+                                placeholder="Enter case title..."
                             />
                         </div>
                         <div className="flex items-center mb-4">
                             <textarea
                                 className="flex-1 p-2 border border-gray-300 rounded"
-                                value={docContent}
-                                onChange={(e) => setDocContent(e.target.value)}
-                                placeholder="Enter document content..."
-                                rows="8"
+                                value={caseDetails}
+                                onChange={(e) => setCaseDetails(e.target.value)}
+                                placeholder="Enter case details..."
+                                rows="4"
                             ></textarea>
                         </div>
                         <button
-                            onClick={handleAddDocument}
+                            onClick={handleAddCase}
                             className=" border border-solid border-blue-950 border-x-2 border-y-2 bg-white text-blue-950 px-4 py-2 rounded-md duration-200 hover:bg-blue-950 hover:text-white"
                         >
-                            Add Document
+                            Add Case
                         </button>
                         <div className="flex-1 overflow-y-scroll p-4 mt-4 rounded bg-white">
-                            {docList.length > 0 ? (
-                                docList.map((doc, index) => (
+                            {caseList.length > 0 ? (
+                                caseList.map((c, index) => (
                                     <div
                                         key={index}
                                         className="mb-4 p-4 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-100"
-                                        onClick={() => openDocument(doc)}
+                                        onClick={() => openCase(c)}
                                     >
-                                        <h3 className="text-lg font-semibold text-blue-600">{doc.title}</h3>
-                                        <p className="text-gray-700 truncate">{doc.content}</p>
+                                        <h3 className="text-lg font-semibold text-blue-600">{c.title}</h3>
+                                        <p className="text-gray-700">{c.details}</p>
                                     </div>
                                 ))
                             ) : (
-                                <p className="text-gray-500">No documents drafted yet. Start by drafting a new document.</p>
+                                <p className="text-gray-500">No cases added yet. Start by adding a new case.</p>
                             )}
                         </div>
                     </div>
                 </div>
             </main>
 
-            {/* Document Details Modal */}
-            {selectedDoc && (
+            {/* Case Details Modal */}
+            {selectedCase && (
                 <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
                     <div className="bg-white p-6 rounded-lg shadow-lg max-w-lg w-full">
-                        <h2 className="text-2xl font-bold mb-4">{selectedDoc.title}</h2>
-                        <p className="text-gray-700 mb-4 whitespace-pre-wrap">{selectedDoc.content}</p>
+                        <h2 className="text-2xl font-bold mb-4">{selectedCase.title}</h2>
+                        <p className="text-gray-700 mb-4">{selectedCase.details}</p>
                         <button
-                            onClick={closeDocument}
+                            onClick={closeCase}
                             className="mt-4 p-2 border border-solid border-blue-950 border-x-2 border-y-2 bg-blue-950 text-white px-4 py-2 rounded-md duration-200 hover:bg-white hover:text-blue-950"
                         >
                             Close
