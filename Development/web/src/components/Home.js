@@ -25,7 +25,7 @@ export default function Home() {
 
     const animateStats = (start, end, setter) => {
         let startTime;
-        const duration = 2000; // 2 seconds for the animation
+        const duration = 10000; // 2 seconds for the animation
 
         const step = (timestamp) => {
             if (!startTime) startTime = timestamp;

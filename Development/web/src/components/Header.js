@@ -110,7 +110,7 @@ export default function Header() {
                 <Link href={'/'}>
                     <div className='flex items-center gap-2'>
                         <Image src="/header.png" alt="Cadex Law Logo" width={44} height={44} className={`${logoLoaded ? 'logo-animation' : ''}`} />
-                        <h1 className={'text-xl sm:text-2xl goldGradient font-medium ' + poppins.className}>Cadex Law Simulation</h1>
+                        <h1 className={'text-xl sm:text-2xl goldGradient font-medium ' + poppins.className}>Cadex Law</h1>
                     </div>
                 </Link>
                 {navActions}
