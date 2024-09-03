@@ -75,11 +75,11 @@ export default function Hero() {
     <div className='flex flex-1 justify-around items-center'>
         <div className='text-center'>
             <h4 className='text-4xl font-bold goldGradient'>{stats.cases}</h4>
-            <p className='text-xl text-gray-600'>New Users</p>
+            <p className='text-xl text-gray-600'>Users</p>
         </div>
         <div className='text-center'>
             <h4 className='text-4xl font-bold goldGradient'>{stats.newUsers}</h4>
-            <p className='text-xl text-gray-600'>New Cases</p>
+            <p className='text-xl text-gray-600'>Cases</p>
         </div>
         <div className='text-center'>
             <h4 className='text-4xl font-bold goldGradient'>{stats.statsProvided}</h4>
