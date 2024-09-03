@@ -1,20 +1,15 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import Hero from './Hero';
-import Footer from './Footer';
-import Header from './Header';
 import CarouselComponent from './Carousel';
 
 export default function Home() {
-    // Set target values for the stats
     const targetStats = {
         cases: 400,        // Number between 300-500
         newUsers: 1250,    // Number between 1000-1500
         statsProvided: 45, // Number between 30-60
     };
 
-    // Initialize state with 0 for animation start
     const [stats, setStats] = useState({
         cases: 0,
         newUsers: 0,
@@ -45,12 +40,12 @@ export default function Home() {
         animateStats(0, targetStats.cases, (value) => setStats((prevStats) => ({ ...prevStats, cases: value })));
         animateStats(0, targetStats.newUsers, (value) => setStats((prevStats) => ({ ...prevStats, newUsers: value })));
         animateStats(0, targetStats.statsProvided, (value) => setStats((prevStats) => ({ ...prevStats, statsProvided: value })));
-    }, [targetStats.cases, targetStats.newUsers, targetStats.statsProvided]); // Added targetStats dependencies
+    }, [targetStats.cases, targetStats.newUsers, targetStats.statsProvided]);
 
     return (
-        
-        <div className='flex flex-col flex-1 bg-white'>  
-            <div className={`mx-auto w-[1.5px] my-16 h-12 sm:h-16 md:h-20 bg-gradient-to-b from-transparent to-blue-950 mb-4 transform transition-transform duration-700 ${loaded ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`} />    
+        <div className='flex flex-col flex-1 bg-white'>
+            <div className={`mx-auto w-[1.5px] my-16 h-12 sm:h-16 md:h-20 bg-gradient-to-b from-transparent to-blue-950 mb-4 transform transition-transform duration-700 ${loaded ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`} />
+            
             <section className={`flex flex-col items-center py-12 px-4 md:px-8 lg:px-16 bg-white transform transition-transform duration-700 ${loaded ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
                 <div className='max-w-5xl'>
                     <h3 className='text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-semibold text-center text-blue-950 '>Features</h3>
@@ -70,7 +65,9 @@ export default function Home() {
                     </Link>
                 </div>
             </section>
-            <div className={`mx-auto w-[1.5px] my-16 h-12 sm:h-16 md:h-20 bg-gradient-to-b from-transparent to-blue-950 mb-4 transform transition-transform duration-700 ${loaded ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`} />    
+            
+            <div className={`mx-auto w-[1.5px] my-16 h-12 sm:h-16 md:h-20 bg-gradient-to-b from-transparent to-blue-950 mb-4 transform transition-transform duration-700 ${loaded ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`} />
+            
             <section className={`flex flex-col items-center py-10 px-4 md:px-8 lg:px-16 transform transition-transform duration-700 ${loaded ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
                 <div className='max-w-5xl w-full'>
                     <h3 className='text-4xl lg:text-7xl font-semibold my-14 text-center text-blue-950 '>Universities we work with</h3>
