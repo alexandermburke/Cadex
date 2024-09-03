@@ -44,12 +44,12 @@ export default function Home() {
 
     return (
         <div className='flex flex-col flex-1 bg-white'>
-            <div className={`mx-auto w-[1.5px] my-16 h-12 sm:h-16 md:h-20 bg-gradient-to-b from-transparent to-blue-950 mb-4 transform transition-transform duration-700 ${loaded ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`} />
+            <div className={`mx-auto w-[1.5px] my-12 h-12 sm:h-16 md:h-20 bg-gradient-to-b from-transparent to-blue-950 transform transition-transform duration-700 ${loaded ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`} />
             
-            <section className={`flex flex-col items-center py-12 px-4 md:px-8 lg:px-16 bg-white transform transition-transform duration-700 ${loaded ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
+            <section className={`flex flex-col items-center py-10 px-4 md:px-8 lg:px-16 bg-white transform transition-transform duration-700 ${loaded ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
                 <div className='max-w-5xl'>
                     <h3 className='text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-semibold text-center text-blue-950 '>Features</h3>
-                    <ul className='list-disc pl-5 my-14'>
+                    <ul className='list-disc pl-5 my-12'>
                         <li className='text-base sm:text-lg md:text-xl my-2'>Interactive legal simulations for defendants, plaintiffs, and judges.</li>
                         <li className='text-base sm:text-lg md:text-xl my-2'>Instant feedback and performance analysis.</li>
                         <li className='text-base sm:text-lg md:text-xl my-2'>Realistic courtroom experiences.</li>
@@ -66,11 +66,11 @@ export default function Home() {
                 </div>
             </section>
             
-            <div className={`mx-auto w-[1.5px] my-16 h-12 sm:h-16 md:h-20 bg-gradient-to-b from-transparent to-blue-950 mb-4 transform transition-transform duration-700 ${loaded ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`} />
+            <div className={`mx-auto w-[1.5px] my-12 h-12 sm:h-16 md:h-20 bg-gradient-to-b from-transparent to-blue-950 transform transition-transform duration-700 ${loaded ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`} />
             
-            <section className={`flex flex-col items-center py-10 px-4 md:px-8 lg:px-16 transform transition-transform duration-700 ${loaded ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
+            <section className={`flex flex-col items-center py-8 px-4 md:px-8 lg:px-16 transform transition-transform duration-700 ${loaded ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
                 <div className='max-w-5xl w-full'>
-                    <h3 className='text-4xl lg:text-7xl font-semibold my-14 text-center text-blue-950 '>Universities we work with</h3>
+                    <h3 className='text-4xl lg:text-7xl font-semibold my-12 text-center text-blue-950 '>Universities we work with</h3>
                     <CarouselComponent />
                 </div>
             </section>
