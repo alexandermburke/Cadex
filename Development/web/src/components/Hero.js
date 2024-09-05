@@ -22,7 +22,7 @@ export default function Hero() {
 
     const animateStats = (start, end, setter) => {
         let startTime;
-        const duration = 10000; // 10 seconds for the animation
+        const duration = 5000; // 5 seconds for the animation
 
         const step = (timestamp) => {
             if (!startTime) startTime = timestamp;
@@ -45,7 +45,7 @@ export default function Hero() {
     }, [targetStats.cases, targetStats.newUsers, targetStats.statsProvided]);
 
     return (
-        <section className='flex-col flex-1 grid grid-cols-1 lg:grid-cols-1 gap-10 md:gap-12 w-full mx-auto my-0 px-4 py-12'>
+        <section className='flex-col flex-1 grid grid-cols-1 lg:grid-cols-1 gap-8 w-full mx-auto px-4 py-12'>
             <div className={`flex flex-col flex-1 items-center gap-6 text-center lg:text-left mx-auto w-full transform transition-transform duration-700 ${loaded ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
                 <div className='flex items-center gap-4 max-w-4xl'>
                     <h2 className={'text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-semibold text-center lg:text-center py-6 ' + poppins.className}>
@@ -74,16 +74,16 @@ export default function Hero() {
                 <div className="flex flex-col lg:flex-row justify-around bg-white shadow-lg rounded p-6 mt-8 w-full">
                     <div className='flex flex-1 justify-around items-center'>
                         <div className='text-center'>
-                            <h4 className='text-4xl font-bold goldGradient'>{stats.cases}</h4>
-                            <p className='text-xl text-gray-600'>Users</p>
+                            <h4 className='text-3xl sm:text-4xl font-bold goldGradient'>{stats.cases}</h4>
+                            <p className='text-base sm:text-lg text-gray-600'>Users</p>
                         </div>
                         <div className='text-center'>
-                            <h4 className='text-4xl font-bold goldGradient'>{stats.newUsers}</h4>
-                            <p className='text-xl text-gray-600'>Cases</p>
+                            <h4 className='text-3xl sm:text-4xl font-bold goldGradient'>{stats.newUsers}</h4>
+                            <p className='text-base sm:text-lg text-gray-600'>Cases</p>
                         </div>
                         <div className='text-center'>
-                            <h4 className='text-4xl font-bold goldGradient'>{stats.statsProvided}</h4>
-                            <p className='text-xl text-gray-600'>Referrals</p>
+                            <h4 className='text-3xl sm:text-4xl font-bold goldGradient'>{stats.statsProvided}</h4>
+                            <p className='text-base sm:text-lg text-gray-600'>Referrals</p>
                         </div>
                     </div>
                 </div>

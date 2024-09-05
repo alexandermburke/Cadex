@@ -11,26 +11,35 @@ export default function LegalAnalysis() {
     const [isModalOpen, setIsModalOpen] = useState(false); // State to manage modal visibility
     const router = useRouter();
 
+    // Function to handle API call to ChatGPT 3.5
     const handleAnalyzeText = async () => {
         if (!inputText.trim()) return;
-
+    
         setIsLoading(true);
-
+    
         try {
-            // Simulate an API call to an AI-powered legal analysis service
-            await new Promise((res) => setTimeout(res, 1000));
-
-            // Example AI-generated analysis result
-            const result = `Analysis of the provided text: \n\n"${inputText}"\n\nThe text involves legal principles related to contract law, particularly focusing on breach of contract and potential remedies available under the law. The AI suggests that further analysis may be required to evaluate specific clauses and their enforceability.`;
-
-            setAnalysisResult(result);
+            const response = await fetch('/api/chatgpt', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ inputText }),
+            });
+    
+            if (!response.ok) {
+                throw new Error('Failed to analyze text');
+            }
+    
+            const { analysis } = await response.json();
+            setAnalysisResult(analysis);
         } catch (error) {
             console.error('Error during legal analysis:', error);
+            setAnalysisResult('An error occurred during the analysis.');
         } finally {
             setIsLoading(false);
         }
     };
-
+    
     const toggleSidebar = () => {
         setIsSidebarVisible(!isSidebarVisible);
     };
@@ -98,14 +107,6 @@ export default function LegalAnalysis() {
 
             {/* Main Content Area */}
             <main className="flex-1 flex flex-col items-center p-4 bg-white">
-                <header className="flex items-center justify-between w-full p-4 bg-white">
-                    <button
-                        onClick={toggleSidebar}
-                        className='flex items-center justify-center gap-4 border border-solid border-blue-950 border-x-2 border-y-2 bg-blue-950 text-white px-4 py-2 rounded-md duration-200 hover:bg-white hover:text-blue-950'
-                    >
-                        {isSidebarVisible ? 'Hide' : 'Show'}
-                    </button>
-                </header>
                 <div className="flex-1 w-full max-w-4xl p-4 bg-gray-100 rounded-lg shadow-md">
                     <div className="flex flex-col h-full">
                         <div className="flex items-center mb-4">
@@ -139,6 +140,16 @@ export default function LegalAnalysis() {
                             )}
                         </div>
                     </div>
+                </div>
+
+                {/* Hide/Show Sidebar Button */}
+                <div className="w-full max-w-4xl mt-4 flex justify-end">
+                    <button
+                        onClick={toggleSidebar}
+                        className="flex items-center justify-center gap-2 border border-blue-950 bg-blue-950 text-white px-4 py-2 rounded-md duration-200 hover:bg-white hover:text-blue-950"
+                    >
+                        {isSidebarVisible ? 'Hide Sidebar' : 'Show Sidebar'}
+                    </button>
                 </div>
             </main>
 
