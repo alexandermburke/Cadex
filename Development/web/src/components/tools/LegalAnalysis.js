@@ -1,14 +1,15 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
 export default function LegalAnalysis() {
     const [inputText, setInputText] = useState('');
     const [analysisResult, setAnalysisResult] = useState('');
-    const [isSidebarVisible, setIsSidebarVisible] = useState(true); // State to manage sidebar visibility
-    const [isLoading, setIsLoading] = useState(false); // State to manage loading state
-    const [isModalOpen, setIsModalOpen] = useState(false); // State to manage modal visibility
+    const [typedResult, setTypedResult] = useState(''); // State to hold the animated typing result
+    const [isSidebarVisible, setIsSidebarVisible] = useState(true);
+    const [isLoading, setIsLoading] = useState(false);
+    const [isModalOpen, setIsModalOpen] = useState(false);
     const router = useRouter();
 
     // Function to handle API call to ChatGPT 3.5
@@ -16,6 +17,8 @@ export default function LegalAnalysis() {
         if (!inputText.trim()) return;
     
         setIsLoading(true);
+        setAnalysisResult('');
+        setTypedResult('');
     
         try {
             const response = await fetch('/api/chatgpt', {
@@ -32,6 +35,7 @@ export default function LegalAnalysis() {
     
             const { analysis } = await response.json();
             setAnalysisResult(analysis);
+            openModal(); // Automatically open the modal once the analysis is available
         } catch (error) {
             console.error('Error during legal analysis:', error);
             setAnalysisResult('An error occurred during the analysis.');
@@ -39,7 +43,21 @@ export default function LegalAnalysis() {
             setIsLoading(false);
         }
     };
-    
+
+    // Typing effect hook
+    useEffect(() => {
+        if (analysisResult) {
+            let index = 0;
+            const typingInterval = setInterval(() => {
+                setTypedResult((prev) => prev + analysisResult[index]);
+                index++;
+                if (index >= analysisResult.length) {
+                    clearInterval(typingInterval);
+                }
+            }, 50); // Adjust speed of typing animation here (50ms per character)
+        }
+    }, [analysisResult]);
+
     const toggleSidebar = () => {
         setIsSidebarVisible(!isSidebarVisible);
     };
@@ -50,6 +68,7 @@ export default function LegalAnalysis() {
 
     const closeModal = () => {
         setIsModalOpen(false);
+        setTypedResult(''); // Reset typed result when closing the modal
     };
 
     return (
@@ -133,7 +152,7 @@ export default function LegalAnalysis() {
                             {analysisResult ? (
                                 <div className="mb-4 p-4 border border-gray-300 rounded-lg">
                                     <h3 className="text-lg font-semibold text-blue-600">Analysis Result</h3>
-                                    <p className="text-gray-700 whitespace-pre-wrap">{analysisResult}</p>
+                                    <p className="text-gray-700 whitespace-pre-wrap">{typedResult}</p> {/* Display typed result */}
                                 </div>
                             ) : (
                                 <p className="text-gray-500">{isLoading ? 'Analyzing the text...' : 'Enter some legal text and click "Analyze Text" to get started.'}</p>
@@ -158,7 +177,7 @@ export default function LegalAnalysis() {
                 <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
                     <div className="bg-white p-6 rounded-lg shadow-lg max-w-lg w-full">
                         <h2 className="text-2xl font-bold mb-4">Analysis Report</h2>
-                        <p className="text-gray-700 whitespace-pre-wrap">{analysisResult}</p>
+                        <p className="text-gray-700 whitespace-pre-wrap">{typedResult}</p> {/* Display typed result in the modal */}
                         <button
                             onClick={closeModal}
                             className="mt-4 p-2 border border-solid border-blue-950 border-x-2 border-y-2 bg-blue-950 text-white px-4 py-2 rounded-md duration-200 hover:bg-white hover:text-blue-950"
