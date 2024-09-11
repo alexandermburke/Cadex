@@ -45,7 +45,7 @@ export default function Header() {
 
     let navActions = (
         <nav className='hidden items-stretch md:flex'>
-            <Link href={'/admin'} className='mx-2 p-2 px-2 grid place-items-center relative z-10 rounded-lg bg-transparent hover:text-slate-200'>
+            <Link href={'/admin/application'} className='mx-2 p-2 px-2 grid place-items-center relative z-10 rounded-lg bg-transparent hover:text-slate-200'>
                 <p>Simulation</p>
             </Link>
             <Link href={'/pricing'} className='mx-2 p-2 px-2 grid place-items-center relative z-10 rounded-lg bg-transparent hover:text-slate-200'>
@@ -72,7 +72,7 @@ export default function Header() {
         </nav>
     );
 
-    if (pathname.split('/')[1] === 'admin' && currentUser) {
+    if ((pathname.split('/')[1] === 'lawtools' || pathname.split('/')[1] === 'ailawtools' || pathname.split('/')[1] === 'admin') && currentUser) {
         navActions = (
             <>
                 <p className={'capitalize flex-1 ' + poppins.className}>Welcome <span>{currentUser.displayName}</span></p>
@@ -81,7 +81,10 @@ export default function Header() {
                         <p>Dashboard</p>
                     </Link>
                     <Link href={'/lawtools/research'} className='border border-solid duration-200 border-transparent hover:text-slate-200 px-4 grid place-items-center rounded'>
-                        <p>Tools</p>
+                        <div className="flex items-center">
+                            <p>Tools</p>
+                            <span className="ml-2 px-2 py-1 text-xs bg-emerald-400 text-white rounded">Beta</span>
+                        </div>
                     </Link>
                     <Link href={'/admin/account'} className='border border-solid duration-200 border-transparent hover:text-slate-200 px-4 grid place-items-center rounded'>
                         <p>Account</p>
@@ -95,7 +98,12 @@ export default function Header() {
         );
         menuActions = (
             <nav className='flex flex-col gap-2'>
-                <Link href={'/lawtools/research'} className='p-2 rounded border-solid border duration-200 text-lg hover:text-white hover:bg-blue-950 border-blue-950 border-x-4 border-y-4'><p>Tools</p></Link>
+                <Link href={'/lawtools/research'} className='p-2 rounded border-solid border duration-200 text-lg hover:text-white hover:bg-blue-950 border-blue-950 border-x-4 border-y-4'>
+                    <div className="flex items-center">
+                        <p>Tools</p>
+                        <span className="ml-2 px-2 py-1 text-xs bg-emerald-400 text-white rounded">Beta</span>
+                    </div>
+                </Link>
                 <Link href={'/admin'} className='p-2 rounded border-solid border duration-200 text-lg hover:text-white hover:bg-blue-950 border-blue-950 border-x-4 border-y-4'><p>Dashboard</p></Link>
                 <Link href={'/admin/account'} className='p-2 rounded border-solid border duration-200 hover:text-white hover:bg-blue-950 text-lg border-blue-950 border-x-4 border-y-4'><p>Account</p></Link>
                 <button className='p-2 text-left rounded border-solid border duration-200 hover:text-white hover:bg-blue-950 text-lg border-blue-950 border-x-4 border-y-4' onClick={logout}><p>Logout</p></button>
@@ -104,6 +112,7 @@ export default function Header() {
         );
     }
 
+   
     return (
         <header className='z-[100] fixed top-0 left-0 right-0 bg-transparent'>
             <div className='flex items-center justify-between gap-4 max-w-[1400px] mx-auto w-full overflow-hidden p-2 drop-shadow-sm'>

@@ -93,7 +93,7 @@ export default function Plans() {
                             <div className='flex items-center justify-between gap-4 w-full'>
                                 <h3 className={'font-medium text-lg sm:text-xl md:text-2xl ' + (selectedPlan === plan.name ? ' goldGradient ' : ' ') + poppins.className}>{plan.name}</h3>
                                 {plan.name === 'Pro' && (
-                                    <p className='bg-emerald-400 text-white px-2 py-1 rounded-lg text-xs sm:text-sm'>Recommended</p>
+                                    <p className='bg-emerald-400 text-white px-2 py-1 rounded text-xs sm:text-sm'>Recommended</p>
                                 )}
                             </div>
                             <div className='flex flex-col text-left'>

@@ -2,6 +2,29 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { Line, Bar } from 'react-chartjs-2';
+import {
+    Chart as ChartJS,
+    CategoryScale,
+    LinearScale,
+    PointElement,
+    LineElement,
+    BarElement,
+    Title,
+    Tooltip,
+    Legend,
+} from 'chart.js';
+
+ChartJS.register(
+    CategoryScale,
+    LinearScale,
+    PointElement,
+    LineElement,
+    BarElement,
+    Title,
+    Tooltip,
+    Legend
+);
 
 export default function Predictive() {
     const [inputData, setInputData] = useState(''); // User input data for predictions
@@ -9,6 +32,7 @@ export default function Predictive() {
     const [isSidebarVisible, setIsSidebarVisible] = useState(true); // State to manage sidebar visibility
     const [isModalOpen, setIsModalOpen] = useState(false); // State to manage modal visibility
     const [isLoading, setIsLoading] = useState(false); // State to manage loading state
+    const [areChartsVisible, setAreChartsVisible] = useState(true); // Toggle charts visibility
     const router = useRouter();
 
     const handleGeneratePrediction = async () => {
@@ -36,8 +60,39 @@ export default function Predictive() {
         setIsSidebarVisible(!isSidebarVisible);
     };
 
+    const toggleChartsVisibility = () => {
+        setAreChartsVisible(!areChartsVisible);
+    };
+
     const closeModal = () => {
         setIsModalOpen(false);
+    };
+
+    // Example chart data
+    const lineChartData = {
+        labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
+        datasets: [
+            {
+                label: 'Legal Risk Over Time',
+                data: [3, 2, 2.5, 4, 5.5, 3.8, 5],
+                borderColor: 'rgba(59, 130, 246, 1)',
+                backgroundColor: 'rgba(59, 130, 246, 0.5)',
+                fill: true,
+            },
+        ],
+    };
+
+    const barChartData = {
+        labels: ['Risk 1', 'Risk 2', 'Risk 3', 'Risk 4', 'Risk 5'],
+        datasets: [
+            {
+                label: 'Legal Risk Categories',
+                data: [3, 5, 2, 6, 4],
+                backgroundColor: 'rgba(59, 130, 246, 0.5)',
+                borderColor: 'rgba(59, 130, 246, 1)',
+                borderWidth: 1,
+            },
+        ],
     };
 
     return (
@@ -102,6 +157,12 @@ export default function Predictive() {
                     >
                         {isSidebarVisible ? 'Hide' : 'Show'}
                     </button>
+                    <button
+                        onClick={toggleChartsVisibility}
+                        className="ml-4 border border-solid border-blue-950 border-x-2 border-y-2 bg-white text-blue-950 px-4 py-2 rounded-md duration-200 hover:bg-blue-950 hover:text-white"
+                    >
+                        {areChartsVisible ? 'Hide Charts' : 'Show Charts'}
+                    </button>
                 </header>
                 <div className="flex-1 w-full max-w-4xl p-4 bg-gray-100 rounded-lg shadow-md">
                     <div className="flex flex-col h-full">
@@ -122,6 +183,24 @@ export default function Predictive() {
                         >
                             {isLoading ? 'Generating Prediction...' : 'Generate Prediction'}
                         </button>
+
+                        {/* Toggleable Charts */}
+                        {areChartsVisible && (
+                            <>
+                                {/* Line Chart */}
+                                <div className="my-8">
+                                    <h3 className="text-lg font-semibold text-blue-600 mb-4">Legal Risk Trend Over Time</h3>
+                                    <Line data={lineChartData} />
+                                </div>
+
+                                {/* Bar Chart */}
+                                <div className="my-8">
+                                    <h3 className="text-lg font-semibold text-blue-600 mb-4">Legal Risk by Category</h3>
+                                    <Bar data={barChartData} />
+                                </div>
+                            </>
+                        )}
+
                         <div 
                             className="flex-1 overflow-y-scroll p-4 mt-4 rounded bg-white cursor-pointer"
                             onClick={() => setIsModalOpen(true)}
