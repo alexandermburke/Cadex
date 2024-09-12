@@ -29,7 +29,7 @@ export default function Sidebar({ activeLink }) {
                     </nav>
                 </section>
                 <section className="flex flex-col gap-4">
-                    <h2 className="text-lg font-semibold text-gray-700">LLM Law Tools</h2>
+                    <h2 className="text-lg font-semibold text-gray-700">AI Law Tools</h2>
                     <nav className="flex flex-col gap-2">
                         <Link href="/ailawtools/analysis" className={`flex items-center gap-4 p-2 rounded ${activeLink === '/ailawtools/analysis' ? 'bg-blue-100 text-blue-950' : 'hover:bg-blue-100 text-gray-700'}`}>
                             <i className="fa-solid fa-brain text-gray-600"></i>
@@ -46,7 +46,7 @@ export default function Sidebar({ activeLink }) {
                     </nav>
                 </section>
                 <section className="flex flex-col gap-4">
-                    <h2 className="text-lg font-semibold text-gray-700">LLM Law Simulation</h2>
+                    <h2 className="text-lg font-semibold text-gray-700">AI Law Simulation</h2>
                     <nav className="flex flex-col gap-2">
                         <Link href="/admin" className={`flex items-center gap-4 p-2 rounded ${activeLink === '/admin' ? 'bg-blue-100 text-blue-950' : 'hover:bg-blue-100 text-gray-700'}`}>
                             <i className="fa-solid fa-flask text-gray-600"></i>
