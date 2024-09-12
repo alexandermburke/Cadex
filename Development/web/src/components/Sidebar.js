@@ -46,7 +46,7 @@ export default function Sidebar({ activeLink }) {
                     </nav>
                 </section>
                 <section className="flex flex-col gap-4">
-                    <h2 className="text-lg font-semibold text-gray-700">AI Law Simulation</h2>
+                    <h2 className="text-lg font-semibold text-gray-700">LLM Law Simulation</h2>
                     <nav className="flex flex-col gap-2">
                         <Link href="/admin" className={`flex items-center gap-4 p-2 rounded ${activeLink === '/admin' ? 'bg-blue-100 text-blue-950' : 'hover:bg-blue-100 text-gray-700'}`}>
                             <i className="fa-solid fa-flask text-gray-600"></i>
@@ -54,15 +54,15 @@ export default function Sidebar({ activeLink }) {
                         </Link>
                     </nav>
                 </section>
-            </div>
             {/* New section at the bottom */}
-            <section className="mt-auto flex items-center gap-2 p-4">
+            <section className="mt-auto flex items-center gap-2 p-4 mt-44">
                 <div className="flex flex-col">
                     <span className="font-semibold text-blue-900">{currentUser?.displayName || 'User'}</span>
                     <span className="text-xs text-gray-500">{currentUser?.email || 'User'}</span>
                 </div>
                 <span className="ml-auto text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full capitalize">{userDataObj?.billing.plan || 'User'}</span>
             </section>
+            </div>
         </aside>
     );
 }
