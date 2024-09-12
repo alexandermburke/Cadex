@@ -48,7 +48,7 @@ export default function Sidebar({ activeLink }) {
                 <section className="flex flex-col gap-4">
                     <h2 className="text-lg font-semibold text-gray-700">AI Law Simulation</h2>
                     <nav className="flex flex-col gap-2">
-                        <Link href="/admin" className={`flex items-center gap-4 p-2 rounded ${activeLink === '/admin' ? 'bg-blue-100 text-blue-950' : 'hover:bg-blue-100 text-gray-700'}`}>
+                        <Link href="/admin/application" className={`flex items-center gap-4 p-2 rounded ${activeLink === '/admin' ? 'bg-blue-100 text-blue-950' : 'hover:bg-blue-100 text-gray-700'}`}>
                             <i className="fa-solid fa-flask text-gray-600"></i>
                             <span>Simulate a Case</span>
                         </Link>
