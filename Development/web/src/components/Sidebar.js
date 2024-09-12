@@ -29,19 +29,19 @@ export default function Sidebar({ activeLink }) {
                     </nav>
                 </section>
                 <section className="flex flex-col gap-4">
-                    <h2 className="text-lg font-semibold text-gray-700">AI Law Tools</h2>
+                    <h2 className="text-lg font-semibold text-gray-700">LLM Law Tools</h2>
                     <nav className="flex flex-col gap-2">
                         <Link href="/ailawtools/analysis" className={`flex items-center gap-4 p-2 rounded ${activeLink === '/ailawtools/analysis' ? 'bg-blue-100 text-blue-950' : 'hover:bg-blue-100 text-gray-700'}`}>
                             <i className="fa-solid fa-brain text-gray-600"></i>
-                            <span>AI Legal Analysis</span>
+                            <span>Legal Analysis</span>
                         </Link>
                         <Link href="/ailawtools/contractreview" className={`flex items-center gap-4 p-2 rounded ${activeLink === '/ailawtools/contractreview' ? 'bg-blue-100 text-blue-950' : 'hover:bg-blue-100 text-gray-700'}`}>
                             <i className="fa-solid fa-robot text-gray-600"></i>
-                            <span>AI Contract Review</span>
+                            <span>Contract Review</span>
                         </Link>
                         <Link href="/ailawtools/predictive" className={`flex items-center gap-4 p-2 rounded ${activeLink === '/ailawtools/predictive' ? 'bg-blue-100 text-blue-950' : 'hover:bg-blue-100 text-gray-700'}`}>
                             <i className="fa-solid fa-chart-line text-gray-600"></i>
-                            <span>AI Predictive Analytics</span>
+                            <span>Predictive Analytics</span>
                         </Link>
                     </nav>
                 </section>
