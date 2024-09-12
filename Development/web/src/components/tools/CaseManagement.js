@@ -1,6 +1,6 @@
 'use client';
 import React, { useState } from 'react';
-import Link from 'next/link';
+import Sidebar from '../Sidebar'; // Import Sidebar component
 import { useRouter } from 'next/navigation';
 
 export default function CaseManagement() {
@@ -35,62 +35,14 @@ export default function CaseManagement() {
     return (
         <div className="flex h-screen bg-gray-100">
             {/* Sidebar */}
-            {isSidebarVisible && (
-                <aside className="w-64 bg-white h-full flex flex-col p-4 border-r border-gray-200">
-                    <div className="flex flex-col gap-8">
-                        <section className="flex flex-col gap-4">
-                            <h2 className="text-lg font-semibold text-gray-700">Law Tools</h2>
-                            <nav className="flex flex-col gap-2">
-                                <Link href="/lawtools/research" className={`flex items-center gap-4 p-2 rounded hover:bg-blue-100 ${router.pathname === '/legal-research' ? 'bg-blue-100 text-blue-950' : 'text-gray-700'}`}>
-                                    <i className="fa-solid fa-gavel text-gray-600"></i>
-                                    <span>Legal Research</span>
-                                </Link>
-                                <Link href="/lawtools/casemanagement" className={`flex items-center gap-4 p-2 rounded bg-blue-100 ${router.pathname === '/case-management' ? 'bg-blue-100 text-blue-950' : 'text-gray-700'}`}>
-                                    <i className="fa-solid fa-folder-open text-gray-600"></i>
-                                    <span>Case Management</span>
-                                </Link>
-                                <Link href="/lawtools/documentdrafting" className={`flex items-center gap-4 p-2 rounded hover:bg-blue-100 ${router.pathname === '/document-drafting' ? 'bg-blue-100 text-blue-950' : 'text-gray-700'}`}>
-                                    <i className="fa-solid fa-file-alt text-gray-600"></i>
-                                    <span>Document Drafting</span>
-                                </Link>
-                            </nav>
-                        </section>
-                        <section className="flex flex-col gap-4">
-                            <h2 className="text-lg font-semibold text-gray-700">AI Law Tools</h2>
-                            <nav className="flex flex-col gap-2">
-                                <Link href="/ailawtools/analysis" className={`flex items-center gap-4 p-2 rounded hover:bg-blue-100 ${router.pathname === '/ai-legal-analysis' ? 'bg-blue-100 text-blue-950' : 'text-gray-700'}`}>
-                                    <i className="fa-solid fa-brain text-gray-600"></i>
-                                    <span>AI Legal Analysis</span>
-                                </Link>
-                                <Link href="/ailawtools/contractreview" className={`flex items-center gap-4 p-2 rounded hover:bg-blue-100 ${router.pathname === '/ai-contract-review' ? 'bg-blue-100 text-blue-950' : 'text-gray-700'}`}>
-                                    <i className="fa-solid fa-robot text-gray-600"></i>
-                                    <span>AI Contract Review</span>
-                                </Link>
-                                <Link href="/ailawtools/predictive" className={`flex items-center gap-4 p-2 rounded hover:bg-blue-100 ${router.pathname === '/ai-predictive-analytics' ? 'bg-blue-100 text-blue-950' : 'text-gray-700'}`}>
-                                    <i className="fa-solid fa-chart-line text-gray-600"></i>
-                                    <span>AI Predictive Analytics</span>
-                                </Link>
-                            </nav>
-                        </section>
-                        <section className="flex flex-col gap-4">
-                            <h2 className="text-lg font-semibold text-gray-700">AI Law Simulation</h2>
-                            <nav className="flex flex-col gap-2">
-                                <Link href="/admin" className={`flex items-center gap-4 p-2 rounded hover:bg-blue-100 ${router.pathname === '/ai-law-simulation' ? 'hover:bg-blue-100 text-blue-950' : 'text-gray-700'}`}>
-                                    <i className="fa-solid fa-flask text-gray-600"></i>
-                                    <span>Simulate a Case</span>
-                                </Link>
-                            </nav>
-                        </section>
-                    </div>
-                </aside>
-            )}
+            {isSidebarVisible && <Sidebar activeLink="/lawtools/casemanagement" />} {/* Pass activeLink as a prop */}
 
             {/* Main Content Area */}
             <main className="flex-1 flex flex-col items-center p-4 bg-white">
                 <header className="flex items-center justify-between w-full p-4 bg-white">
                     <button
                         onClick={toggleSidebar}
-                        className='flex items-center justify-center gap-4 border border-solid border-blue-950 border-x-2 border-y-2 bg-blue-950 text-white px-4 py-2 rounded-md duration-200 hover:bg-white hover:text-blue-950'
+                        className="flex items-center justify-center gap-4 border border-solid border-blue-950 border-x-2 border-y-2 bg-blue-950 text-white px-4 py-2 rounded-md duration-200 hover:bg-white hover:text-blue-950"
                     >
                         {isSidebarVisible ? 'Hide' : 'Show'}
                     </button>

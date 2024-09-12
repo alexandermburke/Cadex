@@ -2,60 +2,67 @@
 import React from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { useAuth } from '@/context/AuthContext';
 
-export default function Sidebar() {
+export default function Sidebar({ activeLink }) {
     const router = useRouter();
+    const { currentUser, userDataObj, isPaid } = useAuth()
 
     return (
-        <aside className="w-64 bg-gray-100 h-screen flex flex-col p-4 border-r border-gray-200">
+        <aside className="w-64 bg-white h-full flex flex-col p-4 border-r border-gray-200">
             <div className="flex flex-col gap-8">
                 <section className="flex flex-col gap-4">
-                    <h2 className="text-lg font-semibold text-gray-700">AI Tools</h2>
+                    <h2 className="text-lg font-semibold text-gray-700">Law Tools</h2>
                     <nav className="flex flex-col gap-2">
-                        <Link href="/ai-playground" className={`flex items-center gap-4 p-2 rounded-md hover:bg-blue-100 ${router.pathname === '/ai-playground' ? 'bg-blue-100 text-blue-950' : 'text-gray-700'}`}>
-                            <i className="fa-solid fa-flask text-gray-600"></i>
-                            <span>AI Playground</span>
+                        <Link href="/lawtools/research" className={`flex items-center gap-4 p-2 rounded ${activeLink === '/lawtools/research' ? 'bg-blue-100 text-blue-950' : 'hover:bg-blue-100 text-gray-700'}`}>
+                            <i className="fa-solid fa-gavel text-gray-600"></i>
+                            <span>Legal Research</span>
                         </Link>
-                        <Link href="/chat-pdf" className={`flex items-center gap-4 p-2 rounded-md hover:bg-blue-100 ${router.pathname === '/chat-pdf' ? 'bg-blue-100 text-blue-950' : 'text-gray-700'}`}>
+                        <Link href="/lawtools/casemanagement" className={`flex items-center gap-4 p-2 rounded ${activeLink === '/lawtools/casemanagement' ? 'bg-blue-100 text-blue-950' : 'hover:bg-blue-100 text-gray-700'}`}>
+                            <i className="fa-solid fa-folder-open text-gray-600"></i>
+                            <span>Case Management</span>
+                        </Link>
+                        <Link href="/lawtools/documentdrafting" className={`flex items-center gap-4 p-2 rounded ${activeLink === '/lawtools/documentdrafting' ? 'bg-blue-100 text-blue-950' : 'hover:bg-blue-100 text-gray-700'}`}>
                             <i className="fa-solid fa-file-alt text-gray-600"></i>
-                            <span>Chat PDF</span>
-                        </Link>
-                        <Link href="/image-generator" className={`flex items-center gap-4 p-2 rounded-md hover:bg-blue-100 ${router.pathname === '/image-generator' ? 'bg-blue-100 text-blue-950' : 'text-gray-700'}`}>
-                            <i className="fa-solid fa-image text-gray-600"></i>
-                            <span>Image Generator</span>
+                            <span>Document Drafting</span>
                         </Link>
                     </nav>
                 </section>
                 <section className="flex flex-col gap-4">
-                    <h2 className="text-lg font-semibold text-gray-700">AI Models</h2>
+                    <h2 className="text-lg font-semibold text-gray-700">AI Law Tools</h2>
                     <nav className="flex flex-col gap-2">
-                        <Link href="/chatgpt-4" className={`flex items-center gap-4 p-2 rounded-md hover:bg-blue-100 ${router.pathname === '/chatgpt-4' ? 'bg-blue-100 text-blue-950' : 'text-gray-700'}`}>
+                        <Link href="/ailawtools/analysis" className={`flex items-center gap-4 p-2 rounded ${activeLink === '/ailawtools/analysis' ? 'bg-blue-100 text-blue-950' : 'hover:bg-blue-100 text-gray-700'}`}>
                             <i className="fa-solid fa-brain text-gray-600"></i>
-                            <span>ChatGPT-4</span>
+                            <span>AI Legal Analysis</span>
                         </Link>
-                        <Link href="/claude-opus" className={`flex items-center gap-4 p-2 rounded-md hover:bg-blue-100 ${router.pathname === '/claude-opus' ? 'bg-blue-100 text-blue-950' : 'text-gray-700'}`}>
+                        <Link href="/ailawtools/contractreview" className={`flex items-center gap-4 p-2 rounded ${activeLink === '/ailawtools/contractreview' ? 'bg-blue-100 text-blue-950' : 'hover:bg-blue-100 text-gray-700'}`}>
                             <i className="fa-solid fa-robot text-gray-600"></i>
-                            <span>Claude Opus</span>
+                            <span>AI Contract Review</span>
                         </Link>
-                        <Link href="/gemini-1-5-pro" className={`flex items-center gap-4 p-2 rounded-md hover:bg-blue-100 ${router.pathname === '/gemini-1-5-pro' ? 'bg-blue-100 text-blue-950' : 'text-gray-700'}`}>
-                            <i className="fa-solid fa-star text-gray-600"></i>
-                            <span>Gemini 1.5 Pro</span>
+                        <Link href="/ailawtools/predictive" className={`flex items-center gap-4 p-2 rounded ${activeLink === '/ailawtools/predictive' ? 'bg-blue-100 text-blue-950' : 'hover:bg-blue-100 text-gray-700'}`}>
+                            <i className="fa-solid fa-chart-line text-gray-600"></i>
+                            <span>AI Predictive Analytics</span>
                         </Link>
-                        <Link href="/groq" className={`flex items-center gap-4 p-2 rounded-md hover:bg-blue-100 ${router.pathname === '/groq' ? 'bg-blue-100 text-blue-950' : 'text-gray-700'}`}>
-                            <i className="fa-solid fa-cube text-gray-600"></i>
-                            <span>Groq</span>
-                        </Link>
-                        <Link href="/llama-3" className={`flex items-center gap-4 p-2 rounded-md hover:bg-blue-100 ${router.pathname === '/llama-3' ? 'bg-blue-100 text-blue-950' : 'text-gray-700'}`}>
-                            <i className="fa-solid fa-paw text-gray-600"></i>
-                            <span>Llama 3</span>
-                        </Link>
-                        <Link href="/mistral-large" className={`flex items-center gap-4 p-2 rounded-md hover:bg-blue-100 ${router.pathname === '/mistral-large' ? 'bg-blue-100 text-blue-950' : 'text-gray-700'}`}>
-                            <i className="fa-solid fa-wind text-gray-600"></i>
-                            <span>Mistral Large</span>
+                    </nav>
+                </section>
+                <section className="flex flex-col gap-4">
+                    <h2 className="text-lg font-semibold text-gray-700">AI Law Simulation</h2>
+                    <nav className="flex flex-col gap-2">
+                        <Link href="/admin" className={`flex items-center gap-4 p-2 rounded ${activeLink === '/admin' ? 'bg-blue-100 text-blue-950' : 'hover:bg-blue-100 text-gray-700'}`}>
+                            <i className="fa-solid fa-flask text-gray-600"></i>
+                            <span>Simulate a Case</span>
                         </Link>
                     </nav>
                 </section>
             </div>
+            {/* New section at the bottom */}
+            <section className="mt-auto flex items-center gap-2 p-4">
+                <div className="flex flex-col">
+                    <span className="font-semibold text-blue-900">{currentUser?.displayName || 'User'}</span>
+                    <span className="text-xs text-gray-500">{currentUser?.email || 'User'}</span>
+                </div>
+                <span className="ml-auto text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full capitalize">{userDataObj?.billing.plan || 'User'}</span>
+            </section>
         </aside>
     );
 }
