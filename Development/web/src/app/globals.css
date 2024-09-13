@@ -203,6 +203,6 @@ html {
   }
   50% {
     opacity: 1;
-    text-shadow: 0 0 10px rgba(255, 255, 255, 1);
+    text-shadow: 0 0 1px rgb(255, 255, 255);
   }
 }
