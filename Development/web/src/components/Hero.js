@@ -58,7 +58,7 @@ export default function Hero() {
 
   return (
     <section className="w-full bg-white">
-      <div className="max-w-7xl mx-auto px-4 py-12">
+      <div className="max-w-7xl mx-auto px-4 py-6">
         <div
           className={`flex flex-col items-center text-center mx-auto transform transition-transform duration-700 ${
             loaded ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'
@@ -67,7 +67,7 @@ export default function Hero() {
           {/* First line: Empowering your */}
           <h2
             className={
-              'text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-semibold py-2 mb-4 ' +
+              'text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-semibold py-2 mb-0 ' +
               poppins.className
             }
           >

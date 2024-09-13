@@ -18,7 +18,7 @@
     "dotenv": "^16.4.5",
     "firebase": "^10.8.0",
     "firebase-admin": "^12.0.0",
-    "next": "^14.2.8",
+    "next": "^14.2.11",
     "next-themes": "^0.3.0",
     "openai": "^4.60.0",
     "pdfjs-dist": "^4.6.82",
