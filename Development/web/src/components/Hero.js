@@ -5,7 +5,7 @@ import React, { useState, useEffect } from 'react';
 
 const poppins = Poppins({
   subsets: ['latin'],
-  weight: ['400', '100', '200', '300', '500', '600', '700'],
+  weight: ['100', '200', '300', '400', '500', '600', '700'],
 });
 
 export default function Hero() {
@@ -60,14 +60,14 @@ export default function Hero() {
     <section className="w-full bg-white">
       <div className="max-w-7xl mx-auto px-4 py-12">
         <div
-          className={`flex flex-col items-center gap-6 text-center mx-auto transform transition-transform duration-700 ${
+          className={`flex flex-col items-center text-center mx-auto transform transition-transform duration-700 ${
             loaded ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'
           }`}
         >
           {/* First line: Empowering your */}
           <h2
             className={
-              'text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-semibold py-2 ' +
+              'text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-semibold py-2 mb-2 ' +
               poppins.className
             }
           >
@@ -98,7 +98,7 @@ export default function Hero() {
           {/* Second line: Legal practice with AI */}
           <h2
             className={
-              'text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-semibold py-2 ' +
+              'text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-semibold py-2 mb-8 ' +
               poppins.className
             }
           >
