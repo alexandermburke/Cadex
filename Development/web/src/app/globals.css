@@ -183,6 +183,7 @@ html {
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   position: relative;
+  padding-bottom: 8px;
 }
 
 .flare-letter::after {
@@ -191,8 +192,11 @@ html {
   top: 0;
   left: 0;
   color: white;
+  background: none; /* Ensure no background on pseudo-element */
+  -webkit-background-clip: unset;
+  -webkit-text-fill-color: white; /* Fills the text with white */
   opacity: 0;
-  animation: flareAnimation 3.5s forwards;
+  animation: flareAnimation 2.5s forwards;
   animation-delay: var(--animation-delay);
 }
 
