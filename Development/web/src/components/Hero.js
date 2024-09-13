@@ -53,7 +53,7 @@ export default function Hero() {
   }, []);
 
   // Words that will have the flare effect
-  const flareWordsFirstLine = ['your'];
+  const flareWordsFirstLine = ['your',];
   const flareWordsSecondLine = ['Legal', 'Practice'];
 
   return (
@@ -67,7 +67,7 @@ export default function Hero() {
           {/* First line: Empowering your */}
           <h2
             className={
-              'text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-semibold py-2 mb-2 ' +
+              'text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-semibold py-2 mb-4 ' +
               poppins.className
             }
           >
