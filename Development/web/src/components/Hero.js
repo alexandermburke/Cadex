@@ -67,7 +67,7 @@ export default function Hero() {
           {/* First line: Empowering your */}
           <h2
             className={
-              'text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-semibold py-2 mb-0 ' +
+              'text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-semibold py-2 mb-0 ' +
               poppins.className
             }
           >
@@ -98,7 +98,7 @@ export default function Hero() {
           {/* Second line: Legal practice with AI */}
           <h2
             className={
-              'text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-semibold py-2 mb-8 ' +
+              'text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-semibold py-2 mb-8 ' +
               poppins.className
             }
           >
@@ -133,7 +133,7 @@ export default function Hero() {
             case.
           </p>
 
-          <div className="flex justify-center mt-6">
+          <div className="flex justify-center mt-6 mb-6">
             <Link
               href="/#about"
               className="before:ease relative h-12 w-56 overflow-hidden rounded bg-gradient-to-r from-blue-950 to-slate-700 text-white shadow-2xl transition-all before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-56"
