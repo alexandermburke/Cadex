@@ -174,3 +174,35 @@ html {
 .logo-animation {
   animation: fadeInSlide 1s ease-out forwards;
 }
+
+/* Flare animation for "Your Legal Practice" */
+
+.flare-letter {
+  display: inline-block;
+  background: linear-gradient(30deg, #D4B44A, #ecddaa);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  position: relative;
+}
+
+.flare-letter::after {
+  content: attr(data-letter);
+  position: absolute;
+  top: 0;
+  left: 0;
+  color: white;
+  opacity: 0;
+  animation: flareAnimation 3.5s forwards;
+  animation-delay: var(--animation-delay);
+}
+
+@keyframes flareAnimation {
+  0%,
+  100% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 1);
+  }
+}

@@ -52,6 +52,10 @@ export default function Hero() {
     );
   }, []);
 
+  // Words that will have the flare effect
+  const flareWordsFirstLine = ['your'];
+  const flareWordsSecondLine = ['Legal', 'Practice'];
+
   return (
     <section className="w-full bg-white">
       <div className="max-w-7xl mx-auto px-4 py-12">
@@ -60,20 +64,75 @@ export default function Hero() {
             loaded ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'
           }`}
         >
+          {/* First line: Empowering your */}
           <h2
             className={
-              'text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-semibold py-6 ' +
+              'text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-semibold py-2 ' +
               poppins.className
             }
           >
             Empowering{' '}
-            <span className="goldGradient">Your Legal Practice</span> with AI
+            {/* Flare effect on "your" */}
+            <span className="relative inline-block">
+              {flareWordsFirstLine.map((word, wordIndex) => (
+                <span key={wordIndex} style={{ whiteSpace: 'nowrap' }}>
+                  {word.split('').map((letter, letterIndex) => (
+                    <span
+                      key={letterIndex}
+                      className="flare-letter"
+                      data-letter={letter}
+                      style={{
+                        '--animation-delay': `${
+                          (wordIndex * 5 + letterIndex) * 150
+                        }ms`,
+                      }}
+                    >
+                      {letter}
+                    </span>
+                  ))}
+                </span>
+              ))}
+            </span>
           </h2>
+
+          {/* Second line: Legal practice with AI */}
+          <h2
+            className={
+              'text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-semibold py-2 ' +
+              poppins.className
+            }
+          >
+            {/* Flare effect on "Legal Practice" */}
+            <span className="relative inline-block">
+              {flareWordsSecondLine.map((word, wordIndex) => (
+                <span key={wordIndex} style={{ whiteSpace: 'nowrap' }}>
+                  {word.split('').map((letter, letterIndex) => (
+                    <span
+                      key={letterIndex}
+                      className="flare-letter"
+                      data-letter={letter}
+                      style={{
+                        '--animation-delay': `${
+                          (wordIndex * 5 + letterIndex) * 150
+                        }ms`,
+                      }}
+                    >
+                      {letter}
+                    </span>
+                  ))}
+                  {' '}
+                </span>
+              ))}
+            </span>
+            {' '}with AI
+          </h2>
+
           <p className="text-center sm:text-lg md:text-xl text-black max-w-2xl">
             Cadex helps simulate real-life legal scenarios to enhance your
             practice, based on our Database of every known State or Federal
             case.
           </p>
+
           <div className="flex justify-center mt-6">
             <Link
               href="/#about"
@@ -113,9 +172,7 @@ export default function Hero() {
         </div>
 
         {/* Vertical Divider */}
-        <div
-          className={`mx-auto w-[1.5px] my-12 h-12 sm:h-16 md:h-20 bg-gradient-to-b from-transparent to-blue-950`}
-        />
+        <div className="mx-auto w-[1.5px] my-12 h-12 sm:h-16 md:h-20 bg-gradient-to-b from-transparent to-blue-950" />
 
         <div
           className={`flex flex-col items-center mt-8 transform transition-transform duration-700 ${

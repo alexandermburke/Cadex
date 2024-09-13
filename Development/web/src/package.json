@@ -21,6 +21,7 @@
     "next": "^14.2.8",
     "next-themes": "^0.3.0",
     "openai": "^4.60.0",
+    "pdfjs-dist": "^4.6.82",
     "react": "^18",
     "react-chartjs-2": "^5.2.0",
     "react-dom": "^18",

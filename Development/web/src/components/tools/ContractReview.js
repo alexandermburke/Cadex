@@ -2,6 +2,9 @@
 import React, { useState } from 'react';
 import Sidebar from '../Sidebar';
 import { useRouter } from 'next/navigation';
+import * as pdfjsLib from 'pdfjs-dist/build/pdf';
+// Set the workerSrc property
+pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
 
 export default function ContractReview() {
   const [contractText, setContractText] = useState('');
@@ -43,6 +46,33 @@ export default function ContractReview() {
     setIsSidebarVisible(!isSidebarVisible);
   };
 
+  // Function to handle PDF file upload
+  const handleFileUpload = async (event) => {
+    const file = event.target.files[0];
+    if (file && file.type === 'application/pdf') {
+      try {
+        const reader = new FileReader();
+        reader.onload = async () => {
+          const typedarray = new Uint8Array(reader.result);
+          const pdf = await pdfjsLib.getDocument({ data: typedarray }).promise;
+          let textContent = '';
+          for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+            const page = await pdf.getPage(pageNum);
+            const textContentObj = await page.getTextContent();
+            const pageText = textContentObj.items.map((item) => item.str).join(' ');
+            textContent += pageText + '\n';
+          }
+          setContractText(textContent);
+        };
+        reader.readAsArrayBuffer(file);
+      } catch (error) {
+        console.error('Error reading PDF file:', error);
+      }
+    } else {
+      alert('Please upload a valid PDF file.');
+    }
+  };
+
   return (
     <div className="flex h-screen bg-gray-100">
       {/* Sidebar */}
@@ -60,6 +90,16 @@ export default function ContractReview() {
               >
                 {isSidebarVisible ? 'Hide' : 'Show'}
               </button>
+            </div>
+            {/* File Upload Button */}
+            <div className="flex items-center mb-4">
+              <input
+                type="file"
+                accept=".pdf"
+                onChange={handleFileUpload}
+                disabled={isLoading}
+                className="mb-2"
+              />
             </div>
             <div className="flex items-center mb-4">
               <textarea
@@ -88,7 +128,7 @@ export default function ContractReview() {
                 <p className="text-gray-500">
                   {isLoading
                     ? 'Reviewing the contract...'
-                    : 'Enter contract text and click "Review Contract" to get started.'}
+                    : 'Enter contract text or upload a PDF and click "Review Contract" to get started.'}
                 </p>
               )}
             </div>
