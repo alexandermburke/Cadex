@@ -136,7 +136,7 @@ export default function ContractReview() {
                   <p className="text-gray-700 whitespace-pre-wrap">{reviewResult}</p>
                 </div>
               ) : (
-                <p className="text-gray-500">
+                <p className="text-gray-400">
                   {isLoading
                     ? 'Reviewing the contract...'
                     : 'Enter contract text or upload a PDF and click "Review Contract" to get started.'}
