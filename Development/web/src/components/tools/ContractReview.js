@@ -12,8 +12,18 @@ export default function ContractReview() {
   const [isSidebarVisible, setIsSidebarVisible] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
-  const { promise, resolve, reject } = Promise.withResolvers();
+
+  // Traditional promise creation to replace Promise.withResolvers
+  function createPromiseWithResolvers() {
+    let resolve, reject;
+    const promise = new Promise((res, rej) => {
+      resolve = res;
+      reject = rej;
+    });
+    return { promise, resolve, reject };
+  }
   
+  // Function to analyze the contract text
   const handleAnalyzeContract = async () => {
     if (!contractText.trim()) return;
 
