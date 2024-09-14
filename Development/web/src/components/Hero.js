@@ -24,7 +24,7 @@ export default function Hero() {
 
   const animateStats = (start, end, setter) => {
     let startTime;
-    const duration = 5000; // 5 seconds for the animation
+    const duration = 7500; // 5 seconds for the animation
 
     const step = (timestamp) => {
       if (!startTime) startTime = timestamp;

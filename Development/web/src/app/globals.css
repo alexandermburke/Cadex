@@ -196,7 +196,7 @@ html {
   -webkit-background-clip: unset;
   -webkit-text-fill-color: white; /* Fills the text with white */
   opacity: 0;
-  animation: flareAnimation 4.5s forwards;
+  animation: flareAnimation 6.5s forwards;
   animation-delay: var(--animation-delay);
 }
 
