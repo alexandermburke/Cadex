@@ -55,7 +55,7 @@ export default function Sidebar({ activeLink }) {
                     </nav>
                 </section>
             {/* New section at the bottom */}
-            <section className="mt-auto flex items-center gap-2 p-4 mt-44">
+            <section className="mr-40 flex items-center gap-2 p-4 mt-44">
                 <div className="flex flex-col">
                     <span className="font-semibold text-blue-900">{currentUser?.displayName || 'User'}</span>
                     <span className="text-xs text-gray-500">{currentUser?.email || 'User'}</span>

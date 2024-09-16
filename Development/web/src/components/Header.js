@@ -80,7 +80,7 @@ export default function Header() {
                     <Link href={'/admin'} className='border border-solid duration-200 border-transparent hover:text-slate-200 px-4 grid place-items-center rounded'>
                         <p>Dashboard</p>
                     </Link>
-                    <Link href={'/lawtools/research'} className='border border-solid duration-200 border-transparent hover:text-slate-200 px-4 grid place-items-center rounded'>
+                    <Link href={'/lawtools/casemanagement'} className='border border-solid duration-200 border-transparent hover:text-slate-200 px-4 grid place-items-center rounded'>
                         <div className="flex items-center">
                             <p>Tools</p>
                             <span className="ml-2 px-2 py-1 text-xs bg-emerald-400 text-white rounded">Beta</span>
@@ -98,7 +98,7 @@ export default function Header() {
         );
         menuActions = (
             <nav className='flex flex-col gap-2'>
-                <Link href={'/lawtools/research'} className='p-2 rounded border-solid border duration-200 text-lg hover:text-white hover:bg-blue-950 border-blue-950 border-x-4 border-y-4'>
+                <Link href={'/lawtools/casemanagement'} className='p-2 rounded border-solid border duration-200 text-lg hover:text-white hover:bg-blue-950 border-blue-950 border-x-4 border-y-4'>
                     <div className="flex items-center">
                         <p>Tools</p>
                         <span className="ml-2 px-2 py-1 text-xs bg-emerald-400 text-white rounded">Beta</span>
