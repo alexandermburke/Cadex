@@ -37,7 +37,7 @@ export default function Header() {
             <button onClick={() => copyToClipboard()} className='ml duration-200 overflow-hidden p-0.5 rounded relative'>
                 <div className='absolute inset-0 goldBackground' />
                 <div className='p-2 flex items-center justify-center gap-4 relative w-full z-10 bg-transparent rounded-lg hover:bg-transparent duration-200 text-white hover:text-blue-900'>
-                    <p className=''>{showText ? 'Link copied' : 'Share link'}</p>
+                    <p className=''>{showText ? 'Link copied' : 'Feature Request'}</p>
                 </div>
             </button>
         </div>
