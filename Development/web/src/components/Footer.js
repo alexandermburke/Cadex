@@ -36,6 +36,10 @@ export default function Footer() {
                                 <i className="fa-solid fa-at"></i>
                                 <p>support@cadexlaw.com</p>
                             </div>
+                            <div className='flex items-center gap-2 relative w-fit overflow-hidden after:absolute after:right-full after:bottom-0 after:h-[1px] after:bg-white after:w-full after:duration-200 hover:after:translate-x-full'>
+                                <i className="fa-solid fa-house"></i>
+                                <p>14950 N 87th St Scottsdale, Arizona</p>
+                            </div>
                         </div>
                     </div>
                 </div>
