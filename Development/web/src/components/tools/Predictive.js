@@ -8,12 +8,12 @@ import {
     LinearScale,
     PointElement,
     LineElement,
-    Title,
+    Title as ChartTitle,
     Tooltip,
     Legend,
 } from 'chart.js';
 
-ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
+ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, ChartTitle, Tooltip, Legend);
 
 export default function Predictive() {
     const [inputData, setInputData] = useState(''); // User input data for predictions
@@ -22,6 +22,19 @@ export default function Predictive() {
     const [isModalOpen, setIsModalOpen] = useState(false); // State to manage modal visibility
     const [isLoading, setIsLoading] = useState(false); // State to manage loading state
     const [areChartsVisible, setAreChartsVisible] = useState(true); // Toggle charts visibility
+    const [chartData, setChartData] = useState(null); // State to store chart data
+    const [chartOptions, setChartOptions] = useState(null); // State to store chart options
+
+    const isChartDataValid = () => {
+        return (
+            chartData !== null &&
+            typeof chartData === 'object' &&
+            Array.isArray(chartData.labels) &&
+            chartData.labels.length > 0 &&
+            Array.isArray(chartData.datasets) &&
+            chartData.datasets.length > 0
+        );
+    };
 
     const handleGeneratePrediction = async () => {
         if (!inputData.trim()) return;
@@ -29,16 +42,38 @@ export default function Predictive() {
         setIsLoading(true);
 
         try {
-            // Simulate an API call to an AI-powered predictive analytics service
-            await new Promise((res) => setTimeout(res, 1000));
+            // Make an API call to your predictive analytics service
+            const response = await fetch('/api/predictive', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ inputData }),
+            });
 
-            // Example AI-generated prediction result
-            const result = `Predictive Analytics Result: Based on the input data "${inputData}", the AI model predicts a potential increase in legal risks related to compliance issues. Recommended actions include reviewing the associated contracts and ensuring all legal requirements are met.`;
+            if (!response.ok) {
+                throw new Error('Error generating prediction');
+            }
 
-            setPredictionResult(result);
-            setIsModalOpen(true); // Open the modal when prediction is complete
+            const data = await response.json();
+
+            if (data.error) {
+                console.error('API Error:', data.details);
+                setPredictionResult('An error occurred while generating the prediction.');
+                setChartData(null);
+                setChartOptions(null);
+            } else {
+                const { predictionResult, chartData, chartOptions } = data;
+                setPredictionResult(predictionResult);
+                setChartData(chartData);
+                setChartOptions(chartOptions);
+                setIsModalOpen(true); // Open the modal when prediction is complete
+            }
         } catch (error) {
             console.error('Error generating prediction:', error);
+            setPredictionResult('An error occurred while generating the prediction.');
+            setChartData(null);
+            setChartOptions(null);
         } finally {
             setIsLoading(false);
         }
@@ -56,37 +91,23 @@ export default function Predictive() {
         setIsModalOpen(false);
     };
 
-    // Example chart data
-    const lineChartData = {
-        labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
-        datasets: [
-            {
-                label: 'Legal Risk Over Time',
-                data: [3, 2, 2.5, 4, 5.5, 3.8, 5],
-                borderColor: 'rgba(59, 130, 246, 1)',
-                backgroundColor: 'rgba(59, 130, 246, 0.5)',
-                fill: true,
-            },
-        ],
-    };
-
     return (
         <div className="flex h-screen bg-gray-100">
             {/* Sidebar */}
-            {isSidebarVisible && <Sidebar activeLink="/ailawtools/predictive" />} {/* Pass activeLink as a prop */}
+            {isSidebarVisible && <Sidebar activeLink="/ailawtools/predictive" />}
 
             {/* Main Content Area */}
             <main className="flex-1 flex flex-col items-center p-4 bg-white">
                 <header className="flex items-center justify-between w-full p-4 bg-white">
                     <button
                         onClick={toggleSidebar}
-                        className="flex items-center justify-center gap-4 border border-solid border-blue-950 border-x-2 border-y-2 bg-blue-950 text-white px-4 py-2 rounded-md duration-200 hover:bg-white hover:text-blue-950"
+                        className="flex items-center justify-center gap-4 border border-solid border-blue-950 bg-blue-950 text-white px-4 py-2 rounded-md duration-200 hover:bg-white hover:text-blue-950"
                     >
                         {isSidebarVisible ? 'Hide' : 'Show'}
                     </button>
                     <button
                         onClick={toggleChartsVisibility}
-                        className="ml-4 border border-solid border-blue-950 border-x-2 border-y-2 bg-white text-blue-950 px-4 py-2 rounded-md duration-200 hover:bg-blue-950 hover:text-white"
+                        className="ml-4 border border-solid border-blue-950 bg-white text-blue-950 px-4 py-2 rounded-md duration-200 hover:bg-blue-950 hover:text-white"
                     >
                         {areChartsVisible ? 'Hide Charts' : 'Show Charts'}
                     </button>
@@ -105,32 +126,42 @@ export default function Predictive() {
                         </div>
                         <button
                             onClick={handleGeneratePrediction}
-                            className="border border-solid border-blue-950 border-x-2 border-y-2 bg-white text-blue-950 px-4 py-2 rounded-md duration-200 hover:bg-blue-950 hover:text-white"
+                            className="border border-solid border-blue-950 bg-white text-blue-950 px-4 py-2 rounded-md duration-200 hover:bg-blue-950 hover:text-white"
                             disabled={isLoading}
                         >
                             {isLoading ? 'Generating Prediction...' : 'Generate Prediction'}
                         </button>
 
-                        <div className="flex-1 overflow-y-scroll p-4 mt-4 rounded bg-white cursor-pointer" onClick={() => setIsModalOpen(true)}>
+                        <div
+                            className="flex-1 overflow-y-scroll p-4 mt-4 rounded bg-white cursor-pointer"
+                            onClick={() => setIsModalOpen(true)}
+                        >
                             {predictionResult ? (
                                 <div className="mb-4 p-4 border border-gray-300 rounded-lg">
                                     <h3 className="text-lg font-semibold text-blue-600">Prediction Result</h3>
                                     <p className="text-gray-700 whitespace-pre-wrap">{predictionResult}</p>
                                 </div>
                             ) : (
-                                <p className="text-gray-500">{isLoading ? 'Generating prediction...' : 'Enter data and click "Generate Prediction" to get started.'}</p>
+                                <p className="text-gray-500">
+                                    {isLoading
+                                        ? 'Generating prediction...'
+                                        : 'Enter data and click "Generate Prediction" to get started.'}
+                                </p>
                             )}
                         </div>
 
                         {/* Toggleable Charts */}
                         {areChartsVisible && (
-                            <>
-                                {/* Line Chart */}
-                                <div className="my-8">
-                                    <h3 className="text-lg font-semibold text-blue-600 mb-4">Legal Risk Trend Over Time</h3>
-                                    <Line data={lineChartData} />
-                                </div>
-                            </>
+                            isChartDataValid() && chartOptions ? (
+                                <>
+                                    {/* Line Chart */}
+                                    <div className="my-8">
+                                        <Line data={chartData} options={chartOptions} />
+                                    </div>
+                                </>
+                            ) : (
+                                <p className="text-gray-500">No chart data available.</p>
+                            )
                         )}
                     </div>
                 </div>
@@ -144,7 +175,7 @@ export default function Predictive() {
                         <p className="text-gray-700 whitespace-pre-wrap">{predictionResult}</p>
                         <button
                             onClick={closeModal}
-                            className="mt-4 p-2 border border-solid border-blue-950 border-x-2 border-y-2 bg-blue-950 text-white px-4 py-2 rounded-md duration-200 hover:bg-white hover:text-blue-950"
+                            className="mt-4 p-2 border border-solid border-blue-950 bg-blue-950 text-white px-4 py-2 rounded-md duration-200 hover:bg-white hover:text-blue-950"
                         >
                             Close
                         </button>

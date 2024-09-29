@@ -19,18 +19,18 @@ export async function POST(request) {
       messages: [
         {
           role: 'system',
-          content: 'You are a legal assistant.',
+          content: `You are a legal assistant specializing in contract analysis. Your task is to review the following contract text and provide a concise summary highlighting key points, potential ambiguities, and any areas that may require further attention or clarification. Do not provide legal advice, but focus on summarizing the content and noting any general observations.`,
         },
         {
           role: 'user',
-          content: `Please provide a detailed legal analysis of the following contract:\n\n${contractText}\n\nHighlight any potential legal issues, ambiguities, or clauses that might require further review. Provide suggestions for improvements or areas that might need legal consultation.`,
+          content: `Contract Text:\n\n${contractText}`,
         },
       ],
       max_tokens: 1000,
       temperature: 0.7,
     });
 
-    const analysis = response.choices?.[0]?.message?.content || 'No analysis available.';
+    const analysis = response.choices?.[0]?.message?.content.trim() || 'No analysis available.';
 
     return NextResponse.json({ analysis }, { status: 200 });
   } catch (error) {
