@@ -139,7 +139,7 @@ export default function Hero() {
               className="before:ease relative h-12 w-56 overflow-hidden rounded bg-gradient-to-r from-blue-950 to-slate-700 text-white shadow-2xl transition-all before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-56"
             >
               <div className="flex items-center justify-center h-full">
-                View Pricing Model
+                Explore Plans
                 <i className="ml-8 fa-solid fa-arrow-right"></i>
               </div>
             </Link>
