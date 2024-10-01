@@ -37,7 +37,7 @@ export default function Header() {
             <button onClick={() => copyToClipboard()} className='ml duration-200 overflow-hidden p-0.5 rounded relative'>
                 <div className='absolute inset-0 goldBackground' />
                 <div className='p-2 flex items-center justify-center gap-4 relative w-full z-10 bg-transparent rounded-lg hover:bg-transparent duration-200 text-white hover:text-blue-900'>
-                    <p className=''>{showText ? 'Link copied' : 'Feature Request'}</p>
+                    <p className=''>{showText ? 'Link copied' : 'Report Bug'}</p>
                 </div>
             </button>
         </div>
@@ -80,7 +80,7 @@ export default function Header() {
                     <Link href={'/admin'} className='border border-solid duration-200 border-transparent hover:text-slate-200 px-4 grid place-items-center rounded'>
                         <p>Dashboard</p>
                     </Link>
-                    <Link href={'/lawtools/casemanagement'} className='border border-solid duration-200 border-transparent hover:text-slate-200 px-4 grid place-items-center rounded'>
+                    <Link href={'/lawtools/research'} className='border border-solid duration-200 border-transparent hover:text-slate-200 px-4 grid place-items-center rounded'>
                         <div className="flex items-center">
                             <p>Tools</p>
                             <span className="ml-2 px-2 py-1 text-xs bg-emerald-400 text-white rounded">Beta</span>
@@ -98,7 +98,7 @@ export default function Header() {
         );
         menuActions = (
             <nav className='flex flex-col gap-2'>
-                <Link href={'/lawtools/casemanagement'} className='p-2 rounded border-solid border duration-200 text-lg hover:text-white hover:bg-blue-950 border-blue-950 border-x-4 border-y-4'>
+                <Link href={'/lawtools/research'} className='p-2 rounded border-solid border duration-200 text-lg hover:text-white hover:bg-blue-950 border-blue-950 border-x-4 border-y-4'>
                     <div className="flex items-center">
                         <p>Tools</p>
                         <span className="ml-2 px-2 py-1 text-xs bg-emerald-400 text-white rounded">Beta</span>
