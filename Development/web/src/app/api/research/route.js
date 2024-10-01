@@ -43,30 +43,23 @@ Provide the response in the following JSON format:
     "decision": "Decision made in Case 1",
     "link": "https://example.com/case1"
   },
-  {
-    "title": "Case Title 2",
-    "fullCaseName": "Full Case Name of Case 2",
-    "summary": "Brief summary of the case.",
-    "importantDates": "Important dates for Case 2",
-    "citations": "Legal citations for Case 2",
-    "relatedCases": "Related cases for Case 2",
-    "decision": "Decision made in Case 2",
-    "link": "https://example.com/case2"
-  },
   // More cases if relevant
 ]
 
-Ensure the response is valid JSON.
+Ensure the response is valid JSON and do not include any additional text outside the JSON output.
 `;
 
         const response = await openai.chat.completions.create({
             model: 'gpt-3.5-turbo',
             messages: [{ role: 'user', content: prompt }],
-            max_tokens: 1500, // Increased to accommodate additional data
+            max_tokens: 1500,
             temperature: 0.7,
         });
 
         const assistantMessage = response.choices?.[0]?.message?.content.trim();
+
+        // ** Add logging of the assistant's message **
+        console.log('Assistant Message:', assistantMessage);
 
         // Parse the assistant's message as JSON
         let searchResults;
@@ -74,6 +67,7 @@ Ensure the response is valid JSON.
             searchResults = JSON.parse(assistantMessage);
         } catch (error) {
             console.error('Error parsing JSON:', error);
+            console.error('Assistant Message:', assistantMessage);
             return NextResponse.json(
                 { error: 'Failed to parse AI response as JSON.', details: error.message },
                 { status: 500 }
