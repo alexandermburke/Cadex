@@ -11,26 +11,33 @@ export async function POST(request) {
             return NextResponse.json({ error: 'No search query provided.' }, { status: 400 });
         }
 
+        // Check if OPENAI_API_KEY is available
+        if (!process.env.OPENAI_API_KEY) {
+            console.error('OPENAI_API_KEY is not set.');
+            return NextResponse.json(
+                { error: 'Server configuration error: OpenAI API key is missing.' },
+                { status: 500 }
+            );
+        }
+
         const openai = new OpenAI({
             apiKey: process.env.OPENAI_API_KEY,
         });
 
         // Define the prompt for the AI
         const prompt = `
-You are a legal expert with extensive knowledge of U.S. Supreme Court cases and other notable legal cases in the United States.
+As a legal expert, provide up to 3 relevant U.S. legal cases for the search query: "${searchQuery}". For each case, include:
 
-Given the search query: "${searchQuery}", provide a list of relevant cases. For each case, include:
+- "title": The official case name.
+- "fullCaseName": The official full case name.
+- "summary": A brief description of the case.
+- "importantDates": Key dates relevant to the case.
+- "citations": Legal citations for the case.
+- "relatedCases": Other related cases.
+- "decision": The decision made in the case.
+- "link": A URL to the case or a detailed article (use a placeholder if necessary).
 
-- **Title**: The official case name.
-- **Full Case Name**: The official full case name.
-- **Summary**: A brief description of the case.
-- **Important Dates**: Key dates relevant to the case.
-- **Citations**: Legal citations for the case.
-- **Related Cases**: Other cases that are related.
-- **Decision**: The decision made in the case.
-- **Link**: A URL where the full text of the case or a detailed article can be found (use a placeholder URL if necessary).
-
-Provide the response in the following JSON format:
+Provide the response **strictly** in valid JSON format without any additional text:
 
 [
   {
@@ -42,29 +49,35 @@ Provide the response in the following JSON format:
     "relatedCases": "Related cases for Case 1",
     "decision": "Decision made in Case 1",
     "link": "https://example.com/case1"
-  },
-  // More cases if relevant
+  }
+  // ... up to 3 cases
 ]
 
-Ensure the response is valid JSON and do not include any additional text outside the JSON output.
+Only output the JSON array and nothing else.
 `;
 
         const response = await openai.chat.completions.create({
             model: 'gpt-3.5-turbo',
             messages: [{ role: 'user', content: prompt }],
             max_tokens: 1500,
-            temperature: 0.7,
+            temperature: 0,
         });
 
         const assistantMessage = response.choices?.[0]?.message?.content.trim();
 
-        // ** Add logging of the assistant's message **
+        // Log the assistant's message for debugging
         console.log('Assistant Message:', assistantMessage);
 
-        // Parse the assistant's message as JSON
+        // Attempt to extract JSON from the assistant's message
         let searchResults;
         try {
-            searchResults = JSON.parse(assistantMessage);
+            // Match the JSON array in the assistant's message
+            const jsonMatch = assistantMessage.match(/\[\s*\{[\s\S]*\}\s*\]/);
+            if (jsonMatch) {
+                searchResults = JSON.parse(jsonMatch[0]);
+            } else {
+                throw new Error('No JSON array found in the assistant message.');
+            }
         } catch (error) {
             console.error('Error parsing JSON:', error);
             console.error('Assistant Message:', assistantMessage);
@@ -78,7 +91,7 @@ Ensure the response is valid JSON and do not include any additional text outside
     } catch (error) {
         console.error('Error during OpenAI API call:', error.response?.data || error.message);
         return NextResponse.json(
-            { error: 'Failed to process search query', details: error.message },
+            { error: 'Failed to process search query', details: error.response?.data || error.message },
             { status: 500 }
         );
     }
