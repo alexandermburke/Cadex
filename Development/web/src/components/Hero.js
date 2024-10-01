@@ -164,7 +164,7 @@ export default function Hero() {
                 <h4 className="text-3xl sm:text-4xl font-bold goldGradient">
                   {stats.statsProvided}
                 </h4>
-                <p className="text-base sm:text-lg text-gray-600">Referrals</p>
+                <p className="text-base sm:text-lg text-gray-600">Bugs Fixed</p>
               </div>
             </div>
           </div>
