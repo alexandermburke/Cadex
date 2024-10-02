@@ -26,7 +26,7 @@ export async function POST(request) {
 
         // Define the prompt for the AI
         const prompt = `
-As a legal expert, provide up to 3 relevant U.S. legal cases for the search query: "${searchQuery}". For each case, include:
+As a legal expert, provide up to 5 relevant U.S. legal cases for the search query: "${searchQuery}". For each case, include:
 
 - "title": The official case name.
 - "fullCaseName": The official full case name.
@@ -50,7 +50,7 @@ Provide the response **strictly** in valid JSON format without any additional te
     "decision": "Decision made in Case 1",
     "link": "https://example.com/case1"
   }
-  // ... up to 3 cases
+  // ... up to 5 cases
 ]
 
 Only output the JSON array and nothing else.
