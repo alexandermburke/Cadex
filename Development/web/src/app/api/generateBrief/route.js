@@ -1,4 +1,6 @@
-// app/api/generateBrief/route.js
+// app/api/generatebrief/route.js
+
+export const runtime = 'nodejs';
 
 import { NextResponse } from 'next/server';
 import { Configuration, OpenAIApi } from 'openai';
@@ -13,6 +15,12 @@ export async function POST(request) {
   const configuration = new Configuration({
     apiKey: process.env.OPENAI_API_KEY,
   });
+
+  if (!configuration.apiKey) {
+    console.error('OpenAI API key is missing.');
+    return NextResponse.json({ error: 'Server configuration error' }, { status: 500 });
+  }
+
   const openai = new OpenAIApi(configuration);
 
   try {
@@ -32,7 +40,7 @@ export async function POST(request) {
 
     return NextResponse.json({ brief }, { status: 200 });
   } catch (error) {
-    console.error('Error generating brief:', error);
+    console.error('Error generating brief:', error.response ? error.response.data : error.message);
     return NextResponse.json({ error: 'Failed to generate brief' }, { status: 500 });
   }
 }

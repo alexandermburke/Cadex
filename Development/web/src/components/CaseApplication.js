@@ -63,11 +63,13 @@ export default function SimulationCase() {
     setFeedbackIndex(0);
 
     try {
+      console.log('Fetching from URL:', '/api/generateBrief');
       const response = await fetch('/api/generateBrief', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ caseDescription, category, skillLevel }),
       });
+      
 
       if (!response.ok) {
         throw new Error('Failed to generate brief');
