@@ -24,7 +24,7 @@ export default function Hero() {
 
   const animateStats = (start, end, setter) => {
     let startTime;
-    const duration = 12000; // 7.5 seconds for the animation
+    const duration = 7500; // 7.5 seconds for the animation
 
     const step = (timestamp) => {
       if (!startTime) startTime = timestamp;
@@ -40,7 +40,7 @@ export default function Hero() {
 
   // State variable to trigger re-animation
   const [animationTrigger, setAnimationTrigger] = useState(0);
-  const animationInterval = 5; // Repeat animation every 5 seconds (adjust as needed)
+  const animationInterval = 12; // Repeat animation every 5 seconds (adjust as needed)
 
   useEffect(() => {
     setLoaded(true);
