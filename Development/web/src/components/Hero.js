@@ -24,7 +24,7 @@ export default function Hero() {
 
   const animateStats = (start, end, setter) => {
     let startTime;
-    const duration = 7500; // 5 seconds for the animation
+    const duration = 12000; // 7.5 seconds for the animation
 
     const step = (timestamp) => {
       if (!startTime) startTime = timestamp;
@@ -38,6 +38,10 @@ export default function Hero() {
     window.requestAnimationFrame(step);
   };
 
+  // State variable to trigger re-animation
+  const [animationTrigger, setAnimationTrigger] = useState(0);
+  const animationInterval = 5; // Repeat animation every 5 seconds (adjust as needed)
+
   useEffect(() => {
     setLoaded(true);
 
@@ -50,10 +54,17 @@ export default function Hero() {
     animateStats(0, targetStats.statsProvided, (value) =>
       setStats((prevStats) => ({ ...prevStats, statsProvided: value }))
     );
+
+    // Interval to trigger re-animation
+    const interval = setInterval(() => {
+      setAnimationTrigger((prev) => prev + 1);
+    }, animationInterval * 1000);
+
+    return () => clearInterval(interval);
   }, []);
 
   // Words that will have the flare effect
-  const flareWordsFirstLine = ['your',];
+  const flareWordsFirstLine = ['your'];
   const flareWordsSecondLine = ['Legal', 'Practice'];
 
   return (
@@ -64,7 +75,7 @@ export default function Hero() {
             loaded ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'
           }`}
         >
-          {/* First line: Empowering your */}
+          {/* First line: Improving your */}
           <h2
             className={
               'text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-semibold py-2 mb-0 ' +
@@ -73,7 +84,7 @@ export default function Hero() {
           >
             Improving{' '}
             {/* Flare effect on "your" */}
-            <span className="relative inline-block">
+            <span className="relative inline-block" key={animationTrigger}>
               {flareWordsFirstLine.map((word, wordIndex) => (
                 <span key={wordIndex} style={{ whiteSpace: 'nowrap' }}>
                   {word.split('').map((letter, letterIndex) => (
@@ -103,7 +114,7 @@ export default function Hero() {
             }
           >
             {/* Flare effect on "Legal Practice" */}
-            <span className="relative inline-block">
+            <span className="relative inline-block" key={animationTrigger}>
               {flareWordsSecondLine.map((word, wordIndex) => (
                 <span key={wordIndex} style={{ whiteSpace: 'nowrap' }}>
                   {word.split('').map((letter, letterIndex) => (
@@ -129,7 +140,7 @@ export default function Hero() {
 
           <p className="text-center sm:text-lg md:text-xl text-black max-w-2xl">
             Cadex helps simulate real-life legal scenarios to enhance your
-            practice, based on our Database of every known State or Federal
+            practice, based on our database of every known State or Federal
             case.
           </p>
 
