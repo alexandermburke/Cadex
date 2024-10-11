@@ -40,7 +40,7 @@ export default function Hero() {
 
   // State variable to trigger re-animation
   const [animationTrigger, setAnimationTrigger] = useState(0);
-  const animationInterval = 12; // Repeat animation every 5 seconds (adjust as needed)
+  const animationInterval = 12; // Repeat animation every 12 seconds (adjust as needed)
 
   useEffect(() => {
     setLoaded(true);
