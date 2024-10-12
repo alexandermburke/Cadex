@@ -10,7 +10,7 @@ export default function Home() {
     <CoolLayout>
       <Main>
         <Hero />
-        <Product />
+       
       </Main >
     </CoolLayout>
   );

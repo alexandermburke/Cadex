@@ -8,7 +8,7 @@ import { AuthProvider } from "@/context/AuthContext";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
-  description: "EnthusiastList - Buy, Sell, and Trade Enthusiast Cars",
+  description: "Cadex Law",
 };
 
 export default function RootLayout({ children }) {
