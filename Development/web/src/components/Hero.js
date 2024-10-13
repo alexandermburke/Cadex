@@ -206,8 +206,8 @@ export default function Hero() {
   // Define the VerticalDivider component
   const VerticalDivider = () => (
     <div
-      className={`mx-auto w-[2px] my-16 bg-gradient-to-b from-transparent via-slate-500 to-blue-950 transition-all duration-700 ${
-        loaded ? 'h-12 sm:h-16 md:h-20 opacity-100' : 'h-0 opacity-0'
+      className={`mx-auto w-[2px] my-4 bg-gradient-to-b from-transparent via-slate-500 to-blue-950 transition-all duration-700 ${
+        loaded ? 'h-12 sm:h-16 md:h-20 opacity-0' : 'h-0 opacity-0'
       }`}
     />
   );
@@ -301,37 +301,6 @@ export default function Hero() {
               </div>
             </Link>
           </div>
-
-{/* Average Weekly Stats Section */}
-<div className="flex flex-col lg:flex-row justify-around items-center mt-8 w-full">
-  {/* First Stat */}
-  <div className="flex flex-col items-center justify-center bg-white shadow-md rounded p-6 m-4 w-full sm:w-[300px] h-[200px]">
-    <h4 className="text-7xl font-bold goldGradient">
-      {stats.cases}
-    </h4>
-    <p className="text-base text-gray-600 mt-2">Users</p>
-  </div>
-  {/* Second Stat */}
-  <div className="flex flex-col items-center justify-center bg-white shadow-md rounded p-6 m-4 w-full sm:w-[300px] h-[200px]">
-    <h4 className="text-7xl font-bold goldGradient">
-      {stats.newUsers}
-    </h4>
-    <p className="text-base text-gray-600 mt-2">Cases</p>
-  </div>
-  {/* Third Stat */}
-  <div className="flex flex-col items-center justify-center bg-white shadow-md rounded p-6 m-4 w-full sm:w-[300px] h-[200px]">
-    <h4 className="text-7xl font-bold goldGradient">
-      {stats.statsProvided}
-    </h4>
-    <p className="text-base text-gray-600 mt-2">Hours Saved</p>
-  </div>
-</div>
-<p className="text-center text-gray-500 mt-6">
-  Average Weekly Stats
-</p>
-
-
-
         </div>
 
         {/* Vertical Divider */}
@@ -341,7 +310,7 @@ export default function Hero() {
         <div className="flex flex-col items-center py-10 px-4 md:px-8 lg:px-16 Professional">
           <div className="max-w-5xl">
             <h3 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-semibold text-center text-blue-950">
-              Why <span className='font-medium goldGradient '>Choose</span> Cadex?
+              Why <span className='font-medium goldGradient '>Choose</span> Cadex
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-8 my-12">
               {benefits.map((benefit, index) => (
@@ -365,8 +334,37 @@ export default function Hero() {
         {/* Vertical Divider */}
         <VerticalDivider />
 
-        {/* Testimonials Section */}
-        <div className="flex flex-col items-center py-10 px-4 md:px-8 lg:px-16 bg-white">
+ {/* Features Section */}
+ <div className="flex flex-col items-center py-10 px-4 md:px-8 lg:px-16 bg-white">
+          <div className="max-w-5xl">
+            <h3 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-semibold text-center text-blue-950">
+              Features
+            </h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-8 my-12">
+              {features.map((feature, index) => (
+                <div
+                  key={index}
+                  className="flex flex-col items-center p-6 Professional rounded shadow-md hover:shadow-xl transition-shadow"
+                >
+                  {feature.icon}
+                  <h4 className="text-xl font-semibold text-blue-950 mb-2 text-center">
+                    {feature.title}
+                  </h4>
+                  <p className="text-base text-center text-gray-700">
+                    {feature.description}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+       
+
+        {/* Vertical Divider */}
+        <VerticalDivider />
+
+         {/* Testimonials Section */}
+         <div className="flex flex-col items-center py-10 px-4 md:px-8 lg:px-16 bg-white">
           <div className="max-w-5xl">
             <h3 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-semibold text-center text-blue-950">
               What <span className='font-medium goldGradient '>Our Users</span> Say
@@ -390,34 +388,6 @@ export default function Hero() {
                   </p>
                   <p className="text-base text-center text-gray-700">
                     {testimonial.quote}
-                  </p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* Vertical Divider */}
-        <VerticalDivider />
-
-        {/* Features Section */}
-        <div className="flex flex-col items-center py-10 px-4 md:px-8 lg:px-16 bg-white">
-          <div className="max-w-5xl">
-            <h3 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-semibold text-center text-blue-950">
-              Features
-            </h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-8 my-12">
-              {features.map((feature, index) => (
-                <div
-                  key={index}
-                  className="flex flex-col items-center p-6 Professional rounded shadow-md hover:shadow-xl transition-shadow"
-                >
-                  {feature.icon}
-                  <h4 className="text-xl font-semibold text-blue-950 mb-2 text-center">
-                    {feature.title}
-                  </h4>
-                  <p className="text-base text-center text-gray-700">
-                    {feature.description}
                   </p>
                 </div>
               ))}
