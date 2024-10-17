@@ -442,7 +442,7 @@ export default function Hero() {
         {/* What Our Users Are Saying Section */}
         <div className="flex flex-col items-center py-10 px-4 md:px-8 lg:px-16 bg-white">
           <div className="max-w-7xl w-full">
-            <h3 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-semibold text-center text-blue-950">
+            <h3 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-semibold text-center text-black">
               What <span className="font-medium goldGradient">Our Users</span> Are Saying
             </h3>
             <p className="text-center sm:text-lg md:text-xl text-black max-w-2xl mx-auto my-4">
@@ -452,7 +452,7 @@ export default function Hero() {
               {testimonials.map((testimonial, index) => (
                 <div
                   key={index}
-                  className="flex flex-col items-center text-center bg-blue-100 p-6 rounded-lg shadow-md"
+                  className="flex flex-col items-center text-center bg-slate-100 p-6 rounded-lg shadow-md"
                 >
                   {testimonial.image && (
                     <img
@@ -464,15 +464,15 @@ export default function Hero() {
                   <h4 className="text-xl font-semibold text-blue-950">
                     {testimonial.name}
                   </h4>
-                  <p className="text-sm text-blue-700 mb-2">
+                  <p className="text-sm text-black mb-2">
                     {testimonial.title}
                   </p>
                   {testimonial.handle && (
-                    <p className="text-sm text-blue-700 mb-2">
+                    <p className="text-sm text-black mb-2">
                       {testimonial.handle}
                     </p>
                   )}
-                  <p className="text-base text-blue-800">
+                  <p className="text-base text-black ">
                     "{testimonial.quote}"
                   </p>
                 </div>
