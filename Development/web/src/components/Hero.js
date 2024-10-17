@@ -205,13 +205,44 @@ export default function Hero() {
     },
   ];
 
+   // Frequently Asked Questions data
+   const faqs = [
+    {
+      question: 'What is Cadex?',
+      answer:
+        'Cadex is an AI-powered platform that enhances your legal practice with advanced tools and simulations.',
+    },
+    {
+      question: 'How does Cadex help legal professionals?',
+      answer:
+        'Cadex provides tools like legal research, case management, document drafting, and predictive analytics to improve efficiency and accuracy.',
+    },
+    {
+      question: 'Is Cadex suitable for law students?',
+      answer:
+        'Yes, Cadex offers interactive legal simulations and resources that are valuable for both professionals and students.',
+    },
+    {
+      question: 'How secure is my data with Cadex?',
+      answer:
+        'We prioritize data security and employ industry-standard encryption and security protocols to protect your information.',
+    },
+    {
+      question: 'Can I try Cadex before purchasing?',
+      answer:
+        'Yes, we offer a free trial period for you to experience the features of Cadex.',
+    },
+  ];
+
+
   const totalTraditionalCost = '$1,400/month';
   const totalCadexCost = '$100/month';
 
+  
   // Define the VerticalDivider component
   const VerticalDivider = () => (
     <div
-      className={`mx-auto w-[2px] my-4 bg-gradient-to-b from-transparent via-slate-500 to-blue-950 transition-all duration-700 ${
+      className={`mx-auto w-[2px] my-0 bg-gradient-to-b from-transparent via-slate-500 to-blue-950 transition-all duration-700 ${
         loaded ? 'h-12 sm:h-16 md:h-20 opacity-0' : 'h-0 opacity-0'
       }`}
     />
@@ -229,7 +260,7 @@ export default function Hero() {
           {/* First line: Improving your */}
           <h2
             className={
-              'text-4xl sm:text-6xl md:text-6xl lg:text-7xl font-semibold py-2 mb-0 ' +
+              'text-5xl sm:text-7xl font-semibold py-2 mb-0 ' +
               poppins.className
             }
           >
@@ -260,7 +291,7 @@ export default function Hero() {
           {/* Second line: Legal Practice with AI */}
           <h2
             className={
-              'text-4xl sm:text-6xl md:text-6xl lg:text-7xl font-semibold py-2 mb-8 ' +
+              'text-5xl sm:text-7xl font-semibold py-2 mb-8 ' +
               poppins.className
             }
           >
@@ -457,25 +488,48 @@ export default function Hero() {
                 </tbody>
               </table>
               <p className="text-center mt-4 text-gray-700">
-                Save over <span className="font-bold">$1,300</span> per month by using Cadex!
+                Save over an estimated <span className="font-bold">$1,300</span> per month by using Cadex!
               </p>
             </div>
           </div>
         </div>
 
-        {/* Vertical Divider */}
-        <VerticalDivider />
+         {/* Vertical Divider */}
+         <VerticalDivider />
 
-        {/* Universities Section */}
-        <div className="flex flex-col items-center py-8 px-4 md:px-8 lg:px-16">
-          <div className="max-w-5xl w-full">
-            <h3 className="text-4xl lg:text-7xl font-semibold my-12 text-center text-blue-950 ">
-              Universities We Work With
-            </h3>
-            <CarouselComponent />
-          </div>
+{/* Universities Section */}
+<div className="flex flex-col items-center py-8 px-4 md:px-8 lg:px-16">
+  <div className="max-w-5xl w-full">
+    <h3 className="text-4xl lg:text-7xl font-semibold my-12 text-center text-blue-950 ">
+      Universities We Work With
+    </h3>
+    <CarouselComponent />
+  </div>
+</div>
+
+{/* Vertical Divider */}
+<VerticalDivider />
+
+{/* FAQ Section */}
+<div className="flex flex-col items-center py-10 px-4 md:px-8 lg:px-16">
+  <div className="max-w-5xl w-full">
+    <h3 className="text-4xl lg:text-7xl font-semibold my-12 text-center text-blue-950 ">
+      Frequently Asked Questions
+    </h3>
+    <div className="space-y-6">
+      {faqs.map((faq, index) => (
+        <div key={index} className="bg-white rounded shadow-md p-6">
+          <h4 className="text-xl font-semibold text-blue-950 mb-2">
+            {faq.question}
+          </h4>
+          <p className="text-base text-gray-700">{faq.answer}</p>
         </div>
-      </div>
-    </section>
-  );
+      ))}
+    </div>
+  </div>
+</div>
+
+</div>
+</section>
+);
 }
