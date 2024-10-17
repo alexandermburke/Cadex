@@ -18,6 +18,11 @@ import {
   FaUsers,
 } from 'react-icons/fa';
 
+// Import Swiper components and styles
+import { Swiper, SwiperSlide } from 'swiper/react';
+import 'swiper/css';
+import { Autoplay } from 'swiper/modules'; // Import Autoplay module
+
 const poppins = Poppins({
   subsets: ['latin'],
   weight: ['100', '200', '300', '400', '500', '600', '700'],
@@ -306,11 +311,57 @@ export default function Hero() {
         {/* Vertical Divider */}
         <VerticalDivider />
 
-        {/* Benefits Section */}
-        <div className="flex flex-col items-center py-10 px-4 md:px-8 lg:px-16 Professional">
+{/* Features Section */}
+<div className="flex flex-col items-center py-10 px-4 md:px-8 lg:px-16 bg-white">
+  <div className="max-w-7xl w-full">
+  <h3 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-semibold text-center text-blue-950">
+              Features
+            </h3>
+    <Swiper
+      modules={[Autoplay]}
+      spaceBetween={20} // Adjust space between slides
+      slidesPerView="auto"
+      autoplay={{
+        delay: 0,
+        disableOnInteraction: false,
+      }}
+      speed={3000} // Adjust speed as needed (lower value = faster)
+      loop={true}
+      freeMode={true}
+      freeModeMomentum={false}
+      className="my-12"
+    >
+      {features.map((feature, index) => (
+        <SwiperSlide
+          key={index}
+          style={{ width: '200px', height: '200px' }} // Set both width and height
+        >
+          <div
+            className="w-full h-full flex flex-col items-center justify-center p-4 Professional rounded shadow-md hover:shadow-xl transition-shadow"
+          >
+            {feature.icon}
+            <h4 className="text-lg font-semibold text-blue-950 mb-2 text-center">
+              {feature.title}
+            </h4>
+            <p className="text-sm text-center text-gray-700">
+              {feature.description}
+            </p>
+          </div>
+        </SwiperSlide>
+      ))}
+    </Swiper>
+  </div>
+</div>
+ 
+
+        {/* Vertical Divider */}
+        <VerticalDivider />
+
+       {/* Benefits Section */}
+       <div className="flex flex-col items-center py-10 px-4 md:px-8 lg:px-16 Professional">
           <div className="max-w-5xl">
             <h3 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-semibold text-center text-blue-950">
-              Why <span className='font-medium goldGradient '>Choose</span> Cadex
+              Why <span className="font-medium goldGradient">Choose</span> Cadex
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-8 my-12">
               {benefits.map((benefit, index) => (
@@ -330,44 +381,15 @@ export default function Hero() {
             </div>
           </div>
         </div>
-
+ 
         {/* Vertical Divider */}
         <VerticalDivider />
 
- {/* Features Section */}
- <div className="flex flex-col items-center py-10 px-4 md:px-8 lg:px-16 bg-white">
+        {/* Testimonials Section */}
+        <div className="flex flex-col items-center py-10 px-4 md:px-8 lg:px-16 bg-white">
           <div className="max-w-5xl">
             <h3 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-semibold text-center text-blue-950">
-              Features
-            </h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-8 my-12">
-              {features.map((feature, index) => (
-                <div
-                  key={index}
-                  className="flex flex-col items-center p-6 Professional rounded shadow-md hover:shadow-xl transition-shadow"
-                >
-                  {feature.icon}
-                  <h4 className="text-xl font-semibold text-blue-950 mb-2 text-center">
-                    {feature.title}
-                  </h4>
-                  <p className="text-base text-center text-gray-700">
-                    {feature.description}
-                  </p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-       
-
-        {/* Vertical Divider */}
-        <VerticalDivider />
-
-         {/* Testimonials Section */}
-         <div className="flex flex-col items-center py-10 px-4 md:px-8 lg:px-16 bg-white">
-          <div className="max-w-5xl">
-            <h3 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-semibold text-center text-blue-950">
-              What <span className='font-medium goldGradient '>Our Users</span> Say
+              What <span className="font-medium goldGradient">Our Users</span> Say
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 my-12">
               {testimonials.map((testimonial, index) => (
@@ -402,7 +424,7 @@ export default function Hero() {
         <div className="flex flex-col items-center py-10 px-4 md:px-8 lg:px-16 Professional">
           <div className="max-w-5xl">
             <h3 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-semibold text-center text-blue-950">
-            <span className='font-medium goldGradient '>Save Money</span> with Cadex
+              <span className="font-medium goldGradient">Save Money</span> with Cadex
             </h3>
             <div className="my-12 overflow-x-auto">
               {/* Cost Comparison Table */}
