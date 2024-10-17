@@ -158,27 +158,55 @@ export default function Hero() {
     },
   ];
 
+  // Updated Testimonials Section
   const testimonials = [
     {
-      name: 'John Doe',
-      title: 'Senior Partner at XYZ Law Firm',
+      name: 'Emily Watson',
+      title: 'Associate at Smith & Associates',
+      handle: '@emilywatson',
       quote:
-        'Cadex has revolutionized the way we practice law. We save countless hours each week.',
-      image: '/avatar1.png', // Replace with actual image paths
+        'Cadex has been a game-changer for our firm. The AI-powered legal simulations have improved our case strategies significantly.',
+      image: '/emily_watson.png',
     },
     {
-      name: 'Jane Smith',
-      title: 'Legal Analyst at ABC Corp',
+      name: 'Robert Brown',
+      title: 'Law Student at Harvard Law School',
+      handle: '@robertbrown',
       quote:
-        'The predictive analytics feature has given us a competitive edge.',
-      image: '/avatar2.png',
+        'Using Cadex has enhanced my understanding of complex legal concepts through interactive simulations.',
+      image: '/robert_brown.png',
     },
     {
-      name: 'Michael Johnson',
-      title: 'Law Professor at University of Law',
+      name: 'Laura Green',
+      title: 'Professor of Law at Stanford University',
+      handle: '@lauragreen',
       quote:
         'An invaluable tool for educating the next generation of legal professionals.',
-      image: '/avatar4.png',
+      image: '/laura_green.png',
+    },
+    {
+      name: 'Michael Lee',
+      title: 'Legal Analyst at Global Corp',
+      handle: '@michaellee',
+      quote:
+        'The predictive analytics and AI tools in Cadex have saved us time and significantly reduced costs.',
+      image: '/michael_lee.png',
+    },
+    {
+      name: 'Sophia Martinez',
+      title: 'Paralegal at LegalWorks',
+      handle: '@sophiamartinez',
+      quote:
+        'Cadex simplifies complex legal research, making my job so much easier.',
+      image: '/sophia_martinez.png',
+    },
+    {
+      name: 'Daniel Kim',
+      title: 'Partner at Kim & Partners',
+      handle: '@danielkim',
+      quote:
+        'The AI tools in Cadex have given us a competitive edge in case preparation.',
+      image: '/daniel_kim.png',
     },
   ];
 
@@ -205,8 +233,8 @@ export default function Hero() {
     },
   ];
 
-   // Frequently Asked Questions data
-   const faqs = [
+  // Frequently Asked Questions data
+  const faqs = [
     {
       question: 'What is Cadex?',
       answer:
@@ -234,11 +262,9 @@ export default function Hero() {
     },
   ];
 
-
   const totalTraditionalCost = '$1,400/month';
   const totalCadexCost = '$100/month';
 
-  
   // Define the VerticalDivider component
   const VerticalDivider = () => (
     <div
@@ -342,54 +368,51 @@ export default function Hero() {
         {/* Vertical Divider */}
         <VerticalDivider />
 
-{/* Features Section */}
-<div className="flex flex-col items-center py-10 px-4 md:px-8 lg:px-16 bg-white">
-  <div className="max-w-7xl w-full">
-  <h3 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-semibold text-center text-blue-950">
+        {/* Features Section */}
+        <div className="flex flex-col items-center py-10 px-4 md:px-8 lg:px-16 bg-white">
+          <div className="max-w-7xl w-full">
+            <h3 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-semibold text-center text-blue-950">
               Features
             </h3>
-    <Swiper
-      modules={[Autoplay]}
-      spaceBetween={20} // Adjust space between slides
-      slidesPerView="auto"
-      autoplay={{
-        delay: 0,
-        disableOnInteraction: false,
-      }}
-      speed={3000} // Adjust speed as needed (lower value = faster)
-      loop={true}
-      freeMode={true}
-      freeModeMomentum={false}
-      className="my-12"
-    >
-      {features.map((feature, index) => (
-        <SwiperSlide
-          key={index}
-          style={{ width: '200px', height: '200px' }} // Set both width and height
-        >
-          <div
-            className="w-full h-full flex flex-col items-center justify-center p-4 Professional rounded shadow-md hover:shadow-xl transition-shadow"
-          >
-            {feature.icon}
-            <h4 className="text-lg font-semibold text-blue-950 mb-2 text-center">
-              {feature.title}
-            </h4>
-            <p className="text-sm text-center text-gray-700">
-              {feature.description}
-            </p>
+            <Swiper
+              modules={[Autoplay]}
+              spaceBetween={20}
+              slidesPerView="auto"
+              autoplay={{
+                delay: 0,
+                disableOnInteraction: false,
+              }}
+              speed={3000}
+              loop={true}
+              freeMode={true}
+              freeModeMomentum={false}
+              className="my-12"
+            >
+              {features.map((feature, index) => (
+                <SwiperSlide
+                  key={index}
+                  style={{ width: '200px', height: '200px' }}
+                >
+                  <div className="w-full h-full flex flex-col items-center justify-center p-4 Professional rounded shadow-md hover:shadow-xl transition-shadow">
+                    {feature.icon}
+                    <h4 className="text-lg font-semibold text-blue-950 mb-2 text-center">
+                      {feature.title}
+                    </h4>
+                    <p className="text-sm text-center text-gray-700">
+                      {feature.description}
+                    </p>
+                  </div>
+                </SwiperSlide>
+              ))}
+            </Swiper>
           </div>
-        </SwiperSlide>
-      ))}
-    </Swiper>
-  </div>
-</div>
- 
+        </div>
 
         {/* Vertical Divider */}
         <VerticalDivider />
 
-       {/* Benefits Section */}
-       <div className="flex flex-col items-center py-10 px-4 md:px-8 lg:px-16 Professional">
+        {/* Benefits Section */}
+        <div className="flex flex-col items-center py-10 px-4 md:px-8 lg:px-16 Professional">
           <div className="max-w-5xl">
             <h3 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-semibold text-center text-blue-950">
               Why <span className="font-medium goldGradient">Choose</span> Cadex
@@ -412,35 +435,45 @@ export default function Hero() {
             </div>
           </div>
         </div>
- 
+
         {/* Vertical Divider */}
         <VerticalDivider />
 
-        {/* Testimonials Section */}
+        {/* What Our Users Are Saying Section */}
         <div className="flex flex-col items-center py-10 px-4 md:px-8 lg:px-16 bg-white">
-          <div className="max-w-5xl">
+          <div className="max-w-7xl w-full">
             <h3 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-semibold text-center text-blue-950">
-              What <span className="font-medium goldGradient">Our Users</span> Say
+              What <span className="font-medium goldGradient">Our Users</span> Are Saying
             </h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 my-12">
+            <p className="text-center sm:text-lg md:text-xl text-black max-w-2xl mx-auto my-4">
+              People love us because Cadex saves them time and money.
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               {testimonials.map((testimonial, index) => (
                 <div
                   key={index}
-                  className="flex flex-col items-center p-6 Professional rounded shadow-md"
+                  className="flex flex-col items-center text-center bg-blue-100 p-6 rounded-lg shadow-md"
                 >
-                  <img
-                    src={testimonial.image}
-                    alt={testimonial.name}
-                    className="w-24 h-24 rounded-full mb-4"
-                  />
-                  <h4 className="text-xl font-semibold text-blue-950 mb-2 text-center">
+                  {testimonial.image && (
+                    <img
+                      src={testimonial.image}
+                      alt={testimonial.name}
+                      className="w-24 h-24 rounded-full mb-4"
+                    />
+                  )}
+                  <h4 className="text-xl font-semibold text-blue-950">
                     {testimonial.name}
                   </h4>
-                  <p className="text-sm text-gray-600 mb-2 text-center">
+                  <p className="text-sm text-blue-700 mb-2">
                     {testimonial.title}
                   </p>
-                  <p className="text-base text-center text-gray-700">
-                    {testimonial.quote}
+                  {testimonial.handle && (
+                    <p className="text-sm text-blue-700 mb-2">
+                      {testimonial.handle}
+                    </p>
+                  )}
+                  <p className="text-base text-blue-800">
+                    "{testimonial.quote}"
                   </p>
                 </div>
               ))}
@@ -494,42 +527,41 @@ export default function Hero() {
           </div>
         </div>
 
-         {/* Vertical Divider */}
-         <VerticalDivider />
+        {/* Vertical Divider */}
+        <VerticalDivider />
 
-{/* Universities Section */}
-<div className="flex flex-col items-center py-8 px-4 md:px-8 lg:px-16">
-  <div className="max-w-5xl w-full">
-    <h3 className="text-4xl lg:text-7xl font-semibold my-12 text-center text-blue-950 ">
-      Universities We Work With
-    </h3>
-    <CarouselComponent />
-  </div>
-</div>
-
-{/* Vertical Divider */}
-<VerticalDivider />
-
-{/* FAQ Section */}
-<div className="flex flex-col items-center py-10 px-4 md:px-8 lg:px-16">
-  <div className="max-w-5xl w-full">
-    <h3 className="text-4xl lg:text-7xl font-semibold my-12 text-center text-blue-950 ">
-      Frequently Asked Questions
-    </h3>
-    <div className="space-y-6">
-      {faqs.map((faq, index) => (
-        <div key={index} className="bg-white rounded shadow-md p-6">
-          <h4 className="text-xl font-semibold text-blue-950 mb-2">
-            {faq.question}
-          </h4>
-          <p className="text-base text-gray-700">{faq.answer}</p>
+        {/* Universities Section */}
+        <div className="flex flex-col items-center py-8 px-4 md:px-8 lg:px-16">
+          <div className="max-w-5xl w-full">
+            <h3 className="text-4xl lg:text-7xl font-semibold my-12 text-center text-blue-950 ">
+              Universities We Work With
+            </h3>
+            <CarouselComponent />
+          </div>
         </div>
-      ))}
-    </div>
-  </div>
-</div>
 
-</div>
-</section>
-);
+        {/* Vertical Divider */}
+        <VerticalDivider />
+
+        {/* FAQ Section */}
+        <div className="flex flex-col items-center py-10 px-4 md:px-8 lg:px-16">
+          <div className="max-w-5xl w-full">
+            <h3 className="text-4xl lg:text-7xl font-semibold my-12 text-center text-blue-950 ">
+              Frequently Asked Questions
+            </h3>
+            <div className="space-y-6">
+              {faqs.map((faq, index) => (
+                <div key={index} className="bg-white rounded shadow-md p-6">
+                  <h4 className="text-xl font-semibold text-blue-950 mb-2">
+                    {faq.question}
+                  </h4>
+                  <p className="text-base text-gray-700">{faq.answer}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
 }
