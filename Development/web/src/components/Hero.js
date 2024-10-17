@@ -229,7 +229,7 @@ export default function Hero() {
           {/* First line: Improving your */}
           <h2
             className={
-              'text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-semibold py-2 mb-0 ' +
+              'text-4xl sm:text-6xl md:text-6xl lg:text-7xl font-semibold py-2 mb-0 ' +
               poppins.className
             }
           >
@@ -260,7 +260,7 @@ export default function Hero() {
           {/* Second line: Legal Practice with AI */}
           <h2
             className={
-              'text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-semibold py-2 mb-8 ' +
+              'text-4xl sm:text-6xl md:text-6xl lg:text-7xl font-semibold py-2 mb-8 ' +
               poppins.className
             }
           >
