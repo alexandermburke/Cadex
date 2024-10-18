@@ -473,7 +473,7 @@ export default function Hero() {
                     </p>
                   )}
                   <p className="text-base text-black ">
-                    "{testimonial.quote}"
+                    {testimonial.quote}
                   </p>
                 </div>
               ))}
