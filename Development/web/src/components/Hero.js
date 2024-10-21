@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Poppins } from 'next/font/google';
 import Link from 'next/link';
 import CarouselComponent from './Carousel';
+import Image from 'next/image'; // Import Image from next/image
 import {
   FaGavel,
   FaSearch,
@@ -166,7 +167,7 @@ export default function Hero() {
       handle: '@emilywatson',
       quote:
         'Cadex has been a game-changer for our firm. The AI-powered legal simulations have improved our case strategies significantly.',
-      image: '/emily_watson.png',
+      image: '/avatar1.png',
     },
     {
       name: 'Robert Brown',
@@ -174,7 +175,7 @@ export default function Hero() {
       handle: '@robertbrown',
       quote:
         'Using Cadex has enhanced my understanding of complex legal concepts through interactive simulations.',
-      image: '/robert_brown.png',
+      image: '/avatar2.png',
     },
     {
       name: 'Laura Green',
@@ -182,7 +183,7 @@ export default function Hero() {
       handle: '@lauragreen',
       quote:
         'An invaluable tool for educating the next generation of legal professionals.',
-      image: '/laura_green.png',
+      image: '/avatar3.png',
     },
     {
       name: 'Michael Lee',
@@ -190,7 +191,7 @@ export default function Hero() {
       handle: '@michaellee',
       quote:
         'The predictive analytics and AI tools in Cadex have saved us time and significantly reduced costs.',
-      image: '/michael_lee.png',
+      image: '/avatar3.png',
     },
     {
       name: 'Sophia Martinez',
@@ -198,7 +199,7 @@ export default function Hero() {
       handle: '@sophiamartinez',
       quote:
         'Cadex simplifies complex legal research, making my job so much easier.',
-      image: '/sophia_martinez.png',
+      image: '/avatar2.png',
     },
     {
       name: 'Daniel Kim',
@@ -206,7 +207,7 @@ export default function Hero() {
       handle: '@danielkim',
       quote:
         'The AI tools in Cadex have given us a competitive edge in case preparation.',
-      image: '/daniel_kim.png',
+      image: '/avatar1.png',
     },
   ];
 
@@ -455,10 +456,12 @@ export default function Hero() {
                   className="flex flex-col items-center text-center bg-slate-100 p-6 rounded-lg shadow-md"
                 >
                   {testimonial.image && (
-                    <img
+                    <Image
                       src={testimonial.image}
                       alt={testimonial.name}
-                      className="w-24 h-24 rounded-full mb-4"
+                      width={96}
+                      height={96}
+                      className="rounded-full mb-4"
                     />
                   )}
                   <h4 className="text-xl font-semibold text-blue-950">
