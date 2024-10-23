@@ -35,7 +35,7 @@ export default function Login() {
     <img src="/header.png" alt="Cadex Law Logo" className='w-24 h-24 sm:mr-4' />
     <div className='text-center sm:text-left'>
         <h2 className={'text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-semibold ' + poppins.className}>
-            <span className='goldGradient'>Cadex Law Simulation</span>
+            <span className='goldGradient'>Cadex Law</span>
         </h2>
     </div>
 </div>
