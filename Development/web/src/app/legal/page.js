@@ -1,5 +1,5 @@
 import React from 'react'
-import Legal from '@/components/Legal'
+import TAS from '@/components/TermsandConditions'
 import CoolLayout from '@/components/CoolLayout'
 import Main from '@/components/Main'
 
@@ -9,7 +9,7 @@ export const metadata = {
 
 export default function BrowsePage() {
     return (
-        <Legal />
+        <TAS />
         
     
     )

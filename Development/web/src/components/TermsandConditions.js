@@ -26,7 +26,7 @@ export default function Legal() {
       </h1>
 
       <p>
-        Welcome to Cadex. These Terms & Conditions govern your use of Cadex's website and services.
+        Welcome to Cadex. These Terms & Conditions govern your use of Cadex&#39;s website and services.
         By accessing or using Cadex, you agree to be bound by these Terms & Conditions. If you do
         not agree with these Terms & Conditions, please do not use Cadex.
       </p>
@@ -37,7 +37,7 @@ export default function Legal() {
         that you are at least 18 years old.
       </p>
       <p>
-        You agree to use Cadex's website and services only for lawful purposes and in accordance
+        You agree to use Cadex&#39;s website and services only for lawful purposes and in accordance
         with these Terms & Conditions.
       </p>
 
@@ -56,7 +56,7 @@ export default function Legal() {
 
       <h2 className="text-2xl font-semibold mt-4">Intellectual Property</h2>
       <p>
-        All content on Cadex's website, including but not limited to text, graphics, logos, images,
+        All content on Cadex&#39;s website, including but not limited to text, graphics, logos, images,
         and software, is the property of Cadex or its licensors and is protected by copyright,
         trademark, and other intellectual property laws.
       </p>
@@ -67,7 +67,7 @@ export default function Legal() {
 
       <h2 className="text-2xl font-semibold mt-4">Disclaimer of Warranties</h2>
       <p>
-        Cadex's website and services are provided on an 'as is' and 'as available' basis, without
+        Cadex&#39;s website and services are provided on an &#39;as is&#39; and &#39;as available&#39; basis, without
         any warranties of any kind, either express or implied. Cadex does not warrant that its
         website will be uninterrupted or error-free, or that any defects will be corrected.
       </p>
@@ -75,7 +75,7 @@ export default function Legal() {
       <h2 className="text-2xl font-semibold mt-4">Limitation of Liability</h2>
       <p>
         In no event shall Cadex be liable for any direct, indirect, incidental, special, or
-        consequential damages arising out of or in any way connected with your use of Cadex's
+        consequential damages arising out of or in any way connected with your use of Cadex&#39;s
         website or services, whether based on contract, tort, strict liability, or any other legal
         theory.
       </p>
@@ -84,8 +84,8 @@ export default function Legal() {
       <p>
         You agree to indemnify and hold harmless Cadex, its affiliates, officers, directors,
         employees, and agents from and against any and all claims, liabilities, damages, losses,
-        costs, or expenses, including reasonable attorneys' fees, arising out of or in any way
-        connected with your use of Cadex's website or services.
+        costs, or expenses, including reasonable attorneys&#39; fees, arising out of or in any way
+        connected with your use of Cadex&#39;s website or services.
       </p>
 
       <h2 className="text-2xl font-semibold mt-4">Governing Law</h2>
@@ -97,7 +97,7 @@ export default function Legal() {
       <h2 className="text-2xl font-semibold mt-4">Jurisdiction</h2>
       <p>
         Any legal suit, action, or proceeding arising out of, or related to, these Terms &
-        Conditions or the use of Cadex's website or services shall be instituted exclusively in the
+        Conditions or the use of Cadex&#39;s website or services shall be instituted exclusively in the
         federal or state courts located in Maricopa County, Arizona.
       </p>
 

@@ -1,10 +1,8 @@
 'use client'
 import CoolLayout from '@/components/CoolLayout'
-import Login from '@/components/Login'
 import Main from '@/components/Main'
 import { useAuth } from '@/context/AuthContext'
 import React from 'react'
-import SearchBtn from '@/components/SearchButton';
 
 export default function SubLayout({ children }) {
     const { currentUser, loading } = useAuth()
