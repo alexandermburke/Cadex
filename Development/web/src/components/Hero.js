@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Poppins } from 'next/font/google';
 import Link from 'next/link';
 import CarouselComponent from './Carousel';
-import Image from 'next/image'; // Import Image from next/image
+import Image from 'next/image';
 import {
   FaGavel,
   FaSearch,
@@ -19,10 +19,9 @@ import {
   FaUsers,
 } from 'react-icons/fa';
 
-// Import Swiper components and styles
 import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css';
-import { Autoplay } from 'swiper/modules'; // Import Autoplay module
+import { Autoplay } from 'swiper/modules';
 
 const poppins = Poppins({
   subsets: ['latin'],
@@ -45,7 +44,7 @@ export default function Hero() {
 
   const animateStats = (start, end, setter) => {
     let startTime;
-    const duration = 7500; // 7.5 seconds for the animation
+    const duration = 7500;
 
     const step = (timestamp) => {
       if (!startTime) startTime = timestamp;
@@ -59,11 +58,18 @@ export default function Hero() {
     window.requestAnimationFrame(step);
   };
 
-  // State variable to trigger re-animation
   const [animationTrigger, setAnimationTrigger] = useState(0);
-  const animationInterval = 12; // Repeat animation every 12 seconds
+  const animationInterval = 12;
+
+  const [showDisclaimer, setShowDisclaimer] = useState(false);
 
   useEffect(() => {
+    // Check if the disclaimer has been shown before
+    const hasSeenDisclaimer = localStorage.getItem('hasSeenDisclaimer');
+    if (!hasSeenDisclaimer) {
+      setShowDisclaimer(true);
+    }
+
     setLoaded(true);
 
     animateStats(0, targetStats.cases, (value) =>
@@ -76,13 +82,17 @@ export default function Hero() {
       setStats((prevStats) => ({ ...prevStats, statsProvided: value }))
     );
 
-    // Interval to trigger re-animation
     const interval = setInterval(() => {
       setAnimationTrigger((prev) => prev + 1);
     }, animationInterval * 1000);
 
     return () => clearInterval(interval);
   }, []);
+
+  const handleCloseDisclaimer = () => {
+    setShowDisclaimer(false);
+    localStorage.setItem('hasSeenDisclaimer', 'true');
+  };
 
   // Words that will have the flare effect
   const flareWordsFirstLine = ['your'];
@@ -159,7 +169,6 @@ export default function Hero() {
     },
   ];
 
-  // Updated Testimonials Section
   const testimonials = [
     {
       name: 'Emily Watson',
@@ -234,7 +243,9 @@ export default function Hero() {
     },
   ];
 
-  // Frequently Asked Questions data
+  const totalTraditionalCost = '$1,400/month';
+  const totalCadexCost = '$100/month';
+
   const faqs = [
     {
       question: 'What is Cadex?',
@@ -263,10 +274,6 @@ export default function Hero() {
     },
   ];
 
-  const totalTraditionalCost = '$1,400/month';
-  const totalCadexCost = '$100/month';
-
-  // Define the VerticalDivider component
   const VerticalDivider = () => (
     <div
       className={`mx-auto w-[2px] my-0 bg-gradient-to-b from-transparent via-slate-500 to-blue-950 transition-all duration-700 ${
@@ -277,6 +284,29 @@ export default function Hero() {
 
   return (
     <section className="w-full bg-white">
+      {/* Disclaimer Popup */}
+      {showDisclaimer && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white rounded-lg p-6 max-w-lg mx-auto">
+            <h2 className="text-2xl font-semibold mb-4">Important Disclaimer</h2>
+            <p className="mb-4 text-gray-700">
+              Please be advised that Cadex is intended solely as a supplementary tool to assist lawyers, law students, and legal enthusiasts in their educational and professional pursuits. It is not a substitute for professional legal advice from a qualified attorney, nor should it be considered an alternative to formal legal examinations such as the LSAT or Bar Exam. Users should exercise caution, as artificial intelligence technologies in their current state may occasionally produce exaggerated, inaccurate, or falsified representations of legal cases. Therefore, any information or insights provided by Cadex should not be relied upon without conducting your own independent research and verification. For further details and stipulations, please refer to our{' '}
+              <Link href="/terms-and-conditions" className="text-blue-600 underline">
+                Terms and Conditions
+              </Link>.
+            </p>
+            <div className="text-right">
+              <button
+                onClick={handleCloseDisclaimer}
+                className="mt-4 px-6 py-2 bg-blue-950 text-white rounded hover:bg-blue-800"
+              >
+                I Understand
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="max-w-7xl mx-auto px-4 py-0">
         {/* Hero Section */}
         <div
@@ -287,8 +317,7 @@ export default function Hero() {
           {/* First line: Improving your */}
           <h2
             className={
-              'text-5xl sm:text-7xl font-semibold py-2 mb-0 ' +
-              poppins.className
+              'text-5xl sm:text-7xl font-semibold py-2 mb-0 ' + poppins.className
             }
           >
             Improving{' '}
@@ -302,9 +331,7 @@ export default function Hero() {
                       className="flare-letter"
                       data-letter={letter}
                       style={{
-                        '--animation-delay': `${
-                          (wordIndex * 5 + letterIndex) * 150
-                        }ms`,
+                        '--animation-delay': `${(wordIndex * 5 + letterIndex) * 150}ms`,
                       }}
                     >
                       {letter}
@@ -318,8 +345,7 @@ export default function Hero() {
           {/* Second line: Legal Practice with AI */}
           <h2
             className={
-              'text-5xl sm:text-7xl font-semibold py-2 mb-8 ' +
-              poppins.className
+              'text-5xl sm:text-7xl font-semibold py-2 mb-8 ' + poppins.className
             }
           >
             {/* Flare effect on "Legal Practice" */}
@@ -332,9 +358,7 @@ export default function Hero() {
                       className="flare-letter"
                       data-letter={letter}
                       style={{
-                        '--animation-delay': `${
-                          (wordIndex * 5 + letterIndex) * 150
-                        }ms`,
+                        '--animation-delay': `${(wordIndex * 5 + letterIndex) * 150}ms`,
                       }}
                     >
                       {letter}
@@ -524,7 +548,8 @@ export default function Hero() {
                 </tbody>
               </table>
               <p className="text-center mt-4 text-gray-700">
-                Save over an estimated <span className="font-bold">$1,300</span> per month by using Cadex!
+                Save over an estimated{' '}
+                <span className="font-bold">$1,300</span> per month by using Cadex!
               </p>
             </div>
           </div>

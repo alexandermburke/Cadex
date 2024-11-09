@@ -12,7 +12,7 @@ const poppins = Poppins({ subsets: ["latin"], weight: ['400', '100', '200', '300
 const plans = [
     {
         name: 'Basic',
-        description: 'For Individual Legal Practice',
+        description: 'For Individual Legal Study & Practice',
         price: '$5 USD',
         interval: 'Per week',
         features: [
@@ -30,7 +30,7 @@ const plans = [
         price: '$50 USD',
         interval: 'Per month',
         features: [
-            'Everything in the Free plan',
+            'Everything in the Base plan',
             'Unlimited access to all case simulations',
             '10 case simulations shared to all team members per month',
             'Priority support and feature requests',
