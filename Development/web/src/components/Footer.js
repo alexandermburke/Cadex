@@ -65,11 +65,11 @@ export default function Footer() {
                     <div className="flex flex-col gap-2 w-fit">
             <h3 className="font-bold">Legal</h3>
             <div className="flex flex-col gap-1 text-sm">
-              <Link className="relative w-fit overflow-hidden hover:underline" href={'/privacy-policy'}>
+              <Link className="relative w-fit overflow-hidden hover:underline" href={'/privacy'}>
                 <p>Privacy Policy</p>
               </Link>
-              <Link className="relative w-fit overflow-hidden hover:underline" href={'/terms-conditions'}>
-                <p>Terms & Conditions</p>
+              <Link className="relative w-fit overflow-hidden hover:underline" href={'/legal'}>
+                <p>Terms & Agreements</p>
               </Link>
             </div>
           </div>

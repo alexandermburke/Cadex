@@ -291,7 +291,7 @@ export default function Hero() {
             <h2 className="text-2xl font-semibold mb-4">Important Disclaimer</h2>
             <p className="mb-4 text-gray-700">
               Please be advised that Cadex is intended solely as a supplementary tool to assist lawyers, law students, and legal enthusiasts in their educational and professional pursuits. It is not a substitute for professional legal advice from a qualified attorney, nor should it be considered an alternative to formal legal examinations such as the LSAT or Bar Exam. Users should exercise caution, as artificial intelligence technologies in their current state may occasionally produce exaggerated, inaccurate, or falsified representations of legal cases. Therefore, any information or insights provided by Cadex should not be relied upon without conducting your own independent research and verification. For further details and stipulations, please refer to our{' '}
-              <Link href="/terms-and-conditions" className="text-blue-600 underline">
+              <Link href="/legal" className="text-blue-600 underline">
                 Terms and Conditions
               </Link>.
             </p>
