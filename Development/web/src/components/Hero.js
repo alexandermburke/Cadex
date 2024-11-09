@@ -296,12 +296,15 @@ export default function Hero() {
               </Link>.
             </p>
             <div className="text-right">
-              <button
-                onClick={handleCloseDisclaimer}
-                className="mt-4 px-6 py-2 bg-blue-950 text-white rounded hover:bg-blue-800"
+            <button
+           onClick={handleCloseDisclaimer}
+           className="before:ease relative h-12 w-56 overflow-hidden rounded bg-gradient-to-r from-blue-950 to-slate-700 text-white shadow-2xl transition-all before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-56"
               >
-                I Understand
-              </button>
+            <div className="flex items-center justify-center h-full">
+              I Understand
+            <i className="ml-8 fa-solid fa-arrow-right"></i>
+             </div>
+            </button>
             </div>
           </div>
         </div>
