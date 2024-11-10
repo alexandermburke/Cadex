@@ -21,7 +21,7 @@ export default function Legal() {
       />
 
       {/* Update the title */}
-      <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-semibold text-center goldGradient">
+      <h1 className="text-3xl sm:text-3xl md:text-3xl lg:text-3xl font-semibold text-center goldGradient">
         Terms & Conditions
       </h1>
 
