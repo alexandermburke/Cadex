@@ -9,7 +9,7 @@ export default function Account() {
 
     const { currentUser, userDataObj, isPaid } = useAuth()
 
-    const plan = userDataObj?.billing?.plan || 'Free'; // Get the plan, default to 'Free'
+    const plan = userDataObj?.billing?.plan || 'free'; 
 
     const vals = {
         'email': currentUser.email,

@@ -75,7 +75,7 @@ export default function Sidebar({ activeLink }) {
                         ) : (
                             <>
                                 <Link
-                                    href="/pricing"
+                                    href="/admin/billing"
                                     className="flex items-center gap-4 p-2 text-gray-400 hover:text-gray-400"
                                 >
                                     <i className="fa-solid fa-gavel text-gray-400"></i>
@@ -83,7 +83,7 @@ export default function Sidebar({ activeLink }) {
                                     <i className="fa-solid fa-lock ml-auto text-gray-400"></i>
                                 </Link>
                                 <Link
-                                    href="/pricing"
+                                    href="/admin/billing"
                                     className="flex items-center gap-4 p-2 text-gray-400 hover:text-gray-400"
                                 >
                                     <i className="fa-solid fa-flask text-gray-400"></i>
