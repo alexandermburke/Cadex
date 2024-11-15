@@ -47,15 +47,15 @@ export default function Header() {
         <nav className='hidden items-stretch md:flex'>
             <Link href={'/admin'} className='border border-solid duration-200 border-transparent hover:text-slate-200 px-4 grid place-items-center rounded'>
                         <div className="flex items-center">
-                            <p>Tools</p>
-                            <span className="ml-2 px-2 py-1 text-xs bg-emerald-400 text-white rounded">Beta</span>
+                            <p>Dashboard</p>
+                            <span className="ml-2 px-2 py-1 text-xs bg-emerald-400 text-white rounded">New</span>
                         </div>
                     </Link>
             <Link href={'/pricing'} className='mx-2 p-2 px-2 grid place-items-center relative z-10 rounded-lg bg-transparent hover:text-slate-200'>
                 <p>Pricing</p>
             </Link>
-            <Link href={'/admin'} className='mx-2 p-2 px-2 grid place-items-center relative z-10 rounded-lg bg-transparent hover:text-slate-200'>
-                <p>{currentUser ? 'Dashboard' : 'Login'}</p>
+            <Link href={'/admin/account'} className='mx-2 p-2 px-2 grid place-items-center relative z-10 rounded-lg bg-transparent hover:text-slate-200'>
+                <p>{currentUser ? 'Account' : 'Login'}</p>
             </Link>
             <Link href={'/careers'} className='mx-2 ml-4 duration-200 overflow-hidden p-0.5 rounded-lg relative'>
                 <div className='absolute inset-0' />

@@ -13,14 +13,14 @@ const plans = [
     {
         name: 'Basic',
         description: 'For Individual Legal Study & Practice',
-        price: '$5 USD',
-        interval: 'Per week',
+        price: '$1 USD',
+        interval: 'Per day',
         features: [
-            'Access to basic legal case simulations',
-            'Join public case discussions',
-            'Manage 2 simulated cases',
-            'No Ads',
+            'Access to all AI tools',
+            'Access to all legal tools',
             'Cancel any time',
+            'No Ads',
+            'Join public case discussions',
         ],
         recommended: false
     },
@@ -32,7 +32,7 @@ const plans = [
         features: [
             'Everything in the Base plan',
             'Unlimited access to all case simulations',
-            '10 case simulations shared to all team members per month',
+            'Unlimited access to LSAT/Bar exam prep',
             'Priority support and feature requests',
         ],
         recommended: true
