@@ -37,11 +37,13 @@ export default function ExamPrep() {
       { value: 'Below 150', label: 'Below 150' },
       { value: '150-160', label: '150-160' },
       { value: '160-170', label: '160-170' },
+      { value: 'Above 170', label: 'Above 170' },
     ],
     BAR: [
       { value: '60%', label: '60% Correct' },
       { value: '70%', label: '70% Correct' },
-      { value: '80%', label: '80% Correct' },
+      { value: '80%', label: '80% Correct' },     
+      { value: '90%', label: '90% Correct' },
     ],
     MPRE: [
       { value: 'Low (Below 85)', label: 'Low (Below 85)' },
@@ -317,7 +319,7 @@ export default function ExamPrep() {
             {/* Exam Question Display */}
             {questionText && (
               <div className="mb-4 p-4 bg-white rounded shadow">
-                <h3 className="text-lg font-semibold text-blue-600">Exam Question</h3>
+                <h3 className="text-lg font-semibold text-blue-950">Exam Question</h3>
                 <p className="text-gray-700 whitespace-pre-wrap">{questionText}</p>
               </div>
             )}
