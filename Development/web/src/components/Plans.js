@@ -48,7 +48,7 @@ export default function Plans() {
 
     async function handleUpdatePlan() {
         if (!selectedPlan || isPaid) { return }
-        let billing = { plan: 'free', status: false }
+        let billing = { plan: 'free', status: true }
         // if selected plan is free, then just save and send to dashboard
 
         if (selectedPlan === 'Pro') {

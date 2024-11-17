@@ -107,7 +107,7 @@ export default function Plans() {
                 </div>
             )}
           <div className='flex flex-col gap-6'>
-                 <p className='text-center'>All transactions are handled by Stripe</p>
+                 <p className='text-center'>All transactions are handled by Stripe.</p>
             </div>
         </>
         

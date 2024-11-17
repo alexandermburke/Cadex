@@ -318,7 +318,7 @@ export default function ExamPrep() {
 
             {/* Exam Question Display */}
             {questionText && (
-              <div className="mb-4 p-4 bg-white rounded shadow">
+              <div className="mb-4 p-4 bg-white rounded shadow overflow-y-scroll">
                 <h3 className="text-lg font-semibold text-blue-950">Exam Question</h3>
                 <p className="text-gray-700 whitespace-pre-wrap">{questionText}</p>
               </div>
