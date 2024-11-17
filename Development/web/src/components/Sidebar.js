@@ -18,7 +18,7 @@ export default function Sidebar({ activeLink }) {
                     <h2 className="text-lg font-semibold text-gray-700">Law Tools</h2>
                     <nav className="flex flex-col gap-2">
                         <Link href="/lawtools/research" className={`flex items-center gap-4 p-2 rounded ${activeLink === '/lawtools/research' ? 'bg-blue-100 text-blue-950' : 'hover:bg-blue-100 text-gray-700'}`}>
-                            <i className="fa-solid fa-globe text-gray-600"></i>
+                        <i className="fa-solid fa-gavel text-gray-600"></i>
                             <span>Legal Research</span>
                         </Link>
                         <Link href="/lawtools/casemanagement" className={`flex items-center gap-4 p-2 rounded ${activeLink === '/lawtools/casemanagement' ? 'bg-blue-100 text-blue-950' : 'hover:bg-blue-100 text-gray-700'}`}>
@@ -61,12 +61,12 @@ export default function Sidebar({ activeLink }) {
                                     href="/admin/case"
                                     className={`flex items-center gap-4 p-2 rounded ${activeLink === '/admin/case' ? 'bg-blue-100 text-blue-950' : 'hover:bg-blue-100 text-gray-700'}`}
                                 >
-                                    <i className="fa-solid fa-gavel text-gray-600"></i>
+                                    <i className="fa-solid fa-globe text-gray-600"></i>
                                     <span>Simulate a Case</span>
                                 </Link>
                                 <Link
-                                    href="/admin/lsatprep"
-                                    className={`flex items-center gap-4 p-2 rounded ${activeLink === '/admin/lsatprep' ? 'bg-blue-100 text-blue-950' : 'hover:bg-blue-100 text-gray-700'}`}
+                                    href="/ailawtools/examprep"
+                                    className={`flex items-center gap-4 p-2 rounded ${activeLink === '/ailawtools/lsatprep' ? 'bg-blue-100 text-blue-950' : 'hover:bg-blue-100 text-gray-700'}`}
                                 >
                                     <i className="fa-solid fa-flask text-gray-600"></i>
                                     <span>LSAT/BAR Prep</span>
@@ -102,7 +102,7 @@ export default function Sidebar({ activeLink }) {
                         <span className="text-xs text-gray-500">{currentUser?.email || 'User'}</span>
                     </div>
                     <span
-                        className={`ml-auto text-xs px-2 py-1 rounded-full capitalize ${
+                        className={`ml-6 text-xs px-2 py-1 rounded-full capitalize ${
                             plan === 'Pro'
                                 ? 'bg-blue-100 text-blue-700'
                                 : 'bg-green-100 text-green-700'

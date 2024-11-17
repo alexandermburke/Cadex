@@ -265,21 +265,19 @@ export default function Dashboard() {
         <div className="flex flex-col sm:flex-row gap-2">
           <button
             onClick={handleSaveCase}
-            className="relative flex items-center justify-center h-12 w-full sm:w-56 overflow-hidden rounded bg-gradient-to-r from-blue-950 to-slate-700 text-white shadow-2xl transition-all before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-56"
-          >
-          <div className="flex items-center justify-center h-full">
+            className="group before:ease relative h-12 w-56 overflow-hidden rounded bg-gradient-to-r from-blue-950 to-slate-700 text-white shadow-2xl transition-all before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-56">     
+             <div className="flex items-center justify-center h-full">
               <p>{savingCase ? 'Saving ...' : 'Save Progress'}</p>
-              <i className="ml-8 fa-solid fa-save"></i>
+              <i className="ml-8 fa-solid fa-save opacity-0 group-hover:opacity-100 transition-opacity duration-200"></i>
             </div>
           </button>
           <Link
             href={'/simulation?user=' + currentUser.displayName}
             target="_blank"
-            className="relative flex items-center justify-center h-12 w-full sm:w-56 overflow-hidden rounded bg-gradient-to-r from-blue-950 to-slate-700 text-white shadow-2xl transition-all before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-56"
-          >
-            <div className="flex items-center justify-center h-full">
+            className="group before:ease relative h-12 w-56 overflow-hidden rounded bg-gradient-to-r from-blue-950 to-slate-700 text-white shadow-2xl transition-all before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-56">
+                <div className="flex items-center justify-center h-full">
               <p>Start Simulation</p>
-              <i className="ml-8 fa-solid fa-play"></i>
+              <i className="ml-8 fa-solid fa-play opacity-0 group-hover:opacity-100 transition-opacity duration-200"></i>
             </div>
           </Link>
         </div>

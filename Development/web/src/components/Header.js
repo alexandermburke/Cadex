@@ -45,7 +45,7 @@ export default function Header() {
 
     let navActions = (
         <nav className='hidden items-stretch md:flex'>
-            <Link href={'/admin'} className='border border-solid duration-200 border-transparent hover:text-slate-200 px-4 grid place-items-center rounded'>
+            <Link href={'/lawtools/research'} className='border border-solid duration-200 border-transparent hover:text-slate-200 px-4 grid place-items-center rounded'>
                         <div className="flex items-center">
                             <p>Dashboard</p>
                             <span className="ml-2 px-2 py-1 text-xs bg-emerald-400 text-white rounded">New</span>

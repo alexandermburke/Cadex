@@ -298,12 +298,11 @@ export default function Hero() {
             <div className="text-right">
             <button
            onClick={handleCloseDisclaimer}
-           className="before:ease relative h-12 w-56 overflow-hidden rounded bg-gradient-to-r from-blue-950 to-slate-700 text-white shadow-2xl transition-all before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-56"
-              >
-            <div className="flex items-center justify-center h-full">
-              I Understand
-            <i className="ml-8 fa-solid fa-arrow-right"></i>
-             </div>
+           className="group before:ease relative h-12 w-56 overflow-hidden rounded bg-gradient-to-r from-blue-950 to-slate-700 text-white shadow-2xl transition-all before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-56">
+           <div className="flex items-center justify-center h-full">
+           I Understand
+            <i className="ml-8 fa-solid fa-arrow-right opacity-0 group-hover:opacity-100 transition-opacity duration-200"></i>
+            </div>
             </button>
             </div>
           </div>
@@ -383,12 +382,11 @@ export default function Hero() {
           <div className="flex justify-center mt-6 mb-6">
             <Link
               href="/pricing"
-              className="before:ease relative h-12 w-56 overflow-hidden rounded bg-gradient-to-r from-blue-950 to-slate-700 text-white shadow-2xl transition-all before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-56"
-            >
+              className="group before:ease relative h-12 w-56 overflow-hidden rounded bg-gradient-to-r from-blue-950 to-slate-700 text-white shadow-2xl transition-all before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-56">
               <div className="flex items-center justify-center h-full">
                 Explore Our Plans
-                <i className="ml-8 fa-solid fa-arrow-right"></i>
-              </div>
+                      <i className="ml-8 fa-solid fa-arrow-right opacity-0 group-hover:opacity-100 transition-opacity duration-200"></i>
+                    </div>
             </Link>
           </div>
         </div>
@@ -463,54 +461,6 @@ export default function Hero() {
             </div>
           </div>
         </div>
-
-        {/* Vertical Divider */}
-        <VerticalDivider />
-
-        {/* What Our Users Are Saying Section */}
-        <div className="flex flex-col items-center py-10 px-4 md:px-8 lg:px-16 bg-white">
-          <div className="max-w-7xl w-full">
-            <h3 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-semibold text-center text-black">
-              What <span className="font-medium goldGradient">Our Users</span> Are Saying
-            </h3>
-            <p className="text-center sm:text-lg md:text-xl text-black max-w-2xl mx-auto my-4">
-              People love us because Cadex saves them time and money.
-            </p>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {testimonials.map((testimonial, index) => (
-                <div
-                  key={index}
-                  className="flex flex-col items-center text-center bg-slate-100 p-6 rounded-lg shadow-md"
-                >
-                  {testimonial.image && (
-                    <Image
-                      src={testimonial.image}
-                      alt={testimonial.name}
-                      width={96}
-                      height={96}
-                      className="rounded-full mb-4"
-                    />
-                  )}
-                  <h4 className="text-xl font-semibold text-blue-950">
-                    {testimonial.name}
-                  </h4>
-                  <p className="text-sm text-black mb-2">
-                    {testimonial.title}
-                  </p>
-                  {testimonial.handle && (
-                    <p className="text-sm text-black mb-2">
-                      {testimonial.handle}
-                    </p>
-                  )}
-                  <p className="text-base text-black ">
-                    {testimonial.quote}
-                  </p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-
         {/* Vertical Divider */}
         <VerticalDivider />
 
@@ -561,19 +511,6 @@ export default function Hero() {
         {/* Vertical Divider */}
         <VerticalDivider />
 
-        {/* Universities Section */}
-        <div className="flex flex-col items-center py-8 px-4 md:px-8 lg:px-16">
-          <div className="max-w-5xl w-full">
-            <h3 className="text-4xl lg:text-7xl font-semibold my-12 text-center text-blue-950 ">
-              Universities We Work With
-            </h3>
-            <CarouselComponent />
-          </div>
-        </div>
-
-        {/* Vertical Divider */}
-        <VerticalDivider />
-
         {/* FAQ Section */}
         <div className="flex flex-col items-center py-10 px-4 md:px-8 lg:px-16">
           <div className="max-w-5xl w-full">
@@ -592,6 +529,18 @@ export default function Hero() {
             </div>
           </div>
         </div>
+          {/* Vertical Divider */}
+          <VerticalDivider />
+
+{/* Universities Section */}
+<div className="flex flex-col items-center py-8 px-4 md:px-8 lg:px-16">
+  <div className="max-w-5xl w-full">
+    <h3 className="text-4xl lg:text-7xl font-semibold my-12 text-center text-blue-950 ">
+      Universities We Work With
+    </h3>
+    <CarouselComponent />
+  </div>
+</div>
       </div>
     </section>
   );

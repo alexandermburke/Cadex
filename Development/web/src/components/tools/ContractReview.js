@@ -83,8 +83,8 @@ export default function ContractReview() {
 
       {/* Main Content Area */}
       <main className="flex-1 flex flex-col items-center p-4 bg-white">
-        <div className="flex-1 w-full max-w-4xl p-4 bg-gray-100 rounded-lg shadow-md">
-          <div className="flex flex-col h-full">
+                <div className="flex-1 w-full max-w-4xl p-4 bg-gray-100 max-h-128 rounded-lg shadow-md">
+                    <div className="flex flex-col h-full">
             {/* Hide button at the top left */}
             <div className="flex items-start justify-start w-full mb-4">
               <button
