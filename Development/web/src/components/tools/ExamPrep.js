@@ -260,7 +260,7 @@ export default function ExamPrep() {
                 <option value="Constitutional Law">Constitutional Law</option>
                 <option value="Contracts">Contracts</option>
                 <option value="Torts">Torts</option>
-                <option value="Property Law">Property Law</option>
+                <option value="Intellectual Property Law">Intellectual Property Law</option>
                 <option value="Evidence">Evidence</option>
                 {/* Add more types as needed */}
               </select>
