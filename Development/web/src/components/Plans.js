@@ -12,15 +12,15 @@ const poppins = Poppins({ subsets: ["latin"], weight: ['400', '100', '200', '300
 const plans = [
     {
         name: 'Basic',
-        description: 'For Individual Legal Study & Practice',
-        price: '$1 USD',
-        interval: 'Per day',
+        description: 'For Individual Legal Practice',
+        price: '$5 USD',
+        interval: 'Per week',
         features: [
-            'Access to all AI tools',
-            'Access to all legal tools',
-            'Cancel any time',
-            'No Ads',
+            'Access to basic legal case simulations',
             'Join public case discussions',
+            'Manage 2 simulated cases',
+            'No Ads',
+            'Cancel any time',
         ],
         recommended: false
     },
@@ -30,9 +30,9 @@ const plans = [
         price: '$50 USD',
         interval: 'Per month',
         features: [
-            'Everything in the Base plan',
+            'Everything in the Free plan',
             'Unlimited access to all case simulations',
-            'Unlimited access to LSAT/Bar exam prep',
+            '10 case simulations shared to all team members per month',
             'Priority support and feature requests',
         ],
         recommended: true
@@ -48,7 +48,7 @@ export default function Plans() {
 
     async function handleUpdatePlan() {
         if (!selectedPlan || isPaid) { return }
-        let billing = { plan: 'free', status: true }
+        let billing = { plan: 'free', status: false }
         // if selected plan is free, then just save and send to dashboard
 
         if (selectedPlan === 'Pro') {
@@ -93,7 +93,7 @@ export default function Plans() {
                             <div className='flex items-center justify-between gap-4 w-full'>
                                 <h3 className={'font-medium text-lg sm:text-xl md:text-2xl ' + (selectedPlan === plan.name ? ' goldGradient ' : ' ') + poppins.className}>{plan.name}</h3>
                                 {plan.name === 'Pro' && (
-                                    <p className='bg-emerald-400 text-white px-2 py-1 rounded text-xs sm:text-sm'>Recommended</p>
+                                    <p className='bg-emerald-400 text-white px-2 py-1 rounded-lg text-xs sm:text-sm'>Recommended</p>
                                 )}
                             </div>
                             <div className='flex flex-col text-left'>
