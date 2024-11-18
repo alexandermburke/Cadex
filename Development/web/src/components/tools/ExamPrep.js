@@ -285,7 +285,7 @@ export default function ExamPrep() {
   return (
     <div className="flex h-screen bg-gray-100">
       {/* Sidebar */}
-      {isSidebarVisible && <Sidebar activeLink="/ailawtools/lsatprep" />}
+      {isSidebarVisible && <Sidebar activeLink="/ailawtools/examprep" />}
 
       {/* Main Content Area */}
       <main className="flex-1 flex flex-col items-center p-4 bg-white">
