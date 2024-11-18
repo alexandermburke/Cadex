@@ -16,8 +16,8 @@ const plans = [
         price: '$1 USD',
         interval: 'Per day',
         features: [
-            'Access to all AI tools',
-            'Access to all legal tools',
+            'Unlimited access to all case simulations',
+            'Unlimited access to LSAT/Bar exam prep',
             'Cancel any time',
             'No Ads',
             'Join public case discussions',
@@ -31,8 +31,8 @@ const plans = [
         interval: 'Per month',
         features: [
             'Everything in the Base plan',
-            'Unlimited access to all case simulations',
-            'Unlimited access to LSAT/Bar exam prep',
+            'Access to all AI tools',
+            'Access to all legal tools',
             'Priority support and feature requests',
         ],
         recommended: true
