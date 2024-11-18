@@ -1,4 +1,4 @@
-'use client'
+'use client';
 import { Inter, Poppins } from 'next/font/google';
 import Link from 'next/link';
 import React, { useState, useEffect } from 'react';
@@ -26,18 +26,25 @@ export default function Header() {
     }, [pathname]);
 
     async function copyToClipboard() {
+        if (!currentUser?.displayName) return;
         setShowText(true);
         navigator.clipboard.writeText(`https://cadexlaw.com/${currentUser.displayName}`);
         await new Promise(r => setTimeout(r, 2000));
         setShowText(false);
     }
 
+    // Updated shareBtn with hover effect for bug icon
     let shareBtn = (
         <div className='flex flex-col relative'>    
-            <button onClick={() => copyToClipboard()} className='ml duration-200 overflow-hidden p-0.5 rounded relative'>
-                <div className='absolute inset-0 goldBackground' />
-                <div className='p-2 flex items-center justify-center gap-4 relative w-full z-10 bg-transparent rounded-lg hover:bg-transparent duration-200 text-white hover:text-blue-900'>
-                    <p className=''>{showText ? 'Link copied' : 'Report Bug'}</p>
+            <button 
+                onClick={() => copyToClipboard()} 
+                className='ml duration-200 overflow-hidden p-0.5 rounded relative group'
+            >
+                <div className='p-2 grid place-items-center relative goldBackground z-10 bg-transparent rounded duration-200 text-white before:ease h-10 w-40 overflow-hidden shadow-2xl transition-all before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-40'>
+                    <div className="flex items-center justify-center h-full">
+                        <p className=''>{showText ? 'Link copied' : 'Report Bug'}</p>
+                        <i className="ml-8 fa-solid fa-arrow-right opacity-0 group-hover:opacity-100 transition-opacity duration-200"></i>
+                    </div>
                 </div>
             </button>
         </div>
@@ -45,20 +52,32 @@ export default function Header() {
 
     let navActions = (
         <nav className='hidden items-stretch md:flex'>
-            <Link href={'/ailawtools/examprep'} className='border border-solid duration-200 border-transparent hover:text-slate-200 px-4 grid place-items-center rounded'>
-                        <div className="flex items-center">
-                            <p>Dashboard</p>
-                            <span className="ml-2 px-2 py-1 text-xs bg-emerald-400 text-white rounded">New</span>
-                        </div>
-                    </Link>
-            <Link href={'/pricing'} className='mx-2 p-2 px-2 grid place-items-center relative z-10 rounded-lg bg-transparent hover:text-slate-200'>
+            <Link 
+                href={'/ailawtools/examprep'} 
+                className='border border-solid duration-200 border-transparent hover:text-slate-200 px-4 grid place-items-center rounded'
+            >
+                <div className="flex items-center">
+                    <p>Dashboard</p>
+                    <span className="ml-2 px-2 py-1 text-xs bg-emerald-400 text-white rounded">New</span>
+                </div>
+            </Link>
+            <Link 
+                href={'/pricing'} 
+                className='mx-2 p-2 px-2 grid place-items-center relative z-10 rounded-lg bg-transparent hover:text-slate-200'
+            >
                 <p>Pricing</p>
             </Link>
-            <Link href={'/admin/account'} className='mx-2 p-2 px-2 grid place-items-center relative z-10 rounded-lg bg-transparent hover:text-slate-200'>
+            <Link 
+                href={'/admin/account'} 
+                className='mx-2 p-2 px-2 grid place-items-center relative z-10 rounded-lg bg-transparent hover:text-slate-200'
+            >
                 <p>{currentUser ? 'Account' : 'Login'}</p>
             </Link>
-            <Link href={'/careers'} className='mx-2 ml-4 duration-200 overflow-hidden p-0.5 rounded-lg relative'>
-                <div className='absolute inset-0' />
+            <Link 
+                href={'/careers'} 
+                className='mx-2 ml-4 duration-200 overflow-hidden p-0.5 rounded-lg relative'
+            >
+                <div className='absolute inset-0'></div>
                 <div className='p-2 grid place-items-center relative z-10 bg-transparent rounded duration-200 text-white before:ease h-10 w-40 overflow-hidden bg-gradient-to-r from-blue-950 to-slate-700 shadow-2xl transition-all before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-40'>
                     <p>Open Positions</p>
                 </div>
@@ -68,31 +87,64 @@ export default function Header() {
 
     let menuActions = (
         <nav className='flex flex-col gap-2'>
-            <Link className='p-2 rounded-lg border-solid border duration-200 text-lg hover:text-white hover:bg-blue-950 border-blue-950 border-x-4 border-y-4' href={'/admin'}><p>Dashboard</p></Link>
-            <Link className='p-2 rounded-lg border-solid border duration-200 text-lg hover:text-white hover:bg-blue-950 border-blue-950 border-x-4 border-y-4' href={'/pricing'}><p>Pricing</p></Link>
-            <Link className='p-2 rounded-lg border-solid duration-200 text-lg hover:text-white hover:bg-blue-950 border-blue-950 border-x-4 border-y-4' href={'/admin'}><p>Login</p></Link>
-            <Link className='p-2 rounded-lg grid place-items-center relative z-10 bg-gradient-to-r hover:text-white hover:bg-blue-950 from-blue-950 to-slate-700 duration-200 text-white before:ease overflow-hidden  shadow-2xl transition-all before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-40' href={'/careers'}><p>{'Open Positions'}</p></Link>
+            <Link 
+                className='p-2 rounded-lg border-solid border duration-200 text-lg hover:text-white hover:bg-blue-950 border-blue-950 border-x-4 border-y-4' 
+                href={'/admin'}
+            >
+                <p>Dashboard</p>
+            </Link>
+            <Link 
+                className='p-2 rounded-lg border-solid border duration-200 text-lg hover:text-white hover:bg-blue-950 border-blue-950 border-x-4 border-y-4' 
+                href={'/pricing'}
+            >
+                <p>Pricing</p>
+            </Link>
+            <Link 
+                className='p-2 rounded-lg grid place-items-center relative z-10 bg-gradient-to-r hover:text-white hover:bg-blue-950 from-blue-950 to-slate-700 duration-200 text-white before:ease overflow-hidden shadow-2xl transition-all before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-40' 
+                href={'/careers'}
+            >
+                <p>Open Positions</p>
+            </Link>
         </nav>
     );
 
-    if ((pathname.split('/')[1] === 'lawtools' || pathname.split('/')[1] === 'ailawtools' || pathname.split('/')[1] === 'admin') && currentUser) {
+    if (
+        (pathname.split('/')[1] === 'lawtools' || 
+         pathname.split('/')[1] === 'ailawtools' || 
+         pathname.split('/')[1] === 'admin') && 
+        currentUser
+    ) {
         navActions = (
             <>
-                <p className={'capitalize flex-1 ' + poppins.className}>Welcome <span>{currentUser.displayName}</span></p>
+                <p className={'capitalize flex-1 ' + poppins.className}>
+                    Welcome <span>{currentUser.displayName}</span>
+                </p>
                 <div className='hidden items-stretch md:flex'>
-                    <Link href={'/admin'} className='border border-solid duration-200 border-transparent hover:text-slate-200 px-4 grid place-items-center rounded'>
+                    <Link 
+                        href={'/admin'} 
+                        className='border border-solid duration-200 border-transparent hover:text-slate-200 px-4 grid place-items-center rounded'
+                    >
                         <p>Dashboard</p>
                     </Link>
-                    <Link href={'/ailawtools/examprep'} className='border border-solid duration-200 border-transparent hover:text-slate-200 px-4 grid place-items-center rounded'>
+                    <Link 
+                        href={'/ailawtools/examprep'} 
+                        className='border border-solid duration-200 border-transparent hover:text-slate-200 px-4 grid place-items-center rounded'
+                    >
                         <div className="flex items-center">
                             <p>Tools</p>
                             <span className="ml-2 px-2 py-1 text-xs bg-emerald-400 text-white rounded">Beta</span>
                         </div>
                     </Link>
-                    <Link href={'/admin/account'} className='border border-solid duration-200 border-transparent hover:text-slate-200 px-4 grid place-items-center rounded'>
+                    <Link 
+                        href={'/admin/account'} 
+                        className='border border-solid duration-200 border-transparent hover:text-slate-200 px-4 grid place-items-center rounded'
+                    >
                         <p>Account</p>
                     </Link>
-                    <button onClick={logout} className='border border-solid duration-200 border-transparent hover:text-slate-200 px-4 grid place-items-center rounded'>
+                    <button 
+                        onClick={logout} 
+                        className='border border-solid duration-200 border-transparent hover:text-slate-200 px-4 grid place-items-center rounded'
+                    >
                         <p>Logout</p>
                     </button>
                     {shareBtn}
@@ -101,28 +153,53 @@ export default function Header() {
         );
         menuActions = (
             <nav className='flex flex-col gap-2'>
-                <Link href={'/ailawtools/examprep'} className='p-2 rounded border-solid border duration-200 text-lg hover:text-white hover:bg-blue-950 border-blue-950 border-x-4 border-y-4'>
+                <Link 
+                    href={'/ailawtools/examprep'} 
+                    className='p-2 rounded border-solid border duration-200 text-lg hover:text-white hover:bg-blue-950 border-blue-950 border-x-4 border-y-4'
+                >
                     <div className="flex items-center">
                         <p>Tools</p>
                         <span className="ml-2 px-2 py-1 text-xs bg-emerald-400 text-white rounded">Beta</span>
                     </div>
                 </Link>
-                <Link href={'/admin'} className='p-2 rounded border-solid border duration-200 text-lg hover:text-white hover:bg-blue-950 border-blue-950 border-x-4 border-y-4'><p>Dashboard</p></Link>
-                <Link href={'/admin/account'} className='p-2 rounded border-solid border duration-200 hover:text-white hover:bg-blue-950 text-lg border-blue-950 border-x-4 border-y-4'><p>Account</p></Link>
-                <button className='p-2 text-left rounded border-solid border duration-200 hover:text-white hover:bg-blue-950 text-lg border-blue-950 border-x-4 border-y-4' onClick={logout}><p>Logout</p></button>
+                <Link 
+                    href={'/admin'} 
+                    className='p-2 rounded border-solid border duration-200 text-lg hover:text-white hover:bg-blue-950 border-blue-950 border-x-4 border-y-4'
+                >
+                    <p>Dashboard</p>
+                </Link>
+                <Link 
+                    href={'/admin/account'} 
+                    className='p-2 rounded border-solid border duration-200 hover:text-white hover:bg-blue-950 text-lg border-blue-950 border-x-4 border-y-4'
+                >
+                    <p>Account</p>
+                </Link>
+                <button 
+                    className='p-2 text-left rounded border-solid border duration-200 hover:text-white hover:bg-blue-950 text-lg border-blue-950 border-x-4 border-y-4' 
+                    onClick={logout}
+                >
+                    <p>Logout</p>
+                </button>
                 {shareBtn}
             </nav>
         );
     }
 
-   
     return (
         <header className='z-[100] fixed top-0 left-0 right-0 bg-transparent'>
             <div className='flex items-center justify-between gap-4 max-w-[1400px] mx-auto w-full overflow-hidden p-2 drop-shadow-sm'>
                 <Link href={'/'}>
                     <div className='flex items-center gap-2'>
-                        <Image src="/header.png" alt="Cadex Law Logo" width={44} height={44} className={`${logoLoaded ? 'logo-animation' : ''}`} />
-                        <h1 className={'text-xl sm:text-2xl goldGradient font-medium ' + poppins.className}>Cadex Law</h1>
+                        <Image 
+                            src="/header.png" 
+                            alt="Cadex Law Logo" 
+                            width={44} 
+                            height={44} 
+                            className={`${logoLoaded ? 'logo-animation' : ''}`} 
+                        />
+                        <h1 className={'text-xl sm:text-2xl goldGradient font-medium ' + poppins.className}>
+                            Cadex Law
+                        </h1>
                     </div>
                 </Link>
                 {navActions}
