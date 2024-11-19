@@ -1,5 +1,6 @@
 // ExamPrep.js
 'use client';
+
 import React, { useState, useEffect } from 'react';
 import Sidebar from '../Sidebar';
 import { useRouter } from 'next/navigation';
@@ -30,34 +31,76 @@ export default function ExamPrep() {
     lawType: 'General Law',
   });
 
+  // Mapping for difficulty levels based on exam type
   const difficultyMapping = {
     LSAT: [
       { value: 'Below 150', label: 'Below 150' },
       { value: '150-160', label: '150-160' },
       { value: '160-170', label: '160-170' },
-      { value: 'Above 170', label: 'Above 170' },
+      { value: '175+', label: '175+' },
     ],
     BAR: [
-      { value: '60%', label: '60% Correct' },
-      { value: '70%', label: '70% Correct' },
-      { value: '80%', label: '80% Correct' },
-      { value: '90%', label: '90% Correct' },
+      { value: 'Below Average', label: 'Below Average' },
+      { value: 'Average', label: 'Average' },
+      { value: 'Above Average', label: 'Above Average' },
+      { value: 'Expert', label: 'Expert' },
     ],
     MPRE: [
-      { value: 'Low (Below 85)', label: 'Low (Below 85)' },
-      { value: 'Medium (85-95)', label: 'Medium (85-95)' },
-      { value: 'High (95+)', label: 'High (95+)' },
+      { value: 'Basic', label: 'Basic' },
+      { value: 'Intermediate', label: 'Intermediate' },
+      { value: 'Advanced', label: 'Advanced' },
+    ],
+  };
+
+  // Mapping for law types based on exam type
+  const lawTypeMapping = {
+    LSAT: ['General Law'], // LSAT doesn't cover specific law subjects
+    BAR: [
+      'General Law',
+      'Criminal Law',
+      'Civil Law',
+      'Contracts',
+      'Torts',
+      'Constitutional Law',
+      'Evidence',
+      'Real Property',
+      'Civil Procedure',
+      'Business Associations (Corporations)',
+      'Family Law',
+      'Trusts and Estates',
+      'Secured Transactions',
+      'Negotiable Instruments',
+      'Intellectual Property',
+      'Professional Responsibility',
+    ],
+    MPRE: [
+      'Professional Responsibility',
+      'Ethics and Legal Responsibilities',
+      'Disciplinary Actions',
+      'Conflict of Interest',
+      'Confidentiality',
+      'Client Communication',
+      'Fees and Trust Accounts',
+      'Advertising and Solicitation',
+      'Other Professional Conduct',
     ],
   };
 
   const [difficultyOptions, setDifficultyOptions] = useState(difficultyMapping['LSAT']);
+  const [lawTypeOptions, setLawTypeOptions] = useState(lawTypeMapping['LSAT']);
 
+  // Update difficulty and law type options when exam type changes
   useEffect(() => {
-    const options = difficultyMapping[examConfig.examType] || [];
-    setDifficultyOptions(options);
+    const newDifficultyOptions = difficultyMapping[examConfig.examType] || [];
+    const newLawTypeOptions = lawTypeMapping[examConfig.examType] || ['General Law'];
+
+    setDifficultyOptions(newDifficultyOptions);
+    setLawTypeOptions(newLawTypeOptions);
+
     setExamConfig((prevConfig) => ({
       ...prevConfig,
-      difficulty: options[0]?.value || '',
+      difficulty: newDifficultyOptions[0]?.value || '',
+      lawType: newLawTypeOptions[0] || 'General Law',
     }));
   }, [examConfig.examType]);
 
@@ -257,19 +300,19 @@ export default function ExamPrep() {
     return (
       <div className="flex items-center justify-center h-screen">
         <p className="text-gray-700">
-          Please <a href="/login" className="text-blue-600 underline">log in</a> to use the Exam Prep tool.
+          Please <a href="/login" className="text-blue-950 underline">log in</a> to use the Exam Prep tool.
         </p>
       </div>
     );
   }
 
-  const isProUser = userDataObj?.billing?.plan === 'pro';
+  const isProUser = userDataObj?.billing?.plan === 'Pro';
 
   return (
     <div className="flex h-screen bg-gray-100">
       {isSidebarVisible && <Sidebar activeLink="/ailawtools/examprep" />}
       <main className="flex-1 flex flex-col items-center p-4 bg-white">
-        <div className="flex-1 w-full max-w-4xl p-4 bg-gray-100 max-h-128 rounded-lg shadow-md">
+        <div className="flex-1 w-full max-w-4xl p-4 bg-gray-100 max-h-128 rounded-lg shadow-md overflow-hidden">
           <div className="flex flex-col h-full">
             <div className="flex items-start justify-between w-full mb-4">
               <div>
@@ -289,7 +332,7 @@ export default function ExamPrep() {
                   }}
                   className={`gap-4 ml-2 border border-solid px-4 py-2 rounded-md duration-200 ${
                     isProUser
-                      ? 'bg-green-600 text-white hover:bg-green-700'
+                      ? 'border border-solid border-emerald-400 bg-emerald-400 text-white hover:bg-white hover:text-emerald-400'
                       : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                   }`}
                   disabled={!isProUser}
@@ -313,12 +356,14 @@ export default function ExamPrep() {
                 </button>
               </div>
             </div>
+
             {questionText && (
               <div className="mb-4 p-4 bg-white rounded shadow overflow-y-scroll">
                 <h3 className="text-lg font-semibold text-blue-950">Exam Question</h3>
                 <p className="text-gray-700 whitespace-pre-wrap">{questionText}</p>
               </div>
             )}
+
             {questionText && (
               <div className="flex items-center mb-4">
                 <textarea
@@ -331,6 +376,7 @@ export default function ExamPrep() {
                 ></textarea>
               </div>
             )}
+
             {questionText && (
               <div className="flex space-x-2">
                 <button
@@ -349,6 +395,7 @@ export default function ExamPrep() {
                 </button>
               </div>
             )}
+
             {!questionText && (
               <div className="flex flex-col items-center justify-center h-full">
                 <p className="text-gray-500 mb-2">Click Configure Exam Prep to start.</p>
@@ -361,6 +408,164 @@ export default function ExamPrep() {
             )}
           </div>
         </div>
+
+        {/* Configuration Modal */}
+        {isConfigModalOpen && (
+          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+            <div className="bg-white p-6 rounded-lg w-11/12 max-w-md overflow-y-auto">
+              <h2 className="text-xl mb-4">Configure Exam Prep</h2>
+              <form>
+                {/* Exam Type */}
+                <div className="mb-4">
+                  <label className="block text-gray-700">Exam Type:</label>
+                  <select
+                    name="examType"
+                    value={examConfig.examType}
+                    onChange={handleConfigChange}
+                    className="w-full border border-gray-300 rounded p-2"
+                  >
+                    <option value="LSAT">LSAT</option>
+                    <option value="BAR">BAR</option>
+                    <option value="MPRE">MPRE</option>
+                  </select>
+                </div>
+
+                {/* Difficulty */}
+                <div className="mb-4">
+                  <label className="block text-gray-700">Difficulty:</label>
+                  <select
+                    name="difficulty"
+                    value={examConfig.difficulty}
+                    onChange={handleConfigChange}
+                    className="w-full border border-gray-300 rounded p-2"
+                  >
+                    {difficultyOptions.map((option) => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Law Type */}
+                <div className="mb-4">
+                  <label className="block text-gray-700">Law Type:</label>
+                  <select
+                    name="lawType"
+                    value={examConfig.lawType}
+                    onChange={handleConfigChange}
+                    className="w-full border border-gray-300 rounded p-2"
+                  >
+                    {lawTypeOptions.map((lawType, index) => (
+                      <option key={index} value={lawType}>
+                        {lawType}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Start Exam Prep Button */}
+                <div className="flex justify-end">
+                  {/* Custom Styled Start Exam Prep Button */}
+                  <button
+                    type="button"
+                    onClick={handleStartExamPrep}
+                    className="group before:ease relative h-12 w-56 overflow-hidden rounded bg-gradient-to-r from-blue-950 to-slate-700 text-white shadow-2xl transition-all before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-56"
+                    aria-label="Start Exam Prep"
+                  >
+                    <div className="flex items-center justify-center h-full">
+                      Start Exam Prep
+                      <i className="ml-8 fa-solid fa-arrow-right opacity-0 group-hover:opacity-100 transition-opacity duration-200"></i>
+                    </div>
+                  </button>
+                  {/* Cancel Button */}
+                  <button
+                    type="button"
+                    onClick={closeConfigModal}
+                    className="ml-4 px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-50"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+
+        {/* Result Modal */}
+        {isResultModalOpen && (
+          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+            <div className="bg-white p-6 rounded-lg w-11/12 max-w-md">
+              <h2 className="text-xl mb-4">Answer Feedback</h2>
+              <p className="text-gray-700 whitespace-pre-wrap">{typedResult}</p>
+              <div className="flex justify-end mt-4">
+                <button
+                  type="button"
+                  onClick={closeResultModal}
+                  className="px-4 py-2 bg-blue-950 text-white rounded"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Load Progress Modal */}
+        {isLoadProgressModalOpen && (
+          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+            <div className="bg-white p-6 rounded-lg w-11/12 max-w-2xl overflow-y-auto max-h-full">
+              <h2 className="text-xl mb-4">Load Saved Progress</h2>
+              {savedProgresses.length === 0 ? (
+                <p className="text-gray-700">No saved progresses found.</p>
+              ) : (
+                <ul>
+                  {savedProgresses.map((progress) => (
+                    <li key={progress.id} className="mb-4 border-b pb-2">
+                      <div className="flex justify-between items-center">
+                        <div>
+                          <p className="font-semibold">Exam Type: {progress.examConfig.examType}</p>
+                          <p className="text-sm text-gray-600">
+                            Law Type: {progress.examConfig.lawType}
+                          </p>
+                          <p className="text-sm text-gray-600">
+                            Difficulty: {progress.examConfig.difficulty}
+                          </p>
+                          <p className="text-sm text-gray-600">
+                            Saved on: {new Date(progress.timestamp).toLocaleString()}
+                          </p>
+                        </div>
+                        <div className="flex space-x-2">
+                          <button
+                            onClick={() => handleLoadProgress(progress)}
+                            className="px-3 py-1 bg-blue-950 text-white rounded"
+                          >
+                            Load
+                          </button>
+                          <button
+                            onClick={() => handleDeleteProgress(progress.id)}
+                            className="px-3 py-1 bg-red-600 text-white rounded"
+                          >
+                            Delete
+                          </button>
+                        </div>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              )}
+              <div className="flex justify-end mt-4">
+                <button
+                  type="button"
+                  onClick={closeLoadProgressModal}
+                  className="px-4 py-2 bg-gray-300 text-gray-700 rounded"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </main>
     </div>
   );
