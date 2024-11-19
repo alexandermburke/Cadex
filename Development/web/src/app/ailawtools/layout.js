@@ -17,6 +17,11 @@ export default function SubLayout({ children }) {
             </div>
         )
     }
+    if (!currentUser && !loading) {
+        content = (
+            <Login />
+        )
+    }
 
     return (
         <CoolLayout>

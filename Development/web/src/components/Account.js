@@ -14,7 +14,7 @@ export default function Account() {
     const vals = {
         'email': currentUser.email,
         'username': currentUser.displayName,
-        'listings': Object.keys(userDataObj?.listings || {}).length,
+        'cases': Object.keys(userDataObj?.listings || {}).length,
         'link': 'www.cadexlaw.com/' + currentUser.displayName,
     }
 
