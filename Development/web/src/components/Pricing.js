@@ -19,6 +19,7 @@ const plans = [
             'Flexible subscription with no long-term commitment',
             'Ad-free user experience',
             'Engage in open discussions on public cases',
+            'Cancel at any time, no questions asked'
         ],
         recommended: false
     },
@@ -29,7 +30,7 @@ const plans = [
         interval: 'Per month',
         features: [
             'Includes all features from the Basic plan',
-            'Full access to advanced exam preparation modes',
+            'Full access to Pro+ Mode Exam Prep',
             'Exclusive access to AI-driven legal assistance tools',
             'Comprehensive suite of professional legal resources',
             'Priority customer support and expedited feature requests',
