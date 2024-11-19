@@ -9,37 +9,39 @@ const poppins = Poppins({ subsets: ["latin"], weight: ['400', '100', '200', '300
 const plans = [
     {
         name: 'Basic',
-        description: 'For Individual Legal Study & Practice',
-        price: '$1 USD',
-        interval: 'Per day',
+        description: 'Designed for individual legal study and practice.',
+        price: '$15 USD',
+        interval: 'Per month',
+        promotion: '$1 for the first month',
         features: [
-            'Unlimited access to all case simulations',
-            'Unlimited access to LSAT/Bar exam prep',
-            'Cancel any time',
-            'No Ads',
-            'Join public case discussions',
+            'Comprehensive access to case simulation tools',
+            'Access to streamlined LSAT and Bar exam preparation resources',
+            'Flexible subscription with no long-term commitment',
+            'Ad-free user experience',
+            'Engage in open discussions on public cases',
         ],
         recommended: false
     },
     {
         name: 'Pro',
-        description: 'For Law Firms & Professional Use',
+        description: 'Optimized for law firms and professional applications.',
         price: '$50 USD',
         interval: 'Per month',
         features: [
-            'Everything in the Base plan',
-            'Access to all AI tools',
-            'Access to all legal tools',
-            'Priority support and feature requests',
+            'Includes all features from the Basic plan',
+            'Full access to advanced exam preparation modes',
+            'Exclusive access to AI-driven legal assistance tools',
+            'Comprehensive suite of professional legal resources',
+            'Priority customer support and expedited feature requests',
         ],
         recommended: true
     },
-]
+];
+
 
 export default function Plans() {
-
-    const { currentUser, userDataObj, isPaid } = useAuth()
-    const router = useRouter()
+    const { currentUser, userDataObj, isPaid } = useAuth();
+    const router = useRouter();
 
     return (
         <>
@@ -55,10 +57,17 @@ export default function Plans() {
                 {plans.map((plan, planIndex) => (
                     <div
                         key={planIndex}
-                        className={`p-4 sm:p-8 border border-solid rounded-2xl duration-200 hover:scale-[102%] sm:hover:scale-[105%] bg-white goldShadow w-full sm:w-96 max-w-full flex flex-col gap-4 ${
+                        className={`relative p-4 sm:p-8 border border-solid rounded-2xl duration-200 hover:scale-[102%] sm:hover:scale-[105%] bg-white goldShadow w-full sm:w-96 max-w-full flex flex-col gap-4 ${
                             plan.recommended ? 'border-blue-400' : 'border-blue-200'
                         }`}
                     >
+                        {/* Promotion Badge for Basic Plan */}
+                        {plan.promotion && (
+                            <div className="absolute top-0 left-0 -translate-y-1/2 px-4 py-1 goldBackground text-sm text-slate-950 rounded shadow-md capitalize">
+                                {plan.promotion}
+                            </div>
+                        )}
+
                         {/* Plan Header */}
                         <div className='flex items-center justify-between gap-4 w-full'>
                             <h3
@@ -100,8 +109,7 @@ export default function Plans() {
             </div>
 
             {/* Footer Section */}
-            <div className='flex flex-col gap-6 mt-8'>
-            </div>
+            <div className='flex flex-col gap-6 mt-8'></div>
         </>
-    )
+    );
 }

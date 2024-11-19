@@ -117,6 +117,10 @@ html {
   background: linear-gradient(30deg, #D4B44A, #ecddaa);
 }
 
+.goldBackgroundtwo {
+  background: -webkit-linear-gradient(30deg, #D4B44A, #ecddaa);
+}
+
 .unstyled {
   border: none;
   outline: none;

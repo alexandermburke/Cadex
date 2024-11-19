@@ -374,9 +374,9 @@ export default function Hero() {
           </h2>
 
           <p className="text-center sm:text-lg md:text-xl text-black max-w-2xl">
-            Cadex helps simulate real-life legal scenarios to enhance your
-            practice, based on our database of every known State or Federal
-            case.
+            Cadex offers a highly advanced AI based Exam Prep with direct feedback
+            to help Students & Lawyers pass their Exams at a much cheaper price 
+            than traditional study tools.
           </p>
 
           <div className="flex justify-center mt-6 mb-6">

@@ -10,7 +10,7 @@ import { doc, collection, addDoc, getDocs, deleteDoc, query, where } from 'fireb
 import { useAuth } from '@/context/AuthContext';
 
 export default function ExamPrep() {
-  const { currentUser } = useAuth();
+  const { currentUser, userDataObj } = useAuth(); // Include userDataObj for plan check
   const router = useRouter();
 
   const [inputText, setInputText] = useState('');
@@ -24,14 +24,12 @@ export default function ExamPrep() {
   const [isLoadProgressModalOpen, setIsLoadProgressModalOpen] = useState(false);
   const [savedProgresses, setSavedProgresses] = useState([]);
 
-  // Exam configuration state
   const [examConfig, setExamConfig] = useState({
     examType: 'LSAT',
     difficulty: '',
     lawType: 'General Law',
   });
 
-  // Difficulty options based on the selected exam
   const difficultyMapping = {
     LSAT: [
       { value: 'Below 150', label: 'Below 150' },
@@ -42,7 +40,7 @@ export default function ExamPrep() {
     BAR: [
       { value: '60%', label: '60% Correct' },
       { value: '70%', label: '70% Correct' },
-      { value: '80%', label: '80% Correct' },     
+      { value: '80%', label: '80% Correct' },
       { value: '90%', label: '90% Correct' },
     ],
     MPRE: [
@@ -50,24 +48,19 @@ export default function ExamPrep() {
       { value: 'Medium (85-95)', label: 'Medium (85-95)' },
       { value: 'High (95+)', label: 'High (95+)' },
     ],
-    // Add more exams as needed
   };
 
-  // State for difficulty options
   const [difficultyOptions, setDifficultyOptions] = useState(difficultyMapping['LSAT']);
 
-  // Update difficulty options when examType changes
   useEffect(() => {
     const options = difficultyMapping[examConfig.examType] || [];
     setDifficultyOptions(options);
-    // Set the default difficulty to the first option
     setExamConfig((prevConfig) => ({
       ...prevConfig,
       difficulty: options[0]?.value || '',
     }));
   }, [examConfig.examType]);
 
-  // Function to fetch a new exam question based on configuration
   const handleGetQuestion = async () => {
     setIsLoading(true);
     setQuestionText('');
@@ -98,7 +91,6 @@ export default function ExamPrep() {
     }
   };
 
-  // Function to submit the user's answer and get feedback
   const handleSubmitAnswer = async () => {
     if (!inputText.trim()) return;
 
@@ -130,7 +122,6 @@ export default function ExamPrep() {
     }
   };
 
-  // Typing effect for feedback
   useEffect(() => {
     if (answerResult) {
       setTypedResult('');
@@ -147,7 +138,6 @@ export default function ExamPrep() {
     }
   }, [answerResult]);
 
-  // Toggle functions for modals and sidebar
   const toggleSidebar = () => {
     setIsSidebarVisible(!isSidebarVisible);
   };
@@ -177,7 +167,6 @@ export default function ExamPrep() {
     setIsLoadProgressModalOpen(false);
   };
 
-  // Handle configuration changes
   const handleConfigChange = (e) => {
     const { name, value } = e.target;
     setExamConfig((prevConfig) => ({
@@ -191,7 +180,6 @@ export default function ExamPrep() {
     handleGetQuestion();
   };
 
-  // Function to save progress to Firebase
   const handleSaveProgress = async () => {
     if (!currentUser) {
       alert('You need to be logged in to save your progress.');
@@ -208,7 +196,6 @@ export default function ExamPrep() {
         timestamp: new Date().toISOString(),
       };
 
-      // Add the progress data to Firestore
       await addDoc(collection(db, 'examProgress'), progressData);
 
       alert('Progress saved successfully!');
@@ -218,7 +205,6 @@ export default function ExamPrep() {
     }
   };
 
-  // Function to fetch saved progresses from Firebase
   const fetchSavedProgresses = async () => {
     if (!currentUser) {
       alert('You need to be logged in to load your progress.');
@@ -244,7 +230,6 @@ export default function ExamPrep() {
     }
   };
 
-  // Function to load a saved progress
   const handleLoadProgress = (progress) => {
     setExamConfig(progress.examConfig);
     setQuestionText(progress.questionText);
@@ -253,7 +238,6 @@ export default function ExamPrep() {
     closeLoadProgressModal();
   };
 
-  // Function to delete a saved progress from Firebase
   const handleDeleteProgress = async (id) => {
     if (!currentUser) {
       alert('You need to be logged in to delete your progress.');
@@ -262,8 +246,6 @@ export default function ExamPrep() {
 
     try {
       await deleteDoc(doc(db, 'examProgress', id));
-
-      // Refresh the list of saved progresses
       fetchSavedProgresses();
     } catch (error) {
       console.error('Error deleting progress:', error);
@@ -271,7 +253,6 @@ export default function ExamPrep() {
     }
   };
 
-  // If the user is not authenticated, prompt them to log in
   if (!currentUser) {
     return (
       <div className="flex items-center justify-center h-screen">
@@ -282,23 +263,40 @@ export default function ExamPrep() {
     );
   }
 
+  const isProUser = userDataObj?.billing?.plan === 'pro';
+
   return (
     <div className="flex h-screen bg-gray-100">
-      {/* Sidebar */}
       {isSidebarVisible && <Sidebar activeLink="/ailawtools/examprep" />}
-
-      {/* Main Content Area */}
       <main className="flex-1 flex flex-col items-center p-4 bg-white">
         <div className="flex-1 w-full max-w-4xl p-4 bg-gray-100 max-h-128 rounded-lg shadow-md">
           <div className="flex flex-col h-full">
-            {/* Header Buttons */}
             <div className="flex items-start justify-between w-full mb-4">
-              <button
-                onClick={toggleSidebar}
-                className="gap-4 border border-solid border-blue-950 bg-blue-950 text-white px-4 py-2 rounded-md duration-200 hover:bg-white hover:text-blue-950"
-              >
-                {isSidebarVisible ? 'Hide' : 'Show'}
-              </button>
+              <div>
+                <button
+                  onClick={toggleSidebar}
+                  className="gap-4 border border-solid border-blue-950 bg-blue-950 text-white px-4 py-2 rounded-md duration-200 hover:bg-white hover:text-blue-950"
+                >
+                  {isSidebarVisible ? 'Hide' : 'Show'}
+                </button>
+                <button
+                  onClick={() => {
+                    if (isProUser) {
+                      router.push('/ailawtools/examprep/full-mode');
+                    } else {
+                      alert('Full Mode is only available for Pro users. Upgrade to access this feature.');
+                    }
+                  }}
+                  className={`gap-4 ml-2 border border-solid px-4 py-2 rounded-md duration-200 ${
+                    isProUser
+                      ? 'bg-green-600 text-white hover:bg-green-700'
+                      : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                  }`}
+                  disabled={!isProUser}
+                >
+                  Full Mode
+                </button>
+              </div>
               <div>
                 <button
                   onClick={openLoadProgressModal}
@@ -315,16 +313,12 @@ export default function ExamPrep() {
                 </button>
               </div>
             </div>
-
-            {/* Exam Question Display */}
             {questionText && (
               <div className="mb-4 p-4 bg-white rounded shadow overflow-y-scroll">
                 <h3 className="text-lg font-semibold text-blue-950">Exam Question</h3>
                 <p className="text-gray-700 whitespace-pre-wrap">{questionText}</p>
               </div>
             )}
-
-            {/* Answer Input */}
             {questionText && (
               <div className="flex items-center mb-4">
                 <textarea
@@ -337,8 +331,6 @@ export default function ExamPrep() {
                 ></textarea>
               </div>
             )}
-
-            {/* Action Buttons */}
             {questionText && (
               <div className="flex space-x-2">
                 <button
@@ -357,8 +349,6 @@ export default function ExamPrep() {
                 </button>
               </div>
             )}
-
-            {/* Prompt to Configure Exam Prep */}
             {!questionText && (
               <div className="flex flex-col items-center justify-center h-full">
                 <p className="text-gray-500 mb-2">Click Configure Exam Prep to start.</p>
@@ -372,147 +362,6 @@ export default function ExamPrep() {
           </div>
         </div>
       </main>
-
-      {/* Exam Configuration Modal */}
-      {isConfigModalOpen && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
-            <h2 className="text-2xl font-bold mb-4">Configure Exam Prep</h2>
-            <div className="mb-4">
-              <label className="block text-gray-700 font-semibold mb-2">Exam Type</label>
-              <select
-                name="examType"
-                value={examConfig.examType}
-                onChange={handleConfigChange}
-                className="w-full p-2 border border-gray-300 rounded"
-              >
-                <option value="LSAT">LSAT</option>
-                <option value="BAR">Bar Exam</option>
-                <option value="MPRE">MPRE</option>
-                {/* Add more exams as needed */}
-              </select>
-            </div>
-            <div className="mb-4">
-              <label className="block text-gray-700 font-semibold mb-2">Difficulty</label>
-              <select
-                name="difficulty"
-                value={examConfig.difficulty}
-                onChange={handleConfigChange}
-                className="w-full p-2 border border-gray-300 rounded"
-              >
-                {difficultyOptions.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div className="mb-4">
-              <label className="block text-gray-700 font-semibold mb-2">Type of Law</label>
-              <select
-                name="lawType"
-                value={examConfig.lawType}
-                onChange={handleConfigChange}
-                className="w-full p-2 border border-gray-300 rounded"
-              >
-                <option value="General Law">General Law</option>
-                <option value="Criminal Law">Criminal Law</option>
-                <option value="Civil Procedure">Civil Procedure</option>
-                <option value="Constitutional Law">Constitutional Law</option>
-                <option value="Contracts">Contracts</option>
-                <option value="Torts">Torts</option>
-                <option value="Intellectual Property Law">Intellectual Property Law</option>
-                <option value="Evidence">Evidence</option>
-                {/* Add more types as needed */}
-              </select>
-            </div>
-            <div className="flex justify-end">
-              <button
-                onClick={handleStartExamPrep}
-                className="mr-2 border border-solid border-blue-950 bg-blue-950 text-white px-4 py-2 rounded-md duration-200 hover:bg-white hover:text-blue-950"
-              >
-                Start Exam Prep
-              </button>
-              <button
-                onClick={closeConfigModal}
-                className="border border-solid border-gray-500 bg-white text-gray-700 px-4 py-2 rounded-md duration-200 hover:bg-gray-100"
-              >
-                Cancel
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Answer Feedback Modal */}
-      {isResultModalOpen && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg max-w-lg w-full">
-            <h2 className="text-2xl font-bold mb-4">Feedback</h2>
-            <p className="text-gray-700 whitespace-pre-wrap">{typedResult}</p>
-            <div className="flex justify-end mt-4">
-              <button
-                onClick={() => {
-                  closeResultModal();
-                  // Prepare for next question
-                  handleGetQuestion();
-                  setInputText('');
-                }}
-                className="border border-solid border-blue-950 bg-blue-950 text-white px-4 py-2 rounded-md duration-200 hover:bg-white hover:text-blue-950"
-              >
-                Next Question
-              </button>
-              <button
-                onClick={closeResultModal}
-                className="ml-2 border border-solid border-gray-500 bg-white text-gray-700 px-4 py-2 rounded-md duration-200 hover:bg-gray-100"
-              >
-                Close
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Load Progress Modal */}
-      {isLoadProgressModalOpen && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg max-w-lg w-full">
-            <h2 className="text-2xl font-bold mb-4">Load Progress</h2>
-            {savedProgresses.length > 0 ? (
-              <ul className="mb-4">
-                {savedProgresses.map((progress) => (
-                  <li key={progress.id} className="flex justify-between items-center mb-2">
-                    <div>
-                      <button
-                        onClick={() => handleLoadProgress(progress)}
-                        className="text-blue-600 underline"
-                      >
-                        {new Date(progress.timestamp).toLocaleString()}
-                      </button>
-                    </div>
-                    <button
-                      onClick={() => handleDeleteProgress(progress.id)}
-                      className="text-red-600 underline"
-                    >
-                      Delete
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <p>No saved progresses found.</p>
-            )}
-            <div className="flex justify-end">
-              <button
-                onClick={closeLoadProgressModal}
-                className="border border-solid border-gray-500 bg-white text-gray-700 px-4 py-2 rounded-md duration-200 hover:bg-gray-100"
-              >
-                Close
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
