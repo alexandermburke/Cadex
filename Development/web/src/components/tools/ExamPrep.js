@@ -284,7 +284,7 @@ export default function ExamPrep() {
                     if (isProUser) {
                       router.push('/ailawtools/examprep/full-mode');
                     } else {
-                      alert('Full Mode is only available for Pro users. Upgrade to access this feature.');
+                      alert('Pro+ Mode is only available for Pro users. Upgrade to access this feature.');
                     }
                   }}
                   className={`gap-4 ml-2 border border-solid px-4 py-2 rounded-md duration-200 ${
@@ -294,7 +294,7 @@ export default function ExamPrep() {
                   }`}
                   disabled={!isProUser}
                 >
-                  Full Mode
+                  Pro+ Mode
                 </button>
               </div>
               <div>
