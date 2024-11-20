@@ -17,18 +17,29 @@ export default function ExamPrep() {
   const [inputText, setInputText] = useState('');
   const [questionText, setQuestionText] = useState('');
   const [answerResult, setAnswerResult] = useState('');
-  const [typedResult, setTypedResult] = useState('');
   const [isSidebarVisible, setIsSidebarVisible] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [isConfigModalOpen, setIsConfigModalOpen] = useState(false);
   const [isResultModalOpen, setIsResultModalOpen] = useState(false);
   const [isLoadProgressModalOpen, setIsLoadProgressModalOpen] = useState(false);
+  const [isFinalFeedbackModalOpen, setIsFinalFeedbackModalOpen] = useState(false);
   const [savedProgresses, setSavedProgresses] = useState([]);
+
+  // Track the number of questions answered in the current set
+  const [currentQuestionCount, setCurrentQuestionCount] = useState(0);
+
+  // Track answered questions with details
+  const [answeredQuestions, setAnsweredQuestions] = useState([]);
+
+  // Flag to determine if exam prep has started
+  const [isExamStarted, setIsExamStarted] = useState(false);
 
   const [examConfig, setExamConfig] = useState({
     examType: 'LSAT',
     difficulty: '',
     lawType: 'General Law',
+    questionLimit: 5, // Default to 5 questions
+    instantFeedback: true, // New field to control instant feedback
   });
 
   // Mapping for difficulty levels based on exam type
@@ -108,7 +119,6 @@ export default function ExamPrep() {
     setIsLoading(true);
     setQuestionText('');
     setAnswerResult('');
-    setTypedResult('');
     setInputText('');
 
     try {
@@ -126,6 +136,7 @@ export default function ExamPrep() {
 
       const { question } = await response.json();
       setQuestionText(question);
+      setIsExamStarted(true); // Set exam as started
     } catch (error) {
       console.error('Error fetching exam question:', error);
       setQuestionText('An error occurred while fetching the exam question.');
@@ -139,7 +150,6 @@ export default function ExamPrep() {
 
     setIsLoading(true);
     setAnswerResult('');
-    setTypedResult('');
 
     try {
       const response = await fetch('/api/submit-exam-answer', {
@@ -154,32 +164,56 @@ export default function ExamPrep() {
         throw new Error('Failed to submit answer');
       }
 
-      const { feedback } = await response.json();
-      setAnswerResult(feedback);
-      openResultModal();
+      const { feedback, correct } = await response.json(); // Assuming API returns 'feedback' and 'correct'
+
+      // Set default values if undefined
+      const feedbackText = feedback !== undefined ? feedback : 'No feedback provided.';
+      const isCorrect = typeof correct === 'boolean' ? correct : false;
+
+      setAnswerResult(feedbackText);
+
+      // Handle feedback based on instantFeedback setting
+      if (examConfig.instantFeedback) {
+        openResultModal();
+      } else {
+        // If instant feedback is disabled, automatically proceed to the next question
+        // Increment the current question count
+        setCurrentQuestionCount((prevCount) => prevCount + 1);
+
+        // Add to answeredQuestions
+        setAnsweredQuestions((prevQuestions) => [
+          ...prevQuestions,
+          {
+            question: questionText || 'No question text provided.',
+            answer: inputText || 'No answer provided.',
+            feedback: feedbackText,
+            correct: isCorrect,
+          },
+        ]);
+
+        // Automatically fetch the next question after a short delay to ensure state updates
+        setTimeout(() => {
+          handleGetQuestion();
+        }, 500);
+      }
     } catch (error) {
       console.error('Error submitting answer:', error);
       setAnswerResult('An error occurred while submitting your answer.');
+      openResultModal(); // Optionally show error in the Result Modal
     } finally {
       setIsLoading(false);
     }
   };
 
+  // Monitor currentQuestionCount and open final feedback modal when limit is reached
   useEffect(() => {
-    if (answerResult) {
-      setTypedResult('');
-      let index = 0;
-      const typingInterval = setInterval(() => {
-        setTypedResult((prev) => prev + answerResult[index]);
-        index++;
-        if (index >= answerResult.length) {
-          clearInterval(typingInterval);
-        }
-      }, 50);
-
-      return () => clearInterval(typingInterval);
+    if (currentQuestionCount >= examConfig.questionLimit && questionText !== '') {
+      // Reset the count for the next set
+      setCurrentQuestionCount(0);
+      // Open the final feedback modal to allow users to review their performance
+      openFinalFeedbackModal();
     }
-  }, [answerResult]);
+  }, [currentQuestionCount, examConfig.questionLimit, questionText]);
 
   const toggleSidebar = () => {
     setIsSidebarVisible(!isSidebarVisible);
@@ -210,11 +244,20 @@ export default function ExamPrep() {
     setIsLoadProgressModalOpen(false);
   };
 
+  const openFinalFeedbackModal = () => {
+    setIsFinalFeedbackModalOpen(true);
+  };
+
+  const closeFinalFeedbackModal = () => {
+    setIsFinalFeedbackModalOpen(false);
+    // Optionally, prompt the user to reconfigure or start a new set
+  };
+
   const handleConfigChange = (e) => {
-    const { name, value } = e.target;
+    const { name, value, type, checked } = e.target;
     setExamConfig((prevConfig) => ({
       ...prevConfig,
-      [name]: value,
+      [name]: type === 'checkbox' ? checked : value,
     }));
   };
 
@@ -230,14 +273,31 @@ export default function ExamPrep() {
     }
 
     try {
+      // Ensure all fields are defined
       const progressData = {
         userId: currentUser.uid,
-        examConfig,
-        questionText,
-        inputText,
-        answerResult,
+        examConfig: {
+          examType: examConfig.examType || 'LSAT',
+          difficulty: examConfig.difficulty || 'Below 150',
+          lawType: examConfig.lawType || 'General Law',
+          questionLimit: examConfig.questionLimit || 5,
+          instantFeedback: examConfig.instantFeedback !== undefined ? examConfig.instantFeedback : true,
+        },
+        questionText: questionText || '',
+        inputText: inputText || '',
+        answerResult: answerResult || '',
+        currentQuestionCount: currentQuestionCount || 0,
+        answeredQuestions: answeredQuestions.map((q) => ({
+          question: q.question || 'No question text provided.',
+          answer: q.answer || 'No answer provided.',
+          feedback: q.feedback || 'No feedback provided.',
+          correct: typeof q.correct === 'boolean' ? q.correct : false,
+        })),
         timestamp: new Date().toISOString(),
       };
+
+      // Optional: Log progressData to verify fields
+      console.log('Progress Data:', progressData);
 
       await addDoc(collection(db, 'examProgress'), progressData);
 
@@ -278,6 +338,9 @@ export default function ExamPrep() {
     setQuestionText(progress.questionText);
     setInputText(progress.inputText);
     setAnswerResult(progress.answerResult);
+    setCurrentQuestionCount(progress.currentQuestionCount); // Restore the question count
+    setAnsweredQuestions(progress.answeredQuestions || []); // Restore answered questions
+    setIsExamStarted(true); // Ensure the question counter is visible
     closeLoadProgressModal();
   };
 
@@ -320,7 +383,7 @@ export default function ExamPrep() {
                   onClick={toggleSidebar}
                   className="gap-4 border border-solid border-blue-950 bg-blue-950 text-white px-4 py-2 rounded-md duration-200 hover:bg-white hover:text-blue-950"
                 >
-                  {isSidebarVisible ? 'Hide' : 'Show'}
+                  {isSidebarVisible ? 'Hide Sidebar' : 'Show Sidebar'}
                 </button>
                 <button
                   onClick={() => {
@@ -332,7 +395,7 @@ export default function ExamPrep() {
                   }}
                   className={`gap-4 ml-2 border border-solid px-4 py-2 rounded-md duration-200 ${
                     isProUser
-                      ? 'border border-solid border-emerald-400 bg-emerald-400 text-white hover:bg-white hover:text-emerald-400'
+                      ? 'border-emerald-400 bg-emerald-400 text-white hover:bg-white hover:text-emerald-400'
                       : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                   }`}
                   disabled={!isProUser}
@@ -340,22 +403,31 @@ export default function ExamPrep() {
                   Pro+ Mode
                 </button>
               </div>
-              <div>
+              <div className="flex items-center space-x-4">
                 <button
                   onClick={openLoadProgressModal}
-                  className="gap-4 mr-2 border border-solid border-blue-950 bg-white text-blue-950 px-4 py-2 rounded-md duration-200 hover:bg-blue-950 hover:text-white"
+                  className="border border-solid border-blue-950 bg-white text-blue-950 px-4 py-2 rounded-md duration-200 hover:bg-blue-950 hover:text-white"
                   disabled={!currentUser}
                 >
                   Load Progress
                 </button>
                 <button
                   onClick={openConfigModal}
-                  className="gap-4 border border-solid border-blue-950 bg-white text-blue-950 px-4 py-2 rounded-md duration-200 hover:bg-blue-950 hover:text-white"
+                  className="border border-solid border-blue-950 bg-white text-blue-950 px-4 py-2 rounded-md duration-200 hover:bg-blue-950 hover:text-white"
                 >
                   Configure Exam Prep
                 </button>
               </div>
             </div>
+
+            {/* Question Counter Label */}
+            {isExamStarted && (
+              <div className="mb-2 text-right w-full">
+                <span className="text-gray-700">
+                  Questions Answered: {currentQuestionCount} / {examConfig.questionLimit}
+                </span>
+              </div>
+            )}
 
             {questionText && (
               <div className="mb-4 p-4 bg-white rounded shadow overflow-y-scroll">
@@ -388,7 +460,7 @@ export default function ExamPrep() {
                 </button>
                 <button
                   onClick={handleSaveProgress}
-                  className="border border-solid border-green-600 bg-white text-green-600 px-4 py-2 rounded-md duration-200 hover:bg-green-600 hover:text-white"
+                  className="border border-solid border-emerald-400 bg-white text-emerald-400 px-4 py-2 rounded-md duration-200 hover:bg-emerald-400 hover:text-white"
                   disabled={!currentUser}
                 >
                   Save Progress
@@ -464,6 +536,43 @@ export default function ExamPrep() {
                   </select>
                 </div>
 
+                {/* Instant Feedback Checkbox */}
+                <div className="mb-4 flex items-center">
+                  <input
+                    type="checkbox"
+                    id="instantFeedback"
+                    name="instantFeedback"
+                    checked={examConfig.instantFeedback}
+                    onChange={handleConfigChange}
+                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                  />
+                  <label htmlFor="instantFeedback" className="ml-2 block text-gray-700">
+                    Enable Instant Feedback
+                  </label>
+                </div>
+
+                {/* Question Limit Slider */}
+                <div className="mb-6">
+                  <label className="block text-gray-700 mb-2">Number of Questions in a Row:</label>
+                  <div className="flex items-center">
+                    <input
+                      type="range"
+                      min="1"
+                      max="20"
+                      value={examConfig.questionLimit}
+                      onChange={(e) =>
+                        setExamConfig((prevConfig) => ({
+                          ...prevConfig,
+                          questionLimit: parseInt(e.target.value, 10),
+                        }))
+                      }
+                      className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700"
+                      id="questionLimit"
+                    />
+                    <span className="ml-4 text-gray-700">{examConfig.questionLimit}</span>
+                  </div>
+                </div>
+
                 {/* Start Exam Prep Button */}
                 <div className="flex justify-end">
                   {/* Custom Styled Start Exam Prep Button */}
@@ -497,11 +606,57 @@ export default function ExamPrep() {
           <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
             <div className="bg-white p-6 rounded-lg w-11/12 max-w-md">
               <h2 className="text-xl mb-4">Answer Feedback</h2>
-              <p className="text-gray-700 whitespace-pre-wrap">{typedResult}</p>
-              <div className="flex justify-end mt-4">
+              <p className="text-gray-700 whitespace-pre-wrap">{answerResult}</p>
+              <div className="flex justify-end mt-4 space-x-2">
                 <button
                   type="button"
                   onClick={closeResultModal}
+                  className="px-4 py-2 bg-blue-950 text-white rounded"
+                >
+                  Close
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    closeResultModal();
+                    handleGetQuestion();
+                  }}
+                  className="px-4 py-2 bg-emerald-400 text-white rounded hover:bg-green-700"
+                  disabled={isLoading}
+                >
+                  Next Question
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Final Feedback Modal */}
+        {isFinalFeedbackModalOpen && (
+          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 overflow-y-auto">
+            <div className="bg-white p-6 rounded-lg w-11/12 max-w-2xl overflow-y-auto max-h-[80vh]">
+              <h2 className="text-xl mb-4">Session Feedback</h2>
+              <ul>
+                {answeredQuestions.map((item, index) => (
+                  <li key={index} className="mb-4 p-4 border rounded-md">
+                    <p className="font-semibold">Question {index + 1}:</p>
+                    <p className="text-gray-700">{item.question}</p>
+                    <p className="mt-2">
+                      <span className="font-semibold">Your Answer:</span> {item.answer}
+                    </p>
+                    <p className="mt-1">
+                      <span className="font-semibold">Feedback:</span> {item.feedback}
+                    </p>
+                    <p className={`mt-1 ${item.correct ? 'text-emerald-400' : 'text-red-600'}`}>
+                      {item.correct ? 'Correct ✅' : 'Incorrect ❌'}
+                    </p>
+                  </li>
+                ))}
+              </ul>
+              <div className="flex justify-end mt-4">
+                <button
+                  type="button"
+                  onClick={closeFinalFeedbackModal}
                   className="px-4 py-2 bg-blue-950 text-white rounded"
                 >
                   Close
@@ -532,19 +687,25 @@ export default function ExamPrep() {
                             Difficulty: {progress.examConfig.difficulty}
                           </p>
                           <p className="text-sm text-gray-600">
+                            Number of Questions Set: {progress.examConfig.questionLimit}
+                          </p>
+                          <p className="text-sm text-gray-600">
+                            Current Question: {progress.currentQuestionCount}
+                          </p>
+                          <p className="text-sm text-gray-600">
                             Saved on: {new Date(progress.timestamp).toLocaleString()}
                           </p>
                         </div>
                         <div className="flex space-x-2">
                           <button
                             onClick={() => handleLoadProgress(progress)}
-                            className="px-3 py-1 bg-blue-950 text-white rounded"
+                            className="px-3 py-1 bg-blue-950 text-white rounded hover:bg-blue-900"
                           >
                             Load
                           </button>
                           <button
                             onClick={() => handleDeleteProgress(progress.id)}
-                            className="px-3 py-1 bg-red-600 text-white rounded"
+                            className="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-500"
                           >
                             Delete
                           </button>
@@ -558,7 +719,7 @@ export default function ExamPrep() {
                 <button
                   type="button"
                   onClick={closeLoadProgressModal}
-                  className="px-4 py-2 bg-gray-300 text-gray-700 rounded"
+                  className="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-200"
                 >
                   Close
                 </button>
