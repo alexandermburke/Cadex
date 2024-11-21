@@ -385,14 +385,14 @@ export default function ExamPrep() {
     <div className="flex h-screen bg-gray-100">
       {isSidebarVisible && <Sidebar activeLink="/ailawtools/examprep" />}
       <main className="flex-1 flex flex-col items-center p-4 bg-white">
-        <div className="flex-1 w-full max-w-4xl p-4 bg-gray-100 max-h-128 rounded-lg shadow-md overflow-hidden">
+        <div className="flex-1 w-full max-w-4xl p-4 bg-gray-100 max-h-128 rounded shadow-md overflow-hidden">
           <div className="flex flex-col h-full">
             <div className="flex items-start justify-between w-full mb-4">
               <div className="flex items-center">
                 {/* Animated Toggle Sidebar Button */}
                 <button
                   onClick={toggleSidebar}
-                  className=" bg-blue-950 text-white p-2 rounded-md duration-200 hover:bg-blue-900 flex items-center justify-center"
+                  className=" bg-transparent text-blue-950 p-2 rounded duration-200 flex items-center justify-center"
                   aria-label={isSidebarVisible ? 'Hide Sidebar' : 'Show Sidebar'}
                 >
                   <AnimatePresence mode="wait" initial={false}>
@@ -429,7 +429,7 @@ export default function ExamPrep() {
                       alert('Pro+ Mode is only available for Pro users. Upgrade to access this feature.');
                     }
                   }}
-                  className={`gap-4 ml-2 border border-solid px-4 py-2 rounded-md duration-200 ${
+                  className={`gap-4 ml-2 border border-solid px-4 py-2 rounded duration-200 ${
                     isProUser
                       ? 'border-emerald-400 bg-emerald-400 text-white hover:bg-white hover:text-emerald-400'
                       : 'bg-gray-300 text-gray-500 cursor-not-allowed'
@@ -443,14 +443,14 @@ export default function ExamPrep() {
               <div className="flex items-center space-x-4">
                 <button
                   onClick={openLoadProgressModal}
-                  className="border border-solid border-blue-950 bg-white text-blue-950 px-4 py-2 rounded-md duration-200 hover:bg-blue-950 hover:text-white"
+                  className="border border-solid border-blue-950 bg-white text-blue-950 px-4 py-2 rounded duration-200 hover:bg-blue-950 hover:text-white"
                   disabled={!currentUser}
                 >
                   Load Progress
                 </button>
                 <button
                   onClick={openConfigModal}
-                  className="border border-solid border-blue-950 bg-white text-blue-950 px-4 py-2 rounded-md duration-200 hover:bg-blue-950 hover:text-white"
+                  className="border border-solid border-blue-950 bg-white text-blue-950 px-4 py-2 rounded duration-200 hover:bg-blue-950 hover:text-white"
                 >
                   Configure Exam Prep
                 </button>
@@ -490,14 +490,14 @@ export default function ExamPrep() {
               <div className="flex space-x-2">
                 <button
                   onClick={handleSubmitAnswer}
-                  className="border border-solid border-blue-950 bg-white text-blue-950 px-4 py-2 rounded-md duration-200 hover:bg-blue-950 hover:text-white"
+                  className="border border-solid border-blue-950 bg-white text-blue-950 px-4 py-2 rounded duration-200 hover:bg-blue-950 hover:text-white"
                   disabled={isLoading || !inputText.trim()}
                 >
                   {isLoading ? 'Submitting...' : 'Submit Answer'}
                 </button>
                 <button
                   onClick={handleSaveProgress}
-                  className="border border-solid border-emerald-400 bg-white text-emerald-400 px-4 py-2 rounded-md duration-200 hover:bg-emerald-400 hover:text-white"
+                  className="border border-solid border-emerald-400 bg-white text-emerald-400 px-4 py-2 rounded duration-200 hover:bg-emerald-400 hover:text-white"
                   disabled={!currentUser}
                 >
                   Save Progress
@@ -521,7 +521,7 @@ export default function ExamPrep() {
         {/* Configuration Modal */}
         {isConfigModalOpen && (
           <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-            <div className="bg-white p-6 rounded-lg w-11/12 max-w-md overflow-y-auto">
+            <div className="bg-white p-6 rounded w-11/12 max-w-md overflow-y-auto">
               <h2 className="text-xl mb-4">Configure Exam Prep</h2>
               <form>
                 {/* Exam Type */}
@@ -605,7 +605,7 @@ export default function ExamPrep() {
                           questionLimit: parseInt(e.target.value, 10),
                         }))
                       }
-                      className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700"
+                      className="w-full h-2 bg-gray-200 rounded appearance-none cursor-pointer dark:bg-gray-700"
                       id="questionLimit"
                     />
                     <span className="ml-4 text-gray-700">{examConfig.questionLimit}</span>
@@ -643,7 +643,7 @@ export default function ExamPrep() {
         {/* Result Modal */}
         {isResultModalOpen && (
           <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-            <div className="bg-white p-6 rounded-lg w-11/12 max-w-md">
+            <div className="bg-white p-6 rounded w-11/12 max-w-md">
               <h2 className="text-xl mb-4">Answer Feedback</h2>
               <p className="text-gray-700 whitespace-pre-wrap">{answerResult}</p>
               <div className="flex justify-end mt-4 space-x-2">
@@ -673,11 +673,11 @@ export default function ExamPrep() {
         {/* Final Feedback Modal */}
         {isFinalFeedbackModalOpen && (
           <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 overflow-y-auto">
-            <div className="bg-white p-6 rounded-lg w-11/12 max-w-2xl overflow-y-auto max-h-[80vh]">
+            <div className="bg-white p-6 rounded w-11/12 max-w-2xl overflow-y-auto max-h-[80vh]">
               <h2 className="text-xl mb-4">Session Feedback</h2>
               <ul>
                 {answeredQuestions.map((item, index) => (
-                  <li key={index} className="mb-4 p-4 border rounded-md">
+                  <li key={index} className="mb-4 p-4 border rounded">
                     <p className="font-semibold">Question {index + 1}:</p>
                     <p className="text-gray-700">{item.question}</p>
                     <p className="mt-2">
@@ -712,7 +712,7 @@ export default function ExamPrep() {
         {/* Load Progress Modal */}
         {isLoadProgressModalOpen && (
           <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-            <div className="bg-white p-6 rounded-lg w-11/12 max-w-2xl overflow-y-auto max-h-full">
+            <div className="bg-white p-6 rounded w-11/12 max-w-2xl overflow-y-auto max-h-full">
               <h2 className="text-xl mb-4">Load Saved Progress</h2>
               {savedProgresses.length === 0 ? (
                 <p className="text-gray-700">No saved progresses found.</p>

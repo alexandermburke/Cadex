@@ -193,7 +193,7 @@ export default function Research() {
 
             {/* Main Content Area */}
             <main className="flex-1 flex flex-col items-center p-4 bg-white">
-                <div className="flex-1 w-full max-w-4xl p-4 bg-gray-100 max-h-128 rounded-lg shadow-md">
+                <div className="flex-1 w-full max-w-4xl p-4 bg-gray-100 max-h-128 rounded shadow-md">
                     <div className="flex flex-col h-full">
                         {/* Header with Animated Toggle Sidebar Button */}
                         <header className="flex items-center justify-between w-full mb-4 bg-transparent">
@@ -201,7 +201,7 @@ export default function Research() {
                                 {/* Animated Toggle Sidebar Button */}
                                 <button
                                     onClick={toggleSidebar}
-                                    className=" bg-blue-950 text-white p-2 rounded-md duration-200 hover:bg-blue-900 flex items-center justify-center"
+                                         className=" bg-transparent text-blue-950 p-2 rounded duration-200 flex items-center justify-center"
                                     aria-label={isSidebarVisible ? 'Hide Sidebar' : 'Show Sidebar'}
                                 >
                                     <AnimatePresence mode="wait" initial={false}>
@@ -228,17 +228,6 @@ export default function Research() {
                                         )}
                                     </AnimatePresence>
                                 </button>
-
-                                {/* Pro+ Mode Button (Optional) */}
-                                {isProUser && (
-                                    <button
-                                        onClick={() => router.push('/lawtools/research/full-mode')}
-                                        className="ml-4 p-2 border border-solid border-emerald-400 bg-emerald-400 text-white rounded-md duration-200 hover:bg-white hover:text-emerald-400 flex items-center justify-center"
-                                        aria-label="Pro+ Mode"
-                                    >
-                                        Pro+ Mode
-                                    </button>
-                                )}
                             </div>
                         </header>
 
@@ -255,7 +244,7 @@ export default function Research() {
                             />
                             <button
                                 onClick={handleSearch}
-                                className="ml-4 p-2 border border-solid border-blue-950 bg-white text-blue-950 px-4 py-2 rounded-md duration-200 hover:bg-blue-950 hover:text-white"
+                                className="ml-4 p-2 border border-solid border-blue-950 bg-white text-blue-950 px-4 py-2 rounded duration-200 hover:bg-blue-950 hover:text-white"
                                 disabled={isLoading}
                             >
                                 {isLoading ? 'Searching...' : 'Search'}
@@ -267,7 +256,7 @@ export default function Research() {
                             <div className="mb-4 p-4 rounded bg-white">
                                 <h2 className="text-xl font-bold mb-2">Saved Cases</h2>
                                 {savedCases.map((savedCase) => (
-                                    <div key={savedCase.id} className="mb-2 p-2 border border-gray-300 rounded-lg">
+                                    <div key={savedCase.id} className="mb-2 p-2 border border-gray-300 rounded">
                                         <div className="flex items-start justify-between">
                                             <div
                                                 className="cursor-pointer hover:bg-gray-100"
@@ -294,7 +283,7 @@ export default function Research() {
                                 searchResults.map((result, index) => (
                                     <div
                                         key={index}
-                                        className="mb-4 p-4 border border-gray-300 rounded-lg"
+                                        className="mb-4 p-4 border border-gray-300 rounded"
                                     >
                                         <div className="flex items-start justify-between">
                                             <div
@@ -328,7 +317,7 @@ export default function Research() {
             {/* Case Details Modal */}
             {selectedCase && (
                 <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-                    <div className="bg-white p-6 rounded-lg shadow-lg max-w-lg w-full max-h-[90vh] overflow-y-auto">
+                    <div className="bg-white p-6 rounded shadow-lg max-w-lg w-full max-h-[90vh] overflow-y-auto">
                         <h2 className="text-2xl font-bold mb-4">
                             {selectedCase.fullCaseName || selectedCase.title}
                         </h2>
@@ -360,7 +349,7 @@ export default function Research() {
                         <p className="text-gray-700 mb-4">{selectedCase.summary}</p>
                         <button
                             onClick={closeModal}
-                            className="mt-4 p-2 border border-solid border-blue-950 bg-blue-950 text-white px-4 py-2 rounded-md duration-200 hover:bg-white hover:text-blue-950"
+                            className="mt-4 p-2 border border-solid border-blue-950 bg-blue-950 text-white px-4 py-2 rounded duration-200 hover:bg-white hover:text-blue-950"
                         >
                             Close
                         </button>

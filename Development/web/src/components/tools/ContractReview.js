@@ -3,6 +3,8 @@ import React, { useState } from 'react';
 import Sidebar from '../Sidebar';
 import { useRouter } from 'next/navigation';
 import { pdfjs } from 'react-pdf';
+import { FaBars, FaTimes } from 'react-icons/fa';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   PdfLoader,
   PdfHighlighter,
@@ -87,12 +89,36 @@ export default function ContractReview() {
                     <div className="flex flex-col h-full">
             {/* Hide button at the top left */}
             <div className="flex items-start justify-start w-full mb-4">
-              <button
-                onClick={toggleSidebar}
-                className="gap-4 border border-solid border-blue-950 bg-blue-950 text-white px-4 py-2 rounded-md duration-200 hover:bg-white hover:text-blue-950"
-              >
-                {isSidebarVisible ? 'Hide' : 'Show'}
-              </button>
+               {/* Animated Toggle Sidebar Button */}
+               <button
+                                    onClick={toggleSidebar}
+                                         className=" bg-transparent text-blue-950 p-2 rounded duration-200 flex items-center justify-center"
+                                    aria-label={isSidebarVisible ? 'Hide Sidebar' : 'Show Sidebar'}
+                                >
+                                    <AnimatePresence mode="wait" initial={false}>
+                                        {isSidebarVisible ? (
+                                            <motion.div
+                                                key="close-icon"
+                                                initial={{ rotate: 90, opacity: 0 }}
+                                                animate={{ rotate: 0, opacity: 1 }}
+                                                exit={{ rotate: -90, opacity: 0 }}
+                                                transition={{ duration: 0.3 }}
+                                            >
+                                                <FaTimes size={20} />
+                                            </motion.div>
+                                        ) : (
+                                            <motion.div
+                                                key="menu-icon"
+                                                initial={{ rotate: -90, opacity: 0 }}
+                                                animate={{ rotate: 0, opacity: 1 }}
+                                                exit={{ rotate: 90, opacity: 0 }}
+                                                transition={{ duration: 0.3 }}
+                                            >
+                                                <FaBars size={20} />
+                                            </motion.div>
+                                        )}
+                                    </AnimatePresence>
+                                </button>
             </div>
 
             {/* PDF Upload */}
