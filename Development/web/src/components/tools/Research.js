@@ -1,4 +1,6 @@
+// Research.js
 'use client';
+
 import React, { useState, useEffect } from 'react';
 import Sidebar from '../Sidebar'; // Adjust the path as needed
 import { useRouter } from 'next/navigation';
@@ -6,15 +8,22 @@ import { useRouter } from 'next/navigation';
 // Import Firestore functions
 import { db, storage } from '@/firebase';
 import { collection, addDoc, getDocs, deleteDoc, doc } from 'firebase/firestore';
+import { useAuth } from '@/context/AuthContext';
+
+// Import React Icons and Framer Motion
+import { FaBars, FaTimes } from 'react-icons/fa';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export default function Research() {
+    const { currentUser, userDataObj } = useAuth(); // Include userDataObj for plan check
+    const router = useRouter();
+
     const [searchQuery, setSearchQuery] = useState('');
     const [searchResults, setSearchResults] = useState([]);
     const [savedCases, setSavedCases] = useState([]); // State for saved cases
     const [selectedCase, setSelectedCase] = useState(null); // State to store the selected case
     const [isLoading, setIsLoading] = useState(false);
     const [isSidebarVisible, setIsSidebarVisible] = useState(true);
-    const router = useRouter();
 
     // Typing animation states
     const [placeholderText, setPlaceholderText] = useState('');
@@ -164,6 +173,19 @@ export default function Research() {
         }
     };
 
+    // Only allow access if user is logged in
+    if (!currentUser) {
+        return (
+            <div className="flex items-center justify-center h-screen">
+                <p className="text-gray-700">
+                    Please <a href="/login" className="text-blue-950 underline">log in</a> to use the Research tool.
+                </p>
+            </div>
+        );
+    }
+
+    const isProUser = userDataObj?.billing?.plan === 'Pro';
+
     return (
         <div className="flex h-screen bg-blue-100">
             {/* Sidebar */}
@@ -173,14 +195,54 @@ export default function Research() {
             <main className="flex-1 flex flex-col items-center p-4 bg-white">
                 <div className="flex-1 w-full max-w-4xl p-4 bg-gray-100 max-h-128 rounded-lg shadow-md">
                     <div className="flex flex-col h-full">
+                        {/* Header with Animated Toggle Sidebar Button */}
                         <header className="flex items-center justify-between w-full mb-4 bg-transparent">
-                            <button
-                                onClick={toggleSidebar}
-                                className="flex items-center justify-center gap-4 border border-solid border-blue-950 bg-blue-950 text-white px-4 py-2 rounded-md duration-200 hover:bg-white hover:text-blue-950"
-                            >
-                                {isSidebarVisible ? 'Hide' : 'Show'}
-                            </button>
+                            <div className="flex items-center">
+                                {/* Animated Toggle Sidebar Button */}
+                                <button
+                                    onClick={toggleSidebar}
+                                    className=" bg-blue-950 text-white p-2 rounded-md duration-200 hover:bg-blue-900 flex items-center justify-center"
+                                    aria-label={isSidebarVisible ? 'Hide Sidebar' : 'Show Sidebar'}
+                                >
+                                    <AnimatePresence mode="wait" initial={false}>
+                                        {isSidebarVisible ? (
+                                            <motion.div
+                                                key="close-icon"
+                                                initial={{ rotate: 90, opacity: 0 }}
+                                                animate={{ rotate: 0, opacity: 1 }}
+                                                exit={{ rotate: -90, opacity: 0 }}
+                                                transition={{ duration: 0.3 }}
+                                            >
+                                                <FaTimes size={20} />
+                                            </motion.div>
+                                        ) : (
+                                            <motion.div
+                                                key="menu-icon"
+                                                initial={{ rotate: -90, opacity: 0 }}
+                                                animate={{ rotate: 0, opacity: 1 }}
+                                                exit={{ rotate: 90, opacity: 0 }}
+                                                transition={{ duration: 0.3 }}
+                                            >
+                                                <FaBars size={20} />
+                                            </motion.div>
+                                        )}
+                                    </AnimatePresence>
+                                </button>
+
+                                {/* Pro+ Mode Button (Optional) */}
+                                {isProUser && (
+                                    <button
+                                        onClick={() => router.push('/lawtools/research/full-mode')}
+                                        className="ml-4 p-2 border border-solid border-emerald-400 bg-emerald-400 text-white rounded-md duration-200 hover:bg-white hover:text-emerald-400 flex items-center justify-center"
+                                        aria-label="Pro+ Mode"
+                                    >
+                                        Pro+ Mode
+                                    </button>
+                                )}
+                            </div>
                         </header>
+
+                        {/* Search Input and Button */}
                         <div className="flex items-center mb-4">
                             <input
                                 type="text"
@@ -312,7 +374,6 @@ export default function Research() {
                                 Read Full Article
                             </a>
                         )}
-                       
                     </div>
                 </div>
             )}

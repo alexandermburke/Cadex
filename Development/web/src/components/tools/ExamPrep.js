@@ -7,8 +7,20 @@ import { useRouter } from 'next/navigation';
 
 // Import Firebase and authentication
 import { db } from '@/firebase';
-import { doc, collection, addDoc, getDocs, deleteDoc, query, where } from 'firebase/firestore';
+import {
+  doc,
+  collection,
+  addDoc,
+  getDocs,
+  deleteDoc,
+  query,
+  where,
+} from 'firebase/firestore';
 import { useAuth } from '@/context/AuthContext';
+
+// Import React Icons and Framer Motion
+import { FaBars, FaTimes } from 'react-icons/fa';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export default function ExamPrep() {
   const { currentUser, userDataObj } = useAuth(); // Include userDataObj for plan check
@@ -281,7 +293,8 @@ export default function ExamPrep() {
           difficulty: examConfig.difficulty || 'Below 150',
           lawType: examConfig.lawType || 'General Law',
           questionLimit: examConfig.questionLimit || 5,
-          instantFeedback: examConfig.instantFeedback !== undefined ? examConfig.instantFeedback : true,
+          instantFeedback:
+            examConfig.instantFeedback !== undefined ? examConfig.instantFeedback : true,
         },
         questionText: questionText || '',
         inputText: inputText || '',
@@ -315,10 +328,7 @@ export default function ExamPrep() {
     }
 
     try {
-      const q = query(
-        collection(db, 'examProgress'),
-        where('userId', '==', currentUser.uid)
-      );
+      const q = query(collection(db, 'examProgress'), where('userId', '==', currentUser.uid));
       const querySnapshot = await getDocs(q);
 
       const progresses = [];
@@ -378,13 +388,39 @@ export default function ExamPrep() {
         <div className="flex-1 w-full max-w-4xl p-4 bg-gray-100 max-h-128 rounded-lg shadow-md overflow-hidden">
           <div className="flex flex-col h-full">
             <div className="flex items-start justify-between w-full mb-4">
-              <div>
+              <div className="flex items-center">
+                {/* Animated Toggle Sidebar Button */}
                 <button
                   onClick={toggleSidebar}
-                  className="gap-4 border border-solid border-blue-950 bg-blue-950 text-white px-4 py-2 rounded-md duration-200 hover:bg-white hover:text-blue-950"
+                  className=" bg-blue-950 text-white p-2 rounded-md duration-200 hover:bg-blue-900 flex items-center justify-center"
+                  aria-label={isSidebarVisible ? 'Hide Sidebar' : 'Show Sidebar'}
                 >
-                  {isSidebarVisible ? 'Hide Sidebar' : 'Show Sidebar'}
+                  <AnimatePresence mode="wait" initial={false}>
+                    {isSidebarVisible ? (
+                      <motion.div
+                        key="close-icon"
+                        initial={{ rotate: 90, opacity: 0 }}
+                        animate={{ rotate: 0, opacity: 1 }}
+                        exit={{ rotate: -90, opacity: 0 }}
+                        transition={{ duration: 0.3 }}
+                      >
+                        <FaTimes size={20} />
+                      </motion.div>
+                    ) : (
+                      <motion.div
+                        key="menu-icon"
+                        initial={{ rotate: -90, opacity: 0 }}
+                        animate={{ rotate: 0, opacity: 1 }}
+                        exit={{ rotate: 90, opacity: 0 }}
+                        transition={{ duration: 0.3 }}
+                      >
+                        <FaBars size={20} />
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </button>
+
+                {/* Pro+ Mode Button */}
                 <button
                   onClick={() => {
                     if (isProUser) {
@@ -403,6 +439,7 @@ export default function ExamPrep() {
                   Pro+ Mode
                 </button>
               </div>
+
               <div className="flex items-center space-x-4">
                 <button
                   onClick={openLoadProgressModal}
@@ -553,7 +590,9 @@ export default function ExamPrep() {
 
                 {/* Question Limit Slider */}
                 <div className="mb-6">
-                  <label className="block text-gray-700 mb-2">Number of Questions in a Row:</label>
+                  <label className="block text-gray-700 mb-2">
+                    Number of Questions in a Row:
+                  </label>
                   <div className="flex items-center">
                     <input
                       type="range"
@@ -647,7 +686,11 @@ export default function ExamPrep() {
                     <p className="mt-1">
                       <span className="font-semibold">Feedback:</span> {item.feedback}
                     </p>
-                    <p className={`mt-1 ${item.correct ? 'text-emerald-400' : 'text-red-600'}`}>
+                    <p
+                      className={`mt-1 ${
+                        item.correct ? 'text-emerald-400' : 'text-red-600'
+                      }`}
+                    >
                       {item.correct ? 'Correct ✅' : 'Incorrect ❌'}
                     </p>
                   </li>
