@@ -1,180 +1,216 @@
+// Sidebar.js
 'use client';
+
 import React from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
+import { FaLock } from 'react-icons/fa';
 
 export default function Sidebar({ activeLink }) {
-    const router = useRouter();
-    const { currentUser, userDataObj, isPaid } = useAuth();
+  const router = useRouter();
+  const { currentUser, userDataObj, isPaid } = useAuth();
 
-    const plan = userDataObj?.billing?.plan || 'free'; // Default to 'free' if plan is undefined
+  const plan = userDataObj?.billing?.plan || 'free'; // Default to 'free' if plan is undefined
 
-    // Helper function to render locked links
-    const renderLockedLink = (label, iconClass) => (
-        <div className="flex items-center gap-4 p-2 text-gray-400 cursor-not-allowed">
-            <i className={`${iconClass} text-gray-400`}></i>
-            <span>{label}</span>
-            <i className="fa-solid fa-lock ml-auto text-gray-400"></i>
+  // Helper function to render locked links
+  const renderLockedLink = (label, IconComponent) => (
+    <div className="flex items-center gap-4 p-2 text-gray-400 cursor-not-allowed group">
+      <IconComponent className="text-gray-400" size={20} />
+      <span className="relative">
+        {label}
+        <FaLock className="absolute -top-2 -right-6 text-gray-400 hidden group-hover:block" />
+      </span>
+    </div>
+  );
+
+  return (
+    <aside className="w-64 bg-gradient-to-b from-blue-950 to-slate-900 text-white h-full flex flex-col p-6 fixed md:relative z-50">
+      {/* Logo or Brand Name */}
+      <div className="mb-8 flex items-center justify-center">
+        <h1 className="text-3xl font-bold">Dashboard</h1>
+      </div>
+
+      {/* Navigation Sections */}
+      <nav className="flex-1">
+        {/* Law Tools Section */}
+        <section className="mb-6">
+          <h2 className="text-lg font-semibold mb-4">Law Tools</h2>
+          <ul className="space-y-2">
+            {plan === 'Pro' ? (
+              <>
+                <li>
+                  <Link
+                    href="/lawtools/research"
+                    className={`flex items-center gap-3 p-3 rounded transition-colors duration-200 ${
+                      activeLink === '/lawtools/research'
+                        ? 'bg-blue-950'
+                        : 'hover:bg-blue-950 hover:bg-opacity-75'
+                    }`}
+                  >
+                    <i className="fa-solid fa-gavel"></i>
+                    <span>Legal Research</span>
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/lawtools/casemanagement"
+                    className={`flex items-center gap-3 p-3 rounded transition-colors duration-200 ${
+                      activeLink === '/lawtools/casemanagement'
+                       ? 'bg-blue-950'
+                        : 'hover:bg-blue-950 hover:bg-opacity-75'
+                    }`}
+                  >
+                    <i className="fa-solid fa-folder-open"></i>
+                    <span>Case Management</span>
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/lawtools/documentdrafting"
+                    className={`flex items-center gap-3 p-3 rounded transition-colors duration-200 ${
+                      activeLink === '/lawtools/documentdrafting'
+                       ? 'bg-blue-950'
+                        : 'hover:bg-blue-950 hover:bg-opacity-75'
+                    }`}
+                  >
+                    <i className="fa-solid fa-file-alt"></i>
+                    <span>Document Drafting</span>
+                  </Link>
+                </li>
+              </>
+            ) : (
+              <>
+                <li>
+                  {renderLockedLink('Legal Research', FaLock)}
+                </li>
+                <li>
+                  {renderLockedLink('Case Management', FaLock)}
+                </li>
+                <li>
+                  {renderLockedLink('Document Drafting', FaLock)}
+                </li>
+              </>
+            )}
+          </ul>
+        </section>
+
+        {/* AI Law Tools Section */}
+        <section className="mb-6">
+          <h2 className="text-lg font-semibold mb-4">AI Law Tools</h2>
+          <ul className="space-y-2">
+            {plan === 'Pro' ? (
+              <>
+                <li>
+                  <Link
+                    href="/ailawtools/analysis"
+                    className={`flex items-center gap-3 p-3 rounded transition-colors duration-200 ${
+                      activeLink === '/ailawtools/analysis'
+                          ? 'bg-blue-950'
+                        : 'hover:bg-blue-950 hover:bg-opacity-75'
+                    }`}
+                  >
+                    <i className="fa-solid fa-brain"></i>
+                    <span>Legal Analysis</span>
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/ailawtools/contractreview"
+                    className={`flex items-center gap-3 p-3 rounded transition-colors duration-200 ${
+                      activeLink === '/ailawtools/contractreview'
+                         ? 'bg-blue-950'
+                        : 'hover:bg-blue-950 hover:bg-opacity-75'
+                    }`}
+                  >
+                    <i className="fa-solid fa-robot"></i>
+                    <span>Contract Review</span>
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/ailawtools/predictive"
+                    className={`flex items-center gap-3 p-3 rounded transition-colors duration-200 ${
+                      activeLink === '/ailawtools/predictive'
+                      ? 'bg-blue-950'
+                        : 'hover:bg-blue-950 hover:bg-opacity-75'
+                    }`}
+                  >
+                    <i className="fa-solid fa-chart-line"></i>
+                    <span>Predictive Analytics</span>
+                  </Link>
+                </li>
+              </>
+            ) : (
+              <>
+                <li>
+                  {renderLockedLink('Legal Analysis', FaLock)}
+                </li>
+                <li>
+                  {renderLockedLink('Contract Review', FaLock)}
+                </li>
+                <li>
+                  {renderLockedLink('Predictive Analytics', FaLock)}
+                </li>
+              </>
+            )}
+          </ul>
+        </section>
+
+        {/* AI Law Simulation Section */}
+        <section className="mb-6">
+          <h2 className="text-lg font-semibold mb-4">AI Law Simulation</h2>
+          <ul className="space-y-2">
+            {/* Simulate a Case - Available to all users */}
+            <li>
+              <Link
+                href="/admin/case"
+                className={`flex items-center gap-3 p-3 rounded transition-colors duration-200 ${
+                  activeLink === '/admin/case'
+              ? 'bg-blue-950'
+                        : 'hover:bg-blue-950 hover:bg-opacity-75'
+                }`}
+              >
+                <i className="fa-solid fa-globe"></i>
+                <span>Simulate a Case</span>
+              </Link>
+            </li>
+
+            {/* LSAT/BAR Prep - Available to all users */}
+            <li>
+              <Link
+                href="/ailawtools/examprep"
+                className={`flex items-center gap-3 p-3 rounded transition-colors duration-200 ${
+                  activeLink === '/ailawtools/examprep'
+                   ? 'bg-blue-950'
+                        : 'hover:bg-blue-950 hover:bg-opacity-75'
+                }`}
+              >
+                <i className="fa-solid fa-flask"></i>
+                <span>LSAT/BAR Prep</span>
+              </Link>
+            </li>
+          </ul>
+        </section>
+      </nav>
+
+      {/* User Info Section */}
+      <footer className="mt-auto flex items-center gap-4 p-4 bg-transparent rounded">
+        
+        <div className="flex-1">
+          <p className="font-semibold">{currentUser?.displayName || 'User'}</p>
+          <p className="text-sm text-blue-200">{currentUser?.email || 'user@example.com'}</p>
         </div>
-    );
-
-    return (
-        <aside className="w-64 bg-white h-full flex flex-col p-4 border-r border-gray-200">
-            <div className="flex flex-col gap-8">
-                {/* Law Tools Section */}
-                <section className="flex flex-col gap-4">
-                    <h2 className="text-lg font-semibold text-gray-700">Law Tools</h2>
-                    <nav className="flex flex-col gap-2">
-                        {plan === 'Pro' ? (
-                            <>
-                                <Link
-                                    href="/lawtools/research"
-                                    className={`flex items-center gap-4 p-2 rounded ${
-                                        activeLink === '/lawtools/research'
-                                            ? 'bg-blue-100 text-blue-950'
-                                            : 'hover:bg-blue-100 text-gray-700'
-                                    }`}
-                                >
-                                    <i className="fa-solid fa-gavel text-gray-600"></i>
-                                    <span>Legal Research</span>
-                                </Link>
-                                <Link
-                                    href="/lawtools/casemanagement"
-                                    className={`flex items-center gap-4 p-2 rounded ${
-                                        activeLink === '/lawtools/casemanagement'
-                                            ? 'bg-blue-100 text-blue-950'
-                                            : 'hover:bg-blue-100 text-gray-700'
-                                    }`}
-                                >
-                                    <i className="fa-solid fa-folder-open text-gray-600"></i>
-                                    <span>Case Management</span>
-                                </Link>
-                                <Link
-                                    href="/lawtools/documentdrafting"
-                                    className={`flex items-center gap-4 p-2 rounded ${
-                                        activeLink === '/lawtools/documentdrafting'
-                                            ? 'bg-blue-100 text-blue-950'
-                                            : 'hover:bg-blue-100 text-gray-700'
-                                    }`}
-                                >
-                                    <i className="fa-solid fa-file-alt text-gray-600"></i>
-                                    <span>Document Drafting</span>
-                                </Link>
-                            </>
-                        ) : (
-                            <>
-                                {renderLockedLink('Legal Research', 'fa-solid fa-gavel')}
-                                {renderLockedLink('Case Management', 'fa-solid fa-folder-open')}
-                                {renderLockedLink('Document Drafting', 'fa-solid fa-file-alt')}
-                            </>
-                        )}
-                    </nav>
-                </section>
-
-                {/* AI Law Tools Section */}
-                <section className="flex flex-col gap-4">
-                    <h2 className="text-lg font-semibold text-gray-700">AI Law Tools</h2>
-                    <nav className="flex flex-col gap-2">
-                        {plan === 'Pro' ? (
-                            <>
-                                <Link
-                                    href="/ailawtools/analysis"
-                                    className={`flex items-center gap-4 p-2 rounded ${
-                                        activeLink === '/ailawtools/analysis'
-                                            ? 'bg-blue-100 text-blue-950'
-                                            : 'hover:bg-blue-100 text-gray-700'
-                                    }`}
-                                >
-                                    <i className="fa-solid fa-brain text-gray-600"></i>
-                                    <span>Legal Analysis</span>
-                                </Link>
-                                <Link
-                                    href="/ailawtools/contractreview"
-                                    className={`flex items-center gap-4 p-2 rounded ${
-                                        activeLink === '/ailawtools/contractreview'
-                                            ? 'bg-blue-100 text-blue-950'
-                                            : 'hover:bg-blue-100 text-gray-700'
-                                    }`}
-                                >
-                                    <i className="fa-solid fa-robot text-gray-600"></i>
-                                    <span>Contract Review</span>
-                                </Link>
-                                <Link
-                                    href="/ailawtools/predictive"
-                                    className={`flex items-center gap-4 p-2 rounded ${
-                                        activeLink === '/ailawtools/predictive'
-                                            ? 'bg-blue-100 text-blue-950'
-                                            : 'hover:bg-blue-100 text-gray-700'
-                                    }`}
-                                >
-                                    <i className="fa-solid fa-chart-line text-gray-600"></i>
-                                    <span>Predictive Analytics</span>
-                                </Link>
-                            </>
-                        ) : (
-                            <>
-                                {renderLockedLink('Legal Analysis', 'fa-solid fa-brain')}
-                                {renderLockedLink('Contract Review', 'fa-solid fa-robot')}
-                                {renderLockedLink('Predictive Analytics', 'fa-solid fa-chart-line')}
-                            </>
-                        )}
-                    </nav>
-                </section>
-
-                {/* AI Law Simulation Section */}
-                <section className="flex flex-col gap-4">
-                    <h2 className="text-lg font-semibold text-gray-700">AI Law Simulation</h2>
-                    <nav className="flex flex-col gap-2">
-                        {/* Simulate a Case - Available to all users */}
-                        <Link
-                            href="/admin/case"
-                            className={`flex items-center gap-4 p-2 rounded ${
-                                activeLink === '/admin/case'
-                                    ? 'bg-blue-100 text-blue-950'
-                                    : 'hover:bg-blue-100 text-gray-700'
-                            }`}
-                        >
-                            <i className="fa-solid fa-globe text-gray-600"></i>
-                            <span>Simulate a Case</span>
-                        </Link>
-
-                        {/* LSAT/BAR Prep - Available to all users */}
-                        <Link
-                            href="/ailawtools/examprep"
-                            className={`flex items-center gap-4 p-2 rounded ${
-                                activeLink === '/ailawtools/examprep'
-                                    ? 'bg-blue-100 text-blue-950'
-                                    : 'hover:bg-blue-100 text-gray-700'
-                            }`}
-                        >
-                            <i className="fa-solid fa-flask text-gray-600"></i>
-                            <span>LSAT/BAR Prep</span>
-                        </Link>
-                    </nav>
-                </section>
-
-                {/* User Info Section */}
-                <section className="flex items-center gap-2 p-4 mt-auto">
-                    <div className="flex flex-col">
-                        <span className="font-semibold text-blue-900">
-                            {currentUser?.displayName || 'User'}
-                        </span>
-                        <span className="text-xs text-gray-500">
-                            {currentUser?.email || 'user@example.com'}
-                        </span>
-                    </div>
-                    <span
-                        className={`ml-6 text-xs px-2 py-1 rounded-full capitalize ${
-                            plan === 'Pro'
-                                ? 'bg-blue-100 text-blue-700'
-                                : 'bg-green-100 text-green-700'
-                        }`}
-                    >
-                        {plan}
-                    </span>
-                </section>
-            </div>
-        </aside>
-    );
+        <span
+          className={`px-3 py-1 rounded text-xs font-semibold uppercase ${
+            plan === 'Pro'
+              ? 'bg-gradient-to-r from-blue-400 to-blue-600 text-white'
+              : 'bg-gradient-to-r from-emerald-400 to-emerald-600 text-white'
+          }`}
+        >
+          {plan}
+        </span>
+      </footer>
+    </aside>
+  );
 }

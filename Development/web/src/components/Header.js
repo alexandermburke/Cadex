@@ -36,17 +36,7 @@ export default function Header() {
     // Updated shareBtn with hover effect for bug icon
     let shareBtn = (
         <div className='flex flex-col relative'>    
-            <button 
-                onClick={() => copyToClipboard()} 
-                className='ml duration-200 overflow-hidden p-0.5 rounded relative group'
-            >
-                <div className='p-2 grid place-items-center relative goldBackground z-10 bg-transparent rounded duration-200 text-white before:ease h-10 w-40 overflow-hidden shadow-2xl transition-all before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-40'>
-                    <div className="flex items-center justify-center h-full">
-                        <p className=''>{showText ? 'Link copied' : 'Report Bug'}</p>
-                        <i className="ml-8 fa-solid fa-arrow-right opacity-0 group-hover:opacity-100 transition-opacity duration-200"></i>
-                    </div>
-                </div>
-            </button>
+        
         </div>
     );
 

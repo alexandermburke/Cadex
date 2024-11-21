@@ -371,10 +371,18 @@ export default function ExamPrep() {
 
   if (!currentUser) {
     return (
-      <div className="flex items-center justify-center h-screen">
-        <p className="text-gray-700">
-          Please <a href="/login" className="text-blue-950 underline">log in</a> to use the Exam Prep tool.
-        </p>
+      <div className="flex items-center justify-center h-screen bg-gray-100">
+        <div className="text-center p-6 bg-white rounded shadow-md">
+          <p className="text-gray-700 mb-4">
+            Please <a href="/login" className="text-blue-900 underline">log in</a> to use the Exam Prep tool.
+          </p>
+          <button
+            onClick={() => router.push('/login')}
+            className="px-4 py-2 bg-blue-900 text-white rounded hover:bg-blue-700"
+          >
+            Go to Login
+          </button>
+        </div>
       </div>
     );
   }
@@ -382,156 +390,180 @@ export default function ExamPrep() {
   const isProUser = userDataObj?.billing?.plan === 'Pro';
 
   return (
-    <div className="flex h-screen bg-gray-100">
-      {isSidebarVisible && <Sidebar activeLink="/ailawtools/examprep" />}
-      <main className="flex-1 flex flex-col items-center p-4 bg-white">
-        <div className="flex-1 w-full max-w-4xl p-4 bg-gray-100 max-h-128 rounded shadow-md overflow-hidden">
-          <div className="flex flex-col h-full">
-            <div className="flex items-start justify-between w-full mb-4">
-              <div className="flex items-center">
-                {/* Animated Toggle Sidebar Button */}
-                <button
-                  onClick={toggleSidebar}
-                  className=" bg-transparent text-blue-950 p-2 rounded duration-200 flex items-center justify-center"
-                  aria-label={isSidebarVisible ? 'Hide Sidebar' : 'Show Sidebar'}
+    <div className="flex h-screen bg-gray-50">
+      {/* Sidebar */}
+      <Sidebar activeLink="/ailawtools/examprep" />
+
+      {/* Main Content Area */}
+      <main className="flex-1 flex flex-col items-center p-6 overflow-auto">
+        {/* Header */}
+        <div className="w-full max-w-5xl flex items-center justify-between mb-6">
+          {/* Animated Toggle Sidebar Button */}
+          <button
+            onClick={toggleSidebar}
+            className="text-gray-600 hover:text-gray-800 rounded"
+            aria-label={isSidebarVisible ? 'Hide Sidebar' : 'Show Sidebar'}
+          >
+            <AnimatePresence mode="wait" initial={false}>
+              {isSidebarVisible ? (
+                <motion.div
+                  key="close-icon"
+                  initial={{ rotate: 90, opacity: 0 }}
+                  animate={{ rotate: 0, opacity: 1 }}
+                  exit={{ rotate: -90, opacity: 0 }}
+                  transition={{ duration: 0.3 }}
                 >
-                  <AnimatePresence mode="wait" initial={false}>
-                    {isSidebarVisible ? (
-                      <motion.div
-                        key="close-icon"
-                        initial={{ rotate: 90, opacity: 0 }}
-                        animate={{ rotate: 0, opacity: 1 }}
-                        exit={{ rotate: -90, opacity: 0 }}
-                        transition={{ duration: 0.3 }}
-                      >
-                        <FaTimes size={20} />
-                      </motion.div>
-                    ) : (
-                      <motion.div
-                        key="menu-icon"
-                        initial={{ rotate: -90, opacity: 0 }}
-                        animate={{ rotate: 0, opacity: 1 }}
-                        exit={{ rotate: 90, opacity: 0 }}
-                        transition={{ duration: 0.3 }}
-                      >
-                        <FaBars size={20} />
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </button>
-
-                {/* Pro+ Mode Button */}
-                <button
-                  onClick={() => {
-                    if (isProUser) {
-                      router.push('/ailawtools/examprep/full-mode');
-                    } else {
-                      alert('Pro+ Mode is only available for Pro users. Upgrade to access this feature.');
-                    }
-                  }}
-                  className={`gap-4 ml-2 border border-solid px-4 py-2 rounded duration-200 ${
-                    isProUser
-                      ? 'border-emerald-400 bg-emerald-400 text-white hover:bg-white hover:text-emerald-400'
-                      : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                  }`}
-                  disabled={!isProUser}
+                  <FaTimes size={24} />
+                </motion.div>
+              ) : (
+                <motion.div
+                  key="menu-icon"
+                  initial={{ rotate: -90, opacity: 0 }}
+                  animate={{ rotate: 0, opacity: 1 }}
+                  exit={{ rotate: 90, opacity: 0 }}
+                  transition={{ duration: 0.3 }}
                 >
-                  Pro+ Mode
-                </button>
-              </div>
+                  <FaBars size={24} />
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </button>
 
-              <div className="flex items-center space-x-4">
-                <button
-                  onClick={openLoadProgressModal}
-                  className="border border-solid border-blue-950 bg-white text-blue-950 px-4 py-2 rounded duration-200 hover:bg-blue-950 hover:text-white"
-                  disabled={!currentUser}
-                >
-                  Load Progress
-                </button>
-                <button
-                  onClick={openConfigModal}
-                  className="border border-solid border-blue-950 bg-white text-blue-950 px-4 py-2 rounded duration-200 hover:bg-blue-950 hover:text-white"
-                >
-                  Configure Exam Prep
-                </button>
-              </div>
-            </div>
-
-            {/* Question Counter Label */}
-            {isExamStarted && (
-              <div className="mb-2 text-right w-full">
-                <span className="text-gray-700">
-                  Questions Answered: {currentQuestionCount} / {examConfig.questionLimit}
-                </span>
-              </div>
-            )}
-
-            {questionText && (
-              <div className="mb-4 p-4 bg-white rounded shadow overflow-y-scroll">
-                <h3 className="text-lg font-semibold text-blue-950">Exam Question</h3>
-                <p className="text-gray-700 whitespace-pre-wrap">{questionText}</p>
-              </div>
-            )}
-
-            {questionText && (
-              <div className="flex items-center mb-4">
-                <textarea
-                  className="flex-1 p-2 border border-gray-300 rounded"
-                  value={inputText}
-                  onChange={(e) => setInputText(e.target.value)}
-                  placeholder="Enter your answer..."
-                  rows="8"
-                  disabled={isLoading}
-                ></textarea>
-              </div>
-            )}
-
-            {questionText && (
-              <div className="flex space-x-2">
-                <button
-                  onClick={handleSubmitAnswer}
-                  className="border border-solid border-blue-950 bg-white text-blue-950 px-4 py-2 rounded duration-200 hover:bg-blue-950 hover:text-white"
-                  disabled={isLoading || !inputText.trim()}
-                >
-                  {isLoading ? 'Submitting...' : 'Submit Answer'}
-                </button>
-                <button
-                  onClick={handleSaveProgress}
-                  className="border border-solid border-emerald-400 bg-white text-emerald-400 px-4 py-2 rounded duration-200 hover:bg-emerald-400 hover:text-white"
-                  disabled={!currentUser}
-                >
-                  Save Progress
-                </button>
-              </div>
-            )}
-
-            {!questionText && (
-              <div className="flex flex-col items-center justify-center h-full">
-                <p className="text-gray-500 mb-2">Click Configure Exam Prep to start.</p>
-                <p className="text-gray-500 text-sm text-center">
-                  <strong>Important Note:</strong> This is not an official test prep for any law exam
-                  (LSAT, Bar, etc.) and is intended solely to give users an idea of the types of
-                  questions on those exams. We are not affiliated with any of these exams in any way.
-                </p>
-              </div>
-            )}
-          </div>
+          {/* Professional Mode Button */}
+          <button
+            onClick={() => {
+              if (isProUser) {
+                router.push('/ailawtools/examprep/full-mode');
+              } else {
+                alert('Professional Mode is only available for Pro users. Upgrade to access this feature.');
+              }
+            }}
+            className={`px-4 py-2 rounded transition-colors duration-200 ${
+              isProUser
+                ? 'goldBackground shadow-md bg-black text-white hover:opacity-75'
+                : 'bg-gray-300 text-gray-600 cursor-not-allowed'
+            }`}
+            disabled={!isProUser}
+            aria-label="Professional Mode"
+          >
+            Pro Mode
+          </button>
         </div>
+
+        {/* Configuration and Control Buttons */}
+        <div className="w-full max-w-5xl flex justify-end mb-4 space-x-4">
+          <button
+            onClick={openLoadProgressModal}
+            className="group before:ease relative h-12 w-56 overflow-hidden rounded bg-gradient-to-r from-blue-950 to-slate-700 text-white shadow-2xl transition-all before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-56"   
+            disabled={!currentUser}
+          >
+            Load Progress
+          </button>
+          <button
+            onClick={openConfigModal}
+            className="group before:ease relative h-12 w-56 overflow-hidden rounded bg-gradient-to-r from-blue-950 to-slate-700 text-white shadow-2xl transition-all before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-56"   
+          >
+            Configure Exam Prep
+          </button>
+        </div>
+
+        {/* Question Counter */}
+        {isExamStarted && (
+          <div className="w-full max-w-5xl mb-4 p-4 bg-white rounded shadow-md flex justify-between items-center">
+            <span className="text-gray-700">
+              Questions Answered: {currentQuestionCount} / {examConfig.questionLimit}
+            </span>
+            <span
+              className={`px-3 py-1 rounded text-sm font-semibold ${
+                isProUser ? 'bg-blue-100 text-blue-700' : 'bg-emerald-100 text-emerald-700'
+              }`}
+            >
+              {isProUser ? 'Pro User' : 'Standard User'}
+            </span>
+          </div>
+        )}
+
+        {/* Exam Question */}
+        {questionText && (
+          <div className="w-full max-w-5xl mb-6 p-6 bg-white rounded shadow-md overflow-y-scroll">
+            <h3 className="text-2xl font-semibold text-blue-900 mb-4">Exam Question</h3>
+            <p className="text-gray-800">{questionText}</p>
+          </div>
+        )}
+
+        {/* Answer Input */}
+        {questionText && (
+          <div className="w-full max-w-5xl mb-6">
+            <textarea
+              className="w-full p-4 border border-gray-300 rounded resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-200"
+              value={inputText}
+              onChange={(e) => setInputText(e.target.value)}
+              placeholder="Enter your answer..."
+              rows="6"
+              disabled={isLoading}
+            ></textarea>
+          </div>
+        )}
+
+        {/* Action Buttons */}
+        {questionText && (
+          <div className="w-full max-w-5xl flex space-x-4">
+            <button
+              onClick={handleSubmitAnswer}
+              className={`flex-1 px-4 py-3 rounded font-semibold text-white transition-colors duration-200 shadow-md ${
+                isLoading || !inputText.trim()
+                  ? 'bg-blue-400 cursor-not-allowed shadow-md'
+                  : 'bg-blue-900 hover:bg-blue-950 shadow-md'
+              }`}
+              disabled={isLoading || !inputText.trim()}
+            >
+              {isLoading ? 'Submitting...' : 'Submit Answer'}
+            </button>
+            <button
+              onClick={handleSaveProgress}
+              className="flex-1 px-4 py-3 bg-emerald-600 text-white rounded font-semibold hover:bg-emerald-700 transition-colors duration-200"
+              disabled={!currentUser}
+            >
+              Save Progress
+            </button>
+          </div>
+        )}
+
+        {/* Placeholder Content */}
+        {!questionText && (
+          <div className="w-full max-w-5xl p-6 bg-white rounded shadow-md text-center">
+            <p className="text-gray-600 mb-4">Click <span className="font-semibold">Configure Exam Prep</span> to start.</p>
+            <p className="text-gray-500 text-sm">
+              <strong>Important Note:</strong> This is not an official test prep for any law exam (LSAT, Bar, etc.) and is intended solely to give users an idea of the types of questions on those exams. We are not affiliated with any of these exams in any way.
+            </p>
+          </div>
+        )}
 
         {/* Configuration Modal */}
         {isConfigModalOpen && (
-          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-            <div className="bg-white p-6 rounded w-11/12 max-w-md overflow-y-auto">
-              <h2 className="text-xl mb-4">Configure Exam Prep</h2>
+          <motion.div
+            className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <motion.div
+              className="bg-white p-8 rounded w-11/12 max-w-md shadow-lg"
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.8, opacity: 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              <h2 className="text-2xl font-semibold mb-6">Configure Exam Prep</h2>
               <form>
                 {/* Exam Type */}
                 <div className="mb-4">
-                  <label className="block text-gray-700">Exam Type:</label>
+                  <label className="block text-gray-700 mb-2">Exam Type:</label>
                   <select
                     name="examType"
                     value={examConfig.examType}
                     onChange={handleConfigChange}
-                    className="w-full border border-gray-300 rounded p-2"
+                    className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-200"
                   >
                     <option value="LSAT">LSAT</option>
                     <option value="BAR">BAR</option>
@@ -541,12 +573,12 @@ export default function ExamPrep() {
 
                 {/* Difficulty */}
                 <div className="mb-4">
-                  <label className="block text-gray-700">Difficulty:</label>
+                  <label className="block text-gray-700 mb-2">Difficulty:</label>
                   <select
                     name="difficulty"
                     value={examConfig.difficulty}
                     onChange={handleConfigChange}
-                    className="w-full border border-gray-300 rounded p-2"
+                    className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-200"
                   >
                     {difficultyOptions.map((option) => (
                       <option key={option.value} value={option.value}>
@@ -558,12 +590,12 @@ export default function ExamPrep() {
 
                 {/* Law Type */}
                 <div className="mb-4">
-                  <label className="block text-gray-700">Law Type:</label>
+                  <label className="block text-gray-700 mb-2">Law Type:</label>
                   <select
                     name="lawType"
                     value={examConfig.lawType}
                     onChange={handleConfigChange}
-                    className="w-full border border-gray-300 rounded p-2"
+                    className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-200"
                   >
                     {lawTypeOptions.map((lawType, index) => (
                       <option key={index} value={lawType}>
@@ -574,16 +606,16 @@ export default function ExamPrep() {
                 </div>
 
                 {/* Instant Feedback Checkbox */}
-                <div className="mb-4 flex items-center">
+                <div className="mb-6 flex items-center">
                   <input
                     type="checkbox"
                     id="instantFeedback"
                     name="instantFeedback"
                     checked={examConfig.instantFeedback}
                     onChange={handleConfigChange}
-                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                    className="h-5 w-5 text-blue-900 focus:ring-blue-500 border-gray-300 rounded"
                   />
-                  <label htmlFor="instantFeedback" className="ml-2 block text-gray-700">
+                  <label htmlFor="instantFeedback" className="ml-3 block text-gray-700">
                     Enable Instant Feedback
                   </label>
                 </div>
@@ -605,52 +637,67 @@ export default function ExamPrep() {
                           questionLimit: parseInt(e.target.value, 10),
                         }))
                       }
-                      className="w-full h-2 bg-gray-200 rounded appearance-none cursor-pointer dark:bg-gray-700"
+                      className="w-full h-2 bg-blue-200 rounded appearance-none cursor-pointer"
                       id="questionLimit"
                     />
                     <span className="ml-4 text-gray-700">{examConfig.questionLimit}</span>
                   </div>
                 </div>
 
-                {/* Start Exam Prep Button */}
-                <div className="flex justify-end">
-                  {/* Custom Styled Start Exam Prep Button */}
+                {/* Action Buttons */}
+                <div className="flex justify-end space-x-4">
                   <button
                     type="button"
                     onClick={handleStartExamPrep}
-                    className="group before:ease relative h-12 w-56 overflow-hidden rounded bg-gradient-to-r from-blue-950 to-slate-700 text-white shadow-2xl transition-all before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-56"
+                    className="group before:ease relative h-12 w-56 overflow-hidden rounded bg-gradient-to-r from-blue-950 to-slate-700 text-white shadow-2xl transition-all before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-56"   
                     aria-label="Start Exam Prep"
                   >
-                    <div className="flex items-center justify-center h-full">
-                      Start Exam Prep
-                      <i className="ml-8 fa-solid fa-arrow-right opacity-0 group-hover:opacity-100 transition-opacity duration-200"></i>
-                    </div>
+                    Start Exam Prep
+                    <motion.span
+                      className=""
+                      initial={{ x: -10, opacity: 0 }}
+                      animate={{ x: 0, opacity: 1 }}
+                      transition={{ delay: 0.3, duration: 0.3 }}
+                    >
+                          <i className="ml-8 fa-solid fa-arrow-right"></i>
+               
+                    </motion.span>
                   </button>
-                  {/* Cancel Button */}
                   <button
                     type="button"
                     onClick={closeConfigModal}
-                    className="ml-4 px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-50"
+                    className="px-6 py-3 bg-gray-300 text-gray-700 font-semibold rounded shadow-md hover:bg-gray-400 transition-colors duration-200"
                   >
                     Cancel
                   </button>
                 </div>
               </form>
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
         )}
 
         {/* Result Modal */}
         {isResultModalOpen && (
-          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-            <div className="bg-white p-6 rounded w-11/12 max-w-md">
-              <h2 className="text-xl mb-4">Answer Feedback</h2>
-              <p className="text-gray-700 whitespace-pre-wrap">{answerResult}</p>
-              <div className="flex justify-end mt-4 space-x-2">
+          <motion.div
+            className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <motion.div
+              className="bg-white p-8 rounded w-11/12 max-w-md shadow-lg"
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.8, opacity: 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              <h2 className="text-2xl font-semibold mb-6">Answer Feedback</h2>
+              <p className="text-gray-800 mb-6">{answerResult}</p>
+              <div className="flex justify-end space-x-4">
                 <button
                   type="button"
                   onClick={closeResultModal}
-                  className="px-4 py-2 bg-blue-950 text-white rounded"
+                  className="px-6 py-3 bg-red-600 text-white rounded hover:bg-red-700 transition-colors duration-200"
                 >
                   Close
                 </button>
@@ -660,35 +707,48 @@ export default function ExamPrep() {
                     closeResultModal();
                     handleGetQuestion();
                   }}
-                  className="px-4 py-2 bg-emerald-400 text-white rounded hover:bg-green-700"
+                  className="px-6 py-3 bg-blue-900 text-white rounded hover:bg-blue-700 transition-colors duration-200"
                   disabled={isLoading}
                 >
-                  Next Question
+                  {isLoading ? 'Loading...' : 'Next Question'}
                 </button>
               </div>
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
         )}
 
         {/* Final Feedback Modal */}
         {isFinalFeedbackModalOpen && (
-          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 overflow-y-auto">
-            <div className="bg-white p-6 rounded w-11/12 max-w-2xl overflow-y-auto max-h-[80vh]">
-              <h2 className="text-xl mb-4">Session Feedback</h2>
-              <ul>
+          <motion.div
+            className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 overflow-y-auto"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <motion.div
+              className="bg-white p-8 rounded w-11/12 max-w-3xl shadow-lg max-h-[80vh] overflow-y-auto"
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.8, opacity: 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              <h2 className="text-2xl font-semibold mb-6">Session Feedback</h2>
+              <ul className="space-y-4">
                 {answeredQuestions.map((item, index) => (
-                  <li key={index} className="mb-4 p-4 border rounded">
-                    <p className="font-semibold">Question {index + 1}:</p>
-                    <p className="text-gray-700">{item.question}</p>
-                    <p className="mt-2">
+                  <li key={index} className="p-4 border border-gray-200 rounded">
+                    <p className="font-semibold text-blue-900 mb-2">
+                      Question {index + 1}:
+                    </p>
+                    <p className="text-gray-700 mb-2">{item.question}</p>
+                    <p className="text-gray-800 mb-1">
                       <span className="font-semibold">Your Answer:</span> {item.answer}
                     </p>
-                    <p className="mt-1">
+                    <p className="text-gray-800 mb-1">
                       <span className="font-semibold">Feedback:</span> {item.feedback}
                     </p>
                     <p
-                      className={`mt-1 ${
-                        item.correct ? 'text-emerald-400' : 'text-red-600'
+                      className={`font-semibold ${
+                        item.correct ? 'text-emerald-500' : 'text-red-500'
                       }`}
                     >
                       {item.correct ? 'Correct ✅' : 'Incorrect ❌'}
@@ -696,33 +756,46 @@ export default function ExamPrep() {
                   </li>
                 ))}
               </ul>
-              <div className="flex justify-end mt-4">
+              <div className="flex justify-end mt-6">
                 <button
                   type="button"
                   onClick={closeFinalFeedbackModal}
-                  className="px-4 py-2 bg-blue-950 text-white rounded"
+                  className="px-6 py-3 bg-blue-900 text-white rounded hover:bg-blue-700 transition-colors duration-200"
                 >
                   Close
                 </button>
               </div>
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
         )}
 
         {/* Load Progress Modal */}
         {isLoadProgressModalOpen && (
-          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-            <div className="bg-white p-6 rounded w-11/12 max-w-2xl overflow-y-auto max-h-full">
-              <h2 className="text-xl mb-4">Load Saved Progress</h2>
+          <motion.div
+            className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <motion.div
+              className="bg-white p-8 rounded w-11/12 max-w-3xl shadow-lg overflow-y-auto max-h-full"
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.8, opacity: 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              <h2 className="text-2xl font-semibold mb-6">Load Saved Progress</h2>
               {savedProgresses.length === 0 ? (
                 <p className="text-gray-700">No saved progresses found.</p>
               ) : (
-                <ul>
+                <ul className="space-y-4">
                   {savedProgresses.map((progress) => (
-                    <li key={progress.id} className="mb-4 border-b pb-2">
-                      <div className="flex justify-between items-center">
+                    <li key={progress.id} className="p-4 border border-gray-200 rounded">
+                      <div className="flex justify-between items-start">
                         <div>
-                          <p className="font-semibold">Exam Type: {progress.examConfig.examType}</p>
+                          <p className="font-semibold text-blue-900">
+                            Exam Type: {progress.examConfig.examType}
+                          </p>
                           <p className="text-sm text-gray-600">
                             Law Type: {progress.examConfig.lawType}
                           </p>
@@ -739,16 +812,16 @@ export default function ExamPrep() {
                             Saved on: {new Date(progress.timestamp).toLocaleString()}
                           </p>
                         </div>
-                        <div className="flex space-x-2">
+                        <div className="flex space-x-2 mt-2">
                           <button
                             onClick={() => handleLoadProgress(progress)}
-                            className="px-3 py-1 bg-blue-950 text-white rounded hover:bg-blue-900"
+                            className="px-4 py-2 bg-blue-900 text-white rounded hover:bg-blue-700 transition-colors duration-200"
                           >
                             Load
                           </button>
                           <button
                             onClick={() => handleDeleteProgress(progress.id)}
-                            className="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-500"
+                            className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors duration-200"
                           >
                             Delete
                           </button>
@@ -758,17 +831,17 @@ export default function ExamPrep() {
                   ))}
                 </ul>
               )}
-              <div className="flex justify-end mt-4">
+              <div className="flex justify-end mt-6">
                 <button
                   type="button"
                   onClick={closeLoadProgressModal}
-                  className="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-200"
+                  className="px-6 py-3 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 transition-colors duration-200"
                 >
                   Close
                 </button>
               </div>
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
         )}
       </main>
     </div>
