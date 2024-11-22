@@ -20,7 +20,6 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar })
       <IconComponent className="text-gray-400" size={20} />
       <span className="relative">
         {label}
-        <FaLock className="absolute -top-2 -right-6 text-gray-400 hidden group-hover:block" />
       </span>
     </div>
   );
@@ -48,19 +47,19 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar })
 
   return (
     <motion.aside
-      className="fixed top-0 left-0 w-64 h-full bg-gradient-to-b from-blue-950 to-slate-800 text-white flex flex-col p-6 z-50 md:relative md:translate-x-0"
+      className="fixed top-0 left-0 w-64 h-full bg-gradient-to-b from-blue-950 to-slate-800 text-white flex flex-col z-50 md:relative md:translate-x-0 overflow-hidden"
       initial="hidden"
       animate={isSidebarVisible ? 'visible' : 'hidden'}
       variants={sidebarVariants}
       exit="hidden"
     >
       {/* Logo or Brand Name */}
-      <div className="mb-8 flex items-center justify-center">
-        <h1 className="text-3xl font-bold">Dashboard</h1>
+      <div className="p-6 flex items-center justify-center">
+        <h1 className="text-3xl font-bold goldGradient">Dashboard</h1>
       </div>
 
       {/* Navigation Sections */}
-      <nav className="flex-1">
+      <nav className="flex-1 overflow-y-auto px-6">
         {/* Law Tools Section */}
         <section className="mb-6">
           <h2 className="text-lg font-semibold mb-4">Law Tools</h2>
@@ -211,20 +210,24 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar })
       </nav>
 
       {/* User Info Section */}
-      <footer className="mt-auto flex items-center gap-4 p-4 bg-transparent rounded">
-        <div className="flex-1">
-          <p className="font-semibold">{currentUser?.displayName || 'User'}</p>
-          <p className="text-sm text-blue-200">{currentUser?.email || 'user@example.com'}</p>
+      <footer className="px-6 py-4 bg-transparent">
+        <div className="flex items-center gap-4">
+          <div className="flex-1 min-w-0">
+            <p className="font-semibold truncate">{currentUser?.displayName || 'User'}</p>
+            <p className="text-sm text-blue-200 truncate">
+              {currentUser?.email || 'user@example.com'}
+            </p>
+          </div>
+          <span
+            className={`px-3 py-1 rounded text-xs font-semibold uppercase whitespace-nowrap ${
+              plan === 'Pro' || plan === 'Developer'
+                ? 'bg-gradient-to-r from-blue-400 to-blue-600 text-white'
+                : 'bg-gradient-to-r from-emerald-400 to-emerald-600 text-white'
+            }`}
+          >
+            {plan}
+          </span>
         </div>
-        <span
-          className={`px-3 py-1 rounded text-xs font-semibold uppercase ${
-            plan === 'Pro' || plan === 'Developer'
-              ? 'bg-gradient-to-r from-blue-400 to-blue-600 text-white'
-              : 'bg-gradient-to-r from-emerald-400 to-emerald-600 text-white'
-          }`}
-        >
-          {plan}
-        </span>
       </footer>
     </motion.aside>
   );
