@@ -19,7 +19,7 @@ import {
 import { useAuth } from '@/context/AuthContext';
 
 // Import React Icons and Framer Motion
-import { FaBars, FaTimes } from 'react-icons/fa';
+import { FaBars, FaTimes, FaSave } from 'react-icons/fa'; // Imported FaSave
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function ExamPrep() {
@@ -643,11 +643,16 @@ export default function ExamPrep() {
             </button>
             <button
               onClick={handleSaveProgress}
-              className="flex-1 px-4 py-3 bg-emerald-600 text-white rounded font-semibold hover:bg-emerald-700 transition-colors duration-200"
+              className="flex items-center justify-center px-4 py-3 bg-emerald-600 text-white rounded font-semibold hover:bg-emerald-700 transition-colors duration-200"
               disabled={!currentUser}
               aria-label="Save Progress"
             >
-              Save Progress
+              <motion.div
+                whileHover={{ scale: 1.2, rotate: 360 }}
+                transition={{ duration: 0.5 }}
+              >
+                <FaSave size={24} />
+              </motion.div>
             </button>
           </div>
         )}
