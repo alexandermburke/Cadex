@@ -28,6 +28,8 @@ export default function ExamPrep() {
 
   const [inputText, setInputText] = useState('');
   const [questionText, setQuestionText] = useState('');
+  const [questionStem, setQuestionStem] = useState('');
+  const [options, setOptions] = useState([]);
   const [answerResult, setAnswerResult] = useState('');
   const [isSidebarVisible, setIsSidebarVisible] = useState(false); // Default to hidden on mobile
   const [isLoading, setIsLoading] = useState(false);
@@ -154,6 +156,8 @@ export default function ExamPrep() {
   const handleGetQuestion = async () => {
     setIsLoading(true);
     setQuestionText('');
+    setQuestionStem('');
+    setOptions([]);
     setAnswerResult('');
     setInputText('');
 
@@ -171,7 +175,13 @@ export default function ExamPrep() {
       }
 
       const { question } = await response.json();
-      setQuestionText(question);
+
+      // Parse the question to extract stem and options
+      const { stem, choices } = parseQuestion(question);
+      setQuestionStem(stem);
+      setOptions(choices);
+
+      setQuestionText(question); // Keep the full question text if needed
       setIsExamStarted(true); // Set exam as started
     } catch (error) {
       console.error('Error fetching exam question:', error);
@@ -179,6 +189,40 @@ export default function ExamPrep() {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  // Function to parse the question text
+  const parseQuestion = (text) => {
+    // Split the text by newlines
+    const lines = text.split('\n');
+
+    // Initialize variables
+    let stemLines = [];
+    let options = [];
+
+    // Flag to indicate if we have started parsing options
+    let isOptionSection = false;
+
+    for (let line of lines) {
+      line = line.trim();
+      // Check if the line starts with an option label (e.g., "A)", "B)", etc.)
+      if (/^[A-E][).]/.test(line)) {
+        isOptionSection = true;
+        options.push(line);
+      } else if (isOptionSection && line) {
+        // If we're in the options section and the line doesn't start with an option label, it's a continuation of the previous option
+        if (options.length > 0) {
+          options[options.length - 1] += ' ' + line;
+        }
+      } else {
+        // Before options start, add lines to the stem
+        stemLines.push(line);
+      }
+    }
+
+    const stem = stemLines.join(' ');
+
+    return { stem, choices: options };
   };
 
   const handleSubmitAnswer = async () => {
@@ -388,6 +432,12 @@ export default function ExamPrep() {
     setCurrentQuestionCount(progress.currentQuestionCount); // Restore the question count
     setAnsweredQuestions(progress.answeredQuestions || []); // Restore answered questions
     setIsExamStarted(true); // Ensure the question counter is visible
+
+    // Parse the questionText to update questionStem and options
+    const { stem, choices } = parseQuestion(progress.questionText);
+    setQuestionStem(stem);
+    setOptions(choices);
+
     closeLoadProgressModal();
   };
 
@@ -428,7 +478,7 @@ export default function ExamPrep() {
     );
   }
 
-  const isProUser = userDataObj?.billing?.plan === 'Pro';
+  const isProUser = userDataObj?.billing?.plan === 'Pro' || userDataObj?.billing?.plan === 'Developer';
 
   return (
     <div className="flex h-screen bg-gray-50">
@@ -537,7 +587,7 @@ export default function ExamPrep() {
             </span>
             <span
               className={`px-3 py-1 rounded-full text-sm font-semibold uppercase ${
-                isProUser ? 'bg-emerald-100 text-emerald-700' : 'bg-blue-100 text-blue-700'
+                isProUser ? 'bg-blue-100 text-blue-700' : 'bg-emerald-100 text-emerald-700'
               }`}
             >
               {isProUser ? 'Pro User' : 'Standard User'}
@@ -546,15 +596,24 @@ export default function ExamPrep() {
         )}
 
         {/* Exam Question */}
-        {questionText && (
+        {questionStem && (
           <div className="w-full max-w-5xl mb-6 p-6 bg-white rounded-lg shadow-md overflow-y-scroll">
             <h3 className="text-2xl font-semibold text-blue-900 mb-4">Exam Question</h3>
-            <p className="text-gray-800">{questionText}</p>
+            <p className="text-gray-800 mb-4">{questionStem}</p>
+            {options.length > 0 && (
+              <ul className="list-none">
+                {options.map((option, index) => (
+                  <li key={index} className="mb-2">
+                    {option}
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
         )}
 
         {/* Answer Input */}
-        {questionText && (
+        {(questionStem || questionText) && (
           <div className="w-full max-w-5xl mb-6">
             <textarea
               className="w-full p-4 border border-gray-300 rounded resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-200"
@@ -568,7 +627,7 @@ export default function ExamPrep() {
         )}
 
         {/* Action Buttons */}
-        {questionText && (
+        {(questionStem || questionText) && (
           <div className="w-full max-w-5xl flex space-x-4">
             <button
               onClick={handleSubmitAnswer}
@@ -594,7 +653,7 @@ export default function ExamPrep() {
         )}
 
         {/* Placeholder Content */}
-        {!questionText && (
+        {!questionStem && !questionText && (
           <div className="w-full max-w-5xl p-6 bg-white rounded-lg shadow-md text-center">
             <p className="text-gray-600 mb-4">
               Click <span className="font-semibold">Configure Exam Prep</span> to start.
@@ -676,10 +735,9 @@ export default function ExamPrep() {
                 {/* LSAT Question Types */}
                 {examConfig.examType === 'LSAT' && (
                   <div className="mb-4">
-                    <label className="block text-gray-700 mb-2">Question Types:</label>
                     {/* Logical Reasoning Question Types */}
                     <div className="mb-2">
-                      <label className="block text-gray-700 mb-2">Logical Reasoning Question Types:</label>
+                      <label className="block text-gray-700 mb-2">Logical Reasoning Types:</label>
                       {logicalReasoningQuestionTypes.map((type) => (
                         <div key={type} className="flex items-center mb-1">
                           <input
@@ -699,7 +757,7 @@ export default function ExamPrep() {
 
                     {/* Reading Comprehension Question Types */}
                     <div className="mb-2">
-                      <label className="block text-gray-700 mb-2">Reading Comprehension Question Types:</label>
+                      <label className="block text-gray-700 mb-2">Reading Comprehension Types:</label>
                       {readingComprehensionQuestionTypes.map((type) => (
                         <div key={type} className="flex items-center mb-1">
                           <input
@@ -789,7 +847,179 @@ export default function ExamPrep() {
           </motion.div>
         )}
 
-        {/* ... Rest of your code remains unchanged ... */}
+        {/* Result Modal */}
+        {isResultModalOpen && (
+          <motion.div
+            className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <motion.div
+              className="bg-white p-8 rounded-lg w-11/12 max-w-md shadow-lg"
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.8, opacity: 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              <h2 className="text-2xl font-semibold mb-6">Answer Feedback</h2>
+              <p className="text-gray-800 mb-6">{answerResult}</p>
+              <div className="flex justify-end space-x-4">
+                <button
+                  type="button"
+                  onClick={closeResultModal}
+                  className="px-6 py-3 bg-red-600 text-white rounded hover:bg-red-700 transition-colors duration-200"
+                  aria-label="Close Feedback Modal"
+                >
+                  Close
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    closeResultModal();
+                    handleGetQuestion();
+                  }}
+                  className="px-6 py-3 bg-blue-900 text-white rounded hover:bg-blue-700 transition-colors duration-200"
+                  disabled={isLoading}
+                  aria-label="Next Question"
+                >
+                  {isLoading ? 'Loading...' : 'Next Question'}
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+
+        {/* Final Feedback Modal */}
+        {isFinalFeedbackModalOpen && (
+          <motion.div
+            className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 overflow-y-auto"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <motion.div
+              className="bg-white p-8 rounded-lg w-11/12 max-w-3xl shadow-lg max-h-[80vh] overflow-y-auto"
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.8, opacity: 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              <h2 className="text-2xl font-semibold mb-6">Session Feedback</h2>
+              <ul className="space-y-4">
+                {answeredQuestions.map((item, index) => (
+                  <li key={index} className="p-4 border border-gray-200 rounded">
+                    <p className="font-semibold text-blue-900 mb-2">
+                      Question {index + 1}:
+                    </p>
+                    <p className="text-gray-700 mb-2">{item.question}</p>
+                    <p className="text-gray-800 mb-1">
+                      <span className="font-semibold">Your Answer:</span> {item.answer}
+                    </p>
+                    <p className="text-gray-800 mb-1">
+                      <span className="font-semibold">Feedback:</span> {item.feedback}
+                    </p>
+                    <p
+                      className={`font-semibold ${
+                        item.correct ? 'text-emerald-500' : 'text-red-500'
+                      }`}
+                    >
+                      {item.correct ? 'Correct ✅' : 'Incorrect ❌'}
+                    </p>
+                  </li>
+                ))}
+              </ul>
+              <div className="flex justify-end mt-6">
+                <button
+                  type="button"
+                  onClick={closeFinalFeedbackModal}
+                  className="px-6 py-3 bg-blue-900 text-white rounded hover:bg-blue-700 transition-colors duration-200"
+                  aria-label="Close Final Feedback Modal"
+                >
+                  Close
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+
+        {/* Load Progress Modal */}
+        {isLoadProgressModalOpen && (
+          <motion.div
+            className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <motion.div
+              className="bg-white p-8 rounded-lg w-11/12 max-w-3xl shadow-lg overflow-y-auto max-h-full"
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.8, opacity: 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              <h2 className="text-2xl font-semibold mb-6">Load Saved Progress</h2>
+              {savedProgresses.length === 0 ? (
+                <p className="text-gray-700">No saved progresses found.</p>
+              ) : (
+                <ul className="space-y-4">
+                  {savedProgresses.map((progress) => (
+                    <li key={progress.id} className="p-4 border border-gray-200 rounded">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <p className="font-semibold text-blue-900">
+                            Exam Type: {progress.examConfig.examType}
+                          </p>
+                          <p className="text-sm text-gray-600">
+                            Law Type: {progress.examConfig.lawType}
+                          </p>
+                          <p className="text-sm text-gray-600">
+                            Difficulty: {progress.examConfig.difficulty}
+                          </p>
+                          <p className="text-sm text-gray-600">
+                            Number of Questions Set: {progress.examConfig.questionLimit}
+                          </p>
+                          <p className="text-sm text-gray-600">
+                            Current Question: {progress.currentQuestionCount}
+                          </p>
+                          <p className="text-sm text-gray-600">
+                            Saved on: {new Date(progress.timestamp).toLocaleString()}
+                          </p>
+                        </div>
+                        <div className="flex space-x-2 mt-2">
+                          <button
+                            onClick={() => handleLoadProgress(progress)}
+                            className="px-4 py-2 bg-blue-900 text-white rounded hover:bg-blue-700 transition-colors duration-200"
+                            aria-label="Load Progress"
+                          >
+                            Load
+                          </button>
+                          <button
+                            onClick={() => handleDeleteProgress(progress.id)}
+                            className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors duration-200"
+                            aria-label="Delete Progress"
+                          >
+                            Delete
+                          </button>
+                        </div>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              )}
+              <div className="flex justify-end mt-6">
+                <button
+                  type="button"
+                  onClick={closeLoadProgressModal}
+                  className="px-6 py-3 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 transition-colors duration-200"
+                  aria-label="Close Load Progress Modal"
+                >
+                  Close
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
       </main>
     </div>
   );

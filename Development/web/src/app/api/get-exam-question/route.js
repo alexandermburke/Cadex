@@ -56,9 +56,10 @@ ${questionTypesDescription ? questionTypesDescription : ''}
 - **Style Guidelines**:
   - Use clear and precise language appropriate for the ${examType}.
   - The question should be well-structured and formatted as per the ${examType}'s standards.
+  - **Format the question so that each answer choice starts on a new line and is clearly labeled with a letter (A), B), C), D), E)) followed by a space.**
   - Do not include any introductory explanations or answers.
 
-Please provide only the question text, including the stem and answer choices (A to E) if applicable, without any additional comments or answers. State the model of GPT being used at the bottom of the question, put "Model: modified gpt-3.5-turbo"`;
+Please provide only the question text, including the stem and answer choices, without any additional comments or answers.`;
 
     // Initialize OpenAI API client
     const openai = new OpenAI({
@@ -97,7 +98,12 @@ Please provide only the question text, including the stem and answer choices (A 
     // Return the generated question
     return NextResponse.json({ question }, { status: 200 });
   } catch (error) {
-    // Error handling remains the same
-    // ...
+    console.error('Error generating exam question:', error);
+
+    // Return an error response
+    return NextResponse.json(
+      { error: 'An error occurred while generating the exam question.' },
+      { status: 500 }
+    );
   }
 }
