@@ -43,6 +43,9 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar })
     },
   };
 
+  // Check if the user has access based on their plan
+  const hasAccess = plan === 'Pro' || plan === 'Developer';
+
   return (
     <motion.aside
       className="fixed top-0 left-0 w-64 h-full bg-gradient-to-b from-blue-950 to-slate-800 text-white flex flex-col p-6 z-50 md:relative md:translate-x-0"
@@ -62,7 +65,7 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar })
         <section className="mb-6">
           <h2 className="text-lg font-semibold mb-4">Law Tools</h2>
           <ul className="space-y-2">
-            {plan === 'Pro' ? (
+            {hasAccess ? (
               <>
                 <li>
                   <Link
@@ -118,7 +121,7 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar })
         <section className="mb-6">
           <h2 className="text-lg font-semibold mb-4">AI Law Tools</h2>
           <ul className="space-y-2">
-            {plan === 'Pro' ? (
+            {hasAccess ? (
               <>
                 <li>
                   <Link
@@ -215,7 +218,7 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar })
         </div>
         <span
           className={`px-3 py-1 rounded text-xs font-semibold uppercase ${
-            plan === 'Pro'
+            plan === 'Pro' || plan === 'Developer'
               ? 'bg-gradient-to-r from-blue-400 to-blue-600 text-white'
               : 'bg-gradient-to-r from-emerald-400 to-emerald-600 text-white'
           }`}
