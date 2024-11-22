@@ -6,10 +6,11 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { FaLock } from 'react-icons/fa';
+import { motion } from 'framer-motion';
 
-export default function Sidebar({ activeLink }) {
+export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar }) {
   const router = useRouter();
-  const { currentUser, userDataObj, isPaid } = useAuth();
+  const { currentUser, userDataObj } = useAuth();
 
   const plan = userDataObj?.billing?.plan || 'free'; // Default to 'free' if plan is undefined
 
@@ -24,8 +25,32 @@ export default function Sidebar({ activeLink }) {
     </div>
   );
 
+  // Sidebar animation variants
+  const sidebarVariants = {
+    hidden: {
+      x: '-100%',
+      transition: {
+        duration: 0.3,
+        ease: 'easeInOut',
+      },
+    },
+    visible: {
+      x: '0%',
+      transition: {
+        duration: 0.3,
+        ease: 'easeInOut',
+      },
+    },
+  };
+
   return (
-    <aside className="w-64 bg-gradient-to-b from-blue-950 to-slate-900 text-white h-full flex flex-col p-6 fixed md:relative z-50">
+    <motion.aside
+      className="fixed top-0 left-0 w-64 h-full bg-gradient-to-b from-blue-950 to-slate-800 text-white flex flex-col p-6 z-50 md:relative md:translate-x-0"
+      initial="hidden"
+      animate={isSidebarVisible ? 'visible' : 'hidden'}
+      variants={sidebarVariants}
+      exit="hidden"
+    >
       {/* Logo or Brand Name */}
       <div className="mb-8 flex items-center justify-center">
         <h1 className="text-3xl font-bold">Dashboard</h1>
@@ -44,8 +69,8 @@ export default function Sidebar({ activeLink }) {
                     href="/lawtools/research"
                     className={`flex items-center gap-3 p-3 rounded transition-colors duration-200 ${
                       activeLink === '/lawtools/research'
-                        ? 'bg-blue-950'
-                        : 'hover:bg-blue-950 hover:bg-opacity-75'
+                        ? 'bg-blue-800'
+                        : 'hover:bg-blue-800 hover:bg-opacity-75'
                     }`}
                   >
                     <i className="fa-solid fa-gavel"></i>
@@ -57,8 +82,8 @@ export default function Sidebar({ activeLink }) {
                     href="/lawtools/casemanagement"
                     className={`flex items-center gap-3 p-3 rounded transition-colors duration-200 ${
                       activeLink === '/lawtools/casemanagement'
-                       ? 'bg-blue-950'
-                        : 'hover:bg-blue-950 hover:bg-opacity-75'
+                        ? 'bg-blue-800'
+                        : 'hover:bg-blue-800 hover:bg-opacity-75'
                     }`}
                   >
                     <i className="fa-solid fa-folder-open"></i>
@@ -70,8 +95,8 @@ export default function Sidebar({ activeLink }) {
                     href="/lawtools/documentdrafting"
                     className={`flex items-center gap-3 p-3 rounded transition-colors duration-200 ${
                       activeLink === '/lawtools/documentdrafting'
-                       ? 'bg-blue-950'
-                        : 'hover:bg-blue-950 hover:bg-opacity-75'
+                        ? 'bg-blue-800'
+                        : 'hover:bg-blue-800 hover:bg-opacity-75'
                     }`}
                   >
                     <i className="fa-solid fa-file-alt"></i>
@@ -81,15 +106,9 @@ export default function Sidebar({ activeLink }) {
               </>
             ) : (
               <>
-                <li>
-                  {renderLockedLink('Legal Research', FaLock)}
-                </li>
-                <li>
-                  {renderLockedLink('Case Management', FaLock)}
-                </li>
-                <li>
-                  {renderLockedLink('Document Drafting', FaLock)}
-                </li>
+                <li>{renderLockedLink('Legal Research', FaLock)}</li>
+                <li>{renderLockedLink('Case Management', FaLock)}</li>
+                <li>{renderLockedLink('Document Drafting', FaLock)}</li>
               </>
             )}
           </ul>
@@ -106,8 +125,8 @@ export default function Sidebar({ activeLink }) {
                     href="/ailawtools/analysis"
                     className={`flex items-center gap-3 p-3 rounded transition-colors duration-200 ${
                       activeLink === '/ailawtools/analysis'
-                          ? 'bg-blue-950'
-                        : 'hover:bg-blue-950 hover:bg-opacity-75'
+                        ? 'bg-blue-800'
+                        : 'hover:bg-blue-800 hover:bg-opacity-75'
                     }`}
                   >
                     <i className="fa-solid fa-brain"></i>
@@ -119,8 +138,8 @@ export default function Sidebar({ activeLink }) {
                     href="/ailawtools/contractreview"
                     className={`flex items-center gap-3 p-3 rounded transition-colors duration-200 ${
                       activeLink === '/ailawtools/contractreview'
-                         ? 'bg-blue-950'
-                        : 'hover:bg-blue-950 hover:bg-opacity-75'
+                        ? 'bg-blue-800'
+                        : 'hover:bg-blue-800 hover:bg-opacity-75'
                     }`}
                   >
                     <i className="fa-solid fa-robot"></i>
@@ -132,8 +151,8 @@ export default function Sidebar({ activeLink }) {
                     href="/ailawtools/predictive"
                     className={`flex items-center gap-3 p-3 rounded transition-colors duration-200 ${
                       activeLink === '/ailawtools/predictive'
-                      ? 'bg-blue-950'
-                        : 'hover:bg-blue-950 hover:bg-opacity-75'
+                        ? 'bg-blue-800'
+                        : 'hover:bg-blue-800 hover:bg-opacity-75'
                     }`}
                   >
                     <i className="fa-solid fa-chart-line"></i>
@@ -143,15 +162,9 @@ export default function Sidebar({ activeLink }) {
               </>
             ) : (
               <>
-                <li>
-                  {renderLockedLink('Legal Analysis', FaLock)}
-                </li>
-                <li>
-                  {renderLockedLink('Contract Review', FaLock)}
-                </li>
-                <li>
-                  {renderLockedLink('Predictive Analytics', FaLock)}
-                </li>
+                <li>{renderLockedLink('Legal Analysis', FaLock)}</li>
+                <li>{renderLockedLink('Contract Review', FaLock)}</li>
+                <li>{renderLockedLink('Predictive Analytics', FaLock)}</li>
               </>
             )}
           </ul>
@@ -167,8 +180,8 @@ export default function Sidebar({ activeLink }) {
                 href="/admin/case"
                 className={`flex items-center gap-3 p-3 rounded transition-colors duration-200 ${
                   activeLink === '/admin/case'
-              ? 'bg-blue-950'
-                        : 'hover:bg-blue-950 hover:bg-opacity-75'
+                    ? 'bg-blue-800'
+                    : 'hover:bg-blue-800 hover:bg-opacity-75'
                 }`}
               >
                 <i className="fa-solid fa-globe"></i>
@@ -182,8 +195,8 @@ export default function Sidebar({ activeLink }) {
                 href="/ailawtools/examprep"
                 className={`flex items-center gap-3 p-3 rounded transition-colors duration-200 ${
                   activeLink === '/ailawtools/examprep'
-                   ? 'bg-blue-950'
-                        : 'hover:bg-blue-950 hover:bg-opacity-75'
+                    ? 'bg-blue-800'
+                    : 'hover:bg-blue-800 hover:bg-opacity-75'
                 }`}
               >
                 <i className="fa-solid fa-flask"></i>
@@ -196,7 +209,6 @@ export default function Sidebar({ activeLink }) {
 
       {/* User Info Section */}
       <footer className="mt-auto flex items-center gap-4 p-4 bg-transparent rounded">
-        
         <div className="flex-1">
           <p className="font-semibold">{currentUser?.displayName || 'User'}</p>
           <p className="text-sm text-blue-200">{currentUser?.email || 'user@example.com'}</p>
@@ -211,6 +223,6 @@ export default function Sidebar({ activeLink }) {
           {plan}
         </span>
       </footer>
-    </aside>
+    </motion.aside>
   );
 }
