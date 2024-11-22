@@ -633,7 +633,7 @@ export default function ExamPrep() {
               onClick={handleSubmitAnswer}
               className={`flex-1 px-4 py-3 rounded font-semibold text-white transition-colors duration-200 shadow-md ${
                 isLoading || !inputText.trim()
-                  ? 'bg-blue-400 cursor-not-allowed shadow-md'
+                  ? 'bg-gray-300 text-gray-600 cursor-not-allowed'
                   : 'bg-blue-900 hover:bg-blue-950 shadow-md'
               }`}
               disabled={isLoading || !inputText.trim()}
