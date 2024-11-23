@@ -705,7 +705,7 @@ export default function ExamPrep() {
 
                 {/* Difficulty */}
                 <div className="mb-4">
-                  <label className="block text-gray-700 mb-2">Difficulty:</label>
+                  <label className="block text-gray-700 mb-2">Score Range:</label>
                   <select
                     name="difficulty"
                     value={examConfig.difficulty}
