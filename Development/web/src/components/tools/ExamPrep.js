@@ -1,4 +1,4 @@
-// /app/components/ExamPrep.js
+// ExamPrep.js
 'use client';
 
 import React, { useState, useEffect } from 'react';
@@ -19,7 +19,7 @@ import {
 import { useAuth } from '@/context/AuthContext';
 
 // Import React Icons and Framer Motion
-import { FaBars, FaTimes, FaSave } from 'react-icons/fa';
+import { FaBars, FaTimes, FaSave } from 'react-icons/fa'; // Imported FaSave
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function ExamPrep() {
@@ -38,11 +38,6 @@ export default function ExamPrep() {
   const [isLoadProgressModalOpen, setIsLoadProgressModalOpen] = useState(false);
   const [isFinalFeedbackModalOpen, setIsFinalFeedbackModalOpen] = useState(false);
   const [savedProgresses, setSavedProgresses] = useState([]);
-
-  // New state variable to determine question type
-  const [isMultipleChoice, setIsMultipleChoice] = useState(false);
-  // New state variable for selected option in multiple-choice questions
-  const [selectedOption, setSelectedOption] = useState('');
 
   // Track the number of questions answered in the current set
   const [currentQuestionCount, setCurrentQuestionCount] = useState(0);
@@ -168,7 +163,6 @@ export default function ExamPrep() {
     setOptions([]);
     setAnswerResult('');
     setInputText('');
-    setSelectedOption('');
 
     try {
       const response = await fetch('/api/get-exam-question', {
@@ -189,13 +183,6 @@ export default function ExamPrep() {
       const { stem, choices } = parseQuestion(question);
       setQuestionStem(stem);
       setOptions(choices);
-
-      // Determine if the question is multiple-choice based on the presence of options
-      if (choices.length > 0) {
-        setIsMultipleChoice(true);
-      } else {
-        setIsMultipleChoice(false);
-      }
 
       setQuestionText(question); // Keep the full question text if needed
       setIsExamStarted(true); // Set exam as started
@@ -242,20 +229,7 @@ export default function ExamPrep() {
   };
 
   const handleSubmitAnswer = async () => {
-    let userAnswer = '';
-    if (isMultipleChoice) {
-      if (!selectedOption) {
-        alert('Please select an option before submitting.');
-        return;
-      }
-      userAnswer = selectedOption;
-    } else {
-      if (!inputText.trim()) {
-        alert('Please enter your answer before submitting.');
-        return;
-      }
-      userAnswer = inputText;
-    }
+    if (!inputText.trim()) return;
 
     setIsLoading(true);
     setAnswerResult('');
@@ -266,11 +240,7 @@ export default function ExamPrep() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          question: questionText,
-          answer: userAnswer,
-          examType: examConfig.examType,
-        }),
+        body: JSON.stringify({ question: questionText, answer: inputText, examType: examConfig.examType }),
       });
 
       if (!response.ok) {
@@ -290,7 +260,7 @@ export default function ExamPrep() {
         ...prevQuestions,
         {
           question: questionText || 'No question text provided.',
-          answer: userAnswer || 'No answer provided.',
+          answer: inputText || 'No answer provided.',
           feedback: feedbackText,
           correct: isCorrect,
         },
@@ -415,7 +385,6 @@ export default function ExamPrep() {
         },
         questionText: questionText || '',
         inputText: inputText || '',
-        selectedOption: selectedOption || '',
         answerResult: answerResult || '',
         currentQuestionCount: currentQuestionCount || 0,
         answeredQuestions: answeredQuestions.map((q) => ({
@@ -461,6 +430,7 @@ export default function ExamPrep() {
   const handleLoadProgress = (progress) => {
     setExamConfig(progress.examConfig);
     setQuestionText(progress.questionText);
+    setInputText(progress.inputText);
     setAnswerResult(progress.answerResult);
     setCurrentQuestionCount(progress.currentQuestionCount); // Restore the question count
     setAnsweredQuestions(progress.answeredQuestions || []); // Restore answered questions
@@ -470,15 +440,6 @@ export default function ExamPrep() {
     const { stem, choices } = parseQuestion(progress.questionText);
     setQuestionStem(stem);
     setOptions(choices);
-
-    // Determine if the question is multiple-choice
-    if (choices.length > 0) {
-      setIsMultipleChoice(true);
-      setSelectedOption(progress.selectedOption || '');
-    } else {
-      setIsMultipleChoice(false);
-      setInputText(progress.inputText || '');
-    }
 
     closeLoadProgressModal();
   };
@@ -520,8 +481,7 @@ export default function ExamPrep() {
     );
   }
 
-  const isProUser =
-    userDataObj?.billing?.plan === 'Pro' || userDataObj?.billing?.plan === 'Developer';
+  const isProUser = userDataObj?.billing?.plan === 'Pro' || userDataObj?.billing?.plan === 'Developer';
 
   return (
     <div className="flex h-screen bg-gray-50">
@@ -589,9 +549,7 @@ export default function ExamPrep() {
               if (isProUser) {
                 router.push('/ailawtools/examprep/full-mode');
               } else {
-                alert(
-                  'Professional Mode is only available for Pro users. Upgrade to access this feature.'
-                );
+                alert('Professional Mode is only available for Pro users. Upgrade to access this feature.');
               }
             }}
             className={`px-4 py-2 rounded-md transition-colors duration-200 ${
@@ -602,7 +560,7 @@ export default function ExamPrep() {
             disabled={!isProUser}
             aria-label="Professional Mode"
           >
-            Pro+ Mode
+            Pro Mode
           </button>
         </div>
 
@@ -690,40 +648,8 @@ export default function ExamPrep() {
         {/* Answer Input */}
         {(questionStem || questionText) && (
           <div className="w-full max-w-5xl mb-6">
-<<<<<<< Updated upstream
             {answerMode === 'written' ? (
               // Written Answer Mode
-=======
-            {isMultipleChoice ? (
-              // Render options as radio buttons
-              <div>
-                <p className="mb-4 text-gray-700">Select your answer:</p>
-                <form>
-                  {options.map((option, index) => {
-                    const optionLabel = option.slice(0, 2); // Extract 'A)', 'B)', etc.
-                    const optionText = option.slice(2).trim();
-                    return (
-                      <div key={index} className="flex items-center mb-2">
-                        <input
-                          type="radio"
-                          id={`option-${index}`}
-                          name="answer"
-                          value={optionLabel}
-                          checked={selectedOption === optionLabel}
-                          onChange={(e) => setSelectedOption(e.target.value)}
-                          className="h-4 w-4 text-blue-900 focus:ring-blue-500 border-gray-300"
-                        />
-                        <label htmlFor={`option-${index}`} className="ml-2 text-gray-800">
-                          <span className="font-semibold">{optionLabel}</span> {optionText}
-                        </label>
-                      </div>
-                    );
-                  })}
-                </form>
-              </div>
-            ) : (
-              // Render textarea for written answers
->>>>>>> Stashed changes
               <textarea
                 className="w-full p-4 border border-gray-300 rounded resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-200"
                 value={inputText}
@@ -732,7 +658,6 @@ export default function ExamPrep() {
                 rows="6"
                 disabled={isLoading}
               ></textarea>
-<<<<<<< Updated upstream
             ) : (
               // Multiple Choice Mode
               <div className="flex flex-col space-y-2">
@@ -751,8 +676,6 @@ export default function ExamPrep() {
                   </label>
                 ))}
               </div>
-=======
->>>>>>> Stashed changes
             )}
           </div>
         )}
@@ -763,15 +686,11 @@ export default function ExamPrep() {
             <button
               onClick={handleSubmitAnswer}
               className={`flex-1 px-4 py-3 rounded font-semibold text-white transition-colors duration-200 shadow-md ${
-                isLoading ||
-                (isMultipleChoice ? !selectedOption : !inputText.trim())
+                isLoading || !inputText.trim()
                   ? 'bg-gray-300 text-gray-600 cursor-not-allowed'
                   : 'bg-blue-900 hover:bg-blue-950 shadow-md'
               }`}
-              disabled={
-                isLoading ||
-                (isMultipleChoice ? !selectedOption : !inputText.trim())
-              }
+              disabled={isLoading || !inputText.trim()}
               aria-label="Submit Answer"
             >
               {isLoading ? 'Submitting...' : 'Submit Answer'}
