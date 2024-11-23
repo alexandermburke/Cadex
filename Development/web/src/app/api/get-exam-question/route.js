@@ -9,10 +9,10 @@ export async function POST(request) {
     const { examType, difficulty, lawType, selectedQuestionTypes } = await request.json();
 
     // Validate input parameters
-    if (!examType || !difficulty || !lawType) {
-      console.warn('Incomplete exam configuration received:', { examType, difficulty, lawType });
+    if (!examType || !difficulty) {
+      console.warn('Incomplete exam configuration received:', { examType, difficulty });
       return NextResponse.json(
-        { error: 'Incomplete exam configuration. Please provide examType, difficulty, and lawType.' },
+        { error: 'Incomplete exam configuration. Please provide examType and difficulty.' },
         { status: 400 }
       );
     }
@@ -46,11 +46,55 @@ export async function POST(request) {
       });
     }
 
-    // Define the detailed prompt
-    const prompt = `You are an expert question writer for the ${examType}. Create a ${lawType} question that matches the style and format of a real ${examType} question.
+    let prompt = '';
+
+    if (examType === 'LSAT') {
+      // Decide whether to generate a multiple-choice or written question (50/50 chance)
+      const isMultipleChoice = Math.random() < 0.5;
+
+      if (isMultipleChoice) {
+        // LSAT multiple-choice prompt focusing on logic and reasoning
+        prompt = `You are an expert question writer for the LSAT. Create a **multiple-choice** question that matches the style and format of a real LSAT question, focusing on logical reasoning or analytical reasoning.
+
+- **Difficulty Level**: ${difficultyDescription}. The question should reflect the difficulty expected for a student aiming for a score of ${difficulty} on the LSAT.
+${questionTypesDescription ? questionTypesDescription : ''}
+- **Content Focus**: The question should involve topics like logical reasoning, analytical reasoning, or reading comprehension, without any legal content.
+- **Style Guidelines**:
+  - Use clear and precise language appropriate for the LSAT.
+  - The question should be well-structured and formatted as per the LSAT's standards.
+  - **Format the question so that each answer choice starts on a new line and is clearly labeled with a letter (A), B), C), D), E)) followed by a space.**
+  - Do not include any introductory explanations or answers.
+
+Please provide only the question text, including the stem and answer choices, without any additional comments or answers.`;
+      } else {
+        // LSAT written-response prompt
+        prompt = `You are an expert question writer for the LSAT. Create a **written-response** question that matches the style and format of a real LSAT question, focusing on logical reasoning or analytical reasoning.
+
+- **Difficulty Level**: ${difficultyDescription}. The question should reflect the difficulty expected for a student aiming for a score of ${difficulty} on the LSAT.
+${questionTypesDescription ? questionTypesDescription : ''}
+- **Content Focus**: The question should involve topics like logical reasoning, analytical reasoning, or reading comprehension, without any legal content.
+- **Style Guidelines**:
+  - Use clear and precise language appropriate for the LSAT.
+  - The question should be well-structured and formatted as per the LSAT's standards.
+  - **Provide a question that requires a written response, such as explaining reasoning, analyzing an argument, or summarizing information.**
+  - Do not include any introductory explanations or answers.
+
+Please provide only the question text without any additional comments or answers.`;
+      }
+    } else {
+      // General prompt for other exams
+      if (!lawType) {
+        console.warn('Law type is missing for non-LSAT exam.');
+        return NextResponse.json(
+          { error: 'Incomplete exam configuration. Please provide lawType for non-LSAT exams.' },
+          { status: 400 }
+        );
+      }
+
+      prompt = `You are an expert question writer for the ${examType}. Create a ${lawType} question that matches the style and format of a real ${examType} question.
 
 - **Difficulty Level**: ${difficultyDescription}. The question should reflect the difficulty expected for a student aiming for a score of ${difficulty} on the ${examType}.
-- **Question Type**: Ensure the question adheres to the types commonly found on the ${examType}, such as logical reasoning, analytical reasoning, reading comprehension (for LSAT), or essay questions (for Bar Exam), depending on the selected exam.
+- **Question Type**: Ensure the question adheres to the types commonly found on the ${examType}, such as essay questions (for Bar Exam) or multiple-choice questions, depending on the selected exam.
 ${questionTypesDescription ? questionTypesDescription : ''}
 - **Content Focus**: The question should specifically address key concepts and complexities within ${lawType}, including any relevant subtopics or typical scenarios.
 - **Style Guidelines**:
@@ -60,6 +104,7 @@ ${questionTypesDescription ? questionTypesDescription : ''}
   - Do not include any introductory explanations or answers.
 
 Please provide only the question text, including the stem and answer choices, without any additional comments or answers.`;
+    }
 
     // Initialize OpenAI API client
     const openai = new OpenAI({
@@ -68,7 +113,7 @@ Please provide only the question text, including the stem and answer choices, wi
 
     // Make the API request to OpenAI
     const response = await openai.chat.completions.create({
-      model: 'gpt-3.5-turbo', // Use 'gpt-4' or 'gpt-3.5-turbo' as needed
+      model: 'gpt-3.5-turbo',
       messages: [{ role: 'user', content: prompt }],
       max_tokens: 700, // Adjust as needed
       temperature: 0.7, // Adjust as needed
