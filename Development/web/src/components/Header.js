@@ -47,21 +47,20 @@ export default function Header() {
                 className='border border-solid duration-200 border-transparent hover:text-slate-200 px-4 grid place-items-center rounded'
             >
                 <div className="flex items-center">
-                    <p>Dashboard</p>
-                    <span className="ml-2 px-2 py-1 text-xs bg-emerald-400 text-white rounded">New</span>
+                    <p>Home</p>
                 </div>
             </Link>
             <Link 
-                href={'/pricing'} 
+                href={'/Milestones'} 
                 className='mx-2 p-2 px-2 grid place-items-center relative z-10 rounded-lg bg-transparent hover:text-slate-200'
             >
-                <p>Pricing</p>
+                <p>Milestones</p>
             </Link>
             <Link 
-                href={'/admin/account'} 
+                href={'/admin/Why Invest?'} 
                 className='mx-2 p-2 px-2 grid place-items-center relative z-10 rounded-lg bg-transparent hover:text-slate-200'
             >
-                <p>{currentUser ? 'Account' : 'Login'}</p>
+                <p>{currentUser ? 'Why Invest' : 'Login'}</p>
             </Link>
             <Link 
                 href={'/careers'} 
@@ -69,7 +68,7 @@ export default function Header() {
             >
                 <div className='absolute inset-0'></div>
                 <div className='p-2 grid place-items-center relative z-10 bg-transparent rounded duration-200 text-white before:ease h-10 w-40 overflow-hidden bg-gradient-to-r from-blue-950 to-slate-700 shadow-2xl transition-all before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-40'>
-                    <p>Open Positions</p>
+                    <p>Get in Contact</p>
                 </div>
             </Link>
         </nav>
@@ -81,13 +80,13 @@ export default function Header() {
                 className='p-2 rounded-lg border-solid border duration-200 text-lg hover:text-white hover:bg-blue-950 border-blue-950 border-x-4 border-y-4' 
                 href={'/admin'}
             >
-                <p>Dashboard</p>
+                <p>Home</p>
             </Link>
             <Link 
                 className='p-2 rounded-lg border-solid border duration-200 text-lg hover:text-white hover:bg-blue-950 border-blue-950 border-x-4 border-y-4' 
-                href={'/pricing'}
+                href={'/Milestones'}
             >
-                <p>Pricing</p>
+                <p>Milestones</p>
             </Link>
             <Link 
                 className='p-2 rounded-lg grid place-items-center relative z-10 bg-gradient-to-r hover:text-white hover:bg-blue-950 from-blue-950 to-slate-700 duration-200 text-white before:ease overflow-hidden shadow-2xl transition-all before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-40' 
@@ -114,7 +113,7 @@ export default function Header() {
                         href={'/admin'} 
                         className='border border-solid duration-200 border-transparent hover:text-slate-200 px-4 grid place-items-center rounded'
                     >
-                        <p>Dashboard</p>
+                        <p>Home</p>
                     </Link>
                     <Link 
                         href={'/ailawtools/examprep'} 
@@ -126,10 +125,10 @@ export default function Header() {
                         </div>
                     </Link>
                     <Link 
-                        href={'/admin/account'} 
+                        href={'/admin/Why Invest?'} 
                         className='border border-solid duration-200 border-transparent hover:text-slate-200 px-4 grid place-items-center rounded'
                     >
-                        <p>Account</p>
+                        <p>Why Invest?</p>
                     </Link>
                     <button 
                         onClick={logout} 
@@ -156,13 +155,13 @@ export default function Header() {
                     href={'/admin'} 
                     className='p-2 rounded border-solid border duration-200 text-lg hover:text-white hover:bg-blue-950 border-blue-950 border-x-4 border-y-4'
                 >
-                    <p>Dashboard</p>
+                    <p>Home</p>
                 </Link>
                 <Link 
-                    href={'/admin/account'} 
+                    href={'/admin/Why Invest?'} 
                     className='p-2 rounded border-solid border duration-200 hover:text-white hover:bg-blue-950 text-lg border-blue-950 border-x-4 border-y-4'
                 >
-                    <p>Account</p>
+                    <p>Why Invest?</p>
                 </Link>
                 <button 
                     className='p-2 text-left rounded border-solid border duration-200 hover:text-white hover:bg-blue-950 text-lg border-blue-950 border-x-4 border-y-4' 
@@ -188,7 +187,7 @@ export default function Header() {
                             className={`${logoLoaded ? 'logo-animation' : ''}`} 
                         />
                         <h1 className={'text-xl sm:text-2xl goldGradient font-medium ' + poppins.className}>
-                            Cadex Law
+                            Cadex Law Investors
                         </h1>
                     </div>
                 </Link>

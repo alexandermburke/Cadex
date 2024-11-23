@@ -101,8 +101,8 @@ export default function InvestorSplashPage() {
           <Image
             src="/header.png" // Path to the header image
             alt="Cadex Investor Header"
-            width={125} // Adjust width based on your layout
-            height={125} // Adjust height based on your layout
+            width={100} // Adjust width based on your layout
+            height={100} // Adjust height based on your layout
             className="mx-auto mb-8"
             priority
           />
@@ -128,7 +128,7 @@ export default function InvestorSplashPage() {
         </div>
 
         {/* Milestones Section */}
-        <div className="flex flex-col items-center py-16 bg-gray-100">
+        <div className="flex flex-col items-center py-16 bg-transparent">
           <h2 className="text-4xl sm:text-5xl font-bold text-blue-950 mb-12">Key Milestones</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
             {milestones.map((milestone, index) => (
