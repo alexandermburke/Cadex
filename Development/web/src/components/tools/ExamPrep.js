@@ -560,7 +560,7 @@ export default function ExamPrep() {
             disabled={!isProUser}
             aria-label="Professional Mode"
           >
-            Pro Mode
+            Pro+ Mode
           </button>
         </div>
 
