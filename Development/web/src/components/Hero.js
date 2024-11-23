@@ -2,8 +2,15 @@
 import React, { useState, useEffect } from 'react';
 import { Poppins } from 'next/font/google';
 import Link from 'next/link';
-import CarouselComponent from './Carousel';
-import { FaChartLine, FaRocket, FaUserFriends, FaDollarSign, FaShieldAlt, FaCheck } from 'react-icons/fa';
+import Image from 'next/image'; // Importing the Image component
+import {
+  FaChartLine,
+  FaRocket,
+  FaUserFriends,
+  FaDollarSign,
+  FaShieldAlt,
+  FaCheck,
+} from 'react-icons/fa';
 
 import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css';
@@ -90,6 +97,16 @@ export default function InvestorSplashPage() {
       <div className="max-w-7xl mx-auto px-4 py-16">
         {/* Header Section */}
         <div className="text-center">
+          {/* Header Image */}
+          <Image
+            src="/header.png" // Path to the header image
+            alt="Cadex Investor Header"
+            width={150} // Adjust width based on your layout
+            height={150} // Adjust height based on your layout
+            className="mx-auto mb-8"
+            priority
+          />
+
           <h1 className={'text-5xl sm:text-7xl font-bold mb-6 ' + poppins.className}>
             Invest in the Future of Legal Tech
           </h1>
