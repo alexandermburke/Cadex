@@ -57,6 +57,9 @@ export default function ExamPrep() {
     selectedQuestionTypes: [], // New field for selected question types
   });
 
+  // Answer mode state variable
+  const [answerMode, setAnswerMode] = useState('written'); // Default to 'written' mode
+
   // Mapping for difficulty levels based on exam type
   const difficultyMapping = {
     LSAT: [
@@ -612,17 +615,68 @@ export default function ExamPrep() {
           </div>
         )}
 
+        {/* Answer Mode Toggle */}
+        {(questionStem || questionText) && (
+          <div className="w-full max-w-5xl mb-2 flex items-center justify-center">
+            <div className="relative flex bg-gray-200 rounded-full p-0.5">
+              <motion.div
+                className="absolute top-0 left-0 w-1/2 h-full bg-blue-900 rounded-full"
+                initial={false}
+                animate={{ x: answerMode === 'written' ? 0 : '100%' }}
+                transition={{ type: 'spring', stiffness: 700, damping: 30 }}
+              />
+              <button
+                onClick={() => setAnswerMode('written')}
+                className={`relative w-1/2 px-2 py-1 text-sm rounded-full focus:outline-none ${
+                  answerMode === 'written' ? 'text-white' : 'text-gray-700'
+                }`}
+              >
+                Written
+              </button>
+              <button
+                onClick={() => setAnswerMode('multiple-choice')}
+                className={`relative w-1/2 px-2 py-1 text-sm rounded-full focus:outline-none ${
+                  answerMode === 'multiple-choice' ? 'text-white' : 'text-gray-700'
+                }`}
+              >
+                Multiple Choice
+              </button>
+            </div>
+          </div>
+        )}
+
         {/* Answer Input */}
         {(questionStem || questionText) && (
           <div className="w-full max-w-5xl mb-6">
-            <textarea
-              className="w-full p-4 border border-gray-300 rounded resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-200"
-              value={inputText}
-              onChange={(e) => setInputText(e.target.value)}
-              placeholder="Enter your answer..."
-              rows="6"
-              disabled={isLoading}
-            ></textarea>
+            {answerMode === 'written' ? (
+              // Written Answer Mode
+              <textarea
+                className="w-full p-4 border border-gray-300 rounded resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-200"
+                value={inputText}
+                onChange={(e) => setInputText(e.target.value)}
+                placeholder="Enter your answer..."
+                rows="6"
+                disabled={isLoading}
+              ></textarea>
+            ) : (
+              // Multiple Choice Mode
+              <div className="flex flex-col space-y-2">
+                {options.map((option, index) => (
+                  <label key={index} className="flex items-center">
+                    <input
+                      type="radio"
+                      name="multipleChoiceAnswer"
+                      value={option.charAt(0)} // Assuming options start with 'A)', 'B)', etc.
+                      checked={inputText === option.charAt(0)}
+                      onChange={(e) => setInputText(e.target.value)}
+                      className="form-radio h-4 w-4 text-blue-900"
+                      disabled={isLoading}
+                    />
+                    <span className="ml-2">{option}</span>
+                  </label>
+                ))}
+              </div>
+            )}
           </div>
         )}
 
