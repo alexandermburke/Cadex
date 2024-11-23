@@ -57,10 +57,10 @@ export default function Header() {
                 <p>Milestones</p>
             </Link>
             <Link 
-                href={'/admin/Why Invest?'} 
+                href={'/admin/Why Invest'} 
                 className='mx-2 p-2 px-2 grid place-items-center relative z-10 rounded-lg bg-transparent hover:text-slate-200'
             >
-                <p>{currentUser ? 'Why Invest' : 'Login'}</p>
+                <p>{currentUser ? 'Why Invest' : 'Why Invest'}</p>
             </Link>
             <Link 
                 href={'/careers'} 
@@ -125,10 +125,10 @@ export default function Header() {
                         </div>
                     </Link>
                     <Link 
-                        href={'/admin/Why Invest?'} 
+                        href={'/admin/Why Invest'} 
                         className='border border-solid duration-200 border-transparent hover:text-slate-200 px-4 grid place-items-center rounded'
                     >
-                        <p>Why Invest?</p>
+                        <p>Why Invest</p>
                     </Link>
                     <button 
                         onClick={logout} 
@@ -158,10 +158,10 @@ export default function Header() {
                     <p>Home</p>
                 </Link>
                 <Link 
-                    href={'/admin/Why Invest?'} 
+                    href={'/admin/Why Invest'} 
                     className='p-2 rounded border-solid border duration-200 hover:text-white hover:bg-blue-950 text-lg border-blue-950 border-x-4 border-y-4'
                 >
-                    <p>Why Invest?</p>
+                    <p>Why Invest</p>
                 </Link>
                 <button 
                     className='p-2 text-left rounded border-solid border duration-200 hover:text-white hover:bg-blue-950 text-lg border-blue-950 border-x-4 border-y-4' 
