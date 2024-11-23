@@ -187,7 +187,7 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar })
                 }`}
               >
                 <i className="fa-solid fa-globe"></i>
-                <span>Simulate a Case</span>
+                <span>Simulate Case</span>
               </Link>
             </li>
 
