@@ -643,7 +643,7 @@ export default function ExamPrep() {
             </button>
             <button
               onClick={handleSaveProgress}
-              className="flex items-center justify-center px-4 py-3 bg-emerald-600 text-white rounded font-semibold hover:bg-emerald-700 transition-colors duration-200"
+              className="flex items-center justify-center px-4 py-3 bg-transparent text-blue-950 rounded font-semibold duration-200"
               disabled={!currentUser}
               aria-label="Save Progress"
             >

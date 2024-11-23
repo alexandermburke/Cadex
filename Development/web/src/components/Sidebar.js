@@ -47,7 +47,7 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar })
 
   return (
     <motion.aside
-      className="fixed top-0 left-0 w-64 h-full bg-gradient-to-b from-blue-950 to-slate-800 text-white flex flex-col z-50 md:relative md:translate-x-0 overflow-hidden"
+      className="z-[150] fixed top-0 left-0 w-64 h-full bg-gradient-to-b from-blue-950 to-slate-800 text-white flex flex-col md:relative md:translate-x-0 overflow-hidden"
       initial="hidden"
       animate={isSidebarVisible ? 'visible' : 'hidden'}
       variants={sidebarVariants}
