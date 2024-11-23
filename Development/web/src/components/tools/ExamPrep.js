@@ -590,7 +590,7 @@ export default function ExamPrep() {
                 isProUser ? 'bg-blue-100 text-blue-700' : 'bg-emerald-100 text-emerald-700'
               }`}
             >
-              {isProUser ? 'Pro User' : 'Standard User'}
+              {isProUser ? 'Pro User' : 'Base User'}
             </span>
           </div>
         )}
