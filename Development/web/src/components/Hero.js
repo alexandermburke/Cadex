@@ -101,8 +101,8 @@ export default function InvestorSplashPage() {
           <Image
             src="/header.png" // Path to the header image
             alt="Cadex Investor Header"
-            width={150} // Adjust width based on your layout
-            height={150} // Adjust height based on your layout
+            width={125} // Adjust width based on your layout
+            height={125} // Adjust height based on your layout
             className="mx-auto mb-8"
             priority
           />
