@@ -44,7 +44,7 @@ export default function Header() {
         <nav className='hidden items-stretch md:flex'>
             <Link 
                 href={'/ailawtools/examprep'} 
-                className='border border-solid duration-200 border-transparent hover:text-slate-200 px-4 grid place-items-center rounded'
+                className='border border-solid duration-200 border-transparent text-slate-200 hover:text-slate-400 px-4 grid place-items-center rounded'
             >
                 <div className="flex items-center">
                     <p>Home</p>
@@ -52,13 +52,13 @@ export default function Header() {
             </Link>
             <Link 
                 href={'/Milestones'} 
-                className='mx-2 p-2 px-2 grid place-items-center relative z-10 rounded-lg bg-transparent hover:text-slate-200'
+                className='mx-2 p-2 px-2 grid place-items-center relative z-10 rounded-lg bg-transparent text-slate-200 hover:text-slate-400'
             >
                 <p>Milestones</p>
             </Link>
             <Link 
                 href={'/admin/Why Invest'} 
-                className='mx-2 p-2 px-2 grid place-items-center relative z-10 rounded-lg bg-transparent hover:text-slate-200'
+                className='mx-2 p-2 px-2 grid place-items-center relative z-10 rounded-lg bg-transparent text-slate-200 hover:text-slate-400'
             >
                 <p>{currentUser ? 'Why Invest' : 'Why Invest'}</p>
             </Link>
@@ -111,13 +111,13 @@ export default function Header() {
                 <div className='hidden items-stretch md:flex'>
                     <Link 
                         href={'/admin'} 
-                        className='border border-solid duration-200 border-transparent hover:text-slate-200 px-4 grid place-items-center rounded'
+                        className='border border-solid duration-200 border-transparent hover:text-slate-400 px-4 grid place-items-center rounded'
                     >
                         <p>Home</p>
                     </Link>
                     <Link 
                         href={'/ailawtools/examprep'} 
-                        className='border border-solid duration-200 border-transparent hover:text-slate-200 px-4 grid place-items-center rounded'
+                        className='border border-solid duration-200 border-transparent hover:text-slate-400 px-4 grid place-items-center rounded'
                     >
                         <div className="flex items-center">
                             <p>Tools</p>
@@ -126,13 +126,13 @@ export default function Header() {
                     </Link>
                     <Link 
                         href={'/admin/Why Invest'} 
-                        className='border border-solid duration-200 border-transparent hover:text-slate-200 px-4 grid place-items-center rounded'
+                        className='border border-solid duration-200 border-transparent hover:text-slate-400 px-4 grid place-items-center rounded'
                     >
                         <p>Why Invest</p>
                     </Link>
                     <button 
                         onClick={logout} 
-                        className='border border-solid duration-200 border-transparent hover:text-slate-200 px-4 grid place-items-center rounded'
+                        className='border border-solid duration-200 border-transparent hover:text-slate-400 px-4 grid place-items-center rounded'
                     >
                         <p>Logout</p>
                     </button>
