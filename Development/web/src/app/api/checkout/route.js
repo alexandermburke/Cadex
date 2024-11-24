@@ -1,199 +1,68 @@
-// app/api/webhook/route.js
+// app/api/checkout/route.js
 
-import { buffer } from 'micro';
 import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { adminDB } from '@/firebaseAdmin'; // Adjust the import path as needed
 
 // Initialize Stripe with your secret key
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-  apiVersion: '2023-10-16', // Replace with your Stripe API version
+  apiVersion: '2023-10-16', // Ensure this matches your Stripe API version
 });
 
-// Your Stripe webhook secret
-const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+// Route Segment Configurations
+export const runtime = 'nodejs'; // Ensures the route runs on Node.js
+export const dynamic = 'force-dynamic'; // Forces the route to be dynamic
 
-// Webhook handler
+// Checkout Session Creation Handler
 export async function POST(req) {
-  console.log('🔔 Webhook received');
-
-  const buf = await buffer(req);
-  const sig = req.headers.get('stripe-signature');
-
-  let event;
-
   try {
-    // Verify the event with Stripe
-    event = stripe.webhooks.constructEvent(buf.toString(), sig, webhookSecret);
-    console.log(`✅  Event ${event.type} constructed successfully`);
-  } catch (err) {
-    console.error(`⚠️  Webhook signature verification failed: ${err.message}`);
-    return NextResponse.json({ error: `Webhook Error: ${err.message}` }, { status: 400 });
-  }
+    // Parse the incoming JSON body
+    const { userId, email } = await req.json();
 
-  // Handle the event
-  try {
-    if (webhookHandlers[event.type]) {
-      await webhookHandlers[event.type](event.data.object);
-    } else {
-      console.log(`❓ Unhandled event type: ${event.type}`);
+    // Validate required fields
+    if (!userId || !email) {
+      return NextResponse.json(
+        { error: 'Missing userId or email in request body.' },
+        { status: 400 }
+      );
     }
 
-    // Acknowledge receipt of the event
-    return NextResponse.json({ received: true }, { status: 200 });
-  } catch (err) {
-    console.error(`🔥 Error handling event ${event.type}: ${err.message}`);
-    return NextResponse.json({ error: `Error handling event: ${err.message}` }, { status: 500 });
+    // Create a Stripe Customer explicitly
+    const customer = await stripe.customers.create({
+      email: email,
+      metadata: {
+        userId: userId,
+      },
+    });
+
+    console.log(`✅  Created Stripe Customer: ${customer.id} for userId: ${userId}`);
+
+    // Create Checkout Session with the Customer ID
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ['card'],
+      mode: 'subscription',
+      customer: customer.id, // Associate the session with the customer
+      line_items: [
+        {
+          price: 'price_1Hh1XYZ...', // Replace with your actual price ID from Stripe
+          quantity: 1,
+        },
+      ],
+      metadata: {
+        userId: userId,
+        email: email,
+      },
+      success_url: `${process.env.YOUR_DOMAIN}/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${process.env.YOUR_DOMAIN}/cancel`,
+    });
+
+    console.log(`✅  Created Checkout Session: ${session.id} for customer: ${customer.id}`);
+
+    // Optionally, you can store the session ID in Firestore or perform other actions here
+
+    return NextResponse.json({ sessionId: session.id }, { status: 200 });
+  } catch (error) {
+    console.error('❌  Error creating Checkout Session:', error.message);
+    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }
-
-// Define handlers for relevant Stripe events
-const webhookHandlers = {
-  // Handle successful checkout sessions
-  'checkout.session.completed': async (session) => {
-    try {
-      const stripeCustomerId = session.customer;
-      const userId = session.metadata.userId;
-      const email = session.metadata.email;
-
-      console.log(`🔗 Processing checkout.session.completed for userId: ${userId}`);
-
-      if (!stripeCustomerId || !userId) {
-        throw new Error('Missing stripeCustomerId or userId in session metadata');
-      }
-
-      // Update user's billing information in Firestore
-      await adminDB.collection('users').doc(userId).set(
-        {
-          billing: {
-            plan: 'Pro',
-            status: 'Active',
-            stripeCustomerId: stripeCustomerId,
-          },
-        },
-        { merge: true }
-      );
-
-      console.log(`✅  Saved stripeCustomerId (${stripeCustomerId}) for userId: ${userId}`);
-    } catch (error) {
-      console.error(`❌  Error in 'checkout.session.completed' handler: ${error.message}`);
-      throw error;
-    }
-  },
-
-  // Handle payment failures
-  'invoice.payment_failed': async (invoice) => {
-    try {
-      const stripeCustomerId = invoice.customer;
-      const status = invoice.status; // e.g., 'failed'
-
-      console.log(`🔗 Processing invoice.payment_failed for customerId: ${stripeCustomerId}`);
-
-      if (!stripeCustomerId) {
-        throw new Error('Missing stripeCustomerId in invoice');
-      }
-
-      // Find user by stripeCustomerId
-      const usersRef = adminDB.collection('users');
-      const snapshot = await usersRef.where('billing.stripeCustomerId', '==', stripeCustomerId).get();
-
-      if (snapshot.empty) {
-        console.log(`🔍 No matching user found for customerId: ${stripeCustomerId}`);
-        return;
-      }
-
-      // Update the user's billing status
-      snapshot.forEach(async (doc) => {
-        const userId = doc.id;
-        await doc.ref.set(
-          {
-            'billing.status': 'Inactive',
-          },
-          { merge: true }
-        );
-        console.log(`✅  Updated user ${userId} billing status to 'Inactive' due to payment failure`);
-      });
-    } catch (error) {
-      console.error(`❌  Error in 'invoice.payment_failed' handler: ${error.message}`);
-      throw error;
-    }
-  },
-
-  // Handle subscription updates (e.g., canceled, updated)
-  'customer.subscription.updated': async (subscription) => {
-    try {
-      const stripeCustomerId = subscription.customer;
-      const status = subscription.status; // e.g., 'active', 'canceled'
-
-      console.log(`🔗 Processing customer.subscription.updated for customerId: ${stripeCustomerId}`);
-
-      if (!stripeCustomerId) {
-        throw new Error('Missing stripeCustomerId in subscription');
-      }
-
-      // Find user by stripeCustomerId
-      const usersRef = adminDB.collection('users');
-      const snapshot = await usersRef.where('billing.stripeCustomerId', '==', stripeCustomerId).get();
-
-      if (snapshot.empty) {
-        console.log(`🔍 No matching user found for customerId: ${stripeCustomerId}`);
-        return;
-      }
-
-      // Update the user's billing status based on subscription status
-      snapshot.forEach(async (doc) => {
-        const userId = doc.id;
-        const newStatus = status === 'active' ? 'Active' : 'Inactive';
-        await doc.ref.set(
-          {
-            'billing.status': newStatus,
-          },
-          { merge: true }
-        );
-        console.log(`✅  Updated user ${userId} billing status to '${newStatus}'`);
-      });
-    } catch (error) {
-      console.error(`❌  Error in 'customer.subscription.updated' handler: ${error.message}`);
-      throw error;
-    }
-  },
-
-  // Handle subscription deletions (cancellations)
-  'customer.subscription.deleted': async (subscription) => {
-    try {
-      const stripeCustomerId = subscription.customer;
-
-      console.log(`🔗 Processing customer.subscription.deleted for customerId: ${stripeCustomerId}`);
-
-      if (!stripeCustomerId) {
-        throw new Error('Missing stripeCustomerId in subscription');
-      }
-
-      // Find user by stripeCustomerId
-      const usersRef = adminDB.collection('users');
-      const snapshot = await usersRef.where('billing.stripeCustomerId', '==', stripeCustomerId).get();
-
-      if (snapshot.empty) {
-        console.log(`🔍 No matching user found for customerId: ${stripeCustomerId}`);
-        return;
-      }
-
-      // Update the user's billing status to 'Canceled'
-      snapshot.forEach(async (doc) => {
-        const userId = doc.id;
-        await doc.ref.set(
-          {
-            'billing.status': 'Canceled',
-          },
-          { merge: true }
-        );
-        console.log(`✅  Updated user ${userId} billing status to 'Canceled'`);
-      });
-    } catch (error) {
-      console.error(`❌  Error in 'customer.subscription.deleted' handler: ${error.message}`);
-      throw error;
-    }
-  },
-
-  // Add more handlers as needed for other event types
-};
