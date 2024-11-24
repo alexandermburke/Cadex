@@ -13,13 +13,6 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
 // Your Stripe webhook secret
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
-// Disable Next.js default body parser to handle raw body for Stripe
-export const config = {
-  api: {
-    bodyParser: false,
-  },
-};
-
 // Webhook handler
 export async function POST(req) {
   console.log('🔔 Webhook received');
