@@ -1,14 +1,14 @@
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY_LIVE, {
     apiVersion: "2023-10-16",
 });
 
 // Define your price IDs mapped to plan names
 const priceIds = {
-    Basic: 'price_1QOWCPP6GBvKc5e8U2Dc9G3O', // Replace with your actual Basic plan price ID
-    Pro: 'price_1QOWCgP6GBvKc5e8GaqsWKKK',       // Replace with your actual Pro plan price ID
+    Basic: 'price_1QOUDFP6GBvKc5e8upbY4YVR', // Replace with your actual Basic plan price ID
+    Pro: 'price_1QOUEtP6GBvKc5e8U1TuUVLm',       // Replace with your actual Pro plan price ID
 };
 
 ////////////////////////// BILLING //////////////////////////
