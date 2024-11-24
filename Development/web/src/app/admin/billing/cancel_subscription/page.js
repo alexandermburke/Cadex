@@ -1,65 +1,120 @@
-'use client'
-import { db } from '@/firebase'
-import { doc, setDoc } from 'firebase/firestore'
-import Link from 'next/link'
-import React, { useState } from 'react'
-import { useRouter } from 'next/navigation'
-import { useAuth } from '@/context/AuthContext'
+'use client';
+import { db } from '@/firebase';
+import { doc, updateDoc } from 'firebase/firestore';
+import Link from 'next/link';
+import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/context/AuthContext';
 
 export default function CancelPage() {
-    const [helped, setHelped] = useState(null)
-    const router = useRouter()
-    const { currentUser, userDataObj, setUserDataObj } = useAuth()
+    const [helped, setHelped] = useState(null);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
+    const router = useRouter();
+    const { currentUser, userDataObj, setUserDataObj } = useAuth();
 
     async function handlePlanCancellation() {
-        if (!helped || !userDataObj?.billing?.stripeCustomerId || !userDataObj?.billing?.plan === 'Pro' || !userDataObj?.billing?.status) { return }
+        if (!helped) {
+            alert('Please let us know if we helped you on your job search.');
+            return;
+        }
+        if (
+            !userDataObj?.billing?.stripeCustomerId ||
+            userDataObj?.billing?.plan !== 'Pro'
+        ) {
+            alert('No active Pro subscription found.');
+            return;
+        }
+
+        setLoading(true);
+        setError(null);
+
         try {
-            const options = {
-                method: 'DELETE',
+            const response = await fetch('/api/cancel-subscription', {
+                method: 'POST',
                 headers: {
-                    'Content-type': 'application/json',
+                    'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    customerId: userDataObj?.billing?.stripeCustomerId,
+                    stripeCustomerId: userDataObj.billing.stripeCustomerId,
                     userId: currentUser.uid,
-                    stripeCustomerId: userDataObj?.billing?.stripeCustomerId
-                })
-            }
-            const response = await fetch('/api/checkout', options)
+                }),
+            });
+
+            const data = await response.json();
+
             if (response.ok) {
-                const userRef = doc(db, 'users', currentUser.uid)
-                const res = await setDoc(userRef, { billing: { plan: 'Free', status: false } }, { merge: true })
-                let firebaseData = { ...userDataObj, billing: { plan: 'Free', status: false } }
-                setUserDataObj(firebaseData)
-                localStorage.setItem('hyr', JSON.stringify({ ...firebaseData }))
-                router.push('/admin/account')
+                // Update user's billing status in Firestore
+                const userRef = doc(db, 'users', currentUser.uid);
+                await updateDoc(userRef, {
+                    'billing.status': 'Cancelled',
+                });
+
+                // Update local user data
+                const updatedBilling = {
+                    ...userDataObj.billing,
+                    status: 'Cancelled',
+                };
+                const firebaseData = {
+                    ...userDataObj,
+                    billing: updatedBilling,
+                };
+                setUserDataObj(firebaseData);
+                localStorage.setItem('hyr', JSON.stringify(firebaseData));
+
+                alert('Your subscription has been cancelled.');
+                router.push('/admin/account');
+            } else {
+                console.error('Error cancelling subscription:', data.error);
+                setError(data.error || 'Failed to cancel subscription.');
             }
         } catch (err) {
-            console.log('Failed to cancel plan', err.message)
+            console.error('Error cancelling subscription:', err);
+            setError(err.message || 'An unexpected error occurred.');
+        } finally {
+            setLoading(false);
         }
     }
 
     return (
         <div className='flex flex-1 items-center justify-center flex-col gap-8 pb-20 bg-white rounded-xl'>
-            <p className='text-center  text-xl sm:text-2xl md:text-3xl text-blue-400'>More jobs for us then aye 😜 </p>
-            <p>Did we help you on your job search?</p>
+            <p className='text-center text-xl sm:text-2xl md:text-3xl text-blue-400'>
+                We are sorry to see you go
+            </p>
+            <p>Did we help with your pursuit of Law?</p>
             <div className='grid grid-cols-2 gap-4'>
-                <button onClick={() => { setHelped('no') }}>
-                    <p>No {helped === 'no' ? ' 🥲' : ' '}</p>
+                <button
+                    onClick={() => setHelped('no')}
+                    className={`px-4 py-2 rounded ${helped === 'no' ? 'bg-red-500 text-white' : 'bg-gray-200'}`}
+                >
+                    No {helped === 'no' && '🥲'}
                 </button>
-                <button onClick={() => { setHelped('yes') }}>
-                    <p>Yes {helped === 'yes' ? ' 🔥' : ' '}</p>
+                <button
+                    onClick={() => setHelped('yes')}
+                    className={`px-4 py-2 rounded ${helped === 'yes' ? 'bg-green-500 text-white' : 'bg-gray-200'}`}
+                >
+                    Yes {helped === 'yes' && ''}
                 </button>
             </div>
             <div className='flex items-center gap-4'>
-                <Link href={'/admin'} target='_blank' className={'flex items-center justify-center gap-2 border border-solid border-blue-100 bg-white p-4 rounded-full text-blue-400 duration-200 hover:opacity-50 '}>
-                    <p className=''>Back to home</p>
-                    <i className="fa-solid fa-home"></i>
+                <Link
+                    href='/admin'
+                    className='flex items-center justify-center gap-2 border border-solid border-blue-100 bg-white px-4 py-2 rounded-full text-blue-400 duration-200 hover:opacity-50'
+                >
+                    <p>Back to home</p>
+                    <i className='fa-solid fa-home'></i>
                 </Link>
-                <button onClick={handlePlanCancellation} className={'duration-200 ' + (helped ? ' opacity-100' : ' opacity-30 cursor-not-allowed')}>
-                    <p>Confirm cancellation</p>
+                <button
+                    onClick={handlePlanCancellation}
+                    disabled={!helped || loading}
+                    className={`px-4 py-2 rounded bg-red-500 text-white duration-200 ${
+                        !helped || loading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-red-600'
+                    }`}
+                >
+                    {loading ? 'Cancelling...' : 'Confirm cancellation'}
                 </button>
             </div>
-        </div >
-    )
+            {error && <p className='text-red-500 mt-4'>{error}</p>}
+        </div>
+    );
 }

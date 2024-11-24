@@ -1,73 +1,103 @@
-import { NextResponse } from "next/server"
-import { headers } from "next/headers"
-import Stripe from "stripe"
-import { adminDB } from "@/firebaseAdmin"
+import { NextResponse } from 'next/server';
+import Stripe from 'stripe';
+import { adminDB } from '@/firebaseAdmin';
 
+// Initialize Stripe with your secret key
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-    apiVersion: "2023-10-16",
-})
-const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET
+  apiVersion: '2023-10-16',
+});
 
-////////////////////////// WEBHOOK //////////////////////////
-export async function GET(request) {
-    return NextResponse.json({ message: 'hi mom' }, { status: 200 })
-}
+// Your Stripe webhook secret
+const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
-
-// To handle a POST request to /api
 export async function POST(request) {
-    console.log('WEBHOOK STARTED')
-    try {
-        const body = await request.text()
-        const sig = headers().get('stripe-signature')//req.headers['stripe-signature']
-        // const event = stripe.webhooks.constructEvent(request['rawBody'], sig, process.env.STRIPE_WEBHOOK_KEY)
-        const event = stripe.webhooks.constructEvent(body, sig, webhookSecret)
-        if (!(event.type in webhookHandlers)) { return NextResponse.json({}, { status: 200 }) }
-        await webhookHandlers[event.type](event.data.object)
-        return NextResponse.json({}, { status: 200 })
-    } catch (err) {
-        console.log(err.message)
-        return NextResponse.json({}, { status: 500 })
-    }
-}
+  console.log('WEBHOOK STARTED');
 
+  let event;
+
+  try {
+    // Get the raw body and signature from the request
+    const rawBody = await request.text();
+    const sig = request.headers.get('stripe-signature');
+
+    // Verify the event with Stripe
+    event = stripe.webhooks.constructEvent(rawBody, sig, webhookSecret);
+  } catch (err) {
+    console.error(`Webhook signature verification failed: ${err.message}`);
+    return NextResponse.json({ error: `Webhook Error: ${err.message}` }, { status: 400 });
+  }
+
+  // Handle the event
+  try {
+    if (webhookHandlers[event.type]) {
+      await webhookHandlers[event.type](event.data.object);
+    } else {
+      console.log(`Unhandled event type: ${event.type}`);
+    }
+    return NextResponse.json({ received: true }, { status: 200 });
+  } catch (err) {
+    console.error(`Error handling event ${event.type}: ${err.message}`);
+    return NextResponse.json({ error: `Error handling event: ${err.message}` }, { status: 500 });
+  }
+}
 
 const webhookHandlers = {
-    'checkout.session.completed': async (data) => {
-        //add try catch block you fool
-        const { stripeCustomerId, userId, email, } = data.metadata
-        await adminDB.collection('users').doc(userId)
-            .set({
-                billing: { plan: 'Pro', status: true, stripeCustomerId: stripeCustomerId, },
-            }, { merge: true })
-        console.log('Payment successful')
-    },
-    'invoice.payment_failed': async (data) => {
-        // Add your business logic here
-        //add try catch block here too
+  // Handle successful checkout sessions
+  'checkout.session.completed': async (session) => {
+    try {
+      const stripeCustomerId = session.customer;
+      const userId = session.metadata.userId;
+      const email = session.metadata.email;
 
-        const { stripeCustomerId, userId, email, } = data.metadata
-        await adminDB.collection('users').doc(userId)
-            .set({
-                billing: { status: false, }
-            }, { merge: true })
-    },
-}
+      // Update user's billing information in Firestore
+      await adminDB.collection('users').doc(userId).set(
+        {
+          billing: {
+            plan: 'Pro',
+            status: 'Active',
+            stripeCustomerId: stripeCustomerId,
+          },
+        },
+        { merge: true }
+      );
 
-// 'invoice.paid': async (data) => {
-//     const customer_id = data.customer
-//     const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY)
-//     const customer = await stripe.customers.retrieve(
-//         customer_id
-//     )
+      console.log(`Payment successful for userId: ${userId}, stripeCustomerId: ${stripeCustomerId}`);
+    } catch (error) {
+      console.error(`Error in 'checkout.session.completed' handler: ${error.message}`);
+      throw error;
+    }
+  },
 
-//     const userId = customer.metadata.userId
-//     const userRef = db.collection('users').doc(userId)
-//     const date = new Date()
-//     const day = date.getDate()
-//     const month = date.getMonth() + 1
-//     const year = date.getFullYear()
-//     const res2 = await userRef.set({
-//         billing: { [`${year}/${month}/${day}`]: data.amount_paid / 100 },
-//     }, { merge: true })
-// },
+  // Handle payment failures
+  'invoice.payment_failed': async (invoice) => {
+    try {
+      const stripeCustomerId = invoice.customer;
+
+      // Find user by stripeCustomerId
+      const usersRef = adminDB.collection('users');
+      const snapshot = await usersRef.where('billing.stripeCustomerId', '==', stripeCustomerId).get();
+
+      if (snapshot.empty) {
+        console.log('No matching user found for customerId:', stripeCustomerId);
+        return;
+      }
+
+      // Update the user's billing status
+      snapshot.forEach(async (doc) => {
+        const userId = doc.id;
+        await doc.ref.set(
+          {
+            'billing.status': 'Inactive',
+          },
+          { merge: true }
+        );
+        console.log(`Updated user ${userId} billing status to 'Inactive' due to payment failure`);
+      });
+    } catch (error) {
+      console.error(`Error in 'invoice.payment_failed' handler: ${error.message}`);
+      throw error;
+    }
+  },
+
+  // Add more handlers as needed
+};

@@ -79,16 +79,11 @@ export default function SuccessfulCheckoutPage() {
     return (
         <div className='flex flex-1 items-center justify-center flex-col gap-8 pb-20'>
             <h2 className={'text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-semibold text-center ' + poppins.className}>
-                <span className='text-blue-500'>Congratulations 🎉</span>
+                <span className='text-blue-950'>Congratulations</span>
             </h2>
             <p className='text-center text-slate-600'>Your account was successfully upgraded to <b>Pro</b>!</p>
             <div className='flex flex-col items-center justify-center mt-4'>
-                <Button text="Back to dashboard" clickHandler={() => { router.push('/admin') }} />
-            </div>
-            {/* Stripe Logo with Text */}
-            <div className="flex items-center gap-2 mt-6">
-                <p className="text-center text-slate-600">All transactions are handled by Stripe</p>
-               
+                <Button text="Back to dashboard" clickHandler={() => { router.push('/admin/account') }} />
             </div>
         </div>
     )

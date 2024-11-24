@@ -1,91 +1,140 @@
-'use client'
-import Link from 'next/link'
-import React from 'react'
-import ActionCard from './ActionCard'
-import { useAuth } from '@/context/AuthContext'
-import LogoFiller from './LogoFiller'
+'use client';
+import Link from 'next/link';
+import React, { useState, useEffect } from 'react';
+import ActionCard from './ActionCard';
+import { useAuth } from '@/context/AuthContext';
+import LogoFiller from './LogoFiller';
+import { db } from '@/firebase';
 
 export default function Account() {
+    const { currentUser, userDataObj } = useAuth();
+    const [nextPaymentDate, setNextPaymentDate] = useState(null);
 
-    const { currentUser, userDataObj, isPaid } = useAuth()
+    // Get the user's plan from billing information or default to 'Free'
+    const plan = userDataObj?.billing?.plan || 'Free';
 
-    const plan = userDataObj?.billing?.plan || 'free'; 
+    useEffect(() => {
+        async function fetchSubscriptionData() {
+            if (!currentUser?.uid || !userDataObj?.billing?.stripeCustomerId) return;
 
+            try {
+                // Fetch subscription data from your backend
+                const response = await fetch('/api/get-subscription', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        stripeCustomerId: userDataObj.billing.stripeCustomerId,
+                    }),
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    // Convert Unix timestamp to readable date
+                    const nextPayment = new Date(data.nextPaymentDue * 1000);
+                    setNextPaymentDate(nextPayment.toLocaleDateString());
+                } else {
+                    console.error('Error fetching subscription data:', data.error);
+                }
+            } catch (error) {
+                console.error('Error fetching subscription data:', error);
+            }
+        }
+
+        fetchSubscriptionData();
+    }, [currentUser?.uid, userDataObj?.billing?.stripeCustomerId]);
+
+    // User account details
     const vals = {
-        'email': currentUser.email,
-        'username': currentUser.displayName,
-        'cases': Object.keys(userDataObj?.listings || {}).length,
-        'link': 'www.cadexlaw.com/' + currentUser.displayName,
-    }
+        email: currentUser.email,
+        username: currentUser.displayName,
+        cases: Object.keys(userDataObj?.listings || {}).length,
+        link: 'www.cadexlaw.com/' + currentUser.displayName,
+    };
 
+    // Billing information
     const billingObj = {
-        'current_plan': plan,
-        'status': userDataObj?.billing?.status ? 'Active' : 'Inactive',
-        'actions': (
-            <Link
-                href={isPaid ? '/admin/billing/cancel_subscription' : '/admin/billing'}
-                className='duration-200 hover:opacity-60 goldGradient'
-            >
-                <p>{isPaid ? 'Cancel plan' : 'Upgrade account'} &rarr;</p>
-            </Link>
-        )
-    }
+        current_plan: plan,
+        status: userDataObj?.billing?.status ? 'Active' : 'Inactive',
+        next_payment_due: nextPaymentDate ? nextPaymentDate : 'Loading...',
+        actions: (
+            <div className="flex flex-col gap-2">
+                {plan === 'Pro' ? (
+                    // Show Cancel Subscription button if the plan is Pro
+                    <Link
+                        href="/admin/billing/cancel_subscription"
+                        className="duration-200 hover:opacity-60 goldGradient"
+                    >
+                        <p>Cancel Subscription &rarr;</p>
+                    </Link>
+                ) : (
+                    // Show Upgrade Account button if the plan is Free or Basic
+                    <Link
+                        href="/admin/billing"
+                        className="duration-200 hover:opacity-60 goldGradient"
+                    >
+                        <p>Upgrade Account &rarr;</p>
+                    </Link>
+                )}
+            </div>
+        ),
+    };
 
     return (
         <>
-            <div className='flex flex-col gap-8 flex-1'>
-                <div className='flex items-center justify-between gap-4'>
+            <div className="flex flex-col gap-8 flex-1">
+                <div className="flex items-center justify-between gap-4">
                     <Link
-                        href={'/admin'}
-                        className='flex items-center mr-auto justify-center gap-4 bg-white px-4 py-2 rounded-full text-red-500 duration-200 hover:opacity-50'
+                        href="/admin"
+                        className="flex items-center mr-auto justify-center gap-4 bg-white px-4 py-2 rounded-full text-red-500 duration-200 hover:opacity-50"
                     >
                         <p>&larr; Back</p>
                     </Link>
                 </div>
-                <ActionCard title={'Account Details'}>
-                    <div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
-                        {Object.keys(vals).map((entry, entryIndex) => {
-                            return (
-                                <div className='flex items-center gap-4' key={entryIndex}>
-                                    <p className='font-medium w-24 sm:w-32 capitalize'>
-                                        {entry.replaceAll('_', ' ')}
-                                    </p>
-                                    <p>{vals[entry]}</p>
-                                </div>
-                            )
-                        })}
+                <ActionCard title="Account Details">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        {Object.keys(vals).map((entry, entryIndex) => (
+                            <div className="flex items-center gap-4" key={entryIndex}>
+                                <p className="font-medium w-24 sm:w-32 capitalize">
+                                    {entry.replaceAll('_', ' ')}
+                                </p>
+                                <p>{vals[entry]}</p>
+                            </div>
+                        ))}
                     </div>
                 </ActionCard>
-                <ActionCard title={'Billing & Plan'}>
-                    <div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
-                        {Object.keys(billingObj).map((entry, entryIndex) => {
-                            return (
-                                <div className='flex items-center gap-4' key={entryIndex}>
-                                    <p className='font-medium w-24 sm:w-32 capitalize'>
-                                        {entry.replaceAll('_', ' ')}
+                <ActionCard title="Billing & Plan">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        {Object.keys(billingObj).map((entry, entryIndex) => (
+                            <div className="flex items-center gap-4" key={entryIndex}>
+                                <p className="font-medium w-24 sm:w-32 capitalize">
+                                    {entry.replaceAll('_', ' ')}
+                                </p>
+                                {entry === 'actions' ? (
+                                    billingObj[entry]
+                                ) : entry === 'current_plan' ? (
+                                    <p
+                                        className={`px-2 py-1 rounded-full capitalize text-xs ${
+                                            plan === 'Pro'
+                                                ? 'bg-blue-100 text-blue-700'
+                                                : plan === 'Basic'
+                                                ? 'bg-green-100 text-green-700'
+                                                : 'bg-gray-100 text-gray-700'
+                                        }`}
+                                    >
+                                        {billingObj[entry]}
                                     </p>
-                                    {entry === 'actions' ? (
-                                        billingObj[entry]
-                                    ) : entry === 'current_plan' ? (
-                                        <p
-                                            className={`px-2 py-1 rounded-full capitalize text-xs ${
-                                                plan === 'Pro'
-                                                    ? 'bg-blue-100 text-blue-700'
-                                                    : 'bg-green-100 text-green-700'
-                                            }`}
-                                        >
-                                            {billingObj[entry]}
-                                        </p>
-                                    ) : (
-                                        <p>{billingObj[entry]}</p>
-                                    )}
-                                </div>
-                            )
-                        })}
+                                ) : (
+                                    <p>{billingObj[entry]}</p>
+                                )}
+                            </div>
+                        ))}
                     </div>
                 </ActionCard>
             </div>
             <LogoFiller />
         </>
-    )
+    );
 }

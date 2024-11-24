@@ -7,8 +7,8 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
 
 // Define your price IDs mapped to plan names
 const priceIds = {
-    Basic: 'price_1QOUDFP6GBvKc5e8upbY4YVR', // Replace with your actual Basic plan price ID
-    Pro: 'price_1QOUEtP6GBvKc5e8U1TuUVLm',       // Replace with your actual Pro plan price ID
+    Basic: 'price_1QOWCPP6GBvKc5e8U2Dc9G3O', // Replace with your actual Basic plan price ID
+    Pro: 'price_1QOWCgP6GBvKc5e8GaqsWKKK',       // Replace with your actual Pro plan price ID
 };
 
 ////////////////////////// BILLING //////////////////////////
@@ -53,8 +53,8 @@ export async function POST(request) {
             subscription_data: {
                 trial_period_days: 7,
             },
-            cancel_url: 'https://cadexlaw.com/', // Replace with your cancel URL
-            success_url: 'https://cadexlaw.com/success?session_id={CHECKOUT_SESSION_ID}', // Replace with your success URL
+            cancel_url: 'http://localhost:3000/cancel', // Replace with your cancel URL
+            success_url: 'http://localhost:3000/admin/success?session_id={CHECKOUT_SESSION_ID}',
         });
 
         return NextResponse.json({ url: session.url }, { status: 201 });
