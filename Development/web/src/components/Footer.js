@@ -32,21 +32,6 @@ export default function Footer() {
           </p>
         </div>
         <div className="flex flex-col sm:flex-row gap-6 sm:gap-8 md:gap-10">
-          {/* Navigation Section */}
-          <div className="flex flex-col gap-2 w-fit">
-            <h3 className="font-bold">Navigation</h3>
-            <div className="flex flex-col gap-1 text-sm">
-              <Link className="relative w-fit overflow-hidden hover:underline" href={'/practice'}>
-                <p>Practice</p>
-              </Link>
-              <Link className="relative w-fit overflow-hidden hover:underline" href={'/admin'}>
-                <p>Login</p>
-              </Link>
-              <Link className="relative w-fit overflow-hidden hover:underline" href={'/register'}>
-                <p>Join</p>
-              </Link>
-            </div>
-          </div>
           {/* Contact Section */}
           <div className="flex flex-col gap-2 w-fit">
             <h3 className="font-bold">Contact</h3>
@@ -80,6 +65,40 @@ export default function Footer() {
               <Link className="relative w-fit overflow-hidden hover:underline" href={'/legal'}>
                 <p>Terms & Agreements</p>
               </Link>
+            </div>
+          </div>
+          {/* Careers Section */}
+          <div className="flex flex-col gap-2 w-fit">
+            <h3 className="font-bold">Careers</h3>
+            <div className="flex flex-col gap-1 text-sm">
+              <Link className="relative w-fit overflow-hidden hover:underline" href={'/careers'}>
+                <p>Join Our Team</p>
+              </Link>
+              <Link className="relative w-fit overflow-hidden hover:underline" href={'/careers#benefits'}>
+                <p>Benefits</p>
+              </Link>
+            </div>
+          </div>
+          {/* Investors Section */}
+          <div className="flex flex-col gap-2 w-fit">
+            <h3 className="font-bold">Investors</h3>
+            <div className="flex flex-col gap-1 text-sm">
+              <a
+                href="https://investors.cadexlaw.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="relative w-fit overflow-hidden hover:underline"
+              >
+                <p>Investor Portal</p>
+              </a>
+              <a
+                href="https://investors.cadexlaw.com/about"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="relative w-fit overflow-hidden hover:underline"
+              >
+                <p>About Us</p>
+              </a>
             </div>
           </div>
         </div>
