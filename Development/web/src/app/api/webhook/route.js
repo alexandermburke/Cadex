@@ -3,12 +3,12 @@ import Stripe from 'stripe';
 import { adminDB } from '@/firebaseAdmin';
 
 // Initialize Stripe with your secret key
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY_LIVE, {
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
   apiVersion: '2023-10-16',
 });
 
 // Your Stripe webhook secret
-const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET_LIVE;
+const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
 export async function POST(request) {
   console.log('WEBHOOK STARTED');
