@@ -1,105 +1,206 @@
-import { NextResponse } from "next/server";
-import Stripe from "stripe";
+// app/api/webhook/route.js
 
+import { buffer } from 'micro';
+import { NextResponse } from 'next/server';
+import Stripe from 'stripe';
+import { adminDB } from '@/firebaseAdmin'; // Adjust the import path as needed
 
-const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
+// Initialize Stripe with your secret key
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+  apiVersion: '2023-10-16', // Replace with your Stripe API version
+});
 
-let stripe;
-try {
-  if (!stripeSecretKey) {
-    throw new Error('Stripe Secret Key is not set in environment variables.');
-  }
-  stripe = new Stripe(stripeSecretKey, {
-    apiVersion: '2023-10-16',
-  });
-  console.log('Stripe initialized successfully.');
-} catch (error) {
-  console.error('Error initializing Stripe:', error.message);
-}
+// Your Stripe webhook secret
+const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
-// Define your price IDs mapped to plan names
-const priceIds = {
-    Basic: 'price_1QOUDFP6GBvKc5e8upbY4YVR', 
-    Pro: 'price_1QOUEtP6GBvKc5e8U1TuUVLm',      
+// Disable Next.js default body parser to handle raw body for Stripe
+export const config = {
+  api: {
+    bodyParser: false,
+  },
 };
 
-////////////////////////// BILLING //////////////////////////
+// Webhook handler
+export async function POST(req) {
+  console.log('🔔 Webhook received');
 
-// To handle a POST request to /api/checkout
-export async function POST(request) {
-    const { customerId, userId, email, plan } = await request.json();
-    let stripeCustomerId = customerId;
+  const buf = await buffer(req);
+  const sig = req.headers.get('stripe-signature');
 
-    try {
-        // Create a Stripe customer if not provided
-        if (!customerId) {
-            const customer = await stripe.customers.create({
-                email: email,
-                metadata: {
-                    userId: userId,
-                },
-            });
-            stripeCustomerId = customer.id;
-        }
+  let event;
 
-        // Validate the selected plan
-        if (!priceIds[plan]) {
-            throw new Error('Invalid plan selected');
-        }
+  try {
+    // Verify the event with Stripe
+    event = stripe.webhooks.constructEvent(buf.toString(), sig, webhookSecret);
+    console.log(`✅  Event ${event.type} constructed successfully`);
+  } catch (err) {
+    console.error(`⚠️  Webhook signature verification failed: ${err.message}`);
+    return NextResponse.json({ error: `Webhook Error: ${err.message}` }, { status: 400 });
+  }
 
-        // Create a Stripe Checkout Session with a 7-day trial
-        const session = await stripe.checkout.sessions.create({
-            customer: stripeCustomerId,
-            metadata: {
-                userId: userId,
-                email: email,
-                stripeCustomerId: stripeCustomerId,
-            },
-            line_items: [
-                {
-                    price: priceIds[plan],
-                    quantity: 1,
-                },
-            ],
-            mode: 'subscription',
-            subscription_data: {
-                trial_period_days: 7,
-            },
-            cancel_url: 'http://www.cadexlaw.com/admin', // Replace with your cancel URL
-            success_url: 'http://www.cadexlaw.com/admin/success?session_id={CHECKOUT_SESSION_ID}',
-        });
-
-        return NextResponse.json({ url: session.url }, { status: 201 });
-    } catch (err) {
-        console.log('Failed to create checkout session', err.message);
-        return NextResponse.json({ error: err.message }, { status: 500 });
+  // Handle the event
+  try {
+    if (webhookHandlers[event.type]) {
+      await webhookHandlers[event.type](event.data.object);
+    } else {
+      console.log(`❓ Unhandled event type: ${event.type}`);
     }
+
+    // Acknowledge receipt of the event
+    return NextResponse.json({ received: true }, { status: 200 });
+  } catch (err) {
+    console.error(`🔥 Error handling event ${event.type}: ${err.message}`);
+    return NextResponse.json({ error: `Error handling event: ${err.message}` }, { status: 500 });
+  }
 }
 
-// To handle a DELETE request to /api/checkout (for cancellation)
-export async function DELETE(request) {
-    const { stripeCustomerId, userId } = await request.json();
-
-    if (!stripeCustomerId || !userId) {
-        return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
-    }
-
+// Define handlers for relevant Stripe events
+const webhookHandlers = {
+  // Handle successful checkout sessions
+  'checkout.session.completed': async (session) => {
     try {
-        const customer = await stripe.customers.retrieve(stripeCustomerId, {
-            expand: ['subscriptions'],
-        });
+      const stripeCustomerId = session.customer;
+      const userId = session.metadata.userId;
+      const email = session.metadata.email;
 
-        if (customer.subscriptions.data.length === 0) {
-            throw new Error('No active subscriptions found for this customer.');
-        }
+      console.log(`🔗 Processing checkout.session.completed for userId: ${userId}`);
 
-        const subscriptionId = customer.subscriptions.data[0].id;
+      if (!stripeCustomerId || !userId) {
+        throw new Error('Missing stripeCustomerId or userId in session metadata');
+      }
 
-        await stripe.subscriptions.del(subscriptionId);
+      // Update user's billing information in Firestore
+      await adminDB.collection('users').doc(userId).set(
+        {
+          billing: {
+            plan: 'Pro',
+            status: 'Active',
+            stripeCustomerId: stripeCustomerId,
+          },
+        },
+        { merge: true }
+      );
 
-        return NextResponse.json({ message: 'Subscription cancelled successfully.' }, { status: 200 });
-    } catch (err) {
-        console.log('Failed to cancel subscription', err.message);
-        return NextResponse.json({ error: err.message }, { status: 500 });
+      console.log(`✅  Saved stripeCustomerId (${stripeCustomerId}) for userId: ${userId}`);
+    } catch (error) {
+      console.error(`❌  Error in 'checkout.session.completed' handler: ${error.message}`);
+      throw error;
     }
-}
+  },
+
+  // Handle payment failures
+  'invoice.payment_failed': async (invoice) => {
+    try {
+      const stripeCustomerId = invoice.customer;
+      const status = invoice.status; // e.g., 'failed'
+
+      console.log(`🔗 Processing invoice.payment_failed for customerId: ${stripeCustomerId}`);
+
+      if (!stripeCustomerId) {
+        throw new Error('Missing stripeCustomerId in invoice');
+      }
+
+      // Find user by stripeCustomerId
+      const usersRef = adminDB.collection('users');
+      const snapshot = await usersRef.where('billing.stripeCustomerId', '==', stripeCustomerId).get();
+
+      if (snapshot.empty) {
+        console.log(`🔍 No matching user found for customerId: ${stripeCustomerId}`);
+        return;
+      }
+
+      // Update the user's billing status
+      snapshot.forEach(async (doc) => {
+        const userId = doc.id;
+        await doc.ref.set(
+          {
+            'billing.status': 'Inactive',
+          },
+          { merge: true }
+        );
+        console.log(`✅  Updated user ${userId} billing status to 'Inactive' due to payment failure`);
+      });
+    } catch (error) {
+      console.error(`❌  Error in 'invoice.payment_failed' handler: ${error.message}`);
+      throw error;
+    }
+  },
+
+  // Handle subscription updates (e.g., canceled, updated)
+  'customer.subscription.updated': async (subscription) => {
+    try {
+      const stripeCustomerId = subscription.customer;
+      const status = subscription.status; // e.g., 'active', 'canceled'
+
+      console.log(`🔗 Processing customer.subscription.updated for customerId: ${stripeCustomerId}`);
+
+      if (!stripeCustomerId) {
+        throw new Error('Missing stripeCustomerId in subscription');
+      }
+
+      // Find user by stripeCustomerId
+      const usersRef = adminDB.collection('users');
+      const snapshot = await usersRef.where('billing.stripeCustomerId', '==', stripeCustomerId).get();
+
+      if (snapshot.empty) {
+        console.log(`🔍 No matching user found for customerId: ${stripeCustomerId}`);
+        return;
+      }
+
+      // Update the user's billing status based on subscription status
+      snapshot.forEach(async (doc) => {
+        const userId = doc.id;
+        const newStatus = status === 'active' ? 'Active' : 'Inactive';
+        await doc.ref.set(
+          {
+            'billing.status': newStatus,
+          },
+          { merge: true }
+        );
+        console.log(`✅  Updated user ${userId} billing status to '${newStatus}'`);
+      });
+    } catch (error) {
+      console.error(`❌  Error in 'customer.subscription.updated' handler: ${error.message}`);
+      throw error;
+    }
+  },
+
+  // Handle subscription deletions (cancellations)
+  'customer.subscription.deleted': async (subscription) => {
+    try {
+      const stripeCustomerId = subscription.customer;
+
+      console.log(`🔗 Processing customer.subscription.deleted for customerId: ${stripeCustomerId}`);
+
+      if (!stripeCustomerId) {
+        throw new Error('Missing stripeCustomerId in subscription');
+      }
+
+      // Find user by stripeCustomerId
+      const usersRef = adminDB.collection('users');
+      const snapshot = await usersRef.where('billing.stripeCustomerId', '==', stripeCustomerId).get();
+
+      if (snapshot.empty) {
+        console.log(`🔍 No matching user found for customerId: ${stripeCustomerId}`);
+        return;
+      }
+
+      // Update the user's billing status to 'Canceled'
+      snapshot.forEach(async (doc) => {
+        const userId = doc.id;
+        await doc.ref.set(
+          {
+            'billing.status': 'Canceled',
+          },
+          { merge: true }
+        );
+        console.log(`✅  Updated user ${userId} billing status to 'Canceled'`);
+      });
+    } catch (error) {
+      console.error(`❌  Error in 'customer.subscription.deleted' handler: ${error.message}`);
+      throw error;
+    }
+  },
+
+  // Add more handlers as needed for other event types
+};
