@@ -26,22 +26,22 @@ export default function InvestorSplashPage() {
 
   const milestones = [
     {
-      icon: <FaChartLine className="text-blue-950 text-5xl mb-4" />,
+      icon: <FaChartLine className="text-white text-5xl mb-4" />,
       title: 'Rapid Growth',
       description: 'Achieved 2x monthly user growth in the last 6 months.',
     },
     {
-      icon: <FaUserFriends className="text-blue-950 text-5xl mb-4" />,
+      icon: <FaUserFriends className="text-white text-5xl mb-4" />,
       title: 'Expanding Community',
       description: 'Over 10,000 active users across professionals and students.',
     },
     {
-      icon: <FaDollarSign className="text-blue-950 text-5xl mb-4" />,
+      icon: <FaDollarSign className="text-white text-5xl mb-4" />,
       title: 'Revenue Potential',
       description: 'Projected ARR of $1.5M within the next fiscal year.',
     },
     {
-      icon: <FaRocket className="text-blue-950 text-5xl mb-4" />,
+      icon: <FaRocket className="text-white text-5xl mb-4" />,
       title: 'Innovation-Driven',
       description: 'Leveraging AI to transform legal education and practice.',
     },
@@ -49,17 +49,17 @@ export default function InvestorSplashPage() {
 
   const investorBenefits = [
     {
-      icon: <FaShieldAlt className="text-blue-950 text-5xl mb-4" />,
+      icon: <FaShieldAlt className="text-white text-5xl mb-4" />,
       title: 'Secure Investment',
       description: 'Cadex employs a scalable SaaS model with high retention rates.',
     },
     {
-      icon: <FaCheck className="text-blue-950 text-5xl mb-4" />,
+      icon: <FaCheck className="text-white text-5xl mb-4" />,
       title: 'Proven Market Fit',
       description: 'Validated by adoption in top law schools and firms.',
     },
     {
-      icon: <FaChartLine className="text-blue-950 text-5xl mb-4" />,
+      icon: <FaChartLine className="text-white text-5xl mb-4" />,
       title: 'High ROI',
       description: 'Targeting a 300% return over the next 3 years.',
     },
@@ -93,7 +93,7 @@ export default function InvestorSplashPage() {
   }, []);
 
   return (
-    <section className="w-full bg-white">
+    <section className="w-full bg-transparent">
       <div className="max-w-7xl mx-auto px-4 py-16">
         {/* Header Section */}
         <div className="text-center">
@@ -107,17 +107,17 @@ export default function InvestorSplashPage() {
             priority
           />
 
-          <h1 className={'text-5xl sm:text-7xl font-bold mb-6 ' + poppins.className}>
+          <h1 className={'text-5xl sm:text-7xl font-bold mb-6 text-gray-200 ' + poppins.className}>
             Invest in the Future of Legal Tech
           </h1>
-          <p className="text-xl text-gray-700 max-w-3xl mx-auto">
+          <p className="text-xl text-white max-w-3xl mx-auto">
             Cadex is revolutionizing the legal landscape with Vertical AI, providing innovative tools for law students,
             professionals, and firms. Be part of this groundbreaking journey to reshape a $900B industry.
           </p>
           <div className="mt-8">
             <Link
               href="/contact"
-              className="group before:ease relative h-12 w-56 overflow-hidden rounded bg-gradient-to-r from-blue-950 to-slate-700 text-white shadow-2xl transition-all before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-56"
+              className="group before:ease relative h-12 w-56 overflow-hidden rounded bg-gradient-to-r from-gray-950 to-gray-700 text-white shadow-2xl transition-all before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 before:rotate-6 before:bg-gray before:opacity-20 before:duration-700 hover:before:-translate-x-56"
             >
               <div className="flex items-center justify-center h-full">
                 Contact Us
@@ -129,16 +129,16 @@ export default function InvestorSplashPage() {
 
         {/* Milestones Section */}
         <div className="flex flex-col items-center py-16 bg-transparent">
-          <h2 className="text-4xl sm:text-5xl font-bold text-blue-950 mb-12">Key Milestones</h2>
+          <h2 className="text-4xl sm:text-5xl font-bold text-white mb-12">Key Milestones</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
             {milestones.map((milestone, index) => (
               <div
                 key={index}
-                className="flex flex-col items-center p-6 bg-white rounded shadow-md hover:shadow-xl transition-shadow"
+                className="flex flex-col items-center p-6 bg-blue-950 rounded shadow-md hover:shadow-xl transition-shadow"
               >
                 {milestone.icon}
-                <h3 className="text-xl font-semibold text-blue-950 mb-2 text-center">{milestone.title}</h3>
-                <p className="text-gray-700 text-center">{milestone.description}</p>
+                <h3 className="text-xl font-semibold text-white mb-2 text-center">{milestone.title}</h3>
+                <p className="text-white text-center">{milestone.description}</p>
               </div>
             ))}
           </div>
@@ -146,16 +146,16 @@ export default function InvestorSplashPage() {
 
         {/* Investor Benefits Section */}
         <div className="flex flex-col items-center py-16">
-          <h2 className="text-4xl sm:text-5xl font-bold text-blue-950 mb-12">Why Invest in Cadex?</h2>
+          <h2 className="text-4xl sm:text-5xl font-bold text-white mb-12">Why Invest in Cadex?</h2>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
             {investorBenefits.map((benefit, index) => (
               <div
                 key={index}
-                className="flex flex-col items-center p-6 bg-white rounded shadow-md hover:shadow-xl transition-shadow"
+                className="flex flex-col items-center p-6 bg-blue-950 rounded shadow-md hover:shadow-xl transition-shadow"
               >
                 {benefit.icon}
-                <h3 className="text-xl font-semibold text-blue-950 mb-2 text-center">{benefit.title}</h3>
-                <p className="text-gray-700 text-center">{benefit.description}</p>
+                <h3 className="text-xl font-semibold text-white mb-2 text-center">{benefit.title}</h3>
+                <p className="text-white text-center">{benefit.description}</p>
               </div>
             ))}
           </div>
@@ -163,12 +163,12 @@ export default function InvestorSplashPage() {
 
         {/* FAQs Section */}
         <div className="py-16">
-          <h2 className="text-4xl sm:text-5xl font-bold text-blue-950 mb-12 text-center">FAQs</h2>
+          <h2 className="text-4xl sm:text-5xl font-bold text-white mb-12 text-center">FAQs</h2>
           <div className="space-y-6">
             {faqData.map((faq, index) => (
-              <div key={index} className="bg-white rounded shadow-md p-6">
-                <h3 className="text-lg font-semibold text-blue-950 mb-2">{faq.question}</h3>
-                <p className="text-gray-700">{faq.answer}</p>
+              <div key={index} className="bg-blue-950 rounded shadow-md p-6">
+                <h3 className="text-lg font-semibold text-white mb-2">{faq.question}</h3>
+                <p className="text-white">{faq.answer}</p>
               </div>
             ))}
           </div>
@@ -176,11 +176,11 @@ export default function InvestorSplashPage() {
 
         {/* Call to Action */}
         <div className="text-center mt-16">
-          <h3 className="text-3xl font-semibold text-blue-950 mb-4">Ready to Invest in the Future?</h3>
+          <h3 className="text-3xl font-semibold text-white mb-4">Ready to Invest in the Future?</h3>
           <Link
             href="/contact"
-            className="group before:ease relative h-12 w-56 overflow-hidden rounded bg-gradient-to-r from-blue-950 to-slate-700 text-white shadow-2xl transition-all before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-56"
-          >
+            className="group before:ease relative h-12 w-56 overflow-hidden rounded bg-gradient-to-r from-gray-950 to-gray-700 text-white shadow-2xl transition-all before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 before:rotate-6 before:bg-gray before:opacity-20 before:duration-700 hover:before:-translate-x-56"
+            >
             <div className="flex items-center justify-center h-full">
               Get Started
               <i className="ml-8 fa-solid fa-arrow-right opacity-0 group-hover:opacity-100 transition-opacity duration-200"></i>
