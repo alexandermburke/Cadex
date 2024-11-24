@@ -53,8 +53,8 @@ export async function POST(request) {
             subscription_data: {
                 trial_period_days: 7,
             },
-            cancel_url: 'http://www.cadexlaw.com/cancel', // Replace with your cancel URL
-            success_url: 'http://localhost:3000/admin/success?session_id={CHECKOUT_SESSION_ID}',
+            cancel_url: 'http://www.cadexlaw.com/admin', // Replace with your cancel URL
+            success_url: 'http://www.cadexlaw.com/admin/success?session_id={CHECKOUT_SESSION_ID}',
         });
 
         return NextResponse.json({ url: session.url }, { status: 201 });
