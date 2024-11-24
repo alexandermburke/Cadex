@@ -12,7 +12,7 @@ const plans = [
         description: 'Designed for individual legal study and practice.',
         price: '$15 USD',
         interval: 'Per month',
-        promotion: '$1 for the first month',
+        promotion: 'First 7 days free',
         features: [
             'Comprehensive access to case simulation tools',
             'Access to streamlined LSAT and Bar exam preparation resources',
