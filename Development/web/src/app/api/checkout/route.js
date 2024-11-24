@@ -53,7 +53,7 @@ export async function POST(request) {
             subscription_data: {
                 trial_period_days: 7,
             },
-            cancel_url: 'http://localhost:3000/cancel', // Replace with your cancel URL
+            cancel_url: 'http://www.cadexlaw.com/cancel', // Replace with your cancel URL
             success_url: 'http://localhost:3000/admin/success?session_id={CHECKOUT_SESSION_ID}',
         });
 
