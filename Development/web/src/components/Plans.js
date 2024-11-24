@@ -167,14 +167,8 @@ export default function Plans() {
       )}
       <div className="flex flex-col items-center gap-2 mt-8">
         <div className="flex items-center justify-center gap-2">
-          <p className="text-center">All transactions are handled by</p>
-          <Image
-            src="/stripe-logo.png"
-            alt="Stripe Logo"
-            width={100}
-            height={24}
-            className="object-contain"
-          />
+          <p className="text-center">All transactions are handled by Stripe</p>
+        
         </div>
       </div>
     </>

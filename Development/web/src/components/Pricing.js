@@ -174,13 +174,6 @@ export default function Plans() {
         {/* Stripe Logo with Text */}
         <div className="flex items-center gap-2">
           <p className="text-center">All transactions are handled by Stripe</p>
-          <Image
-            src="/stripe-logo.png" // Ensure this image exists in the public directory
-            alt="Stripe Logo"
-            width={100} // Adjust size as needed
-            height={24} // Adjust size as needed to maintain aspect ratio
-            className="object-contain"
-          />
         </div>
       </div>
     </>
