@@ -1,72 +1,105 @@
-// app/api/checkout/route.js
-import { NextResponse } from 'next/server';
-import Stripe from 'stripe';
+import { NextResponse } from "next/server";
+import Stripe from "stripe";
 
-// Function to select the correct Stripe Secret Key based on the environment
-const getStripeSecretKey = () => {
-  if (process.env.NODE_ENV === 'production') {
-    return process.env.STRIPE_SECRET_KEY;
-  } else {
-    return process.env.STRIPE_SECRET_KEY_TEST;
+
+const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
+
+let stripe;
+try {
+  if (!stripeSecretKey) {
+    throw new Error('Stripe Secret Key is not set in environment variables.');
   }
+  stripe = new Stripe(stripeSecretKey, {
+    apiVersion: '2023-10-16',
+  });
+  console.log('Stripe initialized successfully.');
+} catch (error) {
+  console.error('Error initializing Stripe:', error.message);
+}
+
+// Define your price IDs mapped to plan names
+const priceIds = {
+    Basic: 'price_1QOUDFP6GBvKc5e8upbY4YVR', 
+    Pro: 'price_1QOUEtP6GBvKc5e8U1TuUVLm',      
 };
 
-// Initialize Stripe with the selected Secret Key
-const stripe = new Stripe(getStripeSecretKey(), {
-  apiVersion: '2023-10-16',
-});
+////////////////////////// BILLING //////////////////////////
 
+// To handle a POST request to /api/checkout
 export async function POST(request) {
-  console.log('Received POST request at /api/checkout');
+    const { customerId, userId, email, plan } = await request.json();
+    let stripeCustomerId = customerId;
 
-  const stripeSecretKey = getStripeSecretKey();
+    try {
+        // Create a Stripe customer if not provided
+        if (!customerId) {
+            const customer = await stripe.customers.create({
+                email: email,
+                metadata: {
+                    userId: userId,
+                },
+            });
+            stripeCustomerId = customer.id;
+        }
 
-  // Log whether the Stripe Secret Key is set
-  console.log(
-    `Stripe Secret Key is ${stripeSecretKey ? 'set' : 'not set'} in ${
-      process.env.NODE_ENV
-    } environment.`
-  );
+        // Validate the selected plan
+        if (!priceIds[plan]) {
+            throw new Error('Invalid plan selected');
+        }
 
-  if (!stripeSecretKey) {
-    console.error('Stripe Secret Key is not set.');
-    return NextResponse.json(
-      { error: 'Internal Server Error' },
-      { status: 500 }
-    );
-  }
+        // Create a Stripe Checkout Session with a 7-day trial
+        const session = await stripe.checkout.sessions.create({
+            customer: stripeCustomerId,
+            metadata: {
+                userId: userId,
+                email: email,
+                stripeCustomerId: stripeCustomerId,
+            },
+            line_items: [
+                {
+                    price: priceIds[plan],
+                    quantity: 1,
+                },
+            ],
+            mode: 'subscription',
+            subscription_data: {
+                trial_period_days: 7,
+            },
+            cancel_url: 'http://www.cadexlaw.com/admin', // Replace with your cancel URL
+            success_url: 'http://www.cadexlaw.com/admin/success?session_id={CHECKOUT_SESSION_ID}',
+        });
 
-  try {
-    const { userId, email, priceId } = await request.json();
+        return NextResponse.json({ url: session.url }, { status: 201 });
+    } catch (err) {
+        console.log('Failed to create checkout session', err.message);
+        return NextResponse.json({ error: err.message }, { status: 500 });
+    }
+}
 
-    console.log('Creating checkout session for user:', userId);
+// To handle a DELETE request to /api/checkout (for cancellation)
+export async function DELETE(request) {
+    const { stripeCustomerId, userId } = await request.json();
 
-    // Create Checkout Session
-    const session = await stripe.checkout.sessions.create({
-      payment_method_types: ['card'],
-      mode: 'subscription',
-      line_items: [
-        {
-          price: priceId, // Ensure this is a valid price ID from Stripe Dashboard
-          quantity: 1,
-        },
-      ],
-      success_url: `${process.env.NEXT_PUBLIC_BASE_URL}/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL}/cancel`,
-      customer_metadata: {
-        userId: userId,
-        email: email,
-      },
-    });
+    if (!stripeCustomerId || !userId) {
+        return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
+    }
 
-    console.log('Checkout session created:', session.id);
+    try {
+        const customer = await stripe.customers.retrieve(stripeCustomerId, {
+            expand: ['subscriptions'],
+        });
 
-    return NextResponse.json({ sessionId: session.id }, { status: 200 });
-  } catch (error) {
-    console.error('Error creating checkout session:', error);
-    return NextResponse.json(
-      { error: 'Failed to create checkout session.' },
-      { status: 500 }
-    );
-  }
+        if (customer.subscriptions.data.length === 0) {
+            throw new Error('No active subscriptions found for this customer.');
+        }
+
+        const subscriptionId = customer.subscriptions.data[0].id;
+
+        await stripe.subscriptions.del(subscriptionId);
+
+        return NextResponse.json({ message: 'Subscription cancelled successfully.' }, { status: 200 });
+    } catch (err) {
+        console.log('Failed to cancel subscription', err.message);
+        return NextResponse.json({ error: err.message }, { status: 500 });
+    }
 }
