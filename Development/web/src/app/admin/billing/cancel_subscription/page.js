@@ -85,13 +85,17 @@ export default function CancelPage() {
             <div className='grid grid-cols-2 gap-4'>
                 <button
                     onClick={() => setHelped('no')}
-                    className={`px-4 py-2 rounded ${helped === 'no' ? 'bg-red-500 text-white' : 'bg-gray-200'}`}
+                    className={`px-4 py-2 rounded ${
+                        helped === 'no' ? 'bg-red-500 text-white' : 'bg-gray-200'
+                    }`}
                 >
                     No {helped === 'no' && '🥲'}
                 </button>
                 <button
                     onClick={() => setHelped('yes')}
-                    className={`px-4 py-2 rounded ${helped === 'yes' ? 'bg-green-500 text-white' : 'bg-gray-200'}`}
+                    className={`px-4 py-2 rounded ${
+                        helped === 'yes' ? 'bg-green-500 text-white' : 'bg-gray-200'
+                    }`}
                 >
                     Yes {helped === 'yes' && ''}
                 </button>
@@ -108,7 +112,9 @@ export default function CancelPage() {
                     onClick={handlePlanCancellation}
                     disabled={!helped || loading}
                     className={`px-4 py-2 rounded bg-red-500 text-white duration-200 ${
-                        !helped || loading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-red-600'
+                        !helped || loading
+                            ? 'opacity-50 cursor-not-allowed'
+                            : 'hover:bg-red-600'
                     }`}
                 >
                     {loading ? 'Cancelling...' : 'Confirm cancellation'}

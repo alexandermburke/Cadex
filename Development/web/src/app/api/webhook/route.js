@@ -1,6 +1,5 @@
 // app/api/webhook/route.js
 
-import { buffer } from 'micro';
 import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { adminDB } from '@/firebaseAdmin'; // Adjust the import path as needed
@@ -13,25 +12,22 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
 // Your Stripe webhook secret
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
-// Disable Next.js default body parser to handle raw body for Stripe
-export const config = {
-  api: {
-    bodyParser: false,
-  },
-};
+// Route Segment Configurations
+export const runtime = 'nodejs'; // Ensures the route runs on Node.js
+export const dynamic = 'force-dynamic'; // Forces the route to be dynamic
 
 // Webhook handler
 export async function POST(req) {
   console.log('🔔 Webhook received');
 
-  const buf = await buffer(req);
+  const rawBody = await req.text(); // Read raw body as text
   const sig = req.headers.get('stripe-signature');
 
   let event;
 
   try {
     // Verify the event with Stripe
-    event = stripe.webhooks.constructEvent(buf.toString(), sig, webhookSecret);
+    event = stripe.webhooks.constructEvent(rawBody, sig, webhookSecret);
     console.log(`✅  Event ${event.type} constructed successfully`);
 
     // Log event details for debugging (ensure sensitive data is protected)
