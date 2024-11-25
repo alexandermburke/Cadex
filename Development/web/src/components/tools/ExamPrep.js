@@ -31,7 +31,7 @@ export default function ExamPrep() {
   const [questionStem, setQuestionStem] = useState('');
   const [options, setOptions] = useState([]);
   const [answerResult, setAnswerResult] = useState('');
-  const [isSidebarVisible, setIsSidebarVisible] = useState(false); // Default to hidden on mobile
+  const [isSidebarVisible, setIsSidebarVisible] = useState(true); // Default to hidden on mobile
   const [isLoading, setIsLoading] = useState(false);
   const [isConfigModalOpen, setIsConfigModalOpen] = useState(false);
   const [isResultModalOpen, setIsResultModalOpen] = useState(false);
