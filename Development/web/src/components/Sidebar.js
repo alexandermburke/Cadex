@@ -12,15 +12,18 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar })
   const router = useRouter();
   const { currentUser, userDataObj } = useAuth();
 
-  const plan = userDataObj?.billing?.plan || 'free'; // Default to 'free' if plan is undefined
+  // Ensure plan names are in lowercase for consistent comparison
+  const plan = userDataObj?.billing?.plan?.toLowerCase() || 'free'; // Default to 'free' if plan is undefined
+
+  // Define access variables
+  const hasAccess = plan === 'pro' || plan === 'developer';
+  const hasSimulationAccess = plan === 'pro' || plan === 'basic';
 
   // Helper function to render locked links
   const renderLockedLink = (label, IconComponent) => (
     <div className="flex items-center gap-4 p-2 text-gray-400 cursor-not-allowed group">
       <IconComponent className="text-gray-400" size={20} />
-      <span className="relative">
-        {label}
-      </span>
+      <span className="relative">{label}</span>
     </div>
   );
 
@@ -42,8 +45,27 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar })
     },
   };
 
-  // Check if the user has access based on their plan
-  const hasAccess = plan === 'Pro' || plan === 'Developer';
+  // Helper function to render navigation links
+  const renderNavLink = (href, iconClass, label) => (
+    <li>
+      <Link
+        href={href}
+        className={`flex items-center gap-3 p-3 rounded transition-colors duration-200 ${
+          activeLink === href
+            ? 'bg-blue-800'
+            : 'hover:bg-blue-800 hover:bg-opacity-75'
+        }`}
+      >
+        <i className={iconClass}></i>
+        <span>{label}</span>
+      </Link>
+    </li>
+  );
+
+  // Helper function to render locked navigation links
+  const renderLockedNavLink = (label) => (
+    <li>{renderLockedLink(label, FaLock)}</li>
+  );
 
   return (
     <motion.aside
@@ -66,51 +88,15 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar })
           <ul className="space-y-2">
             {hasAccess ? (
               <>
-                <li>
-                  <Link
-                    href="/lawtools/research"
-                    className={`flex items-center gap-3 p-3 rounded transition-colors duration-200 ${
-                      activeLink === '/lawtools/research'
-                        ? 'bg-blue-800'
-                        : 'hover:bg-blue-800 hover:bg-opacity-75'
-                    }`}
-                  >
-                    <i className="fa-solid fa-gavel"></i>
-                    <span>Legal Research</span>
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="/lawtools/casemanagement"
-                    className={`flex items-center gap-3 p-3 rounded transition-colors duration-200 ${
-                      activeLink === '/lawtools/casemanagement'
-                        ? 'bg-blue-800'
-                        : 'hover:bg-blue-800 hover:bg-opacity-75'
-                    }`}
-                  >
-                    <i className="fa-solid fa-folder-open"></i>
-                    <span>Case Management</span>
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="/lawtools/documentdrafting"
-                    className={`flex items-center gap-3 p-3 rounded transition-colors duration-200 ${
-                      activeLink === '/lawtools/documentdrafting'
-                        ? 'bg-blue-800'
-                        : 'hover:bg-blue-800 hover:bg-opacity-75'
-                    }`}
-                  >
-                    <i className="fa-solid fa-file-alt"></i>
-                    <span>Document Drafting</span>
-                  </Link>
-                </li>
+                {renderNavLink('/lawtools/research', 'fa-solid fa-gavel', 'Legal Research')}
+                {renderNavLink('/lawtools/casemanagement', 'fa-solid fa-folder-open', 'Case Management')}
+                {renderNavLink('/lawtools/documentdrafting', 'fa-solid fa-file-alt', 'Document Drafting')}
               </>
             ) : (
               <>
-                <li>{renderLockedLink('Legal Research', FaLock)}</li>
-                <li>{renderLockedLink('Case Management', FaLock)}</li>
-                <li>{renderLockedLink('Document Drafting', FaLock)}</li>
+                {renderLockedNavLink('Legal Research')}
+                {renderLockedNavLink('Case Management')}
+                {renderLockedNavLink('Document Drafting')}
               </>
             )}
           </ul>
@@ -122,51 +108,15 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar })
           <ul className="space-y-2">
             {hasAccess ? (
               <>
-                <li>
-                  <Link
-                    href="/ailawtools/analysis"
-                    className={`flex items-center gap-3 p-3 rounded transition-colors duration-200 ${
-                      activeLink === '/ailawtools/analysis'
-                        ? 'bg-blue-800'
-                        : 'hover:bg-blue-800 hover:bg-opacity-75'
-                    }`}
-                  >
-                    <i className="fa-solid fa-brain"></i>
-                    <span>Legal Analysis</span>
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="/ailawtools/contractreview"
-                    className={`flex items-center gap-3 p-3 rounded transition-colors duration-200 ${
-                      activeLink === '/ailawtools/contractreview'
-                        ? 'bg-blue-800'
-                        : 'hover:bg-blue-800 hover:bg-opacity-75'
-                    }`}
-                  >
-                    <i className="fa-solid fa-robot"></i>
-                    <span>Contract Review</span>
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="/ailawtools/predictive"
-                    className={`flex items-center gap-3 p-3 rounded transition-colors duration-200 ${
-                      activeLink === '/ailawtools/predictive'
-                        ? 'bg-blue-800'
-                        : 'hover:bg-blue-800 hover:bg-opacity-75'
-                    }`}
-                  >
-                    <i className="fa-solid fa-chart-line"></i>
-                    <span>Predictive Analytics</span>
-                  </Link>
-                </li>
+                {renderNavLink('/ailawtools/analysis', 'fa-solid fa-brain', 'Legal Analysis')}
+                {renderNavLink('/ailawtools/contractreview', 'fa-solid fa-robot', 'Contract Review')}
+                {renderNavLink('/ailawtools/predictive', 'fa-solid fa-chart-line', 'Predictive Analytics')}
               </>
             ) : (
               <>
-                <li>{renderLockedLink('Legal Analysis', FaLock)}</li>
-                <li>{renderLockedLink('Contract Review', FaLock)}</li>
-                <li>{renderLockedLink('Predictive Analytics', FaLock)}</li>
+                {renderLockedNavLink('Legal Analysis')}
+                {renderLockedNavLink('Contract Review')}
+                {renderLockedNavLink('Predictive Analytics')}
               </>
             )}
           </ul>
@@ -176,35 +126,17 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar })
         <section className="mb-6">
           <h2 className="text-lg font-semibold mb-4">AI Law Simulation</h2>
           <ul className="space-y-2">
-            {/* Simulate a Case - Available to all users */}
-            <li>
-              <Link
-                href="/admin/case"
-                className={`flex items-center gap-3 p-3 rounded transition-colors duration-200 ${
-                  activeLink === '/admin/case'
-                    ? 'bg-blue-800'
-                    : 'hover:bg-blue-800 hover:bg-opacity-75'
-                }`}
-              >
-                <i className="fa-solid fa-globe"></i>
-                <span>Simulate Case</span>
-              </Link>
-            </li>
-
-            {/* LSAT/BAR Prep - Available to all users */}
-            <li>
-              <Link
-                href="/ailawtools/examprep"
-                className={`flex items-center gap-3 p-3 rounded transition-colors duration-200 ${
-                  activeLink === '/ailawtools/examprep'
-                    ? 'bg-blue-800'
-                    : 'hover:bg-blue-800 hover:bg-opacity-75'
-                }`}
-              >
-                <i className="fa-solid fa-flask"></i>
-                <span>LSAT/BAR Prep</span>
-              </Link>
-            </li>
+            {hasSimulationAccess ? (
+              <>
+                {renderNavLink('/admin/case', 'fa-solid fa-globe', 'Simulate Case')}
+                {renderNavLink('/ailawtools/examprep', 'fa-solid fa-flask', 'LSAT/BAR Prep')}
+              </>
+            ) : (
+              <>
+                {renderLockedNavLink('Simulate Case')}
+                {renderLockedNavLink('LSAT/BAR Prep')}
+              </>
+            )}
           </ul>
         </section>
       </nav>
@@ -220,12 +152,12 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar })
           </div>
           <span
             className={`px-3 py-1 rounded text-xs font-semibold uppercase whitespace-nowrap ${
-              plan === 'Pro' || plan === 'Developer'
+              hasAccess
                 ? 'bg-gradient-to-r from-blue-400 to-blue-600 text-white'
                 : 'bg-gradient-to-r from-emerald-400 to-emerald-600 text-white'
             }`}
           >
-            {plan}
+            {plan.charAt(0).toUpperCase() + plan.slice(1)}
           </span>
         </div>
       </footer>

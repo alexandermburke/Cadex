@@ -4,25 +4,40 @@ import React, { useState, useEffect } from 'react';
 import ActionCard from './ActionCard';
 import { useAuth } from '@/context/AuthContext';
 import LogoFiller from './LogoFiller';
-import { db } from '@/firebase';
+import { getAuth } from 'firebase/auth';
 
 export default function Account() {
     const { currentUser, userDataObj } = useAuth();
-    const [nextPaymentDate, setNextPaymentDate] = useState(null);
+    const [subscriptionData, setSubscriptionData] = useState({
+        nextPaymentDate: null,
+        amountDue: null,
+        currency: null,
+        status: null,
+    });
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+
+    const auth = getAuth();
 
     // Get the user's plan from billing information or default to 'Free'
     const plan = userDataObj?.billing?.plan || 'Free';
 
     useEffect(() => {
         async function fetchSubscriptionData() {
-            if (!currentUser?.uid || !userDataObj?.billing?.stripeCustomerId) return;
+            if (!currentUser?.uid || !userDataObj?.billing?.stripeCustomerId) {
+                setLoading(false);
+                return;
+            }
 
             try {
-                // Fetch subscription data from your backend
+                // Get the ID token
+                const idToken = await currentUser.getIdToken();
+
                 const response = await fetch('/api/get-subscription', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${idToken}`,
                     },
                     body: JSON.stringify({
                         stripeCustomerId: userDataObj.billing.stripeCustomerId,
@@ -34,17 +49,32 @@ export default function Account() {
                 if (response.ok) {
                     // Convert Unix timestamp to readable date
                     const nextPayment = new Date(data.nextPaymentDue * 1000);
-                    setNextPaymentDate(nextPayment.toLocaleDateString());
+                    setSubscriptionData({
+                        nextPaymentDate: nextPayment.toLocaleDateString(undefined, {
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric',
+                        }),
+                        amountDue: data.amountDue
+                            ? (data.amountDue / 100).toFixed(2) // Assuming amount is in cents
+                            : null,
+                        currency: data.currency ? data.currency.toUpperCase() : null,
+                        status: data.status || 'Inactive',
+                    });
                 } else {
                     console.error('Error fetching subscription data:', data.error);
+                    setError(data.error || 'Failed to fetch subscription data');
                 }
             } catch (error) {
                 console.error('Error fetching subscription data:', error);
+                setError('Failed to fetch subscription data');
+            } finally {
+                setLoading(false);
             }
         }
 
         fetchSubscriptionData();
-    }, [currentUser?.uid, userDataObj?.billing?.stripeCustomerId]);
+    }, [currentUser?.uid, userDataObj?.billing?.stripeCustomerId, currentUser]);
 
     // User account details
     const vals = {
@@ -54,23 +84,35 @@ export default function Account() {
         link: 'www.cadexlaw.com/' + currentUser.displayName,
     };
 
-    // Billing information
+    // Billing information with updated actions and next payment details
     const billingObj = {
         current_plan: plan,
-        status: userDataObj?.billing?.status ? 'Active' : 'Inactive',
-        next_payment_due: nextPaymentDate ? nextPaymentDate : 'Loading...',
+        status: subscriptionData.status || (userDataObj?.billing?.status ? 'Active' : 'Inactive'),
+        next_payment_due: loading
+            ? 'Loading...'
+            : error
+            ? `Error: ${error}`
+            : subscriptionData.nextPaymentDate
+            ? subscriptionData.nextPaymentDate
+            : 'Not Available',
+        amount_due: loading
+            ? 'Loading...'
+            : error
+            ? 'N/A'
+            : subscriptionData.amountDue && subscriptionData.currency
+            ? `${subscriptionData.amountDue} ${subscriptionData.currency}`
+            : 'N/A',
         actions: (
             <div className="flex flex-col gap-2">
-                {plan === 'Pro' ? (
-                    // Show Cancel Subscription button if the plan is Pro
+                {(plan === 'Pro' || plan === 'Basic') && (
                     <Link
                         href="/admin/billing/cancel_subscription"
                         className="duration-200 hover:opacity-60 goldGradient"
                     >
                         <p>Cancel Subscription &rarr;</p>
                     </Link>
-                ) : (
-                    // Show Upgrade Account button if the plan is Free or Basic
+                )}
+                {(plan === 'Basic' || plan === 'Free') && (
                     <Link
                         href="/admin/billing"
                         className="duration-200 hover:opacity-60 goldGradient"
@@ -88,7 +130,7 @@ export default function Account() {
                 <div className="flex items-center justify-between gap-4">
                     <Link
                         href="/admin"
-                        className="flex items-center mr-auto justify-center gap-4 bg-white px-4 py-2 rounded-full text-red-500 duration-200 hover:opacity-50"
+                        className="flex items-center mr-auto justify-center gap-4 bg-red-600 px-4 py-2 rounded text-white duration-200 hover:opacity-50"
                     >
                         <p>&larr; Back</p>
                     </Link>
@@ -127,12 +169,29 @@ export default function Account() {
                                         {billingObj[entry]}
                                     </p>
                                 ) : (
-                                    <p>{billingObj[entry]}</p>
+                                    <p>
+                                        {billingObj[entry]}
+                                        {entry === 'next_payment_due' && subscriptionData.amountDue && (
+                                            <span className="ml-2 text-sm text-gray-500">
+                                                ({billingObj.amount_due})
+                                            </span>
+                                        )}
+                                    </p>
                                 )}
                             </div>
                         ))}
                     </div>
                 </ActionCard>
+                {!loading && !error && subscriptionData.amountDue && (
+                    <ActionCard title="Payment History">
+                        <Link
+                            href="/admin/billing/payment_history"
+                            className="duration-200 hover:opacity-60 goldGradient"
+                        >
+                            <p>View Payment History &rarr;</p>
+                        </Link>
+                    </ActionCard>
+                )}
             </div>
             <LogoFiller />
         </>
