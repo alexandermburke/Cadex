@@ -1,17 +1,12 @@
+// app/api/checkout/route.js
+
 import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { adminDB } from '@/firebaseAdmin'; // Ensure this path is correct
 
-const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
-
-if (!stripeSecretKey) {
-    throw new Error('Stripe Secret Key is not set in environment variables.');
-}
-
-const stripe = new Stripe(stripeSecretKey, {
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
     apiVersion: '2023-10-16',
 });
-console.log('Stripe initialized successfully.');
 
 // Define your price IDs mapped to plan names
 const priceIds = {
