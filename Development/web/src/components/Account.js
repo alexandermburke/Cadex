@@ -129,7 +129,7 @@ export default function Account() {
             <div className="flex flex-col gap-8 flex-1">
                 <div className="flex items-center justify-between gap-4">
                     <Link
-                        href="/admin"
+                        href="/ailawtools/examprep"
                         className="flex items-center mr-auto justify-center gap-4 bg-red-600 px-4 py-2 rounded text-white duration-200 hover:opacity-50"
                     >
                         <p>&larr; Back</p>
