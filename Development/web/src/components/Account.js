@@ -107,7 +107,7 @@ export default function Account() {
                   {(plan === 'Basic' || plan === 'Free') && (
                     <Link
                         href="/admin/billing"
-                        className="group before:ease relative h-12 w-56 overflow-hidden rounded goldBackground text-white shadow-2xl transition-all before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-56">
+                        className="group before:ease relative h-12 w-56 overflow-hidden rounded goldBackground text-white opacity-80 shadow-2xl transition-all before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-56">
                         <div className="flex items-center justify-center h-full">
                             Upgrade Account
                                 <i className="ml-8 fa-solid fa-arrow-right opacity-0 group-hover:opacity-100 transition-opacity duration-200"></i>
