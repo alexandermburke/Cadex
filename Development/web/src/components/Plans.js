@@ -6,7 +6,7 @@ import { useAuth } from '@/context/AuthContext';
 import { doc, setDoc } from 'firebase/firestore';
 import { db } from '@/firebase';
 import { useRouter } from 'next/navigation';
-import Image from 'next/image'; // Import the Image component
+import Image from 'next/image';
 
 const poppins = Poppins({
   subsets: ['latin'],
@@ -51,6 +51,18 @@ export default function Plans() {
   const { currentUser, userDataObj } = useAuth();
   const router = useRouter();
 
+  const currentPlan = userDataObj?.billing?.plan;
+
+  // Filter plans based on the user's current plan
+  let filteredPlans = plans;
+  if (currentPlan === 'Basic') {
+    // If the user is on Basic, only show the Pro plan
+    filteredPlans = plans.filter((plan) => plan.name === 'Pro');
+  } else if (currentPlan === 'Pro') {
+    // If the user is on Pro, don't show any plans
+    filteredPlans = [];
+  }
+
   async function handleUpdatePlan() {
     if (!selectedPlan) return;
 
@@ -81,94 +93,107 @@ export default function Plans() {
 
   return (
     <>
-      {/* Header Section */}
-      <div className="flex flex-col gap-6">
-        <h2
-          className={
-            'text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-semibold text-center ' +
-            poppins.className
-          }
-        >
-          Find the <span className="goldGradient">plan</span> for you
-        </h2>
-      </div>
-
-      {/* Plans Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 sm:mx-auto gap-8">
-        {plans.map((plan, planIndex) => (
-          <div
-            key={planIndex}
-            onClick={() => setSelectedPlan(plan.name)}
-            className={`relative p-4 sm:p-8 border border-solid rounded-2xl duration-200 hover:scale-[102%] sm:hover:scale-[105%] bg-white goldShadow w-full sm:w-96 max-w-full flex flex-col gap-4 ${
-              selectedPlan === plan.name ? 'border-blue-400' : 'border-blue-200'
-            }`}
-          >
-            {/* Promotion Badge for Basic Plan */}
-            {plan.promotion && (
-              <div className="absolute top-0 left-0 -translate-y-1/2 px-4 py-1 goldBackground text-sm text-slate-950 rounded shadow-md capitalize">
-                {plan.promotion}
-              </div>
-            )}
-
-            {/* Plan Header */}
-            <div className="flex items-center justify-between gap-4 w-full">
-              <h3
-                className={`font-medium text-lg sm:text-xl md:text-2xl ${
-                  selectedPlan === plan.name ? 'goldGradient' : ''
-                } ${poppins.className}`}
-              >
-                {plan.name}
-              </h3>
-              {plan.recommended && (
-                <p className="bg-emerald-400 text-white px-2 py-1 rounded text-xs sm:text-sm">
-                  Recommended
-                </p>
-              )}
-            </div>
-
-            {/* Plan Price and Interval */}
-            <div className="flex flex-col text-left">
-              <p
-                className={`font-semibold text-2xl sm:text-3xl md:text-4xl whitespace-nowrap ${poppins.className}`}
-              >
-                {plan.price}
-              </p>
-              <p className="text-xs sm:text-sm pt-2">{plan.interval}</p>
-            </div>
-
-            <hr />
-
-            {/* Plan Description */}
-            <p className="font-medium text-base sm:text-lg md:text-xl">
-              {plan.description}
-            </p>
-
-            {/* Plan Features */}
-            <ul className="flex flex-col gap-2">
-              {plan.features.map((feature, featureIndex) => (
-                <li
-                  key={featureIndex}
-                  className="flex items-center gap-4 text-left"
-                >
-                  <i className="fa-solid fa-check text-emerald-400"></i>
-                  <span>{feature}</span>
-                </li>
-              ))}
-            </ul>
+      {filteredPlans.length > 0 ? (
+        <>
+          {/* Header Section */}
+          <div className="flex flex-col gap-6">
+            <h2
+              className={
+                'text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-semibold text-center ' +
+                poppins.className
+              }
+            >
+              Find the <span className="goldGradient">plan</span> for you
+            </h2>
           </div>
-        ))}
-      </div>
 
-      {/* Footer Section with Stripe Logo */}
-      {selectedPlan && (
-        <div className="flex flex-col max-w-[600px] mx-auto w-full mt-8">
-          <Button text={`Get ${selectedPlan}`} clickHandler={handleUpdatePlan} />
+          {/* Plans Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 sm:mx-auto gap-8">
+            {filteredPlans.map((plan, planIndex) => (
+              <div
+                key={planIndex}
+                onClick={() => setSelectedPlan(plan.name)}
+                className={`relative p-4 sm:p-8 border border-solid rounded-2xl duration-200 hover:scale-[102%] sm:hover:scale-[105%] bg-white goldShadow w-full sm:w-96 max-w-full flex flex-col gap-4 ${
+                  selectedPlan === plan.name ? 'border-blue-400' : 'border-blue-200'
+                }`}
+              >
+                {/* Promotion Badge for Basic Plan */}
+                {plan.promotion && (
+                  <div className="absolute top-0 left-0 -translate-y-1/2 px-4 py-1 goldBackground text-sm text-slate-950 rounded shadow-md capitalize">
+                    {plan.promotion}
+                  </div>
+                )}
+
+                {/* Plan Header */}
+                <div className="flex items-center justify-between gap-4 w-full">
+                  <h3
+                    className={`font-medium text-lg sm:text-xl md:text-2xl ${
+                      selectedPlan === plan.name ? 'goldGradient' : ''
+                    } ${poppins.className}`}
+                  >
+                    {plan.name}
+                  </h3>
+                  {plan.recommended && (
+                    <p className="bg-emerald-400 text-white px-2 py-1 rounded text-xs sm:text-sm">
+                      Recommended
+                    </p>
+                  )}
+                </div>
+
+                {/* Plan Price and Interval */}
+                <div className="flex flex-col text-left">
+                  <p
+                    className={`font-semibold text-2xl sm:text-3xl md:text-4xl whitespace-nowrap ${poppins.className}`}
+                  >
+                    {plan.price}
+                  </p>
+                  <p className="text-xs sm:text-sm pt-2">{plan.interval}</p>
+                </div>
+
+                <hr />
+
+                {/* Plan Description */}
+                <p className="font-medium text-base sm:text-lg md:text-xl">
+                  {plan.description}
+                </p>
+
+                {/* Plan Features */}
+                <ul className="flex flex-col gap-2">
+                  {plan.features.map((feature, featureIndex) => (
+                    <li
+                      key={featureIndex}
+                      className="flex items-center gap-4 text-left"
+                    >
+                      <i className="fa-solid fa-check text-emerald-400"></i>
+                      <span>{feature}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+
+          {/* Footer Section with Button */}
+          {selectedPlan && (
+            <div className="flex flex-col max-w-[600px] mx-auto w-full mt-8">
+              <Button text={`Get ${selectedPlan}`} clickHandler={handleUpdatePlan} />
+            </div>
+          )}
+        </>
+      ) : (
+        // Message when no plans are available to display
+        <div className="flex flex-col items-center mt-8">
+          <p className="text-xl font-semibold">
+            You are already on the highest plan.
+          </p>
         </div>
       )}
+
+      {/* Footer Section with Stripe Logo */}
       <div className="flex flex-col items-center gap-2 mt-8">
         <div className="flex items-center justify-center gap-2">
           <p className="text-center">All transactions are handled by Stripe</p>
-        
+          {/* Include your Stripe logo image here */}
         </div>
       </div>
     </>
