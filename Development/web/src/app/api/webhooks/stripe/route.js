@@ -1,140 +1,150 @@
-// app/api/checkout/route.js
-
 import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { adminDB } from '@/firebaseAdmin'; // Ensure this path is correct
 
+// Initialize Stripe with your secret key
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-    apiVersion: '2023-10-16',
+  apiVersion: '2023-10-16',
 });
 
-// Define your price IDs mapped to plan names
-const priceIds = {
-    Basic: 'price_1QOUDFP6GBvKc5e8upbY4YVR',
-    Pro: 'price_1QOUEtP6GBvKc5e8U1TuUVLm',
-};
+// Your Stripe webhook secret
+const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
-////////////////////////// BILLING //////////////////////////
-
-// Handle a POST request to /api/checkout
 export async function POST(request) {
-    const { customerId, userId, email, plan } = await request.json();
-    let stripeCustomerId = customerId;
+  console.log('--- WEBHOOK STARTED ---');
 
-    if (!userId) {
-        return NextResponse.json({ error: 'Missing required field: userId' }, { status: 400 });
+  let event;
+
+  try {
+    // Get the raw body and signature from the request
+    const rawBody = await request.text();
+    const sig = request.headers.get('stripe-signature');
+
+    if (!sig) {
+      throw new Error('Missing Stripe signature.');
     }
 
-    try {
-        // Create a Stripe customer if not provided
-        if (!stripeCustomerId) {
-            const customer = await stripe.customers.create({
-                email: email,
-                metadata: {
-                    userId: userId,
-                },
-            });
-            stripeCustomerId = customer.id;
+    // Verify the event with Stripe
+    event = stripe.webhooks.constructEvent(rawBody, sig, webhookSecret);
+    console.log('Webhook signature verified:', event.type);
+  } catch (err) {
+    console.error(`Webhook signature verification failed: ${err.message}`);
+    return NextResponse.json({ error: `Webhook Error: ${err.message}` }, { status: 400 });
+  }
 
-            // Save the stripeCustomerId to Firestore
-            await adminDB.collection('users').doc(userId).set(
-                {
-                    billing: {
-                        stripeCustomerId: stripeCustomerId,
-                    },
-                },
-                { merge: true }
-            );
-        }
+  // Log the entire event for debugging
+  console.log('Received event:', JSON.stringify(event, null, 2));
 
-        // Validate the selected plan
-        if (!priceIds[plan]) {
-            throw new Error('Invalid plan selected');
-        }
-
-        // Create a Stripe Checkout Session with a 7-day trial
-        const session = await stripe.checkout.sessions.create({
-            customer: stripeCustomerId,
-            metadata: {
-                userId: userId,
-                email: email,
-                stripeCustomerId: stripeCustomerId,
-            },
-            line_items: [
-                {
-                    price: priceIds[plan],
-                    quantity: 1,
-                },
-            ],
-            mode: 'subscription',
-            subscription_data: {
-                trial_period_days: 7,
-            },
-            cancel_url: 'http://www.cadexlaw.com/admin', // Replace with your cancel URL
-            success_url: 'http://www.cadexlaw.com/admin/success?session_id={CHECKOUT_SESSION_ID}',
-        });
-
-        return NextResponse.json({ url: session.url }, { status: 201 });
-    } catch (err) {
-        console.error('Failed to create checkout session', err.message);
-        return NextResponse.json({ error: err.message }, { status: 500 });
+  try {
+    const handler = webhookHandlers[event.type];
+    if (handler) {
+      await handler(event.data.object, event.id);
+    } else {
+      console.log(`Unhandled event type: ${event.type}`);
     }
+    return NextResponse.json({ received: true }, { status: 200 });
+  } catch (err) {
+    console.error(`Error handling event ${event.type}: ${err.message}`);
+    return NextResponse.json({ error: `Error handling event: ${err.message}` }, { status: 500 });
+  }
 }
 
-// Handle a DELETE request to /api/checkout (for cancellation)
-export async function DELETE(request) {
-    const { stripeCustomerId, userId } = await request.json();
-
-    if (!userId) {
-        return NextResponse.json({ error: 'Missing required field: userId' }, { status: 400 });
-    }
-
-    let customerId = stripeCustomerId;
-
+const webhookHandlers = {
+  // Handle successful checkout sessions
+  'checkout.session.completed': async (session, eventId) => {
     try {
-        // If stripeCustomerId is not provided, retrieve it from Firestore
-        if (!customerId) {
-            const userDoc = await adminDB.collection('users').doc(userId).get();
-            if (!userDoc.exists) {
-                return NextResponse.json({ error: 'User not found.' }, { status: 404 });
-            }
+      const { customer: stripeCustomerId, metadata } = session;
 
-            const userData = userDoc.data();
-            customerId = userData?.billing?.stripeCustomerId;
+      if (!metadata || !metadata.userId) {
+        console.error('Session metadata missing userId or email:', JSON.stringify(session, null, 2));
+        throw new Error('Missing required field: userId in session metadata.');
+      }
 
-            if (!customerId) {
-                return NextResponse.json({ error: 'No stripeCustomerId found for this user.' }, { status: 404 });
-            }
-        }
+      const userId = metadata.userId;
+      const email = metadata.email;
 
-        const customer = await stripe.customers.retrieve(customerId, {
-            expand: ['subscriptions'],
-        });
+      console.log('Processing checkout.session.completed for:', { userId, stripeCustomerId, email });
 
-        if (!customer.subscriptions || customer.subscriptions.data.length === 0) {
-            throw new Error('No active subscriptions found for this customer.');
-        }
+      // Check if the event has already been processed (idempotency)
+      const eventRef = adminDB.collection('processed_events').doc(eventId);
+      const eventDoc = await eventRef.get();
 
-        const subscriptionId = customer.subscriptions.data[0].id;
+      if (eventDoc.exists) {
+        console.log(`Event ${eventId} already processed.`);
+        return;
+      }
 
-        // Cancel the subscription immediately
-        await stripe.subscriptions.del(subscriptionId);
+      // Update user's billing information in Firestore
+      await adminDB.collection('users').doc(userId).set(
+        {
+          billing: {
+            plan: 'Pro',
+            status: 'Active',
+            stripeCustomerId,
+            email,
+          },
+        },
+        { merge: true }
+      );
 
-        // Update Firestore to reflect the cancellation
-        await adminDB.collection('users').doc(userId).set(
+      // Mark the event as processed
+      await eventRef.set({ processed: true });
+      console.log(`User ${userId} updated to 'Pro' plan successfully.`);
+    } catch (err) {
+      console.error(`Error in 'checkout.session.completed' handler: ${err.message}`);
+      throw err;
+    }
+  },
+
+  // Handle payment failures
+  'invoice.payment_failed': async (invoice, eventId) => {
+    try {
+      const stripeCustomerId = invoice.customer;
+
+      if (!stripeCustomerId) {
+        console.error('Invoice is missing customer field:', JSON.stringify(invoice, null, 2));
+        throw new Error('Missing stripeCustomerId in invoice.');
+      }
+
+      // Check if the event has already been processed (idempotency)
+      const eventRef = adminDB.collection('processed_events').doc(eventId);
+      const eventDoc = await eventRef.get();
+
+      if (eventDoc.exists) {
+        console.log(`Event ${eventId} already processed.`);
+        return;
+      }
+
+      // Find user by stripeCustomerId
+      const usersRef = adminDB.collection('users');
+      const snapshot = await usersRef.where('billing.stripeCustomerId', '==', stripeCustomerId).get();
+
+      if (snapshot.empty) {
+        console.log('No matching user found for customerId:', stripeCustomerId);
+        await eventRef.set({ processed: true }); // Mark as processed to avoid retries
+        return;
+      }
+
+      // Update user's billing status
+      await Promise.all(
+        snapshot.docs.map((doc) =>
+          doc.ref.set(
             {
-                billing: {
-                    plan: null, // Or set to 'Canceled' or appropriate status
-                    status: 'Canceled',
-                    stripeCustomerId: customerId,
-                },
+              'billing.status': 'Inactive',
             },
             { merge: true }
-        );
+          )
+        )
+      );
 
-        return NextResponse.json({ message: 'Subscription cancelled successfully.' }, { status: 200 });
+      // Mark the event as processed
+      await eventRef.set({ processed: true });
+      console.log(`Updated billing status to 'Inactive' for customerId: ${stripeCustomerId}`);
     } catch (err) {
-        console.error('Failed to cancel subscription', err.message);
-        return NextResponse.json({ error: err.message }, { status: 500 });
+      console.error(`Error in 'invoice.payment_failed' handler: ${err.message}`);
+      throw err;
     }
-}
+  },
+
+  // Add more handlers as needed
+};
