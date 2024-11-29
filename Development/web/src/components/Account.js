@@ -4,7 +4,6 @@ import React, { useState, useEffect } from 'react';
 import ActionCard from './ActionCard';
 import { useAuth } from '@/context/AuthContext';
 import LogoFiller from './LogoFiller';
-import { getAuth } from 'firebase/auth';
 
 export default function Account() {
     const { currentUser, userDataObj } = useAuth();
@@ -17,66 +16,46 @@ export default function Account() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    const auth = getAuth();
-
-    // Get the user's plan from billing information or default to 'Free'
     const plan = userDataObj?.billing?.plan || 'Free';
 
     useEffect(() => {
-        async function fetchSubscriptionData() {
-            if (!currentUser?.uid || !userDataObj?.billing?.stripeCustomerId) {
+        async function fetchBillingData() {
+            if (!currentUser?.uid) {
                 setLoading(false);
                 return;
             }
 
             try {
-                // Get the ID token
-                const idToken = await currentUser.getIdToken();
-
                 const response = await fetch('/api/webhooks/stripe', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${idToken}`,
-                    },
-                    body: JSON.stringify({
-                        stripeCustomerId: userDataObj.billing.stripeCustomerId,
-                    }),
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ userId: currentUser.uid }),
                 });
 
-                const data = await response.json();
-
-                if (response.ok) {
-                    // Convert Unix timestamp to readable date
-                    const nextPayment = new Date(data.nextPaymentDue * 1000);
-                    setSubscriptionData({
-                        nextPaymentDate: nextPayment.toLocaleDateString(undefined, {
-                            year: 'numeric',
-                            month: 'long',
-                            day: 'numeric',
-                        }),
-                        amountDue: data.amountDue
-                            ? (data.amountDue / 100).toFixed(2) // Assuming amount is in cents
-                            : null,
-                        currency: data.currency ? data.currency.toUpperCase() : null,
-                        status: data.status || 'Inactive',
-                    });
-                } else {
-                    console.error('Error fetching subscription data:', data.error);
-                    setError(data.error || 'Failed to fetch subscription data');
+                if (!response.ok) {
+                    throw new Error('Failed to fetch billing data');
                 }
+
+                const { billing } = await response.json();
+                setSubscriptionData({
+                    nextPaymentDate: billing.nextPaymentDue
+                        ? new Date(billing.nextPaymentDue * 1000).toLocaleDateString()
+                        : 'Not Available',
+                    amountDue: billing.amountDue ? (billing.amountDue / 100).toFixed(2) : null,
+                    currency: billing.currency || null,
+                    status: billing.status || 'Inactive',
+                });
             } catch (error) {
-                console.error('Error fetching subscription data:', error);
+                console.error('Error fetching billing data:', error);
                 setError('Failed to fetch subscription data');
             } finally {
                 setLoading(false);
             }
         }
 
-        fetchSubscriptionData();
-    }, [currentUser?.uid, userDataObj?.billing?.stripeCustomerId, currentUser]);
+        fetchBillingData();
+    }, [currentUser?.uid]);
 
-    // User account details
     const vals = {
         email: currentUser.email,
         username: currentUser.displayName,
@@ -84,17 +63,14 @@ export default function Account() {
         link: 'www.cadexlaw.com/' + currentUser.displayName,
     };
 
-    // Billing information with updated actions and next payment details
     const billingObj = {
         current_plan: plan,
-        status: subscriptionData.status || (userDataObj?.billing?.status ? 'Active' : 'Inactive'),
+        status: subscriptionData.status || 'Inactive',
         next_payment_due: loading
             ? 'Loading...'
             : error
             ? `Error: ${error}`
-            : subscriptionData.nextPaymentDate
-            ? subscriptionData.nextPaymentDate
-            : 'Not Available',
+            : subscriptionData.nextPaymentDate,
         amount_due: loading
             ? 'Loading...'
             : error
@@ -104,26 +80,28 @@ export default function Account() {
             : 'N/A',
         actions: (
             <div className="flex flex-col gap-2">
-                  {(plan === 'Basic' || plan === 'Free') && (
+                {(plan === 'Basic' || plan === 'Free') && (
                     <Link
                         href="/admin/billing"
-                        className="group before:ease relative h-12 w-56 overflow-hidden rounded goldBackground text-white opacity-80 transition-all before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-56">
+                        className="group before:ease relative h-12 w-56 overflow-hidden rounded goldBackground text-white opacity-80 transition-all before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-56"
+                    >
                         <div className="flex items-center justify-center h-full">
                             Upgrade Account
-                                <i className="ml-8 fa-solid fa-arrow-right opacity-0 group-hover:opacity-100 transition-opacity duration-200"></i>
-                              </div>
+                            <i className="ml-8 fa-solid fa-arrow-right opacity-0 group-hover:opacity-100 transition-opacity duration-200"></i>
+                        </div>
                     </Link>
                 )}
                 {(plan === 'Pro' || plan === 'Basic') && (
                     <Link
                         href="/admin/billing/cancel_subscription"
-                        className="group before:ease relative h-12 w-56 overflow-hidden rounded bg-transparent text-blue-950 transition-all before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 before:rotate-6 before:bg-transparent before:opacity-20 before:duration-700 hover:before:-translate-x-56">
+                        className="group before:ease relative h-12 w-56 overflow-hidden rounded bg-transparent text-blue-950 transition-all before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 before:rotate-6 before:bg-transparent before:opacity-20 before:duration-700 hover:before:-translate-x-56"
+                    >
                         <div className="flex items-center justify-center h-full">
-                          Cancel Subscription
-                                <i className="ml-8 fa-solid fa-arrow-right opacity-0 group-hover:opacity-100 transition-opacity duration-200"></i>
-                              </div>
+                            Cancel Subscription
+                            <i className="ml-8 fa-solid fa-arrow-right opacity-0 group-hover:opacity-100 transition-opacity duration-200"></i>
+                        </div>
                     </Link>
-                )}   
+                )}
             </div>
         ),
     };
@@ -131,14 +109,6 @@ export default function Account() {
     return (
         <>
             <div className="flex flex-col gap-8 flex-1">
-                <div className="flex items-center justify-between gap-4">
-                    <Link
-                        href="/ailawtools/examprep"
-                        className="flex items-center mr-auto justify-center gap-4 bg-red-600 px-4 py-2 rounded text-white duration-200 hover:opacity-50"
-                    >
-                        <p>&larr; Back</p>
-                    </Link>
-                </div>
                 <ActionCard title="Account Details">
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         {Object.keys(vals).map((entry, entryIndex) => (
@@ -173,29 +143,12 @@ export default function Account() {
                                         {billingObj[entry]}
                                     </p>
                                 ) : (
-                                    <p>
-                                        {billingObj[entry]}
-                                        {entry === 'next_payment_due' && subscriptionData.amountDue && (
-                                            <span className="ml-2 text-sm text-gray-500">
-                                                ({billingObj.amount_due})
-                                            </span>
-                                        )}
-                                    </p>
+                                    <p>{billingObj[entry]}</p>
                                 )}
                             </div>
                         ))}
                     </div>
                 </ActionCard>
-                {!loading && !error && subscriptionData.amountDue && (
-                    <ActionCard title="Payment History">
-                        <Link
-                            href="/admin/billing/payment_history"
-                            className="duration-200 hover:opacity-60 goldGradient"
-                        >
-                            <p>View Payment History &rarr;</p>
-                        </Link>
-                    </ActionCard>
-                )}
             </div>
             <LogoFiller />
         </>

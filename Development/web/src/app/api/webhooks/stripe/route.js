@@ -50,10 +50,9 @@ export async function POST(request) {
 }
 
 const webhookHandlers = {
-  // Handle successful checkout sessions
   'checkout.session.completed': async (session, eventId) => {
     try {
-      const { customer: stripeCustomerId, metadata } = session;
+      const { customer: stripeCustomerId, metadata, subscription } = session;
 
       if (!metadata || !metadata.userId) {
         console.error('Session metadata missing userId or email:', JSON.stringify(session, null, 2));
@@ -74,14 +73,25 @@ const webhookHandlers = {
         return;
       }
 
+      // Fetch subscription data
+      const subscriptionData = await stripe.subscriptions.retrieve(subscription);
+
+      const nextPaymentDue = subscriptionData.current_period_end; // Unix timestamp
+      const amountDue = subscriptionData.items.data[0].price.unit_amount; // Amount in cents
+      const currency = subscriptionData.items.data[0].price.currency.toUpperCase();
+      const status = subscriptionData.status;
+
       // Update user's billing information in Firestore
       await adminDB.collection('users').doc(userId).set(
         {
           billing: {
             plan: 'Pro',
-            status: 'Active',
+            status,
             stripeCustomerId,
             email,
+            nextPaymentDue,
+            amountDue,
+            currency,
           },
         },
         { merge: true }
@@ -89,7 +99,7 @@ const webhookHandlers = {
 
       // Mark the event as processed
       await eventRef.set({ processed: true });
-      console.log(`User ${userId} updated to 'Pro' plan successfully.`);
+      console.log(`User ${userId} updated to 'Pro' plan successfully with subscription details.`);
     } catch (err) {
       console.error(`Error in 'checkout.session.completed' handler: ${err.message}`);
       throw err;
