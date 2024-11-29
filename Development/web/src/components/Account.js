@@ -33,7 +33,7 @@ export default function Account() {
                 // Get the ID token
                 const idToken = await currentUser.getIdToken();
 
-                const response = await fetch('/api/get-subscription', {
+                const response = await fetch('/api/webhooks/stripe', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
