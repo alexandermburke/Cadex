@@ -18,7 +18,7 @@ export default function RegisterBtn(props) {
     return (
         <div className={'flex items-stretch text-base sm:text-lg rounded-full w-full  bg-white overflow-hidden ' + (leftAligned ? ' max-w-[600px] mx-auto lg:max-w-[70%] lg:ml-0' : ' max-w-[600px] mx-auto')}>
             <div className='flex items-stretch py-4 pl-4'>
-                <p>enthusiastlist.app/</p>
+                <p>cadexlaw.com/</p>
             </div>
             <input value={username} onChange={(e) => setUsername(e.target.value)} className='w-full flex-1 bg-white outline-none border-none py-4 ' placeholder='username' />
             <button onClick={validateUsername} className='ml-4  duration-200 overflow-hidden  p-0.5 rounded-full relative'>
