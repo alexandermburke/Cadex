@@ -17,11 +17,15 @@ import {
   FaDollarSign,
   FaThumbsUp,
   FaUsers,
+  FaGraduationCap,
 } from 'react-icons/fa';
 
 import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css';
 import { Autoplay } from 'swiper/modules';
+
+// Import the useInView hook
+import { useInView } from 'react-intersection-observer';
 
 const poppins = Poppins({
   subsets: ['latin'],
@@ -96,94 +100,95 @@ export default function Hero() {
 
   // Words that will have the flare effect
   const flareWordsFirstLine = ['your'];
-  const flareWordsSecondLine = ['Legal', 'Practice'];
+  const flareWordsSecondLine = ['Legal', 'Journey'];
 
   const features = [
     {
       icon: <FaGavel className="text-blue-950 text-4xl mb-4" />,
-      title: 'Interactive Legal Simulations',
+      title: 'Interactive Practice Exams',
       description:
-        'Experience simulations for defendants, plaintiffs, and judges.',
+        'Experience real exam conditions with AI-generated practice tests.',
     },
     {
       icon: <FaSearch className="text-blue-950 text-4xl mb-4" />,
-      title: 'Legal Research',
-      description: 'Access to extensive legal research databases.',
+      title: 'Personalized Study Materials',
+      description:
+        'Access study materials tailored to your strengths and weaknesses.',
     },
     {
       icon: <FaTasks className="text-blue-950 text-4xl mb-4" />,
-      title: 'Case Management',
-      description: 'Efficiently track and organize cases.',
+      title: 'Progress Tracking',
+      description: 'Monitor your improvement over time with detailed analytics.',
     },
     {
       icon: <FaFileAlt className="text-blue-950 text-4xl mb-4" />,
-      title: 'Document Drafting',
-      description: 'AI-powered suggestions for drafting legal documents.',
+      title: 'Instant Feedback',
+      description: 'Receive immediate feedback to understand areas for improvement.',
     },
     {
       icon: <FaRobot className="text-blue-950 text-4xl mb-4" />,
-      title: 'AI Law Tools',
-      description: 'Enhance legal strategy and decision-making with AI.',
+      title: 'AI-Powered Tutoring',
+      description: 'Get assistance from AI tutors available 24/7.',
     },
     {
       icon: <FaChartLine className="text-blue-950 text-4xl mb-4" />,
-      title: 'Predictive Analytics',
-      description: 'Forecast case outcomes with advanced analytics.',
+      title: 'Adaptive Learning',
+      description:
+        'The platform adapts to your learning style for optimal results.',
     },
     {
       icon: <FaFileContract className="text-blue-950 text-4xl mb-4" />,
-      title: 'Contract Review',
-      description: 'Faster, more accurate assessments using AI.',
+      title: 'Exam Strategies',
+      description: 'Learn effective strategies to tackle complex exam questions.',
     },
     {
       icon: <FaBalanceScale className="text-blue-950 text-4xl mb-4" />,
-      title: 'AI Law Simulation',
-      description: 'Simulate cases for practical experience.',
+      title: 'Comprehensive Question Bank',
+      description: 'Access thousands of exam questions across various topics.',
     },
   ];
 
   const benefits = [
     {
       icon: <FaClock className="text-blue-950 text-5xl mb-4" />,
-      title: 'Save Time',
+      title: 'Study Efficiently',
       description:
-        'Automate routine tasks and focus on what matters most—your clients.',
+        'Maximize your study time with targeted materials and AI guidance.',
     },
     {
       icon: <FaDollarSign className="text-blue-950 text-5xl mb-4" />,
       title: 'Reduce Costs',
       description:
-        'Cut down on overhead expenses with efficient AI-powered tools.',
+        'Save money with affordable AI-powered exam prep compared to traditional methods.',
     },
     {
       icon: <FaThumbsUp className="text-blue-950 text-5xl mb-4" />,
-      title: 'Improve Accuracy',
+      title: 'Improve Scores',
       description:
-        'Minimize errors with intelligent document drafting and analysis.',
+        'Boost your exam performance with personalized learning paths.',
     },
     {
       icon: <FaUsers className="text-blue-950 text-5xl mb-4" />,
-      title: 'Enhance Client Satisfaction',
-      description:
-        'Deliver faster results and better outcomes for your clients.',
+      title: 'Accessible Anywhere',
+      description: 'Study anytime, anywhere with our fully online platform.',
     },
   ];
 
   const testimonials = [
     {
       name: 'Emily Watson',
-      title: 'Associate at Smith & Associates',
+      title: 'Law Student at Harvard Law School',
       handle: '@emilywatson',
       quote:
-        'Cadex has been a game-changer for our firm. The AI-powered legal simulations have improved our case strategies significantly.',
+        'Cadex has transformed my exam prep. The AI-generated practice exams are incredibly helpful.',
       image: '/avatar1.png',
     },
     {
       name: 'Robert Brown',
-      title: 'Law Student at Harvard Law School',
+      title: 'Bar Exam Candidate',
       handle: '@robertbrown',
       quote:
-        'Using Cadex has enhanced my understanding of complex legal concepts through interactive simulations.',
+        'The personalized feedback from Cadex helped me focus on my weak areas and pass the bar exam.',
       image: '/avatar2.png',
     },
     {
@@ -191,86 +196,86 @@ export default function Hero() {
       title: 'Professor of Law at Stanford University',
       handle: '@lauragreen',
       quote:
-        'An invaluable tool for educating the next generation of legal professionals.',
+        'An invaluable tool for students preparing for exams. Cadex makes studying more efficient.',
       image: '/avatar3.png',
     },
     {
       name: 'Michael Lee',
-      title: 'Legal Analyst at Global Corp',
+      title: 'Recent Law Graduate',
       handle: '@michaellee',
       quote:
-        'The predictive analytics and AI tools in Cadex have saved us time and significantly reduced costs.',
+        'Cadex’s adaptive learning paths saved me time and improved my understanding of complex topics.',
       image: '/avatar3.png',
     },
     {
       name: 'Sophia Martinez',
-      title: 'Paralegal at LegalWorks',
+      title: 'Undergraduate Student at NYU',
       handle: '@sophiamartinez',
       quote:
-        'Cadex simplifies complex legal research, making my job so much easier.',
+        'As an aspiring law student, Cadex gave me a head start in understanding legal concepts.',
       image: '/avatar2.png',
     },
     {
       name: 'Daniel Kim',
-      title: 'Partner at Kim & Partners',
+      title: 'High School Senior',
       handle: '@danielkim',
       quote:
-        'The AI tools in Cadex have given us a competitive edge in case preparation.',
+        'Cadex made exploring law fun and accessible even before starting college.',
       image: '/avatar1.png',
     },
   ];
 
   const costComparisonData = [
     {
-      feature: 'Legal Research',
-      traditionalCost: '$500/month',
-      cadexCost: '$100/month',
-    },
-    {
-      feature: 'Case Management',
-      traditionalCost: '$200/month',
-      cadexCost: 'Included',
-    },
-    {
-      feature: 'Document Drafting',
+      feature: 'Practice Exams',
       traditionalCost: '$300/month',
       cadexCost: 'Included',
     },
     {
-      feature: 'Predictive Analytics',
+      feature: 'Study Materials',
+      traditionalCost: '$200/month',
+      cadexCost: 'Included',
+    },
+    {
+      feature: 'Personalized Feedback',
       traditionalCost: '$400/month',
+      cadexCost: 'Included',
+    },
+    {
+      feature: 'One-on-One Tutoring',
+      traditionalCost: '$600/month',
       cadexCost: 'Included',
     },
   ];
 
-  const totalTraditionalCost = '$1,400/month';
+  const totalTraditionalCost = '$1,500/month';
   const totalCadexCost = '$100/month';
 
   const faqs = [
     {
       question: 'What is Cadex?',
       answer:
-        'Cadex is an AI-powered platform that enhances your legal practice with advanced tools and simulations.',
+        'Cadex is an AI-powered exam preparation platform designed to help anyone interested in law to learn and excel, regardless of their current level of education.',
     },
     {
-      question: 'How does Cadex help legal professionals?',
+      question: 'Who can benefit from Cadex?',
       answer:
-        'Cadex provides tools like legal research, case management, document drafting, and predictive analytics to improve efficiency and accuracy.',
+        'Cadex is suitable for high school students, undergraduates, aspiring law students, enrolled law students, and legal professionals seeking to enhance their knowledge and pass exams.',
     },
     {
-      question: 'Is Cadex suitable for law students?',
+      question: 'How does Cadex help with exam preparation?',
       answer:
-        'Yes, Cadex offers interactive legal simulations and resources that are valuable for both professionals and students.',
+        'Cadex offers AI-driven practice exams, personalized study materials, and instant feedback to optimize your study process and improve your exam performance.',
     },
     {
-      question: 'How secure is my data with Cadex?',
+      question: 'How is Cadex different from traditional exam prep tools?',
       answer:
-        'We prioritize data security and employ industry-standard encryption and security protocols to protect your information.',
+        'Unlike traditional methods, Cadex leverages advanced AI technology to provide personalized, interactive, and cost-effective exam preparation resources all in one platform.',
     },
     {
       question: 'Can I try Cadex before purchasing?',
       answer:
-        'Yes, we offer a free trial period for you to experience the features of Cadex.',
+        'Absolutely! We offer a free trial period so you can experience how Cadex can transform your learning journey.',
     },
   ];
 
@@ -281,6 +286,14 @@ export default function Hero() {
       }`}
     />
   );
+
+  // Animations using useInView
+  const [featuresRef, featuresInView] = useInView({ threshold: 0.1, triggerOnce: true });
+  const [benefitRef, benefitInView] = useInView({ threshold: 0.1, triggerOnce: true });
+  const [whoRef, whoInView] = useInView({ threshold: 0.1, triggerOnce: true });
+  const [costRef, costInView] = useInView({ threshold: 0.1, triggerOnce: true });
+  const [faqRef, faqInView] = useInView({ threshold: 0.1, triggerOnce: true });
+  const [uniRef, uniInView] = useInView({ threshold: 0.1, triggerOnce: true });
 
   return (
     <section className="w-full bg-white">
@@ -296,14 +309,15 @@ export default function Hero() {
               </Link>.
             </p>
             <div className="text-right">
-            <button
-           onClick={handleCloseDisclaimer}
-           className="group before:ease relative h-12 w-56 overflow-hidden rounded bg-gradient-to-r from-blue-950 to-slate-700 text-white shadow-2xl transition-all before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-56">
-           <div className="flex items-center justify-center h-full">
-           I Understand
-            <i className="ml-8 fa-solid fa-arrow-right opacity-0 group-hover:opacity-100 transition-opacity duration-200"></i>
-            </div>
-            </button>
+              <button
+                onClick={handleCloseDisclaimer}
+                className="group before:ease relative h-12 w-56 overflow-hidden rounded bg-gradient-to-r from-blue-950 to-slate-700 text-white shadow-2xl transition-all before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-56"
+              >
+                <div className="flex items-center justify-center h-full">
+                  I Understand
+                  <i className="ml-8 fa-solid fa-arrow-right opacity-0 group-hover:opacity-100 transition-opacity duration-200"></i>
+                </div>
+              </button>
             </div>
           </div>
         </div>
@@ -344,13 +358,13 @@ export default function Hero() {
             </span>
           </h2>
 
-          {/* Second line: Legal Practice with AI */}
+          {/* Second line: Legal Journey with AI */}
           <h2
             className={
               'text-5xl sm:text-7xl font-semibold py-2 mb-8 ' + poppins.className
             }
           >
-            {/* Flare effect on "Legal Practice" */}
+            {/* Flare effect on "Legal Journey" */}
             <span className="relative inline-block" key={animationTrigger}>
               {flareWordsSecondLine.map((word, wordIndex) => (
                 <span key={wordIndex} style={{ whiteSpace: 'nowrap' }}>
@@ -374,19 +388,18 @@ export default function Hero() {
           </h2>
 
           <p className="text-center sm:text-lg md:text-xl text-black max-w-2xl">
-            Cadex offers a highly advanced AI based Exam Prep with direct feedback
-            to help Students & Lawyers pass their Exams at a much cheaper price 
-            than traditional study tools.
+            Cadex offers a highly advanced AI-based exam prep with direct feedback to help anyone interested in law excel at a much more affordable price than traditional study tools.
           </p>
 
           <div className="flex justify-center mt-6 mb-6">
             <Link
               href="/pricing"
-              className="group before:ease relative h-12 w-56 overflow-hidden rounded bg-gradient-to-r from-blue-950 to-slate-700 text-white shadow-2xl transition-all before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-56">
+              className="group before:ease relative h-12 w-56 overflow-hidden rounded bg-gradient-to-r from-blue-950 to-slate-700 text-white shadow-2xl transition-all before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-56"
+            >
               <div className="flex items-center justify-center h-full">
                 Explore Our Plans
-                      <i className="ml-8 fa-solid fa-arrow-right opacity-0 group-hover:opacity-100 transition-opacity duration-200"></i>
-                    </div>
+                <i className="ml-8 fa-solid fa-arrow-right opacity-0 group-hover:opacity-100 transition-opacity duration-200"></i>
+              </div>
             </Link>
           </div>
         </div>
@@ -395,7 +408,12 @@ export default function Hero() {
         <VerticalDivider />
 
         {/* Features Section */}
-        <div className="flex flex-col items-center py-10 px-4 md:px-8 lg:px-16 bg-white">
+        <div
+          ref={featuresRef}
+          className={`flex flex-col items-center py-10 px-4 md:px-8 lg:px-16 bg-white transition-all duration-1000 ${
+            featuresInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+          }`}
+        >
           <div className="max-w-7xl w-full">
             <h3 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-semibold text-center text-blue-950">
               Features
@@ -437,35 +455,62 @@ export default function Hero() {
         {/* Vertical Divider */}
         <VerticalDivider />
 
-        {/* Benefits Section */}
-        <div className="flex flex-col items-center py-10 px-4 md:px-8 lg:px-16 Professional">
-          <div className="max-w-5xl">
+        {/* Who Can Benefit Section */}
+        <div
+          ref={whoRef}
+          className={`flex flex-col items-center py-10 px-4 md:px-8 lg:px-16 bg-white transition-all duration-1000 ${
+            whoInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+          }`}
+        >
+          <div className="max-w-7xl w-full">
             <h3 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-semibold text-center text-blue-950">
-              Why <span className="font-medium goldGradient">Choose</span> Cadex
+              Who Can Benefit from Cadex
             </h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-8 my-12">
-              {benefits.map((benefit, index) => (
-                <div
-                  key={index}
-                  className="flex flex-col items-center p-6 bg-white rounded shadow-md hover:shadow-xl transition-shadow"
-                >
-                  {benefit.icon}
-                  <h4 className="text-xl font-semibold text-blue-950 mb-2 text-center">
-                    {benefit.title}
-                  </h4>
-                  <p className="text-base text-center text-gray-700">
-                    {benefit.description}
-                  </p>
-                </div>
-              ))}
+            <p className="text-center sm:text-lg md:text-xl text-black max-w-3xl mx-auto my-6">
+              Cadex is designed for anyone passionate about law—whether you are a high school student exploring career options, an undergraduate considering law school, an aspiring law student preparing for entrance exams, an enrolled law student, or a legal professional seeking to enhance your knowledge. Our platform adapts to your level and helps you progress in your legal journey.
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 mt-8">
+              <div className="flex flex-col items-center p-6 bg-white rounded shadow-md hover:shadow-xl transition-shadow">
+                <FaGraduationCap className="text-blue-950 text-5xl mb-4" />
+                <h4 className="text-xl font-semibold text-blue-950 mb-2 text-center">
+                  High School Students
+                </h4>
+                <p className="text-base text-center text-gray-700">
+                  Begin your exploration into the field of law with foundational materials and guidance.
+                </p>
+              </div>
+              <div className="flex flex-col items-center p-6 bg-white rounded shadow-md hover:shadow-xl transition-shadow">
+                <FaGraduationCap className="text-blue-950 text-5xl mb-4" />
+                <h4 className="text-xl font-semibold text-blue-950 mb-2 text-center">
+                  Undergraduates
+                </h4>
+                <p className="text-base text-center text-gray-700">
+                  Prepare for law school entrance exams and strengthen your understanding of legal concepts.
+                </p>
+              </div>
+              <div className="flex flex-col items-center p-6 bg-white rounded shadow-md hover:shadow-xl transition-shadow">
+                <FaGavel className="text-blue-950 text-5xl mb-4" />
+                <h4 className="text-xl font-semibold text-blue-950 mb-2 text-center">
+                  Law Students & Professionals
+                </h4>
+                <p className="text-base text-center text-gray-700">
+                  Enhance your exam preparation and professional knowledge with advanced AI tools.
+                </p>
+              </div>
             </div>
           </div>
         </div>
+
         {/* Vertical Divider */}
         <VerticalDivider />
 
         {/* Cost Comparison Section */}
-        <div className="flex flex-col items-center py-10 px-4 md:px-8 lg:px-16 Professional">
+        <div
+          ref={costRef}
+          className={`flex flex-col items-center py-10 px-4 md:px-8 lg:px-16 Professional transition-all duration-1000 ${
+            costInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+          }`}
+        >
           <div className="max-w-5xl">
             <h3 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-semibold text-center text-blue-950">
               <span className="font-medium goldGradient">Save Money</span> with Cadex
@@ -477,7 +522,7 @@ export default function Hero() {
                   <tr>
                     <th className="px-4 py-2 bg-blue-950 text-white">Features</th>
                     <th className="px-4 py-2 bg-blue-950 text-white">
-                      Traditional Methods
+                      Traditional Exam Prep
                     </th>
                     <th className="px-4 py-2 bg-blue-950 text-white">Cadex</th>
                   </tr>
@@ -502,7 +547,10 @@ export default function Hero() {
               </table>
               <p className="text-center mt-4 text-gray-700">
                 Save over an estimated{' '}
-                <span className="font-bold">$1,300</span> per month by using Cadex!
+                <span className="font-bold">$1,400</span> per month by choosing Cadex!
+              </p>
+              <p className="text-center mt-4 text-gray-700">
+                Cadex leverages advanced AI technology to provide comprehensive exam prep features at a fraction of the cost of traditional methods. By automating personalized feedback and practice exams, Cadex reduces overhead and passes the savings on to you.
               </p>
             </div>
           </div>
@@ -512,7 +560,12 @@ export default function Hero() {
         <VerticalDivider />
 
         {/* FAQ Section */}
-        <div className="flex flex-col items-center py-10 px-4 md:px-8 lg:px-16">
+        <div
+          ref={faqRef}
+          className={`flex flex-col items-center py-10 px-4 md:px-8 lg:px-16 transition-all duration-1000 ${
+            faqInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+          }`}
+        >
           <div className="max-w-5xl w-full">
             <h3 className="text-4xl lg:text-7xl font-semibold my-12 text-center text-blue-950 ">
               Frequently Asked Questions
@@ -529,18 +582,24 @@ export default function Hero() {
             </div>
           </div>
         </div>
-          {/* Vertical Divider */}
-          <VerticalDivider />
 
-{/* Universities Section */}
-<div className="flex flex-col items-center py-8 px-4 md:px-8 lg:px-16">
-  <div className="max-w-5xl w-full">
-    <h3 className="text-4xl lg:text-7xl font-semibold my-12 text-center text-blue-950 ">
-      Universities We Work With
-    </h3>
-    <CarouselComponent />
-  </div>
-</div>
+        {/* Vertical Divider */}
+        <VerticalDivider />
+
+        {/* Universities Section */}
+        <div
+          ref={uniRef}
+          className={`flex flex-col items-center py-8 px-4 md:px-8 lg:px-16 transition-all duration-1000 ${
+            uniInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+          }`}
+        >
+          <div className="max-w-5xl w-full">
+            <h3 className="text-4xl lg:text-7xl font-semibold my-12 text-center text-blue-950 ">
+              Universities We Work With
+            </h3>
+            <CarouselComponent />
+          </div>
+        </div>
       </div>
     </section>
   );

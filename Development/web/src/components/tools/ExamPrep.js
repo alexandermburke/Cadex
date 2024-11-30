@@ -554,7 +554,7 @@ export default function ExamPrep() {
             }}
             className={`px-4 py-2 rounded-md transition-colors duration-200 ${
               isProUser
-                ? 'text-white goldBackground hover:opacity-75'
+                ? 'group relative h-12 w-36 overflow-hidden rounded goldBackground text-white goldShadow transition-all before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-56'
                 : 'bg-gray-300 text-gray-600 cursor-not-allowed'
             }`}
             disabled={!isProUser}
@@ -728,7 +728,7 @@ export default function ExamPrep() {
         {/* Configuration Modal */}
         {isConfigModalOpen && (
           <motion.div
-            className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50"
+            className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-[151]"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
