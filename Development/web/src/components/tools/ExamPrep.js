@@ -19,7 +19,7 @@ import {
 import { useAuth } from '@/context/AuthContext';
 
 // Import React Icons and Framer Motion
-import { FaBars, FaTimes, FaSave } from 'react-icons/fa'; // Imported FaSave
+import { FaBars, FaTimes, FaSave, FaSyncAlt } from 'react-icons/fa'; // Imported FaSave and FaSyncAlt
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function ExamPrep() {
@@ -706,6 +706,19 @@ export default function ExamPrep() {
                 transition={{ duration: 0.5 }}
               >
                 <FaSave size={24} />
+              </motion.div>
+            </button>
+            <button
+              onClick={handleGetQuestion}
+              className="flex items-center justify-center px-4 py-3 bg-transparent text-blue-950 rounded font-semibold duration-200"
+              disabled={isLoading}
+              aria-label="Generate New Question"
+            >
+              <motion.div
+                whileHover={{ scale: 1.2, rotate: -360 }}
+                transition={{ duration: 0.5 }}
+              >
+                <FaSyncAlt size={24} />
               </motion.div>
             </button>
           </div>
