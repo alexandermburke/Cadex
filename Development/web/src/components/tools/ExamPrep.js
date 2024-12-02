@@ -208,8 +208,8 @@ export default function ExamPrep() {
 
     for (let line of lines) {
       line = line.trim();
-      // Check if the line starts with an option label (e.g., "A)", "B)", etc.)
-      if (/^[A-E][).]/.test(line)) {
+      // Check if the line starts with an option label (e.g., "(A)", "(B)", etc.)
+      if (/^\(?[A-E]\)?[).:]?\s/.test(line)) {
         isOptionSection = true;
         options.push(line);
       } else if (isOptionSection && line) {
@@ -601,7 +601,8 @@ export default function ExamPrep() {
         {/* Exam Question */}
         {questionStem && (
           <div className="w-full max-w-5xl mb-6 p-6 bg-white rounded-lg shadow-md overflow-y-scroll">
-            <h3 className="text-2xl font-semibold text-blue-900 mb-4">Exam Question</h3>
+            <h3 className="text-2xl font-semibold text-blue-900 mb-2">Exam Question</h3>
+            <h3 className="text-sm font-medium text-black mb-6">AI API Version: 0.3.4</h3>
             <p className="text-gray-800 mb-4">{questionStem}</p>
             {options.length > 0 && (
               <ul className="list-none">

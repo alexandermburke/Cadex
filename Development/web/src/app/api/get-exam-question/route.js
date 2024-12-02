@@ -65,6 +65,7 @@ ${questionTypesDescription ? questionTypesDescription : ''}
   - Each answer choice should start on a new line and be plausible to avoid obvious elimination.
   - Use clear and precise language appropriate for the LSAT.
   - Do not include any introductory explanations or answers.
+  - **Ensure that each answer choice is labeled exactly as (A), (B), (C), (D), or (E) followed by a space.**
   - Do not use any asterisks or markdown formatting in the question.
 
 Please provide only the question text, including the stimulus, question stem, and answer choices, without any additional comments or answers.`;
@@ -81,6 +82,7 @@ ${questionTypesDescription ? questionTypesDescription : ''}
   - Each answer choice should start on a new line.
   - Use standard LSAT formatting and language conventions.
   - Do not include any introductory explanations or answers.
+  - **Ensure that each answer choice is labeled exactly as (A), (B), (C), (D), or (E) followed by a space.**
   - Do not use any asterisks or markdown formatting in the question.
 
 Please provide only the question text, including the scenario, rules, question stem, and answer choices, without any additional comments or answers.`;
@@ -108,6 +110,7 @@ ${questionTypesDescription ? questionTypesDescription : ''}
   - Each answer choice should start on a new line.
   - For essay questions, present a detailed fact pattern that requires analysis.
   - Do not include any introductory explanations or answers.
+  - **Ensure that each answer choice is labeled exactly as (A), (B), (C), (D), or (E) followed by a space.**
   - Do not use any asterisks or markdown formatting in the question.
 
 Please provide only the question text, including any necessary scenario, question stem, and answer choices if applicable, without any additional comments or answers.`;
