@@ -20,10 +20,10 @@ export async function POST(request) {
     // Mapping difficulty levels to detailed descriptions
     const difficultyDetails = {
       // LSAT difficulty mapping
-      'Below 150': 'basic understanding with straightforward scenarios',
-      '150-160': 'intermediate understanding with moderate complexity',
-      '160-170': 'advanced understanding with complex and nuanced scenarios',
-      '175+': 'expert-level understanding with extremely complex and nuanced scenarios',
+      'Below 150': 'basic understanding with straightforward scenarios, purpose is to generate a below 150 LSAT equivalent score',
+      '150-160': 'intermediate understanding with moderate complexity, purpose is to generate a 150 to 160 LSAT equivalent score',
+      '160-170': 'advanced understanding with complex and nuanced scenarios, purpose is to generate a 160 to 170 LSAT equivalent score',
+      '175+': 'expert-level understanding with extremely complex and nuanced scenarios, purpose is to generate a 175 or higher LSAT equivalent score',
       // BAR difficulty mapping
       'Below Average': 'basic proficiency with fundamental concepts',
       'Average': 'solid proficiency with moderately challenging concepts',
@@ -40,7 +40,7 @@ export async function POST(request) {
     // Build the question types description for the prompt
     let questionTypesDescription = '';
     if (Array.isArray(selectedQuestionTypes) && selectedQuestionTypes.length > 0) {
-      questionTypesDescription = '- **Question Focus**: The question should be of the following type(s):\n';
+      questionTypesDescription = '- Question Focus: The question should be of the following type(s):\n';
       selectedQuestionTypes.forEach((type) => {
         questionTypesDescription += `  - ${type}\n`;
       });
@@ -49,37 +49,41 @@ export async function POST(request) {
     let prompt = '';
 
     if (examType === 'LSAT') {
-      // Decide whether to generate a multiple-choice or written question (50/50 chance)
+      // Decide whether to generate a multiple-choice or analytical reasoning question (50/50 chance)
       const isMultipleChoice = Math.random() < 0.5;
 
       if (isMultipleChoice) {
-        // LSAT multiple-choice prompt focusing on logic and reasoning
-        prompt = `You are an expert question writer for the LSAT. Create a **multiple-choice** question that matches the style and format of a real LSAT question, focusing on logical reasoning or analytical reasoning.
+        // LSAT Logical Reasoning multiple-choice prompt
+        prompt = `You are an expert question writer for the LSAT. Create a multiple-choice question that matches the style and format of a real LSAT Logical Reasoning question.
 
-- **Difficulty Level**: ${difficultyDescription}. The question should reflect the difficulty expected for a student aiming for a score of ${difficulty} on the LSAT.
+- Difficulty Level: ${difficultyDescription}. The question should reflect the difficulty expected for a student aiming for a score of ${difficulty} on the LSAT.
 ${questionTypesDescription ? questionTypesDescription : ''}
-- **Content Focus**: The question should involve topics like logical reasoning, analytical reasoning, or reading comprehension, without any legal content.
-- **Style Guidelines**:
+- Content Focus: The question should involve logical reasoning, analyzing arguments, identifying assumptions, or drawing conclusions, without any legal content.
+- Style Guidelines:
+  - Include a stimulus (a short passage) followed by a question stem.
+  - Provide five answer choices labeled (A), (B), (C), (D), (E).
+  - Each answer choice should start on a new line and be plausible to avoid obvious elimination.
   - Use clear and precise language appropriate for the LSAT.
-  - The question should be well-structured and formatted as per the LSAT's standards.
-  - **Format the question so that each answer choice starts on a new line and is clearly labeled with a letter (A), B), C), D), E)) followed by a space.**
   - Do not include any introductory explanations or answers.
+  - Do not use any asterisks or markdown formatting in the question.
 
-Please provide only the question text, including the stem and answer choices, without any additional comments or answers.`;
+Please provide only the question text, including the stimulus, question stem, and answer choices, without any additional comments or answers.`;
       } else {
-        // LSAT written-response prompt
-        prompt = `You are an expert question writer for the LSAT. Create a **written-response** question that matches the style and format of a real LSAT question, focusing on logical reasoning or analytical reasoning.
+        // LSAT Analytical Reasoning (Logic Games) prompt
+        prompt = `You are an expert question writer for the LSAT. Create an Analytical Reasoning (Logic Games) question that matches the style and format of a real LSAT question.
 
-- **Difficulty Level**: ${difficultyDescription}. The question should reflect the difficulty expected for a student aiming for a score of ${difficulty} on the LSAT.
+- Difficulty Level: ${difficultyDescription}. The question should reflect the difficulty expected for a student aiming for a score of ${difficulty} on the LSAT.
 ${questionTypesDescription ? questionTypesDescription : ''}
-- **Content Focus**: The question should involve topics like logical reasoning, analytical reasoning, or reading comprehension, without any legal content.
-- **Style Guidelines**:
-  - Use clear and precise language appropriate for the LSAT.
-  - The question should be well-structured and formatted as per the LSAT's standards.
-  - **Provide a question that requires a written response, such as explaining reasoning, analyzing an argument, or summarizing information.**
+- Content Focus: Present a scenario followed by a set of conditions or rules, then pose a question based on that setup.
+- Style Guidelines:
+  - The scenario and rules should be clear and concise but sufficiently complex.
+  - Provide one question related to the scenario with five answer choices labeled (A), (B), (C), (D), (E).
+  - Each answer choice should start on a new line.
+  - Use standard LSAT formatting and language conventions.
   - Do not include any introductory explanations or answers.
+  - Do not use any asterisks or markdown formatting in the question.
 
-Please provide only the question text without any additional comments or answers.`;
+Please provide only the question text, including the scenario, rules, question stem, and answer choices, without any additional comments or answers.`;
       }
     } else {
       // General prompt for other exams
@@ -93,17 +97,20 @@ Please provide only the question text without any additional comments or answers
 
       prompt = `You are an expert question writer for the ${examType}. Create a ${lawType} question that matches the style and format of a real ${examType} question.
 
-- **Difficulty Level**: ${difficultyDescription}. The question should reflect the difficulty expected for a student aiming for a score of ${difficulty} on the ${examType}.
-- **Question Type**: Ensure the question adheres to the types commonly found on the ${examType}, such as essay questions (for Bar Exam) or multiple-choice questions, depending on the selected exam.
+- Difficulty Level: ${difficultyDescription}. The question should reflect the difficulty expected for a student aiming for a score of ${difficulty} on the ${examType}.
+- Question Type: Ensure the question adheres to the types commonly found on the ${examType}, such as essay questions or multiple-choice questions.
 ${questionTypesDescription ? questionTypesDescription : ''}
-- **Content Focus**: The question should specifically address key concepts and complexities within ${lawType}, including any relevant subtopics or typical scenarios.
-- **Style Guidelines**:
+- Content Focus: Specifically address key concepts and complexities within ${lawType}, including relevant subtopics or typical scenarios.
+- Style Guidelines:
   - Use clear and precise language appropriate for the ${examType}.
-  - The question should be well-structured and formatted as per the ${examType}'s standards.
-  - **Format the question so that each answer choice starts on a new line and is clearly labeled with a letter (A), B), C), D), E)) followed by a space.**
+  - The question should be well-structured and adhere to the exam's standards.
+  - For multiple-choice questions, provide four or five answer choices labeled (A), (B), (C), (D), (E).
+  - Each answer choice should start on a new line.
+  - For essay questions, present a detailed fact pattern that requires analysis.
   - Do not include any introductory explanations or answers.
+  - Do not use any asterisks or markdown formatting in the question.
 
-Please provide only the question text, including the stem and answer choices, without any additional comments or answers.`;
+Please provide only the question text, including any necessary scenario, question stem, and answer choices if applicable, without any additional comments or answers.`;
     }
 
     // Initialize OpenAI API client
