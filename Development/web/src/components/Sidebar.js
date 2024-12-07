@@ -88,9 +88,9 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar })
           <ul className="space-y-2">
             {hasAccess ? (
               <>
-                {renderNavLink('/studytools/casesummaries', 'fa-solid fa-file-lines', 'Case Summaries')}
-                {renderNavLink('/studytools/outlinebuilder', 'fa-solid fa-list', 'Outline Builder')}
-                {renderNavLink('/studytools/statuteexplorer', 'fa-solid fa-scroll', 'Statute Explorer')}
+                {renderNavLink('/lawtools/research', 'fa-solid fa-file-lines', 'Case Summaries')}
+                {renderNavLink('/lawtools/casemanagement', 'fa-solid fa-list', 'Outline Builder')}
+                {renderNavLink('/lawtools/documentdrafting', 'fa-solid fa-scroll', 'Statute Explorer')}
               </>
             ) : (
               <>
@@ -108,9 +108,9 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar })
           <ul className="space-y-2">
             {hasAccess ? (
               <>
-                {renderNavLink('/aistudyaids/aiflashcards', 'fa-solid fa-brain', 'AI Flashcards')}
-                {renderNavLink('/aistudyaids/hypoanalysis', 'fa-solid fa-lightbulb', 'Hypothetical Analyzer')}
-                {renderNavLink('/aistudyaids/examinsights', 'fa-solid fa-chart-line', 'Exam Insights')}
+                {renderNavLink('/ailawtools/analysis', 'fa-solid fa-brain', 'AI Flashcards')}
+                {renderNavLink('/ailawtools/contractreview', 'fa-solid fa-lightbulb', 'Hypothetical Analyzer')}
+                {renderNavLink('/ailawtools/predictive', 'fa-solid fa-chart-line', 'Exam Insights')}
               </>
             ) : (
               <>
@@ -122,13 +122,13 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar })
           </ul>
         </section>
 
-        {/* Practice Simulations Section */}
+        {/* Exam Preparation Section */}
         <section className="mb-6">
-          <h2 className="text-lg font-semibold mb-4">Exam Preperation</h2>
+          <h2 className="text-lg font-semibold mb-4">Exam Preparation</h2>
           <ul className="space-y-2">
             {hasSimulationAccess ? (
               <>
-                {renderNavLink('/practice/lsatbarprep', 'fa-solid fa-flask', 'LSAT/BAR Drills')}
+                {renderNavLink('/ailawtools/examprep', 'fa-solid fa-flask', 'LSAT/BAR Drills')}
               </>
             ) : (
               <>
