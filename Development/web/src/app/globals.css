@@ -102,23 +102,20 @@ html {
 }
 
 .goldGradient {
-  background: -webkit-linear-gradient(30deg, #D4B44A, #ecddaa);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-.goldGradienttwo {
-  background: -webkit-linear-gradient(30deg, #D4B44A, #f3f3e1);
+  background: linear-gradient(
+    45deg,
+    #b08d57 0%,    /* Dark bronze base */
+    #d4b44a 25%,   /* Warm gold */
+    #ffd700 50%,   /* Bright gold highlight */
+    #d4b44a 75%,   /* Warm gold */
+    #b08d57 100%   /* Dark bronze base again */
+  );
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
 .goldBackground {
   background: linear-gradient(30deg, #D4B44A, #ecddaa);
-}
-
-.goldBackgroundtwo {
-  background: -webkit-linear-gradient(30deg, #D4B44A, #ecddaa);
 }
 
 .unstyled {
@@ -214,3 +211,4 @@ html {
     text-shadow: 0 0 1px rgb(255, 255, 255);
   }
 }
+
