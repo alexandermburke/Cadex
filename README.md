@@ -1,6 +1,6 @@
 
 
-![alt text](https://www.cadexlaw.com/header.png)
+<img src="https://www.cadexlaw.com/header.png" alt="Cadex Law Header" style="width:200px;">
 
 #
 
