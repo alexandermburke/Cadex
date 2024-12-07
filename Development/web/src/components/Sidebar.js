@@ -82,61 +82,69 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar })
 
       {/* Navigation Sections */}
       <nav className="flex-1 overflow-y-auto px-6">
-        {/* Law Tools Section */}
+        {/* Study & Research Section */}
         <section className="mb-6">
-          <h2 className="text-lg font-semibold mb-4">Law Tools</h2>
+          <h2 className="text-lg font-semibold mb-4">Study & Research</h2>
           <ul className="space-y-2">
             {hasAccess ? (
               <>
-                {renderNavLink('/lawtools/research', 'fa-solid fa-gavel', 'Legal Research')}
-                {renderNavLink('/lawtools/casemanagement', 'fa-solid fa-folder-open', 'Case Management')}
-                {renderNavLink('/lawtools/documentdrafting', 'fa-solid fa-file-alt', 'Document Drafting')}
+                {renderNavLink('/studytools/casesummaries', 'fa-solid fa-file-lines', 'Case Summaries')}
+                {renderNavLink('/studytools/outlinebuilder', 'fa-solid fa-list', 'Outline Builder')}
+                {renderNavLink('/studytools/statuteexplorer', 'fa-solid fa-scroll', 'Statute Explorer')}
               </>
             ) : (
               <>
-                {renderLockedNavLink('Legal Research')}
-                {renderLockedNavLink('Case Management')}
-                {renderLockedNavLink('Document Drafting')}
+                {renderLockedNavLink('Case Summaries')}
+                {renderLockedNavLink('Outline Builder')}
+                {renderLockedNavLink('Statute Explorer')}
               </>
             )}
           </ul>
         </section>
 
-        {/* AI Law Tools Section */}
+        {/* AI Study Aids Section */}
         <section className="mb-6">
-          <h2 className="text-lg font-semibold mb-4">AI Law Tools</h2>
+          <h2 className="text-lg font-semibold mb-4">AI Study Aids</h2>
           <ul className="space-y-2">
             {hasAccess ? (
               <>
-                {renderNavLink('/ailawtools/analysis', 'fa-solid fa-brain', 'Legal Analysis')}
-                {renderNavLink('/ailawtools/contractreview', 'fa-solid fa-robot', 'Contract Review')}
-                {renderNavLink('/ailawtools/predictive', 'fa-solid fa-chart-line', 'Predictive Analytics')}
+                {renderNavLink('/aistudyaids/aiflashcards', 'fa-solid fa-brain', 'AI Flashcards')}
+                {renderNavLink('/aistudyaids/hypoanalysis', 'fa-solid fa-lightbulb', 'Hypothetical Analyzer')}
+                {renderNavLink('/aistudyaids/examinsights', 'fa-solid fa-chart-line', 'Exam Insights')}
               </>
             ) : (
               <>
-                {renderLockedNavLink('Legal Analysis')}
-                {renderLockedNavLink('Contract Review')}
-                {renderLockedNavLink('Predictive Analytics')}
+                {renderLockedNavLink('AI Flashcards')}
+                {renderLockedNavLink('Hypothetical Analyzer')}
+                {renderLockedNavLink('Exam Insights')}
               </>
             )}
           </ul>
         </section>
 
-        {/* AI Law Simulation Section */}
+        {/* Practice Simulations Section */}
         <section className="mb-6">
-          <h2 className="text-lg font-semibold mb-4">AI Law Simulation</h2>
+          <h2 className="text-lg font-semibold mb-4">Exam Preperation</h2>
           <ul className="space-y-2">
             {hasSimulationAccess ? (
               <>
-                {renderNavLink('/admin/case', 'fa-solid fa-globe', 'Simulate Case')}
-                {renderNavLink('/ailawtools/examprep', 'fa-solid fa-flask', 'LSAT/BAR Prep')}
+                {renderNavLink('/practice/lsatbarprep', 'fa-solid fa-flask', 'LSAT/BAR Drills')}
               </>
             ) : (
               <>
-                {renderLockedNavLink('Simulate Case')}
                 {renderLockedNavLink('LSAT/BAR Prep')}
               </>
             )}
+            {/* Feature Request Button (Always visible, not locked) */}
+            <li>
+              <Link
+                href="/request-feature"
+                className="flex items-center gap-3 p-3 rounded transition-colors duration-200 hover:bg-blue-800 hover:bg-opacity-75"
+              >
+                <i className="fa-solid fa-lightbulb"></i>
+                <span>Request a Feature</span>
+              </Link>
+            </li>
           </ul>
         </section>
       </nav>
