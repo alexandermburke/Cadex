@@ -102,14 +102,7 @@ html {
 }
 
 .goldGradient {
-  background: linear-gradient(
-    45deg,
-    #b08d57 0%,    /* Dark bronze base */
-    #d4b44a 25%,   /* Warm gold */
-    #ffd700 50%,   /* Bright gold highlight */
-    #d4b44a 75%,   /* Warm gold */
-    #b08d57 100%   /* Dark bronze base again */
-  );
+  background: -webkit-linear-gradient(30deg, #D4B44A, #e8d28a, #ecddaa);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }

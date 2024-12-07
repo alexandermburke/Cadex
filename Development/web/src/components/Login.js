@@ -43,7 +43,7 @@ export default function Login() {
           alt="Cadex Law Logo"
           width={96}
           height={96}
-          className="w-24 h-24 sm:mr-4"
+          className="w-28 h-28 sm:mr-4"
         />
         <div className="text-center sm:text-left">
           <h2
