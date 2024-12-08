@@ -71,7 +71,7 @@ export default function RegisterPage() {
             // Set default billing info (Free plan) for the new user
             await setDoc(doc(db, 'users', currentUser.uid), {
                 billing: {
-                    plan: 'free',
+                    plan: 'Free',
                     status: 'Inactive',
                     stripeCustomerId: null,
                     nextPaymentDue: null,
