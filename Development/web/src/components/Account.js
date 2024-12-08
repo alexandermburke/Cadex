@@ -8,11 +8,11 @@ import LogoFiller from './LogoFiller';
 export default function Account() {
     const { currentUser, userDataObj } = useAuth();
     const [subscriptionData, setSubscriptionData] = useState({
+        plan: userDataObj?.billing?.plan || 'Free',
+        status: 'Inactive',
         nextPaymentDate: null,
         amountDue: null,
         currency: null,
-        status: null,
-        plan: userDataObj?.billing?.plan || 'Free',
     });
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -28,24 +28,18 @@ export default function Account() {
             }
 
             try {
-                console.log('Fetching subscription data for userId:', currentUser.uid);
                 const response = await fetch('/api/billing', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ userId: currentUser.uid }),
                 });
 
-                console.log('Response status:', response.status);
-
                 if (!response.ok) {
                     const errorData = await response.json();
-                    console.error('Error response from /api/billing:', errorData);
                     throw new Error(errorData.error || 'Failed to fetch billing data');
                 }
 
                 const { billing } = await response.json();
-                console.log('Billing data received:', billing);
-
                 setSubscriptionData({
                     plan: billing.plan || 'Free',
                     status: billing.status || 'Inactive',
@@ -70,10 +64,12 @@ export default function Account() {
         email: currentUser?.email || 'Not available',
         username: currentUser?.displayName || 'Not available',
         cases: Object.keys(userDataObj?.listings || {}).length || 0,
-        link: currentUser?.displayName ? `www.cadexlaw.com/${currentUser.displayName}` : 'Not available',
+        link: currentUser?.displayName
+            ? `www.cadexlaw.com/${currentUser.displayName}`
+            : 'Not available',
     };
 
-    // Determine what to display for next payment due
+    // Determine next payment due display
     let nextPaymentDisplay = 'N/A';
     if (loading) {
         nextPaymentDisplay = 'Loading...';
@@ -83,7 +79,7 @@ export default function Account() {
         nextPaymentDisplay = subscriptionData.nextPaymentDate;
     }
 
-    // Determine what to display for amount due
+    // Determine amount due display
     let amountDueDisplay = 'N/A';
     if (loading) {
         amountDueDisplay = 'Loading...';
@@ -134,7 +130,7 @@ export default function Account() {
                         {Object.keys(vals).map((entry, entryIndex) => (
                             <div className="flex items-center gap-4" key={entryIndex}>
                                 <p className="font-medium w-24 sm:w-32 capitalize">
-                                    {entry.replaceAll('_', ' ')}
+                                    {entry.replace('_', ' ')}
                                 </p>
                                 <p>{vals[entry]}</p>
                             </div>
@@ -146,7 +142,7 @@ export default function Account() {
                         {Object.keys(billingObj).map((entry, entryIndex) => (
                             <div className="flex items-center gap-4" key={entryIndex}>
                                 <p className="font-medium w-24 sm:w-32 capitalize">
-                                    {entry.replaceAll('_', ' ')}
+                                    {entry.replace('_', ' ')}
                                 </p>
                                 {entry === 'actions' ? (
                                     billingObj[entry]
