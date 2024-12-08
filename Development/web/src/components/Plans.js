@@ -16,12 +16,13 @@ const poppins = Poppins({
 const plans = [
   {
     name: 'Basic',
-    description: 'Designed for individual legal study and practice.',
+    description: 'Tailored for individual legal studies and comprehensive practice.',
     price: '$15 USD',
     interval: 'Per month',
     promotion: 'First 7 days free',
     features: [
       'Comprehensive access to case simulation tools',
+      'Unlimited question explanations powered by advanced AI',
       'Access to streamlined LSAT and Bar exam preparation resources',
       'Flexible subscription with no long-term commitment',
       'Ad-free user experience',
@@ -192,8 +193,14 @@ export default function Plans() {
       {/* Footer Section with Stripe Logo */}
       <div className="flex flex-col items-center gap-2 mt-8">
         <div className="flex items-center justify-center gap-2">
-          <p className="text-center">All transactions are handled by Stripe</p>
-          {/* Include your Stripe logo image here */}
+          <p className="text-center">All transactions are securely handled by</p>
+          <Image
+            src="/stripe-logo.png" // Ensure this path is correct
+            alt="Stripe Logo"
+            width={100}
+            height={24}
+            className="object-contain"
+          />
         </div>
       </div>
     </>

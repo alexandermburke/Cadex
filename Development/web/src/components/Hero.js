@@ -192,9 +192,9 @@ export default function Hero() {
       image: '/avatar2.png',
     },
     {
-      name: 'Laura Green',
+      name: 'Laura emerald',
       title: 'Professor of Law at Stanford University',
-      handle: '@lauragreen',
+      handle: '@lauraemerald',
       quote:
         'An invaluable tool for students preparing for exams. Cadex makes studying more efficient.',
       image: '/avatar3.png',
@@ -224,32 +224,6 @@ export default function Hero() {
       image: '/avatar1.png',
     },
   ];
-
-  const costComparisonData = [
-    {
-      feature: 'Practice Exams',
-      traditionalCost: '$300/month',
-      cadexCost: 'Included',
-    },
-    {
-      feature: 'Study Materials',
-      traditionalCost: '$200/month',
-      cadexCost: 'Included',
-    },
-    {
-      feature: 'Personalized Feedback',
-      traditionalCost: '$400/month',
-      cadexCost: 'Included',
-    },
-    {
-      feature: 'One-on-One Tutoring',
-      traditionalCost: '$600/month',
-      cadexCost: 'Included',
-    },
-  ];
-
-  const totalTraditionalCost = '$1,500/month';
-  const totalCadexCost = '$100/month';
 
   const faqs = [
     {
@@ -504,54 +478,75 @@ export default function Hero() {
         {/* Vertical Divider */}
         <VerticalDivider />
 
-        {/* Cost Comparison Section */}
+        {/* Save Money with Cadex Section */}
         <div
           ref={costRef}
-          className={`flex flex-col items-center py-10 px-4 md:px-8 lg:px-16 Professional transition-all duration-1000 ${
+          className={`flex flex-col items-center py-10 px-4 md:px-8 lg:px-16 transition-all duration-1000 ${
             costInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
           }`}
         >
-          <div className="max-w-5xl">
-            <h3 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-semibold text-center text-blue-950">
-              <span className="font-medium goldGradient">Save Money</span> with Cadex
+          <div className="max-w-5xl w-full">
+            {/* Section Title */}
+            <h3 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-semibold text-center text-blue-950 mb-8">
+              Save Money with Cadex
             </h3>
-            <div className="my-12 overflow-x-auto">
-              {/* Cost Comparison Table */}
-              <table className="w-full text-left border-collapse">
-                <thead>
-                  <tr>
-                    <th className="px-4 py-2 bg-blue-950 text-white">Features</th>
-                    <th className="px-4 py-2 bg-blue-950 text-white">
-                      Traditional Exam Prep
-                    </th>
-                    <th className="px-4 py-2 bg-blue-950 text-white">Cadex</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {costComparisonData.map((item, index) => (
-                    <tr
-                      key={index}
-                      className={index % 2 === 0 ? 'Professional' : ''}
-                    >
-                      <td className="border px-4 py-2">{item.feature}</td>
-                      <td className="border px-4 py-2">{item.traditionalCost}</td>
-                      <td className="border px-4 py-2">{item.cadexCost}</td>
-                    </tr>
-                  ))}
-                  <tr className="font-bold">
-                    <td className="border px-4 py-2">Total Cost</td>
-                    <td className="border px-4 py-2">{totalTraditionalCost}</td>
-                    <td className="border px-4 py-2">{totalCadexCost}</td>
-                  </tr>
-                </tbody>
-              </table>
-              <p className="text-center mt-4 text-gray-700">
-                Save over an estimated{' '}
-                <span className="font-bold">$1,400</span> per month by choosing Cadex!
+            
+            {/* Pricing Comparison Cards */}
+            <div className="flex flex-col md:flex-row justify-center items-center gap-8">
+              {/* Traditional Exam Prep Card */}
+              <div className="flex flex-col items-center p-6 bg-white rounded-lg shadow-lg transform hover:scale-105 transition-transform duration-300">
+                <h4 className="text-2xl font-bold text-blue-950 mb-2">Traditional Exam Prep</h4>
+                <p className="text-gray-700 mb-1">starting at</p>
+                <p className="text-4xl font-semibold text-red-600 mb-1">$70+</p>
+                <p className="text-gray-600">per month</p>
+                <div className="mt-4">
+                  <ul className="list-disc list-inside text-gray-700">
+                    <li>Limited Practice Exams</li>
+                    <li>Generic Study Materials</li>
+                    <li>High Costs</li>
+                    <li>Less Personalized Feedback</li>
+                  </ul>
+                </div>
+              </div>
+              
+              {/* Cadex Card */}
+              <div className="flex flex-col items-center p-6 bg-white rounded-lg shadow-lg transform hover:scale-105 transition-transform duration-300">
+                <h4 className="text-2xl font-bold text-blue-950 mb-2">Cadex</h4>  
+                <p className="text-gray-700 mb-1">as low as</p>
+                <p className="text-4xl font-semibold text-emerald-400 mb-1">$15</p>
+                <p className="text-gray-600">per month</p>
+                <div className="mt-4">
+                  <ul className="list-disc list-inside text-gray-700">
+                    <li>AI-Powered Practice Exams</li>
+                    <li>Personalized Study Materials</li>
+                    <li>Affordable Pricing</li>
+                    <li>Instant, Customized Feedback</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+            
+            {/* Savings Highlight */}
+            <div className="mt-12 text-center">
+              <p className="text-2xl sm:text-3xl md:text-4xl font-semibold text-blue-950">
+                Save Up to <span className="text-emerald-400">$1,400</span> Annually!
               </p>
-              <p className="text-center mt-4 text-gray-700">
-                Cadex leverages advanced AI technology to provide comprehensive exam prep features at a fraction of the cost of traditional methods. By automating personalized feedback and practice exams, Cadex reduces overhead and passes the savings on to you.
+              <p className="text-lg sm:text-xl text-gray-700 mt-4 max-w-2xl mx-auto">
+                By choosing Cadex, you gain access to advanced AI-driven tools and personalized learning paths at a fraction of the cost of traditional exam prep services. Invest smartly in your legal education without breaking the bank.
               </p>
+            </div>
+            
+            {/* Call-to-Action Button */}
+            <div className="mt-8 flex justify-center">
+              <Link
+                href="/pricing"
+                className="group before:ease relative h-12 w-56 overflow-hidden rounded bg-gradient-to-r from-blue-950 to-slate-700 text-white shadow-2xl transition-all before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-56"
+              >
+                <div className="flex items-center justify-center h-full">
+                  View Pricing
+                  <i className="ml-8 fa-solid fa-arrow-right opacity-0 group-hover:opacity-100 transition-opacity duration-200"></i>
+                </div>
+              </Link>
             </div>
           </div>
         </div>

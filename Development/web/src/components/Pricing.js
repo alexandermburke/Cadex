@@ -23,10 +23,9 @@ const plans = [
     promotion: 'First 7 days free',
     features: [
       'Comprehensive access to case simulation tools',
+      'Infinite question explanations powered by advanced AI',
       'Access to streamlined LSAT and Bar exam preparation resources',
-      'Flexible subscription with no long-term commitment',
       'Ad-free user experience',
-      'Engage in open discussions on public cases',
       'Cancel at any time, no questions asked',
     ],
     recommended: false,

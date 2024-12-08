@@ -128,7 +128,7 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar })
           <ul className="space-y-2">
             {hasSimulationAccess ? (
               <>
-                {renderNavLink('/ailawtools/examprep', 'fa-solid fa-flask', 'LSAT/BAR Drills')}
+                {renderNavLink('/ailawtools/examprep', 'fa-solid fa-flask', 'LSAT/BAR Prep')}
               </>
             ) : (
               <>
