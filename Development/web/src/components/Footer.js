@@ -107,7 +107,7 @@ export default function Footer() {
           <h3 className="font-bold">Join Our Community</h3>
           <div className="flex gap-1">
             <Link
-              href="https://twitter.com/yourprofile"
+              href="https://x.com/cadexlaw"
               target="_blank"
               rel="noopener noreferrer"
               className="hover:text-blue-400"
@@ -115,7 +115,7 @@ export default function Footer() {
               <FaTwitter size={24} />
             </Link>
             <Link
-              href="https://instagram.com/yourprofile"
+              href="https://www.instagram.com/cadexlaw/"
               target="_blank"
               rel="noopener noreferrer"
               className="hover:text-pink-500"
