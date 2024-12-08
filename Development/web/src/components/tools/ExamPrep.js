@@ -184,8 +184,8 @@ export default function ExamPrep() {
       setQuestionStem(stem);
       setOptions(choices);
 
-      setQuestionText(question); // Keep the full question text if needed
-      setIsExamStarted(true); // Set exam as started
+      setQuestionText(question);
+      setIsExamStarted(true); 
     } catch (error) {
       console.error('Error fetching exam question:', error);
       setQuestionText('An error occurred while fetching the exam question.');
@@ -194,21 +194,16 @@ export default function ExamPrep() {
     }
   };
 
-  // Function to parse the question text
-  const parseQuestion = (text) => {
-    // Split the text by newlines
+    const parseQuestion = (text) => {
     const lines = text.split('\n');
 
-    // Initialize variables
     let stemLines = [];
     let options = [];
 
-    // Flag to indicate if we have started parsing options
     let isOptionSection = false;
 
     for (let line of lines) {
       line = line.trim();
-      // Check if the line starts with an option label (e.g., "(A)", "(B)", etc.)
       if (/^\(?[A-E]\)?[).:]?\s/.test(line)) {
         isOptionSection = true;
         options.push(line);
@@ -218,7 +213,6 @@ export default function ExamPrep() {
           options[options.length - 1] += ' ' + line;
         }
       } else {
-        // Before options start, add lines to the stem
         stemLines.push(line);
       }
     }
@@ -249,14 +243,12 @@ export default function ExamPrep() {
 
       const { feedback, correct } = await response.json(); // Assuming API returns 'feedback' and 'correct'
 
-      // Set default values if undefined
       const feedbackText = feedback !== undefined ? feedback : 'No feedback provided.';
       const isCorrect = typeof correct === 'boolean' ? correct : false;
 
       setAnswerResult(feedbackText);
 
-      // Add to answeredQuestions
-      setAnsweredQuestions((prevQuestions) => [
+       setAnsweredQuestions((prevQuestions) => [
         ...prevQuestions,
         {
           question: questionText || 'No question text provided.',
@@ -266,33 +258,27 @@ export default function ExamPrep() {
         },
       ]);
 
-      // Increment the current question count
-      setCurrentQuestionCount((prevCount) => prevCount + 1);
+     setCurrentQuestionCount((prevCount) => prevCount + 1);
 
-      // Handle feedback based on instantFeedback setting
       if (examConfig.instantFeedback) {
         openResultModal();
       } else {
-        // Automatically fetch the next question after a short delay to ensure state updates
-        setTimeout(() => {
+       setTimeout(() => {
           handleGetQuestion();
         }, 500);
       }
     } catch (error) {
       console.error('Error submitting answer:', error);
       setAnswerResult('An error occurred while submitting your answer.');
-      openResultModal(); // Optionally show error in the Result Modal
+      openResultModal();
     } finally {
       setIsLoading(false);
     }
   };
 
-  // Monitor currentQuestionCount and open final feedback modal when limit is reached
   useEffect(() => {
     if (currentQuestionCount >= examConfig.questionLimit && questionText !== '') {
-      // Reset the count for the next set
       setCurrentQuestionCount(0);
-      // Open the final feedback modal to allow users to review their performance
       openFinalFeedbackModal();
     }
   }, [currentQuestionCount, examConfig.questionLimit, questionText]);
