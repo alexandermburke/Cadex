@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
-import { adminDB } from '@/firebaseAdmin';
+import { adminDB } from '@/firebaseAdmin'; // Adjust path as needed
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
   apiVersion: '2023-10-16',
@@ -34,15 +34,38 @@ export async function POST(request) {
     });
 
     if (!subscriptions.data.length) {
-      return NextResponse.json({ error: 'No active subscriptions found.' }, { status: 404 });
+      // No active subscriptions found, set user to free plan
+      await adminDB.collection('users').doc(userId).set({
+        billing: {
+          plan: 'free',
+          status: 'Inactive',
+          stripeCustomerId: stripeCustomerId,
+          nextPaymentDue: null,
+          amountDue: null,
+          currency: null,
+        }
+      }, { merge: true });
+
+      // Return free plan details
+      return NextResponse.json({
+        billing: {
+          plan: 'free',
+          status: 'Inactive',
+          nextPaymentDue: null,
+          amountDue: null,
+          currency: null,
+        }
+      }, { status: 200 });
     }
 
+    // If subscription found, return subscription details
     const subscription = subscriptions.data[0];
     const billing = {
+      plan: userData?.billing?.plan || 'Pro', // or derive from subscription if needed
+      status: subscription.status,
       nextPaymentDue: subscription.current_period_end,
       amountDue: subscription.items.data[0]?.price?.unit_amount || null,
       currency: subscription.items.data[0]?.price?.currency?.toUpperCase() || null,
-      status: subscription.status,
     };
 
     return NextResponse.json({ billing }, { status: 200 });

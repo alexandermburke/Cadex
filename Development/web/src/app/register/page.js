@@ -64,8 +64,23 @@ export default function RegisterPage() {
             setAuthenticating(true)
             const userCredential = await signup(email, password)
             const currentUser = userCredential.user
-            const addUsernameStatus = await addUsername(currentUser, username)
-            console.log(currentUser)
+            
+            // Add the username to the newly created user
+            await addUsername(currentUser, username)
+    
+            // Set default billing info (Free plan) for the new user
+            await setDoc(doc(db, 'users', currentUser.uid), {
+                billing: {
+                    plan: 'free',
+                    status: 'Inactive',
+                    stripeCustomerId: null,
+                    nextPaymentDue: null,
+                    amountDue: null,
+                    currency: null,
+                }
+            }, { merge: true })
+    
+            console.log('User registered and set to Free plan:', currentUser)
             setStep(2)
         } catch (err) {
             console.log('Failed to register', err.message)
@@ -74,6 +89,7 @@ export default function RegisterPage() {
             setAuthenticating(false)
         }
     }
+    
 
     function goBack() {
         setStep(0)

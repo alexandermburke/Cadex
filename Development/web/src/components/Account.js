@@ -12,11 +12,12 @@ export default function Account() {
         amountDue: null,
         currency: null,
         status: null,
+        plan: userDataObj?.billing?.plan || 'Free',
     });
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    const plan = userDataObj?.billing?.plan || 'Free';
+    const plan = subscriptionData.plan || 'Free';
 
     useEffect(() => {
         async function fetchBillingData() {
@@ -46,12 +47,13 @@ export default function Account() {
                 console.log('Billing data received:', billing);
 
                 setSubscriptionData({
+                    plan: billing.plan || 'Free',
+                    status: billing.status || 'Inactive',
                     nextPaymentDate: billing.nextPaymentDue
                         ? new Date(billing.nextPaymentDue * 1000).toLocaleDateString()
-                        : 'Not Available',
+                        : null,
                     amountDue: billing.amountDue ? (billing.amountDue / 100).toFixed(2) : null,
                     currency: billing.currency || null,
-                    status: billing.status || 'Inactive',
                 });
             } catch (fetchError) {
                 console.error('Error fetching billing data:', fetchError.message);
@@ -71,21 +73,31 @@ export default function Account() {
         link: currentUser?.displayName ? `www.cadexlaw.com/${currentUser.displayName}` : 'Not available',
     };
 
+    // Determine what to display for next payment due
+    let nextPaymentDisplay = 'N/A';
+    if (loading) {
+        nextPaymentDisplay = 'Loading...';
+    } else if (error) {
+        nextPaymentDisplay = `Error: ${error}`;
+    } else if (subscriptionData.nextPaymentDate) {
+        nextPaymentDisplay = subscriptionData.nextPaymentDate;
+    }
+
+    // Determine what to display for amount due
+    let amountDueDisplay = 'N/A';
+    if (loading) {
+        amountDueDisplay = 'Loading...';
+    } else if (error) {
+        amountDueDisplay = 'N/A';
+    } else if (subscriptionData.amountDue && subscriptionData.currency) {
+        amountDueDisplay = `${subscriptionData.amountDue} ${subscriptionData.currency}`;
+    }
+
     const billingObj = {
         current_plan: plan,
         status: subscriptionData.status || 'Inactive',
-        next_payment_due: loading
-            ? 'Loading...'
-            : error
-            ? `Error: ${error}`
-            : subscriptionData.nextPaymentDate,
-        amount_due: loading
-            ? 'Loading...'
-            : error
-            ? 'N/A'
-            : subscriptionData.amountDue && subscriptionData.currency
-            ? `${subscriptionData.amountDue} ${subscriptionData.currency}`
-            : 'N/A',
+        next_payment_due: nextPaymentDisplay,
+        amount_due: amountDueDisplay,
         actions: (
             <div className="flex flex-col gap-2">
                 {(plan === 'Basic' || plan === 'Free') && (
