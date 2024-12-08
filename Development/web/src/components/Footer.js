@@ -37,7 +37,7 @@ export default function Footer() {
             <h3 className="font-bold">Contact</h3>
             <div className="flex flex-col gap-1 text-sm">
               <Link
-                href={'https://github.com/alexandermburke/enthlist/'}
+                href={'https://github.com/alexandermburke/'}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-2 relative w-fit overflow-hidden hover:underline"

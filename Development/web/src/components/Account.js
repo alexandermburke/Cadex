@@ -21,22 +21,30 @@ export default function Account() {
     useEffect(() => {
         async function fetchBillingData() {
             if (!currentUser?.uid) {
+                console.warn('No current user logged in, skipping billing fetch.');
                 setLoading(false);
                 return;
             }
 
             try {
-                const response = await fetch('/api/webhooks/stripe', {
+                console.log('Fetching subscription data for userId:', currentUser.uid);
+                const response = await fetch('/api/billing', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ userId: currentUser.uid }),
                 });
 
+                console.log('Response status:', response.status);
+
                 if (!response.ok) {
-                    throw new Error('Failed to fetch billing data');
+                    const errorData = await response.json();
+                    console.error('Error response from /api/billing:', errorData);
+                    throw new Error(errorData.error || 'Failed to fetch billing data');
                 }
 
                 const { billing } = await response.json();
+                console.log('Billing data received:', billing);
+
                 setSubscriptionData({
                     nextPaymentDate: billing.nextPaymentDue
                         ? new Date(billing.nextPaymentDue * 1000).toLocaleDateString()
@@ -45,8 +53,8 @@ export default function Account() {
                     currency: billing.currency || null,
                     status: billing.status || 'Inactive',
                 });
-            } catch (error) {
-                console.error('Error fetching billing data:', error);
+            } catch (fetchError) {
+                console.error('Error fetching billing data:', fetchError.message);
                 setError('Failed to fetch subscription data');
             } finally {
                 setLoading(false);
@@ -57,10 +65,10 @@ export default function Account() {
     }, [currentUser?.uid]);
 
     const vals = {
-        email: currentUser.email,
-        username: currentUser.displayName,
-        cases: Object.keys(userDataObj?.listings || {}).length,
-        link: 'www.cadexlaw.com/' + currentUser.displayName,
+        email: currentUser?.email || 'Not available',
+        username: currentUser?.displayName || 'Not available',
+        cases: Object.keys(userDataObj?.listings || {}).length || 0,
+        link: currentUser?.displayName ? `www.cadexlaw.com/${currentUser.displayName}` : 'Not available',
     };
 
     const billingObj = {

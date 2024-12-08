@@ -78,7 +78,7 @@ export default function CancelPage() {
 
     return (
         <div className='flex flex-1 items-center justify-center flex-col gap-8 pb-20 bg-white rounded-xl'>
-            <p className='text-center text-xl sm:text-2xl md:text-3xl text-blue-400'>
+            <p className='text-center text-xl sm:text-2xl md:text-3xl text-blue-950'>
                 We are sorry to see you go
             </p>
             <p>Did we help with your pursuit of Law?</p>
@@ -102,8 +102,8 @@ export default function CancelPage() {
             </div>
             <div className='flex items-center gap-4'>
                 <Link
-                    href='/admin'
-                    className='flex items-center justify-center gap-2 border border-solid border-blue-100 bg-white px-4 py-2 rounded-full text-blue-400 duration-200 hover:opacity-50'
+                    href='/admin/account'
+                    className='flex items-center justify-center gap-2 border border-solid border-blue-950 bg-white px-4 py-2 rounded text-blue-950 duration-200 hover:opacity-50'
                 >
                     <p>Back to home</p>
                     <i className='fa-solid fa-home'></i>
