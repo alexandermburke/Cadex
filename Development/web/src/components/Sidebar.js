@@ -138,7 +138,7 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar })
             {/* Feature Request Button (Always visible, not locked) */}
             <li>
               <Link
-                href="/request-feature"
+                href="https://discord.gg/k26TN5N2"
                 className="flex items-center gap-3 p-3 rounded transition-colors duration-200 hover:bg-blue-800 hover:bg-opacity-75"
               >
                 <i className="fa-solid fa-lightbulb"></i>

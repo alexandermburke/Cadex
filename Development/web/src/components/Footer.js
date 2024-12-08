@@ -123,7 +123,7 @@ export default function Footer() {
               <FaInstagram size={24} />
             </Link>
             <Link
-              href="https://discord.gg/yourinvite"
+              href="https://discord.gg/k26TN5N2"
               target="_blank"
               rel="noopener noreferrer"
               className="hover:text-indigo-500"
