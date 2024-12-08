@@ -21,13 +21,28 @@ export async function POST(request) {
     }
 
     const userData = userDoc.data();
-    const stripeCustomerId = userData?.billing?.stripeCustomerId;
+    const plan = userData?.billing?.plan || 'Free';
+    const stripeCustomerId = userData?.billing?.stripeCustomerId || null;
 
+    // If the user is on the Free plan and has no stripeCustomerId, just return free plan details
+    if (plan === 'Free' && !stripeCustomerId) {
+      return NextResponse.json({
+        billing: {
+          plan: 'Free',
+          status: 'Inactive',
+          nextPaymentDue: null,
+          amountDue: null,
+          currency: null,
+        }
+      }, { status: 200 });
+    }
+
+    // If user is not on the Free plan but has no stripeCustomerId, return an error
     if (!stripeCustomerId) {
       return NextResponse.json({ error: 'No stripeCustomerId found for user' }, { status: 400 });
     }
 
-    // Fetch subscriptions from Stripe
+    // Fetch subscriptions from Stripe since we have a stripeCustomerId
     const subscriptions = await stripe.subscriptions.list({
       customer: stripeCustomerId,
       limit: 1,
@@ -37,7 +52,7 @@ export async function POST(request) {
       // No active subscriptions found, set user to free plan
       await adminDB.collection('users').doc(userId).set({
         billing: {
-          plan: 'free',
+          plan: 'Free',
           status: 'Inactive',
           stripeCustomerId: stripeCustomerId,
           nextPaymentDue: null,
@@ -49,7 +64,7 @@ export async function POST(request) {
       // Return free plan details
       return NextResponse.json({
         billing: {
-          plan: 'free',
+          plan: 'Free',
           status: 'Inactive',
           nextPaymentDue: null,
           amountDue: null,
@@ -61,7 +76,7 @@ export async function POST(request) {
     // If subscription found, return subscription details
     const subscription = subscriptions.data[0];
     const billing = {
-      plan: userData?.billing?.plan || 'Pro', // or derive from subscription if needed
+      plan: plan,
       status: subscription.status,
       nextPaymentDue: subscription.current_period_end,
       amountDue: subscription.items.data[0]?.price?.unit_amount || null,
