@@ -92,7 +92,7 @@ export default function Account() {
     const billingObj = {
         current_plan: plan,
         status: subscriptionData.status || 'Inactive',
-        next_payment_due: nextPaymentDisplay,
+        payment_due: nextPaymentDisplay,
         amount_due: amountDueDisplay,
         actions: (
             <div className="flex flex-col gap-2">
