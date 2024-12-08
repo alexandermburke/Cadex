@@ -24,7 +24,6 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css';
 import { Autoplay } from 'swiper/modules';
 
-// Import the useInView hook
 import { useInView } from 'react-intersection-observer';
 
 const poppins = Poppins({
@@ -68,7 +67,6 @@ export default function Hero() {
   const [showDisclaimer, setShowDisclaimer] = useState(false);
 
   useEffect(() => {
-    // Check if the disclaimer has been shown before
     const hasSeenDisclaimer = localStorage.getItem('hasSeenDisclaimer');
     if (!hasSeenDisclaimer) {
       setShowDisclaimer(true);
@@ -98,8 +96,8 @@ export default function Hero() {
     localStorage.setItem('hasSeenDisclaimer', 'true');
   };
 
-  // Animated Phrase: "Law Study Tool"
-  const animatedPhrase = 'Law Study Assistant';
+  // Animate only the word "Dream" in "Your Dream School Awaits."
+  const animatedWord = 'Dream';
 
   const features = [
     {
@@ -147,83 +145,6 @@ export default function Hero() {
     },
   ];
 
-  const benefits = [
-    {
-      icon: <FaClock className="text-blue-950 text-4xl mb-4" />,
-      title: 'Study Efficiently',
-      description:
-        'Maximize your study time with targeted materials and AI guidance.',
-    },
-    {
-      icon: <FaDollarSign className="text-blue-950 text-4xl mb-4" />,
-      title: 'Reduce Costs',
-      description:
-        'Save money with affordable AI-powered exam prep compared to traditional methods.',
-    },
-    {
-      icon: <FaThumbsUp className="text-blue-950 text-4xl mb-4" />,
-      title: 'Improve Scores',
-      description:
-        'Boost your exam performance with personalized learning paths.',
-    },
-    {
-      icon: <FaUsers className="text-blue-950 text-4xl mb-4" />,
-      title: 'Accessible Anywhere',
-      description: 'Study anytime, anywhere with our fully online platform.',
-    },
-  ];
-
-  const testimonials = [
-    {
-      name: 'Emily Watson',
-      title: 'Law Student at Harvard Law School',
-      handle: '@emilywatson',
-      quote:
-        'Cadex has transformed my exam prep. The AI-generated practice exams are incredibly helpful.',
-      image: '/avatar1.png',
-    },
-    {
-      name: 'Robert Brown',
-      title: 'Bar Exam Candidate',
-      handle: '@robertbrown',
-      quote:
-        'The personalized feedback from Cadex helped me focus on my weak areas and pass the bar exam.',
-      image: '/avatar2.png',
-    },
-    {
-      name: 'Laura Emerald',
-      title: 'Professor of Law at Stanford University',
-      handle: '@lauraemerald',
-      quote:
-        'An invaluable tool for students preparing for exams. Cadex makes studying more efficient.',
-      image: '/avatar3.png',
-    },
-    {
-      name: 'Michael Lee',
-      title: 'Recent Law Graduate',
-      handle: '@michaellee',
-      quote:
-        'Cadex’s adaptive learning paths saved me time and improved my understanding of complex topics.',
-      image: '/avatar3.png',
-    },
-    {
-      name: 'Sophia Martinez',
-      title: 'Undergraduate Student at NYU',
-      handle: '@sophiamartinez',
-      quote:
-        'As an aspiring law student, Cadex gave me a head start in understanding legal concepts.',
-      image: '/avatar2.png',
-    },
-    {
-      name: 'Daniel Kim',
-      title: 'High School Senior',
-      handle: '@danielkim',
-      quote:
-        'Cadex made exploring law fun and accessible even before starting college.',
-      image: '/avatar1.png',
-    },
-  ];
-
   const faqs = [
     {
       question: 'What is Cadex?',
@@ -252,6 +173,80 @@ export default function Hero() {
     },
   ];
 
+  // Expanded Success Stories array for demo purposes
+  const successStories = [
+    {
+      name: "Jane Doe",
+      initialScore: 154,
+      newScore: 158,
+      difference: 4,
+      quote: "I tried LSATMax after my attempt with the $950 Testmaster's online equivalent brought my score from a 154 to a 158. The improvement gave me the confidence I needed!",
+    },
+    {
+      name: "John Smith",
+      initialScore: 148,
+      newScore: 155,
+      difference: 7,
+      quote: "I was stuck at 148 despite expensive courses. With Cadex’s adaptive approach, I soared to a 155 in just a few weeks. Personalized feedback made all the difference.",
+    },
+    {
+      name: "Ayesha Khan",
+      initialScore: 160,
+      newScore: 165,
+      difference: 5,
+      quote: "After struggling at 160, Cadex’s strategic exam prep helped me push my score up to 165. I finally felt like I understood the material, not just memorized it.",
+    },
+    {
+      name: "Carlos Mendes",
+      initialScore: 150,
+      newScore: 157,
+      difference: 7,
+      quote: "Spending $950 on traditional prep barely helped. Cadex’s AI-driven tools took me from 150 to 157, proving that smarter study beats expensive methods any day.",
+    },
+    {
+      name: "Linda Green",
+      initialScore: 152,
+      newScore: 160,
+      difference: 8,
+      quote: "Cadex provided the structure and resources I needed to improve my score from 152 to 160. Highly recommended!",
+    },
+    {
+      name: "Mark Thompson",
+      initialScore: 149,
+      newScore: 156,
+      difference: 7,
+      quote: "With Cadex’s personalized study plans, I increased my LSAT score by 7 points in just two months.",
+    },
+    {
+      name: "Sophia Ramirez",
+      initialScore: 155,
+      newScore: 163,
+      difference: 8,
+      quote: "Cadex’s instant feedback and adaptive learning tools helped me jump from 155 to 163 effortlessly.",
+    },
+    {
+      name: "David Lee",
+      initialScore: 151,
+      newScore: 158,
+      difference: 7,
+      quote: "Switching to Cadex was the best decision. My score improved by 7 points, and I felt more prepared than ever.",
+    },
+    {
+      name: "Emma Wilson",
+      initialScore: 153,
+      newScore: 161,
+      difference: 8,
+      quote: "Cadex’s comprehensive question bank and AI tutoring elevated my LSAT score from 153 to 161.",
+    },
+    {
+      name: "James Brown",
+      initialScore: 147,
+      newScore: 154,
+      difference: 7,
+      quote: "After struggling with traditional prep, Cadex helped me achieve a 154 by offering tailored study materials and real-time feedback.",
+    },
+  ];
+
   const VerticalDivider = () => (
     <div
       className={`mx-auto w-[2px] my-0 bg-gradient-to-b from-transparent via-slate-500 to-blue-950 transition-all duration-700 ${
@@ -262,11 +257,11 @@ export default function Hero() {
 
   // Animations using useInView
   const [featuresRef, featuresInView] = useInView({ threshold: 0.1, triggerOnce: true });
-  const [benefitRef, benefitInView] = useInView({ threshold: 0.1, triggerOnce: true });
   const [whoRef, whoInView] = useInView({ threshold: 0.1, triggerOnce: true });
   const [costRef, costInView] = useInView({ threshold: 0.1, triggerOnce: true });
   const [faqRef, faqInView] = useInView({ threshold: 0.1, triggerOnce: true });
   const [uniRef, uniInView] = useInView({ threshold: 0.1, triggerOnce: true });
+  const [storiesRef, storiesInView] = useInView({ threshold: 0.1, triggerOnce: true });
 
   return (
     <section className="w-full bg-white">
@@ -303,37 +298,37 @@ export default function Hero() {
             loaded ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'
           }`}
         >
-          {/* Updated Tagline: "Your All-in-One Law Study Tool" */}
           <h2
-  className={
-    'text-4xl sm:text-6xl font-semibold py-2 mb-0 ' + poppins.className
-  }
->
-  {/* Normal "Your All-in-One" */}
-  <span className="block mb-4">Your All-in-One</span>
-  {/* Animated "Law Study Tool" */}
-  <span className="relative inline-block" key={animationTrigger} aria-hidden="true">
-    {animatedPhrase.split('').map((letter, letterIndex) => {
-      if (letter === ' ') {
-        return <span key={letterIndex}>&nbsp;</span>;
-      }
-      return (
-        <span
-          key={letterIndex}
-          className="flare-letter"
-          data-letter={letter}
-          style={{
-            '--animation-delay': `${letterIndex * 150}ms`,
-          }}
-        >
-          {letter}
-        </span>
-      );
-    })}
-  </span>
-  {/* Screen Reader Text */}
-  <span className="sr-only">Your All-in-One Law Study Tool</span>
-</h2>
+            className={
+              'text-4xl sm:text-6xl font-semibold py-2 mb-0 ' + poppins.className
+            }
+          >
+            {/* "Your Dream School Awaits." with only "Dream" animated */}
+            <span className="block mb-4">
+              Your{' '}
+              <span className="relative inline-block" key={animationTrigger} aria-hidden="true">
+                {animatedWord.split('').map((letter, letterIndex) => {
+                  if (letter === ' ') {
+                    return <span key={letterIndex}>&nbsp;</span>;
+                  }
+                  return (
+                    <span
+                      key={letterIndex}
+                      className="flare-letter"
+                      data-letter={letter}
+                      style={{
+                        '--animation-delay': `${letterIndex * 150}ms`,
+                      }}
+                    >
+                      {letter}
+                    </span>
+                  );
+                })}
+              </span>{' '}
+              School Awaits.
+            </span>
+            <span className="sr-only">Your Dream School Awaits.</span>
+          </h2>
 
           <p className="text-center sm:text-lg md:text-xl text-black max-w-2xl my-6">
             Cadex offers a highly advanced AI-based exam prep with direct feedback to help anyone interested in law excel at a much more affordable price than traditional study tools.
@@ -352,7 +347,6 @@ export default function Hero() {
           </div>
         </div>
 
-        {/* Vertical Divider */}
         <VerticalDivider />
 
         {/* Features Section */}
@@ -383,9 +377,9 @@ export default function Hero() {
               {features.map((feature, index) => (
                 <SwiperSlide
                   key={index}
-                  style={{ width: '200px', height: '200px' }}
+                  style={{ width: '220px', height: '250px' }} // Fixed width and height
                 >
-                  <div className="w-full h-full flex flex-col items-center justify-center p-4 Professional rounded shadow-md hover:shadow-xl transition-shadow">
+                  <div className="w-full h-full flex flex-col items-center justify-center p-4 bg-white rounded shadow-md hover:shadow-xl transition-shadow">
                     {feature.icon}
                     <h4 className="text-lg font-semibold text-blue-950 mb-2 text-center">
                       {feature.title}
@@ -400,7 +394,69 @@ export default function Hero() {
           </div>
         </div>
 
-        {/* Vertical Divider */}
+        <VerticalDivider />
+
+        {/* Success Stories Section - Now with Carousel */}
+        <div
+          ref={storiesRef}
+          className={`flex flex-col items-center py-10 px-4 md:px-8 lg:px-16 transition-all duration-1000 ${
+            storiesInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+          }`}
+        >
+          <div className="max-w-5xl w-full">
+            <h3 className="text-4xl lg:text-7xl font-semibold my-12 text-center text-blue-950 ">
+              <span className='font-medium goldGradient '>Success</span> Stories
+            </h3>
+            <p className="text-center sm:text-lg md:text-xl text-black max-w-3xl mx-auto mb-10">
+              See how our users improved their scores after using Cadex, often following expensive alternatives that offered limited gains.
+            </p>
+            
+            {/* Carousel for Success Stories */}
+            <Swiper
+              modules={[Autoplay]}
+              spaceBetween={20}
+              slidesPerView={1}
+              autoplay={{
+                delay: 0,
+                disableOnInteraction: false,
+              }}
+              speed={3000}
+              loop={true}
+              freeMode={true}
+              freeModeMomentum={false}
+              className="my-12"
+              breakpoints={{
+                640: {
+                  slidesPerView: 2,
+                },
+                1024: {
+                  slidesPerView: 3,
+                },
+              }}
+            >
+              {successStories.map((story, index) => (
+                <SwiperSlide key={index} style={{ width: '300px', height: 'auto' }}>
+                  <div className="bg-white rounded shadow-md p-6 h-full flex flex-col justify-between hover:shadow-xl transition-shadow">
+                    <div>
+                      <h4 className="text-xl font-semibold text-blue-950 mb-2">{story.name}</h4>
+                      <p className="text-base text-gray-700 italic mb-4">"{story.quote}"</p>
+                    </div>
+                    <div className="flex items-center justify-start gap-4 text-gray-700 mt-auto">
+                      <span className="text-sm">
+                        Original Score: <span className="font-bold">{story.initialScore}</span>
+                      </span>
+                      <span className="text-sm">→</span>
+                      <span className="text-sm">
+                        New Score: <span className="font-bold">{story.newScore}</span> (Improvement: <span className="font-bold text-emerald-500">+{story.difference}</span>)
+                      </span>
+                    </div>
+                  </div>
+                </SwiperSlide>
+              ))}
+            </Swiper>
+          </div>
+        </div>
+
         <VerticalDivider />
 
         {/* Who Can Benefit Section */}
@@ -415,7 +471,7 @@ export default function Hero() {
               Who Can <span className='font-medium goldGradient '>Benefit</span> from Cadex
             </h3>
             <p className="text-center sm:text-lg md:text-xl text-black max-w-3xl mx-auto my-6">
-              Cadex is designed for anyone passionate about law - whether you are a high school student exploring career options, an undergraduate considering law school, an aspiring law student preparing for entrance exams, an enrolled law student, or a legal professional seeking to enhance your knowledge. Our platform adapts to your level and helps you progress in your legal journey.
+              Cadex is designed for anyone passionate about law - whether you are a high school student exploring career options, an undergraduate considering law school, an aspiring law student preparing for entrance exams, an enrolled law student, or a legal professional seeking to enhance your knowledge.
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 mt-8">
               <div className="flex flex-col items-center p-6 bg-white rounded shadow-md hover:shadow-xl transition-shadow">
@@ -449,7 +505,6 @@ export default function Hero() {
           </div>
         </div>
 
-        {/* Vertical Divider */}
         <VerticalDivider />
 
         {/* Save Money with Cadex Section */}
@@ -460,15 +515,13 @@ export default function Hero() {
           }`}
         >
           <div className="max-w-5xl w-full">
-            {/* Section Title */}
             <h3 className="text-4xl sm:text-4xl md:text-6xl lg:text-7xl font-semibold text-center text-blue-950 mb-8">
               Save <span className='font-medium goldGradient '>Money</span> with Cadex
             </h3>
             
-            {/* Pricing Comparison Cards */}
             <div className="flex flex-col md:flex-row justify-center items-center gap-8">
               {/* Cadex Card */}
-              <div className="flex flex-col items-center p-6 bg-white rounded-lg shadow-lg transform hover:scale-105 transition-transform duration-300">
+              <div className="flex flex-col items-center p-6 bg-white rounded-lg shadow-lg transform hover:scale-105 transition-transform duration-300 w-full max-w-sm">
                 <h4 className="text-2xl font-bold text-blue-950 mb-2">Cadex</h4>  
                 <p className="text-gray-700 mb-1">as low as</p>
                 <p className="text-4xl font-semibold text-emerald-400 mb-1">$15</p>
@@ -482,8 +535,8 @@ export default function Hero() {
                   </ul>
                 </div>
               </div>
-               {/* Traditional Exam Prep Card */}
-               <div className="flex flex-col items-center p-6 bg-white rounded-lg shadow-md transform hover:scale-105 transition-transform duration-300">
+              {/* Traditional Exam Prep Card */}
+              <div className="flex flex-col items-center p-6 bg-white rounded-lg shadow-md transform hover:scale-105 transition-transform duration-300 w-full max-w-sm">
                 <h4 className="text-2xl font-bold text-blue-950 mb-2">Traditional Exam Prep</h4>
                 <p className="text-gray-700 mb-1">starting at</p>
                 <p className="text-4xl font-semibold text-red-600 mb-1">$70</p>
@@ -508,38 +561,9 @@ export default function Hero() {
                 By choosing Cadex, you gain access to advanced AI-driven tools and personalized learning paths at a fraction of the cost of traditional exam prep services. Invest smartly in your legal education without breaking the bank.
               </p>
             </div>
-            
-           </div>
-        </div>
-
-        {/* Vertical Divider */}
-        <VerticalDivider />
-
-        {/* FAQ Section */}
-        <div
-          ref={faqRef}
-          className={`flex flex-col items-center py-10 px-4 md:px-8 lg:px-16 transition-all duration-1000 ${
-            faqInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
-          }`}
-        >
-          <div className="max-w-5xl w-full">
-            <h3 className="text-4xl lg:text-7xl font-semibold my-12 text-center text-blue-950 ">
-              Frequently Asked Questions
-            </h3>
-            <div className="space-y-6">
-              {faqs.map((faq, index) => (
-                <div key={index} className="bg-white rounded shadow-md p-6">
-                  <h4 className="text-xl font-semibold text-blue-950 mb-2">
-                    {faq.question}
-                  </h4>
-                  <p className="text-base text-gray-700">{faq.answer}</p>
-                </div>
-              ))}
-            </div>
           </div>
         </div>
 
-        {/* Vertical Divider */}
         <VerticalDivider />
 
         {/* Universities Section */}
