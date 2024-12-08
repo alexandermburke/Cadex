@@ -32,7 +32,7 @@ const plans = [
   },
   {
     name: 'Pro',
-    description: 'Optimized for law firms and professional applications.',
+    description: 'Optimized for law students seeking advanced study tools.',
     price: '$50 USD',
     interval: 'Per month',
     features: [
