@@ -13,7 +13,7 @@ const CarouselComponent = () => {
         speed: 500,
         autoplay: true,
         autoplaySpeed: 2000,
-        dots: true,
+        dots: false,
     };
 
     const images = [
