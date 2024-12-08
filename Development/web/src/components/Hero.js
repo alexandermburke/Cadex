@@ -305,7 +305,7 @@ export default function Hero() {
             }
           >
             {/* "Your Dream School Awaits." with only "Dream" animated */}
-            <span className="block mb-4">
+            <span className="block mb-4 text-blue-950">
               Your{' '}
               <span className="relative inline-block" key={animationTrigger} aria-hidden="true">
                 {animatedWord.split('').map((letter, letterIndex) => {
