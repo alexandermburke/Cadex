@@ -353,7 +353,7 @@ export default function Hero() {
         {/* Features Section */}
         <div
           ref={featuresRef}
-          className={`flex flex-col items-center py-10 px-4 md:px-8 lg:px-16 bg-white transition-all duration-1000 ${
+          className={`flex flex-col items-center py-4 px-4 md:px-8 lg:px-16 bg-white transition-all duration-1000 ${
             featuresInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
           }`}
         >
@@ -373,7 +373,7 @@ export default function Hero() {
               loop={true}
               freeMode={true}
               freeModeMomentum={false}
-              className="my-12"
+              className="my-8"
             >
               {features.map((feature, index) => (
                 <SwiperSlide
@@ -400,12 +400,12 @@ export default function Hero() {
         {/* Success Stories Section - Now with Carousel */}
         <div
           ref={storiesRef}
-          className={`flex flex-col items-center py-10 px-4 md:px-8 lg:px-16 transition-all duration-1000 ${
+          className={`flex flex-col items-center px-4 md:px-8 lg:px-16 transition-all duration-1000 ${
             storiesInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
           }`}
         >
           <div className="max-w-5xl w-full">
-            <h3 className="text-4xl lg:text-7xl font-semibold my-12 text-center text-blue-950 ">
+            <h3 className="text-4xl lg:text-7xl font-semibold my-6 text-center text-blue-950 ">
               <span className='font-medium goldGradient '>Success</span> Stories
             </h3>
             <p className="text-center sm:text-lg md:text-xl text-black max-w-3xl mx-auto mb-10">
@@ -561,32 +561,6 @@ export default function Hero() {
               <p className="text-lg sm:text-xl text-gray-700 mt-4 max-w-2xl mx-auto">
                 By choosing Cadex, you gain access to advanced AI-driven tools and personalized learning paths at a fraction of the cost of traditional exam prep services. Invest smartly in your legal education without breaking the bank.
               </p>
-            </div>
-          </div>
-        </div>
-
-        <VerticalDivider />
-
-        {/* FAQ Section */}
-        <div
-          ref={faqRef}
-          className={`flex flex-col items-center py-10 px-4 md:px-8 lg:px-16 transition-all duration-1000 ${
-            faqInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
-          }`}
-        >
-          <div className="max-w-5xl w-full">
-            <h3 className="text-4xl lg:text-7xl font-semibold my-12 text-center text-blue-950 ">
-              Frequently Asked Questions
-            </h3>
-            <div className="space-y-6">
-              {faqs.map((faq, index) => (
-                <div key={index} className="bg-white rounded shadow-md p-6">
-                  <h4 className="text-xl font-semibold text-blue-950 mb-2">
-                    {faq.question}
-                  </h4>
-                  <p className="text-base text-gray-700">{faq.answer}</p>
-                </div>
-              ))}
             </div>
           </div>
         </div>
