@@ -1,160 +1,182 @@
+// app/api/webhooks/stripe.js
+
 import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { adminDB } from '@/firebaseAdmin'; // Ensure this path is correct
 
-// Initialize Stripe with your secret key
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-  apiVersion: '2023-10-16',
+    apiVersion: '2023-10-16',
 });
 
 // Your Stripe webhook secret
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
-export async function POST(request) {
-  console.log('--- WEBHOOK STARTED ---');
-
-  let event;
-
-  try {
-    // Get the raw body and signature from the request
-    const rawBody = await request.text();
-    const sig = request.headers.get('stripe-signature');
-
-    if (!sig) {
-      throw new Error('Missing Stripe signature.');
-    }
-
-    // Verify the event with Stripe
-    event = stripe.webhooks.constructEvent(rawBody, sig, webhookSecret);
-    console.log('Webhook signature verified:', event.type);
-  } catch (err) {
-    console.error(`Webhook signature verification failed: ${err.message}`);
-    return NextResponse.json({ error: `Webhook Error: ${err.message}` }, { status: 400 });
-  }
-
-  // Log the entire event for debugging
-  console.log('Received event:', JSON.stringify(event, null, 2));
-
-  try {
-    const handler = webhookHandlers[event.type];
-    if (handler) {
-      await handler(event.data.object, event.id);
-    } else {
-      console.log(`Unhandled event type: ${event.type}`);
-    }
-    return NextResponse.json({ received: true }, { status: 200 });
-  } catch (err) {
-    console.error(`Error handling event ${event.type}: ${err.message}`);
-    return NextResponse.json({ error: `Error handling event: ${err.message}` }, { status: 500 });
-  }
-}
-
 const webhookHandlers = {
-  'checkout.session.completed': async (session, eventId) => {
-    try {
-      const { customer: stripeCustomerId, metadata, subscription } = session;
+    'checkout.session.completed': async (session, eventId) => {
+        try {
+            const { customer: stripeCustomerId, metadata, subscription } = session;
 
-      if (!metadata || !metadata.userId) {
-        console.error('Session metadata missing userId or email:', JSON.stringify(session, null, 2));
-        throw new Error('Missing required field: userId in session metadata.');
-      }
+            if (!metadata || !metadata.userId) {
+                console.error('Session metadata missing userId:', JSON.stringify(session, null, 2));
+                throw new Error('Missing userId in session metadata.');
+            }
 
-      const userId = metadata.userId;
-      const email = metadata.email;
+            const userId = metadata.userId;
 
-      console.log('Processing checkout.session.completed for:', { userId, stripeCustomerId, email });
+            console.log(`Processing checkout.session.completed for userId: ${userId}, stripeCustomerId: ${stripeCustomerId}`);
 
-      // Check if the event has already been processed (idempotency)
-      const eventRef = adminDB.collection('processed_events').doc(eventId);
-      const eventDoc = await eventRef.get();
+            // Check if the event has already been processed (idempotency)
+            const eventRef = adminDB.collection('processed_events').doc(eventId);
+            const eventDoc = await eventRef.get();
 
-      if (eventDoc.exists) {
-        console.log(`Event ${eventId} already processed.`);
-        return;
-      }
+            if (eventDoc.exists) {
+                console.log(`Event ${eventId} already processed.`);
+                return;
+            }
 
-      // Fetch subscription data
-      const subscriptionData = await stripe.subscriptions.retrieve(subscription);
+            // Fetch user data from Firestore
+            const userDocRef = adminDB.collection('users').doc(userId);
+            const userDoc = await userDocRef.get();
 
-      const nextPaymentDue = subscriptionData.current_period_end; // Unix timestamp
-      const amountDue = subscriptionData.items.data[0].price.unit_amount; // Amount in cents
-      const currency = subscriptionData.items.data[0].price.currency.toUpperCase();
-      const status = subscriptionData.status;
+            if (!userDoc.exists) {
+                throw new Error('User not found in Firestore.');
+            }
 
-      // Update user's billing information in Firestore
-      await adminDB.collection('users').doc(userId).set(
-        {
-          billing: {
-            plan: 'Pro',
-            status,
-            stripeCustomerId,
-            email,
-            nextPaymentDue,
-            amountDue,
-            currency,
-          },
-        },
-        { merge: true }
-      );
+            const userData = userDoc.data();
+            const existingStripeCustomerId = userData.billing?.stripeCustomerId;
 
-      // Mark the event as processed
-      await eventRef.set({ processed: true });
-      console.log(`User ${userId} updated to 'Pro' plan successfully with subscription details.`);
-    } catch (err) {
-      console.error(`Error in 'checkout.session.completed' handler: ${err.message}`);
-      throw err;
-    }
-  },
+            // Validate stripeCustomerId consistency
+            if (existingStripeCustomerId && existingStripeCustomerId !== stripeCustomerId) {
+                console.error(`Mismatch in stripeCustomerId for user ${userId}. Existing: ${existingStripeCustomerId}, New: ${stripeCustomerId}`);
+                throw new Error('Mismatch in stripeCustomerId.');
+            }
 
-  // Handle payment failures
-  'invoice.payment_failed': async (invoice, eventId) => {
-    try {
-      const stripeCustomerId = invoice.customer;
+            // If stripeCustomerId doesn't exist in Firestore, set it
+            if (!existingStripeCustomerId) {
+                await userDocRef.set({
+                    billing: {
+                        stripeCustomerId: stripeCustomerId,
+                    },
+                }, { merge: true });
+            }
 
-      if (!stripeCustomerId) {
-        console.error('Invoice is missing customer field:', JSON.stringify(invoice, null, 2));
-        throw new Error('Missing stripeCustomerId in invoice.');
-      }
+            // Fetch subscription details
+            const subscriptionData = await stripe.subscriptions.retrieve(subscription);
 
-      // Check if the event has already been processed (idempotency)
-      const eventRef = adminDB.collection('processed_events').doc(eventId);
-      const eventDoc = await eventRef.get();
+            const nextPaymentDue = subscriptionData.current_period_end; // Unix timestamp
+            const amountDue = subscriptionData.items.data[0].price.unit_amount; // Amount in cents
+            const currency = subscriptionData.items.data[0].price.currency.toUpperCase();
+            const status = subscriptionData.status;
 
-      if (eventDoc.exists) {
-        console.log(`Event ${eventId} already processed.`);
-        return;
-      }
+            // Update user's billing information in Firestore
+            await userDocRef.set({
+                billing: {
+                    plan: 'Pro', // Adjust based on the plan logic
+                    status,
+                    nextPaymentDue,
+                    amountDue,
+                    currency,
+                },
+            }, { merge: true });
 
-      // Find user by stripeCustomerId
-      const usersRef = adminDB.collection('users');
-      const snapshot = await usersRef.where('billing.stripeCustomerId', '==', stripeCustomerId).get();
+            // Mark the event as processed
+            await eventRef.set({ processed: true });
 
-      if (snapshot.empty) {
-        console.log('No matching user found for customerId:', stripeCustomerId);
-        await eventRef.set({ processed: true }); // Mark as processed to avoid retries
-        return;
-      }
+            console.log(`User ${userId} successfully upgraded to Pro plan.`);
+        } catch (err) {
+            console.error(`Error handling checkout.session.completed: ${err.message}`);
+            throw err;
+        }
+    },
 
-      // Update user's billing status
-      await Promise.all(
-        snapshot.docs.map((doc) =>
-          doc.ref.set(
-            {
-              'billing.status': 'Inactive',
-            },
-            { merge: true }
-          )
-        )
-      );
+    // Handle payment failures
+    'invoice.payment_failed': async (invoice, eventId) => {
+        try {
+            const stripeCustomerId = invoice.customer;
 
-      // Mark the event as processed
-      await eventRef.set({ processed: true });
-      console.log(`Updated billing status to 'Inactive' for customerId: ${stripeCustomerId}`);
-    } catch (err) {
-      console.error(`Error in 'invoice.payment_failed' handler: ${err.message}`);
-      throw err;
-    }
-  },
+            if (!stripeCustomerId) {
+                console.error('Invoice is missing customer field:', JSON.stringify(invoice, null, 2));
+                throw new Error('Missing stripeCustomerId in invoice.');
+            }
 
-  // Add more handlers as needed
+            // Check if the event has already been processed (idempotency)
+            const eventRef = adminDB.collection('processed_events').doc(eventId);
+            const eventDoc = await eventRef.get();
+
+            if (eventDoc.exists) {
+                console.log(`Event ${eventId} already processed.`);
+                return;
+            }
+
+            // Find user by stripeCustomerId
+            const usersSnapshot = await adminDB.collection('users').where('billing.stripeCustomerId', '==', stripeCustomerId).get();
+
+            if (usersSnapshot.empty) {
+                console.log('No matching user found for stripeCustomerId:', stripeCustomerId);
+                await eventRef.set({ processed: true }); // Mark as processed to avoid retries
+                return;
+            }
+
+            // Update user's billing status to Inactive
+            const batch = adminDB.batch();
+            usersSnapshot.forEach(doc => {
+                batch.set(doc.ref, {
+                    billing: {
+                        status: 'Inactive',
+                        // Optionally, you can update other fields like nextPaymentDue, amountDue, etc.
+                    },
+                }, { merge: true });
+            });
+            await batch.commit();
+
+            // Mark the event as processed
+            await eventRef.set({ processed: true });
+
+            console.log(`Updated billing status to 'Inactive' for stripeCustomerId: ${stripeCustomerId}`);
+        } catch (err) {
+            console.error(`Error handling invoice.payment_failed: ${err.message}`);
+            throw err;
+        }
+    },
+
+    // Add more handlers as needed
 };
+
+export async function POST(request) {
+    console.log('--- WEBHOOK STARTED ---');
+
+    let event;
+
+    try {
+        // Get the raw body and signature from the request
+        const rawBody = await request.text();
+        const sig = request.headers.get('stripe-signature');
+
+        if (!sig) {
+            throw new Error('Missing Stripe signature.');
+        }
+
+        // Verify the event with Stripe
+        event = stripe.webhooks.constructEvent(rawBody, sig, webhookSecret);
+        console.log('Webhook signature verified:', event.type);
+    } catch (err) {
+        console.error(`Webhook signature verification failed: ${err.message}`);
+        return NextResponse.json({ error: `Webhook Error: ${err.message}` }, { status: 400 });
+    }
+
+    // Log the entire event for debugging
+    console.log('Received event:', JSON.stringify(event, null, 2));
+
+    try {
+        const handler = webhookHandlers[event.type];
+        if (handler) {
+            await handler(event.data.object, event.id);
+        } else {
+            console.log(`Unhandled event type: ${event.type}`);
+        }
+        return NextResponse.json({ received: true }, { status: 200 });
+    } catch (err) {
+        console.error(`Error handling event ${event.type}: ${err.message}`);
+        return NextResponse.json({ error: `Error handling event: ${err.message}` }, { status: 500 });
+    }
+}

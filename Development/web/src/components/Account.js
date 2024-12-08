@@ -10,7 +10,7 @@ export default function Account() {
     const [subscriptionData, setSubscriptionData] = useState({
         plan: userDataObj?.billing?.plan || 'Free',
         status: 'Inactive',
-        nextPaymentDate: null,
+        nextPaymentDue: null,
         amountDue: null,
         currency: null,
     });
@@ -28,24 +28,28 @@ export default function Account() {
             }
 
             try {
+                console.log('Fetching subscription data for userId:', currentUser.uid);
                 const response = await fetch('/api/billing', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ userId: currentUser.uid }),
                 });
 
+                console.log('Response status:', response.status);
+
                 if (!response.ok) {
                     const errorData = await response.json();
+                    console.error('Error response from /api/billing:', errorData);
                     throw new Error(errorData.error || 'Failed to fetch billing data');
                 }
 
                 const { billing } = await response.json();
+                console.log('Billing data received:', billing);
+
                 setSubscriptionData({
                     plan: billing.plan || 'Free',
                     status: billing.status || 'Inactive',
-                    nextPaymentDate: billing.nextPaymentDue
-                        ? new Date(billing.nextPaymentDue * 1000).toLocaleDateString()
-                        : null,
+                    nextPaymentDue: billing.nextPaymentDue, // Unix timestamp or null
                     amountDue: billing.amountDue ? (billing.amountDue / 100).toFixed(2) : null,
                     currency: billing.currency || null,
                 });
@@ -69,17 +73,17 @@ export default function Account() {
             : 'Not available',
     };
 
-    // Determine next payment due display
-    let nextPaymentDisplay = 'N/A';
+    // Determine what to display for payment due
+    let paymentDueDisplay = 'N/A';
     if (loading) {
-        nextPaymentDisplay = 'Loading...';
+        paymentDueDisplay = 'Loading...';
     } else if (error) {
-        nextPaymentDisplay = `Error: ${error}`;
-    } else if (subscriptionData.nextPaymentDate) {
-        nextPaymentDisplay = subscriptionData.nextPaymentDate;
+        paymentDueDisplay = `Error: ${error}`;
+    } else if (subscriptionData.nextPaymentDue) {
+        paymentDueDisplay = new Date(subscriptionData.nextPaymentDue * 1000).toLocaleDateString();
     }
 
-    // Determine amount due display
+    // Determine what to display for amount due
     let amountDueDisplay = 'N/A';
     if (loading) {
         amountDueDisplay = 'Loading...';
@@ -92,7 +96,7 @@ export default function Account() {
     const billingObj = {
         current_plan: plan,
         status: subscriptionData.status || 'Inactive',
-        payment_due: nextPaymentDisplay,
+        payment_due: paymentDueDisplay, // Actual date or 'N/A' or status
         amount_due: amountDueDisplay,
         actions: (
             <div className="flex flex-col gap-2">
@@ -142,7 +146,7 @@ export default function Account() {
                         {Object.keys(billingObj).map((entry, entryIndex) => (
                             <div className="flex items-center gap-4" key={entryIndex}>
                                 <p className="font-medium w-24 sm:w-32 capitalize">
-                                    {entry.replace('_', ' ')}
+                                    {entry === 'payment_due' ? 'Payment Due' : entry.replace('_', ' ')}
                                 </p>
                                 {entry === 'actions' ? (
                                     billingObj[entry]
