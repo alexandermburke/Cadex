@@ -99,7 +99,7 @@ export default function Hero() {
   };
 
   // Animated Phrase: "Law Study Tool"
-  const animatedPhrase = 'Law Study Tool';
+  const animatedPhrase = 'Law Study Assistant';
 
   const features = [
     {
@@ -149,25 +149,25 @@ export default function Hero() {
 
   const benefits = [
     {
-      icon: <FaClock className="text-blue-950 text-5xl mb-4" />,
+      icon: <FaClock className="text-blue-950 text-4xl mb-4" />,
       title: 'Study Efficiently',
       description:
         'Maximize your study time with targeted materials and AI guidance.',
     },
     {
-      icon: <FaDollarSign className="text-blue-950 text-5xl mb-4" />,
+      icon: <FaDollarSign className="text-blue-950 text-4xl mb-4" />,
       title: 'Reduce Costs',
       description:
         'Save money with affordable AI-powered exam prep compared to traditional methods.',
     },
     {
-      icon: <FaThumbsUp className="text-blue-950 text-5xl mb-4" />,
+      icon: <FaThumbsUp className="text-blue-950 text-4xl mb-4" />,
       title: 'Improve Scores',
       description:
         'Boost your exam performance with personalized learning paths.',
     },
     {
-      icon: <FaUsers className="text-blue-950 text-5xl mb-4" />,
+      icon: <FaUsers className="text-blue-950 text-4xl mb-4" />,
       title: 'Accessible Anywhere',
       description: 'Study anytime, anywhere with our fully online platform.',
     },
@@ -306,7 +306,7 @@ export default function Hero() {
           {/* Updated Tagline: "Your All-in-One Law Study Tool" */}
           <h2
   className={
-    'text-5xl sm:text-7xl font-semibold py-2 mb-0 ' + poppins.className
+    'text-4xl sm:text-6xl font-semibold py-2 mb-0 ' + poppins.className
   }
 >
   {/* Normal "Your All-in-One" */}
@@ -363,7 +363,7 @@ export default function Hero() {
           }`}
         >
           <div className="max-w-7xl w-full">
-            <h3 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-semibold text-center text-blue-950">
+            <h3 className="text-4xl sm:text-4xl md:text-6xl lg:text-7xl font-semibold text-center text-blue-950">
               Features
             </h3>
             <Swiper
@@ -411,7 +411,7 @@ export default function Hero() {
           }`}
         >
           <div className="max-w-7xl w-full">
-            <h3 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-semibold text-center text-blue-950">
+            <h3 className="text-4xl sm:text-4xl md:text-6xl lg:text-7xl font-semibold text-center text-blue-950">
               Who Can <span className='font-medium goldGradient '>Benefit</span> from Cadex
             </h3>
             <p className="text-center sm:text-lg md:text-xl text-black max-w-3xl mx-auto my-6">
@@ -419,7 +419,7 @@ export default function Hero() {
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 mt-8">
               <div className="flex flex-col items-center p-6 bg-white rounded shadow-md hover:shadow-xl transition-shadow">
-                <FaGraduationCap className="text-blue-950 text-5xl mb-4" />
+                <FaGraduationCap className="text-blue-950 text-4xl mb-4" />
                 <h4 className="text-xl font-semibold text-blue-950 mb-2 text-center">
                   High School Students
                 </h4>
@@ -428,7 +428,7 @@ export default function Hero() {
                 </p>
               </div>
               <div className="flex flex-col items-center p-6 bg-white rounded shadow-md hover:shadow-xl transition-shadow">
-                <FaGraduationCap className="text-blue-950 text-5xl mb-4" />
+                <FaGraduationCap className="text-blue-950 text-4xl mb-4" />
                 <h4 className="text-xl font-semibold text-blue-950 mb-2 text-center">
                   Undergraduates
                 </h4>
@@ -437,7 +437,7 @@ export default function Hero() {
                 </p>
               </div>
               <div className="flex flex-col items-center p-6 bg-white rounded shadow-md hover:shadow-xl transition-shadow">
-                <FaGavel className="text-blue-950 text-5xl mb-4" />
+                <FaGavel className="text-blue-950 text-4xl mb-4" />
                 <h4 className="text-xl font-semibold text-blue-950 mb-2 text-center">
                   Law Students & Professionals
                 </h4>
@@ -461,28 +461,12 @@ export default function Hero() {
         >
           <div className="max-w-5xl w-full">
             {/* Section Title */}
-            <h3 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-semibold text-center text-blue-950 mb-8">
+            <h3 className="text-4xl sm:text-4xl md:text-6xl lg:text-7xl font-semibold text-center text-blue-950 mb-8">
               Save <span className='font-medium goldGradient '>Money</span> with Cadex
             </h3>
             
             {/* Pricing Comparison Cards */}
             <div className="flex flex-col md:flex-row justify-center items-center gap-8">
-              {/* Traditional Exam Prep Card */}
-              <div className="flex flex-col items-center p-6 bg-white rounded-lg shadow-lg transform hover:scale-105 transition-transform duration-300">
-                <h4 className="text-2xl font-bold text-blue-950 mb-2">Traditional Exam Prep</h4>
-                <p className="text-gray-700 mb-1">starting at</p>
-                <p className="text-4xl font-semibold text-red-600 mb-1">$70+</p>
-                <p className="text-gray-600">per month</p>
-                <div className="mt-4">
-                  <ul className="list-disc list-inside text-gray-700">
-                    <li>Limited Practice Exams</li>
-                    <li>Generic Study Materials</li>
-                    <li>High Costs</li>
-                    <li>Less Personalized Feedback</li>
-                  </ul>
-                </div>
-              </div>
-              
               {/* Cadex Card */}
               <div className="flex flex-col items-center p-6 bg-white rounded-lg shadow-lg transform hover:scale-105 transition-transform duration-300">
                 <h4 className="text-2xl font-bold text-blue-950 mb-2">Cadex</h4>  
@@ -495,6 +479,21 @@ export default function Hero() {
                     <li>Personalized Study Materials</li>
                     <li>Affordable Pricing</li>
                     <li>Instant, Customized Feedback</li>
+                  </ul>
+                </div>
+              </div>
+               {/* Traditional Exam Prep Card */}
+               <div className="flex flex-col items-center p-6 bg-white rounded-lg shadow-md transform hover:scale-105 transition-transform duration-300">
+                <h4 className="text-2xl font-bold text-blue-950 mb-2">Traditional Exam Prep</h4>
+                <p className="text-gray-700 mb-1">starting at</p>
+                <p className="text-4xl font-semibold text-red-600 mb-1">$70</p>
+                <p className="text-gray-600">per month</p>
+                <div className="mt-4">
+                  <ul className="list-disc list-inside text-gray-700">
+                    <li>Limited Question Explanations</li>
+                    <li>Generic Study Materials</li>
+                    <li>High Costs</li>
+                    <li>Less Personalized Feedback</li>
                   </ul>
                 </div>
               </div>

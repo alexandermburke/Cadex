@@ -27,7 +27,7 @@ const CarouselComponent = () => {
             <Slider {...settings}>
                 {images.map((src, index) => (
                     <div key={index} className="p-4">
-                        <div className="bg-white p-6 rounded-lg shadow-lg text-center">
+                        <div className="bg-white p-6 rounded text-center">
                             <img 
                                 src={src} 
                                 alt={`slide-${index}`} 
