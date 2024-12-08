@@ -26,6 +26,13 @@ import { Autoplay } from 'swiper/modules';
 
 import { useInView } from 'react-intersection-observer';
 
+// Define targetStats outside the component to prevent re-creation on every render
+const targetStats = {
+  cases: 400,
+  newUsers: 1250,
+  statsProvided: 45,
+};
+
 const poppins = Poppins({
   subsets: ['latin'],
   weight: ['100', '200', '300', '400', '500', '600', '700'],
@@ -38,12 +45,6 @@ export default function Hero() {
     newUsers: 0,
     statsProvided: 0,
   });
-
-  const targetStats = {
-    cases: 400,
-    newUsers: 1250,
-    statsProvided: 45,
-  };
 
   const animateStats = (start, end, setter) => {
     let startTime;
@@ -435,11 +436,11 @@ export default function Hero() {
               }}
             >
               {successStories.map((story, index) => (
-                <SwiperSlide key={index} style={{ width: '300px', height: 'auto' }}>
+                <SwiperSlide key={index} style={{ width: '320px', height: '360px' }}>
                   <div className="bg-white rounded shadow-md p-6 h-full flex flex-col justify-between hover:shadow-xl transition-shadow">
                     <div>
                       <h4 className="text-xl font-semibold text-blue-950 mb-2">{story.name}</h4>
-                      <p className="text-base text-gray-700 italic mb-4">"{story.quote}"</p>
+                      <p className="text-base text-gray-700 italic mb-4">&ldquo;{story.quote}&rdquo;</p>
                     </div>
                     <div className="flex items-center justify-start gap-4 text-gray-700 mt-auto">
                       <span className="text-sm">
@@ -560,6 +561,32 @@ export default function Hero() {
               <p className="text-lg sm:text-xl text-gray-700 mt-4 max-w-2xl mx-auto">
                 By choosing Cadex, you gain access to advanced AI-driven tools and personalized learning paths at a fraction of the cost of traditional exam prep services. Invest smartly in your legal education without breaking the bank.
               </p>
+            </div>
+          </div>
+        </div>
+
+        <VerticalDivider />
+
+        {/* FAQ Section */}
+        <div
+          ref={faqRef}
+          className={`flex flex-col items-center py-10 px-4 md:px-8 lg:px-16 transition-all duration-1000 ${
+            faqInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+          }`}
+        >
+          <div className="max-w-5xl w-full">
+            <h3 className="text-4xl lg:text-7xl font-semibold my-12 text-center text-blue-950 ">
+              Frequently Asked Questions
+            </h3>
+            <div className="space-y-6">
+              {faqs.map((faq, index) => (
+                <div key={index} className="bg-white rounded shadow-md p-6">
+                  <h4 className="text-xl font-semibold text-blue-950 mb-2">
+                    {faq.question}
+                  </h4>
+                  <p className="text-base text-gray-700">{faq.answer}</p>
+                </div>
+              ))}
             </div>
           </div>
         </div>
