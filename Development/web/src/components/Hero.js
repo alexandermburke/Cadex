@@ -98,9 +98,8 @@ export default function Hero() {
     localStorage.setItem('hasSeenDisclaimer', 'true');
   };
 
-  // Words that will have the flare effect
-  const flareWordsFirstLine = ['your'];
-  const flareWordsSecondLine = ['Legal', 'Journey'];
+  // Animated Phrase: "Law Study Tool"
+  const animatedPhrase = 'Law Study Tool';
 
   const features = [
     {
@@ -192,7 +191,7 @@ export default function Hero() {
       image: '/avatar2.png',
     },
     {
-      name: 'Laura emerald',
+      name: 'Laura Emerald',
       title: 'Professor of Law at Stanford University',
       handle: '@lauraemerald',
       quote:
@@ -304,64 +303,39 @@ export default function Hero() {
             loaded ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'
           }`}
         >
-          {/* First line: Improving your */}
+          {/* Updated Tagline: "Your All-in-One Law Study Tool" */}
           <h2
-            className={
-              'text-5xl sm:text-7xl font-semibold py-2 mb-0 ' + poppins.className
-            }
-          >
-            Improving{' '}
-            {/* Flare effect on "your" */}
-            <span className="relative inline-block" key={animationTrigger}>
-              {flareWordsFirstLine.map((word, wordIndex) => (
-                <span key={wordIndex} style={{ whiteSpace: 'nowrap' }}>
-                  {word.split('').map((letter, letterIndex) => (
-                    <span
-                      key={letterIndex}
-                      className="flare-letter"
-                      data-letter={letter}
-                      style={{
-                        '--animation-delay': `${(wordIndex * 5 + letterIndex) * 150}ms`,
-                      }}
-                    >
-                      {letter}
-                    </span>
-                  ))}
-                </span>
-              ))}
-            </span>
-          </h2>
+  className={
+    'text-5xl sm:text-7xl font-semibold py-2 mb-0 ' + poppins.className
+  }
+>
+  {/* Normal "Your All-in-One" */}
+  <span className="block mb-4">Your All-in-One</span>
+  {/* Animated "Law Study Tool" */}
+  <span className="relative inline-block" key={animationTrigger} aria-hidden="true">
+    {animatedPhrase.split('').map((letter, letterIndex) => {
+      if (letter === ' ') {
+        return <span key={letterIndex}>&nbsp;</span>;
+      }
+      return (
+        <span
+          key={letterIndex}
+          className="flare-letter"
+          data-letter={letter}
+          style={{
+            '--animation-delay': `${letterIndex * 150}ms`,
+          }}
+        >
+          {letter}
+        </span>
+      );
+    })}
+  </span>
+  {/* Screen Reader Text */}
+  <span className="sr-only">Your All-in-One Law Study Tool</span>
+</h2>
 
-          {/* Second line: Legal Journey with AI */}
-          <h2
-            className={
-              'text-5xl sm:text-7xl font-semibold py-2 mb-8 ' + poppins.className
-            }
-          >
-            {/* Flare effect on "Legal Journey" */}
-            <span className="relative inline-block" key={animationTrigger}>
-              {flareWordsSecondLine.map((word, wordIndex) => (
-                <span key={wordIndex} style={{ whiteSpace: 'nowrap' }}>
-                  {word.split('').map((letter, letterIndex) => (
-                    <span
-                      key={letterIndex}
-                      className="flare-letter"
-                      data-letter={letter}
-                      style={{
-                        '--animation-delay': `${(wordIndex * 5 + letterIndex) * 150}ms`,
-                      }}
-                    >
-                      {letter}
-                    </span>
-                  ))}
-                  {' '}
-                </span>
-              ))}
-            </span>{' '}
-            with AI
-          </h2>
-
-          <p className="text-center sm:text-lg md:text-xl text-black max-w-2xl">
+          <p className="text-center sm:text-lg md:text-xl text-black max-w-2xl my-6">
             Cadex offers a highly advanced AI-based exam prep with direct feedback to help anyone interested in law excel at a much more affordable price than traditional study tools.
           </p>
 
@@ -438,10 +412,10 @@ export default function Hero() {
         >
           <div className="max-w-7xl w-full">
             <h3 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-semibold text-center text-blue-950">
-              Who Can Benefit from Cadex
+              Who Can <span className='font-medium goldGradient '>Benefit</span> from Cadex
             </h3>
             <p className="text-center sm:text-lg md:text-xl text-black max-w-3xl mx-auto my-6">
-              Cadex is designed for anyone passionate about law—whether you are a high school student exploring career options, an undergraduate considering law school, an aspiring law student preparing for entrance exams, an enrolled law student, or a legal professional seeking to enhance your knowledge. Our platform adapts to your level and helps you progress in your legal journey.
+              Cadex is designed for anyone passionate about law - whether you are a high school student exploring career options, an undergraduate considering law school, an aspiring law student preparing for entrance exams, an enrolled law student, or a legal professional seeking to enhance your knowledge. Our platform adapts to your level and helps you progress in your legal journey.
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 mt-8">
               <div className="flex flex-col items-center p-6 bg-white rounded shadow-md hover:shadow-xl transition-shadow">
@@ -488,7 +462,7 @@ export default function Hero() {
           <div className="max-w-5xl w-full">
             {/* Section Title */}
             <h3 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-semibold text-center text-blue-950 mb-8">
-              Save Money with Cadex
+              Save <span className='font-medium goldGradient '>Money</span> with Cadex
             </h3>
             
             {/* Pricing Comparison Cards */}
@@ -536,19 +510,7 @@ export default function Hero() {
               </p>
             </div>
             
-            {/* Call-to-Action Button */}
-            <div className="mt-8 flex justify-center">
-              <Link
-                href="/pricing"
-                className="group before:ease relative h-12 w-56 overflow-hidden rounded bg-gradient-to-r from-blue-950 to-slate-700 text-white shadow-2xl transition-all before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-56"
-              >
-                <div className="flex items-center justify-center h-full">
-                  View Pricing
-                  <i className="ml-8 fa-solid fa-arrow-right opacity-0 group-hover:opacity-100 transition-opacity duration-200"></i>
-                </div>
-              </Link>
-            </div>
-          </div>
+           </div>
         </div>
 
         {/* Vertical Divider */}
