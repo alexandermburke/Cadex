@@ -181,7 +181,7 @@ export default function Hero() {
       initialScore: 154,
       newScore: 158,
       difference: 4,
-      quote: "I tried LSATMax after my attempt with the $950 Testmaster's online equivalent brought my score from a 154 to a 158. The improvement gave me the confidence I needed!",
+      quote: "I tried Cadex after my attempt with the $950 Testmaster's online equivalent brought my score from a 154 to a 158. The improvement gave me the confidence I needed!",
     },
     {
       name: "John Smith",
