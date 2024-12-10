@@ -187,7 +187,7 @@ export default function Header() {
                 <Link href={'/'}>
                     <div className='flex items-center gap-2'>
                         <Image 
-                            src="/header.png" 
+                            src="/header.avif" 
                             alt="Cadex Law Logo" 
                             width={44} 
                             height={44} 

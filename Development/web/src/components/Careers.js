@@ -24,11 +24,11 @@ export default function Careers() {
             <div className='flex flex-col items-center gap-8 text-center w-full lg:max-w-2xl'>
                 <div className='flex flex-col items-center'>
                     <Image
-                        src="/header.png" 
+                        src="/header.avif" 
                         alt="Cadex Law Logo"
-                        width={96} // Adjust the width
-                        height={96} // Adjust the height
-                        className='w-32 h-32 sm:mr-4 mb-4'
+                        width={72} // Adjust the width
+                        height={72} // Adjust the height
+                        className='w-auto h-auto sm:mr-4 mb-4'
                         priority // Ensures this image is prioritized in loading
                     />
                     <h2 className={'text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-semibold ' + poppins.className}>
