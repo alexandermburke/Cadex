@@ -28,7 +28,7 @@ export default function Careers() {
                         alt="Cadex Law Logo"
                         width={96} // Adjust the width
                         height={96} // Adjust the height
-                        className='w-24 h-24 sm:mr-4 mb-4'
+                        className='w-32 h-32 sm:mr-4 mb-4'
                         priority // Ensures this image is prioritized in loading
                     />
                     <h2 className={'text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-semibold ' + poppins.className}>
