@@ -38,13 +38,14 @@ export default function Login() {
   return (
     <>
       <div className="flex flex-col gap-6 items-center sm:flex-row sm:justify-center sm:items-center py-10">
-        <Image
-          src="/header.png"
-          alt="Cadex Law Logo"
-          width={96}
-          height={96}
-          className="w-28 h-28 sm:mr-4"
-        />
+      <Image
+                        src="/header.avif" 
+                        alt="Cadex Law Logo"
+                        width={144} 
+                        height={144} 
+                        className='w-24 h-24 sm:mr-4 mb-4'
+                        unoptimized={true}
+                    />
         <div className="text-center sm:text-left">
           <h2
             className={
