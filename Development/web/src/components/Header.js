@@ -170,7 +170,8 @@ export default function Header() {
                             alt="Cadex Law Logo" 
                             width={44} 
                             height={44} 
-                            className={`${logoLoaded ? 'logo-animation' : ''}`} 
+                            className={`${logoLoaded ? 'logo-animation' : 'w-12 h-12'}`} 
+                            unoptimized={true}
                         />
                         <h1 className={'text-xl sm:text-2xl goldGradient font-medium ' + poppins.className}>
                             Cadex Law
