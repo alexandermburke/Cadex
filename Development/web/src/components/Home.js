@@ -278,7 +278,7 @@ export default function Hero() {
             Students
           </h4>
           <p className="text-base text-center text-gray-700">
-            Start strong and explore law early.
+            Start strong and explore law early
           </p>
         </div>
       </SwiperSlide>
@@ -289,7 +289,7 @@ export default function Hero() {
             Undergrads
           </h4>
           <p className="text-base text-center text-gray-700">
-            Prep for law school success.
+            Prep for law school success
           </p>
         </div>
       </SwiperSlide>
@@ -300,7 +300,7 @@ export default function Hero() {
             Professionals
           </h4>
           <p className="text-base text-center text-gray-700">
-            Enhance knowledge and skills.
+            Enhance knowledge and skills
           </p>
         </div>
       </SwiperSlide>

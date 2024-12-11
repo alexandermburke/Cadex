@@ -174,7 +174,7 @@ export default function Header() {
                             unoptimized={true}
                         />
                         <h1 className={'text-xl sm:text-2xl goldGradient font-medium ' + poppins.className}>
-                            Cadex Law
+                            CadexLaw
                         </h1>
                     </div>
                 </Link>
