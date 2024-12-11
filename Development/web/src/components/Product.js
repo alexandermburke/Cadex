@@ -37,7 +37,7 @@ export default function Hero() {
             processInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
           }`}
         >
-          <h3 className="text-5xl sm:text-6xl font-semibold text-center text-white mb-16">
+          <h3 className="text-5xl sm:text-6xl font-semibold text-center text-white mb-20">
             How It Works
           </h3>
           <div className="flex flex-wrap justify-center items-center gap-16 md:gap-20 max-w-6xl mx-auto">
@@ -85,6 +85,8 @@ export default function Hero() {
               <span className="text-white text-sm mt-1">Reach your target scores</span>
             </div>
           </div>
+        </div>
+        <div className="mb-20">
         </div>
       </div>
     </div>

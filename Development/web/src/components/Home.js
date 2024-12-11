@@ -238,7 +238,7 @@ export default function Hero() {
     {/* Who Can Benefit Section */}
 <div
   ref={whoRef}
-  className={`flex flex-col items-center py-10 px-4 md:px-8 lg:px-16 bg-transparent transition-all duration-1000 ${
+  className={`flex flex-col items-center py-4 px-4 md:px-8 lg:px-16 bg-transparent transition-all duration-1000 ${
     whoInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
   }`}
 >
@@ -269,11 +269,11 @@ export default function Hero() {
           slidesPerView: 3,
         },
       }}
-      className="my-8"
+      className="my-4"
     >
       <SwiperSlide style={{ width: '220px', height: '250px' }}>
-        <div className="flex flex-col items-center p-6 bg-white rounded shadow-md hover:shadow-xl transition-shadow">
-          <FaGraduationCap className="text-blue-950 text-4xl mb-4" />
+      <div className="w-full h-full flex flex-col items-center justify-center p-4 bg-white rounded shadow-md hover:shadow-xl transition-shadow">
+      <FaGraduationCap className="text-blue-950 text-4xl mb-4" />
           <h4 className="text-xl font-semibold text-blue-950 mb-2 text-center">
             Students
           </h4>
@@ -283,8 +283,8 @@ export default function Hero() {
         </div>
       </SwiperSlide>
       <SwiperSlide style={{ width: '220px', height: '250px' }}>
-        <div className="flex flex-col items-center p-6 bg-white rounded shadow-md hover:shadow-xl transition-shadow">
-          <FaGraduationCap className="text-blue-950 text-4xl mb-4" />
+      <div className="w-full h-full flex flex-col items-center justify-center p-4 bg-white rounded shadow-md hover:shadow-xl transition-shadow">
+      <FaGraduationCap className="text-blue-950 text-4xl mb-4" />
           <h4 className="text-xl font-semibold text-blue-950 mb-2 text-center">
             Undergrads
           </h4>
@@ -294,8 +294,8 @@ export default function Hero() {
         </div>
       </SwiperSlide>
       <SwiperSlide style={{ width: '220px', height: '250px' }}>
-        <div className="flex flex-col items-center p-6 bg-white rounded shadow-md hover:shadow-xl transition-shadow">
-          <FaGavel className="text-blue-950 text-4xl mb-4" />
+      <div className="w-full h-full flex flex-col items-center justify-center p-4 bg-white rounded shadow-md hover:shadow-xl transition-shadow">
+      <FaGavel className="text-blue-950 text-4xl mb-4" />
           <h4 className="text-xl font-semibold text-blue-950 mb-2 text-center">
             Professionals
           </h4>
@@ -314,7 +314,7 @@ export default function Hero() {
         {/* Universities Section */}
         <div
           ref={uniRef}
-          className={`flex flex-col items-center py-8 px-4 md:px-8 lg:px-16 transition-all duration-1000 ${
+          className={`flex flex-col items-center px-4 md:px-8 lg:px-16 transition-all duration-1000 ${
             uniInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
           }`}
         >
