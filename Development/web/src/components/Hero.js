@@ -232,7 +232,7 @@ export default function Hero() {
   const [processRef, processInView] = useInView({ threshold: 0.1, triggerOnce: true });
 
   return (
-    <section className="w-full bg-white">
+    <section className="w-full bg-transparent">
       {/* Disclaimer Popup */}
       {showDisclaimer && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
@@ -315,64 +315,10 @@ export default function Hero() {
 
         <VerticalDivider />
 
-        {/* Process Visualization Section */}
-        <div
-          ref={processRef}
-          className={`flex flex-col items-center py-10 px-4 md:px-8 lg:px-16 bg-white transition-all duration-1000 ${
-            processInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
-          }`}
-        >
-          <h3 className="text-4xl sm:text-5xl font-semibold text-center text-blue-950 mb-8">
-            How It Works
-          </h3>
-          <div className="flex flex-wrap justify-center items-center gap-6 md:gap-12 max-w-5xl mx-auto">
-            {/* Step 1 */}
-            <div className="flex flex-col items-center text-center">
-              <FaUsers className="text-blue-950 text-3xl mb-2" />
-              <span className="font-semibold text-blue-950">Sign Up</span>
-              <span className="text-gray-700 text-sm">Create your account & start exploring</span>
-            </div>
-            <div className="hidden md:block h-0.5 bg-gray-300 w-12" />
-
-            {/* Step 2 */}
-            <div className="flex flex-col items-center text-center">
-              <FaFileAlt className="text-blue-950 text-3xl mb-2" />
-              <span className="font-semibold text-blue-950">Assess</span>
-              <span className="text-gray-700 text-sm">Take a quick diagnostic</span>
-            </div>
-            <div className="hidden md:block h-0.5 bg-gray-300 w-12" />
-
-            {/* Step 3 */}
-            <div className="flex flex-col items-center text-center">
-              <FaRobot className="text-blue-950 text-3xl mb-2" />
-              <span className="font-semibold text-blue-950">Personalize</span>
-              <span className="text-gray-700 text-sm">Get AI-tailored materials</span>
-            </div>
-            <div className="hidden md:block h-0.5 bg-gray-300 w-12" />
-
-            {/* Step 4 */}
-            <div className="flex flex-col items-center text-center">
-              <FaTasks className="text-blue-950 text-3xl mb-2" />
-              <span className="font-semibold text-blue-950">Practice Exams</span>
-              <span className="text-gray-700 text-sm">Improve with instant feedback</span>
-            </div>
-            <div className="hidden md:block h-0.5 bg-gray-300 w-12" />
-
-            {/* Step 5 */}
-            <div className="flex flex-col items-center text-center">
-              <FaThumbsUp className="text-blue-950 text-3xl mb-2" />
-              <span className="font-semibold text-blue-950">Succeed</span>
-              <span className="text-gray-700 text-sm">Reach your target scores</span>
-            </div>
-          </div>
-        </div>
-
-        <VerticalDivider />
-
         {/* Features Section */}
         <div
           ref={featuresRef}
-          className={`flex flex-col items-center py-4 px-4 md:px-8 lg:px-16 bg-white transition-all duration-1000 ${
+          className={`flex flex-col items-center py-4 px-4 md:px-8 lg:px-16 bg-transparent transition-all duration-1000 ${
             featuresInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
           }`}
         >
@@ -470,69 +416,6 @@ export default function Hero() {
         </div>
 
         <VerticalDivider />
-
-        {/* Who Can Benefit Section */}
-        <div
-          ref={whoRef}
-          className={`flex flex-col items-center py-10 px-4 md:px-8 lg:px-16 bg-white transition-all duration-1000 ${
-            whoInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
-          }`}
-        >
-          <div className="max-w-7xl w-full">
-            <h3 className="text-4xl sm:text-5xl font-semibold text-center text-blue-950">
-              Who Benefits
-            </h3>
-            <p className="text-center sm:text-lg md:text-xl text-black max-w-3xl mx-auto my-4">
-              From high schoolers to law professionals.
-            </p>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 mt-8">
-              <div className="flex flex-col items-center p-6 bg-white rounded shadow-md hover:shadow-xl transition-shadow">
-                <FaGraduationCap className="text-blue-950 text-4xl mb-4" />
-                <h4 className="text-xl font-semibold text-blue-950 mb-2 text-center">
-                  Students
-                </h4>
-                <p className="text-base text-center text-gray-700">
-                  Start strong and explore law early.
-                </p>
-              </div>
-              <div className="flex flex-col items-center p-6 bg-white rounded shadow-md hover:shadow-xl transition-shadow">
-                <FaGraduationCap className="text-blue-950 text-4xl mb-4" />
-                <h4 className="text-xl font-semibold text-blue-950 mb-2 text-center">
-                  Undergrads
-                </h4>
-                <p className="text-base text-center text-gray-700">
-                  Prep for law school success.
-                </p>
-              </div>
-              <div className="flex flex-col items-center p-6 bg-white rounded shadow-md hover:shadow-xl transition-shadow">
-                <FaGavel className="text-blue-950 text-4xl mb-4" />
-                <h4 className="text-xl font-semibold text-blue-950 mb-2 text-center">
-                  Professionals
-                </h4>
-                <p className="text-base text-center text-gray-700">
-                  Enhance knowledge and skills.
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <VerticalDivider />
-
-        {/* Universities Section */}
-        <div
-          ref={uniRef}
-          className={`flex flex-col items-center py-8 px-4 md:px-8 lg:px-16 transition-all duration-1000 ${
-            uniInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
-          }`}
-        >
-          <div className="max-w-5xl w-full">
-            <h3 className="text-4xl sm:text-5xl font-semibold my-8 text-center text-blue-950 ">
-              Universities We Partner With
-            </h3>
-            <CarouselComponent />
-          </div>
-        </div>
       </div>
     </section>
   );
