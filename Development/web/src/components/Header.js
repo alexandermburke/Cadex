@@ -63,16 +63,6 @@ export default function Header() {
             >
                 <p>{currentUser ? 'Account' : 'Login'}</p>
             </Link>
-            {/* Updated Investors Button */}
-            <a 
-                href='https://investors.cadexlaw.com' 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className='mx-2 ml-4 duration-200 overflow-hidden p-0.5 rounded-lg relative'
-            >
-                <div className='absolute inset-0'></div>
-            
-            </a>
         </nav>
     );
 
@@ -89,7 +79,7 @@ export default function Header() {
                 href={'/pricing'}
             >
                 <p>Pricing</p>
-            </Link>    
+            </Link>
         </nav>
     );
 
