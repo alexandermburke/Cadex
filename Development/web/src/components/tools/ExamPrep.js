@@ -53,7 +53,7 @@ export default function ExamPrep() {
     difficulty: '',
     lawType: 'General Law',
     questionLimit: 5, // Default to 5 questions
-    instantFeedback: true, // New field to control instant feedback
+    instantFeedback: false, // New field to control instant feedback
     selectedQuestionTypes: [], // New field for selected question types
   });
 
@@ -603,7 +603,7 @@ export default function ExamPrep() {
         {questionStem && (
           <div className="w-full max-w-5xl mb-6 p-6 bg-white rounded-lg shadow-md overflow-y-scroll">
             <h3 className="text-2xl font-semibold text-blue-900 mb-2">Exam Question</h3>
-            <h3 className="text-sm font-medium text-black mb-6">AI API Version: 0.3.4</h3>
+            <h3 className="text-sm font-medium text-black mb-6">LExAPI Version: 0.3.4</h3>
             <p className="text-gray-800 mb-4">{questionStem}</p>
             {options.length > 0 && (
               <ul className="list-none">

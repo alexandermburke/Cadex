@@ -243,7 +243,7 @@ export default function Hero() {
   }`}
 >
   <div className="max-w-7xl w-full">
-    <h3 className="text-4xl sm:text-5xl font-semibold text-center text-blue-950">
+    <h3 className="text-4xl sm:text-5xl font-semibold text-center text-blue-950 my-8">
       Who Benefits
     </h3>
     <p className="text-center sm:text-lg md:text-xl text-black max-w-3xl mx-auto my-4">
