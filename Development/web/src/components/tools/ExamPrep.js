@@ -156,6 +156,12 @@ export default function ExamPrep() {
     }));
   }, [examConfig.examType]);
 
+  // Utility function to extract the option letter
+  const getOptionLetter = (option) => {
+    const match = option.match(/^\(?([A-E])\)?[).:]/i);
+    return match ? match[1].toUpperCase() : null;
+  };
+
   const handleGetQuestion = async () => {
     setIsLoading(true);
     setQuestionText('');
@@ -185,7 +191,7 @@ export default function ExamPrep() {
       setOptions(choices);
 
       setQuestionText(question);
-      setIsExamStarted(true); 
+      setIsExamStarted(true);
     } catch (error) {
       console.error('Error fetching exam question:', error);
       setQuestionText('An error occurred while fetching the exam question.');
@@ -194,7 +200,7 @@ export default function ExamPrep() {
     }
   };
 
-    const parseQuestion = (text) => {
+  const parseQuestion = (text) => {
     const lines = text.split('\n');
 
     let stemLines = [];
@@ -228,13 +234,22 @@ export default function ExamPrep() {
     setIsLoading(true);
     setAnswerResult('');
 
+    // Find the selected option text based on the letter
+    const selectedOption = options.find(
+      (option) => getOptionLetter(option) === inputText
+    );
+
     try {
       const response = await fetch('/api/submit-exam-answer', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ question: questionText, answer: inputText, examType: examConfig.examType }),
+        body: JSON.stringify({
+          question: questionText,
+          answer: inputText, // Sending the option letter (e.g., 'A', 'B')
+          examType: examConfig.examType,
+        }),
       });
 
       if (!response.ok) {
@@ -248,7 +263,7 @@ export default function ExamPrep() {
 
       setAnswerResult(feedbackText);
 
-       setAnsweredQuestions((prevQuestions) => [
+      setAnsweredQuestions((prevQuestions) => [
         ...prevQuestions,
         {
           question: questionText || 'No question text provided.',
@@ -258,12 +273,12 @@ export default function ExamPrep() {
         },
       ]);
 
-     setCurrentQuestionCount((prevCount) => prevCount + 1);
+      setCurrentQuestionCount((prevCount) => prevCount + 1);
 
       if (examConfig.instantFeedback) {
         openResultModal();
       } else {
-       setTimeout(() => {
+        setTimeout(() => {
           handleGetQuestion();
         }, 500);
       }
@@ -648,20 +663,25 @@ export default function ExamPrep() {
             ) : (
               // Multiple Choice Mode
               <div className="flex flex-col space-y-2">
-                {options.map((option, index) => (
-                  <label key={index} className="flex items-center">
-                    <input
-                      type="radio"
-                      name="multipleChoiceAnswer"
-                      value={option.charAt(0)} // Assuming options start with 'A)', 'B)', etc.
-                      checked={inputText === option.charAt(0)}
-                      onChange={(e) => setInputText(e.target.value)}
-                      className="form-radio h-4 w-4 text-blue-900"
-                      disabled={isLoading}
-                    />
-                    <span className="ml-2">{option}</span>
-                  </label>
-                ))}
+                {options.map((option, index) => {
+                  const optionLetter = getOptionLetter(option);
+                  if (!optionLetter) return null; // Skip if no valid option letter
+
+                  return (
+                    <label key={index} className="flex items-center">
+                      <input
+                        type="radio"
+                        name="multipleChoiceAnswer"
+                        value={optionLetter}
+                        checked={inputText === optionLetter}
+                        onChange={(e) => setInputText(e.target.value)}
+                        className="form-radio h-4 w-4 text-blue-900"
+                        disabled={isLoading}
+                      />
+                      <span className="ml-2">{option}</span>
+                    </label>
+                  );
+                })}
               </div>
             )}
           </div>

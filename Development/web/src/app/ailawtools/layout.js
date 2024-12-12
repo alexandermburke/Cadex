@@ -1,7 +1,7 @@
 'use client'
 import CoolLayout from '@/components/CoolLayout'
 import Login from '@/components/Login'
-import Main from '@/components/Main'
+import MainTool from '@/components/MainTool'
 import { useAuth } from '@/context/AuthContext'
 import React from 'react'
 
@@ -24,9 +24,9 @@ export default function SubLayout({ children }) {
 
     return (
         <CoolLayout>
-            <Main>
+            <MainTool>
                 {content}
-            </Main>
+            </MainTool>
         </CoolLayout>
     )
 }

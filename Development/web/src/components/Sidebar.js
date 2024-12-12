@@ -77,8 +77,10 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar })
     >
       {/* Logo or Brand Name */}
       <div className="p-6 flex items-center justify-center">
-        <h1 className="text-3xl font-bold goldGradient">Dashboard</h1>
-      </div>
+       <h1 className="text-3xl font-bold goldGradient shine-text relative overflow-hidden">
+         Dashboard
+          </h1>
+        </div>
 
       {/* Navigation Sections */}
       <nav className="flex-1 overflow-y-auto px-6">
