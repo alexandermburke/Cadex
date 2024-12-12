@@ -297,7 +297,7 @@ export default function Hero() {
           </h2>
 
           <p className="text-center sm:text-lg md:text-xl text-black max-w-2xl my-6">
-            Cadex combines AI-driven prep and real-time feedback to help you excel at a fraction of the cost.
+            Cadex combines AI-driven prep and real time feedback to help you excel at a fraction of the cost.
           </p>
 
           <div className="flex justify-center mt-6 mb-6">
