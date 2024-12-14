@@ -1,219 +1,1214 @@
+// AiTutor.js
 'use client';
-import React, { useState } from 'react';
+
+import React, { useState, useEffect, useRef } from 'react';
 import Sidebar from '../Sidebar';
 import { useRouter } from 'next/navigation';
-import { pdfjs } from 'react-pdf';
-import { FaBars, FaTimes } from 'react-icons/fa';
-import { motion, AnimatePresence } from 'framer-motion';
+import { db } from '@/firebase';
 import {
-  PdfLoader,
-  PdfHighlighter,
-  Highlight,
-  Popup,
-} from 'react-pdf-highlighter';
+  doc,
+  collection,
+  addDoc,
+  getDocs,
+  deleteDoc,
+  query,
+  where,
+} from 'firebase/firestore';
+import { useAuth } from '@/context/AuthContext';
+import { FaBars, FaTimes, FaSave, FaSyncAlt } from 'react-icons/fa';
+import { motion, AnimatePresence } from 'framer-motion';
 
-pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
-
-export default function ContractReview() {
-  const [pdfFile, setPdfFile] = useState(null);
-  const [pdfUrl, setPdfUrl] = useState(null);
-  const [highlights, setHighlights] = useState([]);
-  const [reviewResult, setReviewResult] = useState('');
-  const [isSidebarVisible, setIsSidebarVisible] = useState(true);
-  const [isLoading, setIsLoading] = useState(false);
+export default function AiTutor() {
+  const { currentUser, userDataObj } = useAuth();
   const router = useRouter();
 
-  const handlePdfUpload = (event) => {
-    const file = event.target.files[0];
-    if (file && file.type === 'application/pdf') {
-      setPdfFile(file);
-      const fileUrl = URL.createObjectURL(file);
-      setPdfUrl(fileUrl);
-    } else {
-      alert('Please upload a valid PDF file.');
-    }
+  const [inputText, setInputText] = useState('');
+  const [questionText, setQuestionText] = useState('');
+  const [questionStem, setQuestionStem] = useState('');
+  const [options, setOptions] = useState([]);
+  const [answerResult, setAnswerResult] = useState('');
+  const [isSidebarVisible, setIsSidebarVisible] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isConfigModalOpen, setIsConfigModalOpen] = useState(false);
+  const [isResultModalOpen, setIsResultModalOpen] = useState(false);
+  const [isLoadProgressModalOpen, setIsLoadProgressModalOpen] = useState(false);
+  const [isFinalFeedbackModalOpen, setIsFinalFeedbackModalOpen] = useState(false);
+  const [savedProgresses, setSavedProgresses] = useState([]);
+
+  const [currentQuestionCount, setCurrentQuestionCount] = useState(0);
+  const [answeredQuestions, setAnsweredQuestions] = useState([]);
+  const [isSessionActive, setIsSessionActive] = useState(false);
+  const [isCommunicating, setIsCommunicating] = useState(false); // Define isCommunicating
+
+  const [tutorConfig, setTutorConfig] = useState({
+    examType: 'LSAT', // Default Exam Type
+    topic: 'Logical Reasoning',
+    subTopic: '',
+    complexity: 'Intermediate',
+    questionLimit: 5,
+    instantFeedback: false,
+    selectedQuestionTypes: [],
+  });
+
+  const [answerMode, setAnswerMode] = useState('written'); // Only 'written' mode remains
+
+  // Mapping of Exam Types to their respective Topics and Subtopics
+  const examMapping = {
+    LSAT: {
+      topics: [
+        { value: 'Logical Reasoning', label: 'Logical Reasoning' },
+        { value: 'Reading Comprehension', label: 'Reading Comprehension' },
+        { value: 'Analytical Reasoning', label: 'Analytical Reasoning' },
+      ],
+      subTopics: {
+        'Logical Reasoning': [
+          { value: 'Assumption', label: 'Assumption' },
+          { value: 'Strengthen', label: 'Strengthen' },
+          { value: 'Weaken', label: 'Weaken' },
+          // Add more LSAT Logical Reasoning subtopics as needed
+        ],
+        'Reading Comprehension': [
+          { value: 'Main Idea', label: 'Main Idea' },
+          { value: 'Detail', label: 'Detail' },
+          { value: 'Inference', label: 'Inference' },
+          // Add more LSAT Reading Comprehension subtopics as needed
+        ],
+        'Analytical Reasoning': [
+          { value: 'Logic Games', label: 'Logic Games' },
+          // Add more LSAT Analytical Reasoning subtopics as needed
+        ],
+      },
+    },
+    Bar: {
+      topics: [
+        { value: 'Criminal Law', label: 'Criminal Law' },
+        { value: 'Civil Procedure', label: 'Civil Procedure' },
+        { value: 'Contracts', label: 'Contracts' },
+        // Add more Bar exam topics as needed
+      ],
+      subTopics: {
+        'Criminal Law': [
+          { value: 'Homicide', label: 'Homicide' },
+          { value: 'Theft', label: 'Theft' },
+          { value: 'Fraud', label: 'Fraud' },
+          // Add more Bar Criminal Law subtopics as needed
+        ],
+        'Civil Procedure': [
+          { value: 'Jurisdiction', label: 'Jurisdiction' },
+          { value: 'Pleadings', label: 'Pleadings' },
+          { value: 'Discovery', label: 'Discovery' },
+          // Add more Bar Civil Procedure subtopics as needed
+        ],
+        'Contracts': [
+          { value: 'Formation', label: 'Formation' },
+          { value: 'Performance', label: 'Performance' },
+          { value: 'Breach', label: 'Breach' },
+          // Add more Bar Contracts subtopics as needed
+        ],
+      },
+    },
+    MPRE: {
+      topics: [
+        { value: 'Professional Responsibility', label: 'Professional Responsibility' },
+        { value: 'Ethics', label: 'Ethics' },
+        // Add more MPRE topics as needed
+      ],
+      subTopics: {
+        'Professional Responsibility': [
+          { value: 'Confidentiality', label: 'Confidentiality' },
+          { value: 'Conflict of Interest', label: 'Conflict of Interest' },
+          // Add more MPRE Professional Responsibility subtopics as needed
+        ],
+        'Ethics': [
+          { value: 'Advertising', label: 'Advertising' },
+          { value: 'Fees', label: 'Fees' },
+          // Add more MPRE Ethics subtopics as needed
+        ],
+      },
+    },
+    // Add more Exams as needed
   };
 
-  const handleAnalyzeContract = async () => {
-    if (!pdfFile) return;
+  const complexityMapping = {
+    Beginner: [
+      { value: 'Basic', label: 'Basic' },
+      { value: 'Fundamental', label: 'Fundamental' },
+    ],
+    Intermediate: [
+      { value: 'Intermediate', label: 'Intermediate' },
+      { value: 'Advanced', label: 'Advanced' },
+    ],
+    Advanced: [
+      { value: 'Advanced', label: 'Advanced' },
+      { value: 'Expert', label: 'Expert' },
+    ],
+  };
 
-    setIsLoading(true);
+  const questionTypes = [
+    'Explanation',
+    'Application',
+    'Analysis',
+    'Synthesis',
+    'Evaluation',
+  ];
 
-    try {
-      const reader = new FileReader();
-      reader.readAsArrayBuffer(pdfFile);
-      reader.onloadend = async () => {
-        const arrayBuffer = reader.result;
+  const [topicOptions, setTopicOptions] = useState(examMapping['LSAT'].topics);
+  const [subTopicOptions, setSubTopicOptions] = useState(
+    examMapping['LSAT'].subTopics['Logical Reasoning'] || []
+  );
+  const [complexityOptions, setComplexityOptions] = useState(complexityMapping['Intermediate']);
 
-        const response = await fetch('/api/analyze-contract', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/pdf',
-          },
-          body: arrayBuffer,
-        });
+  // Update Topics and Subtopics when Exam Type changes
+  useEffect(() => {
+    const selectedExam = tutorConfig.examType;
+    const newTopicOptions = examMapping[selectedExam]?.topics || [];
+    const newSubTopicOptions = examMapping[selectedExam]?.subTopics[tutorConfig.topic] || [];
 
-        if (!response.ok) {
-          throw new Error('Error during contract review');
+    setTopicOptions(newTopicOptions);
+    setSubTopicOptions(newSubTopicOptions);
+
+    setTutorConfig((prevConfig) => ({
+      ...prevConfig,
+      topic: newTopicOptions[0]?.value || '',
+      subTopic: newSubTopicOptions[0]?.value || '',
+      selectedQuestionTypes: [],
+    }));
+  }, [tutorConfig.examType]);
+
+  // Update Subtopics when Topic changes
+  useEffect(() => {
+    const selectedExam = tutorConfig.examType;
+    const selectedTopic = tutorConfig.topic;
+    const newSubTopicOptions = examMapping[selectedExam]?.subTopics[selectedTopic] || [];
+
+    setSubTopicOptions(newSubTopicOptions);
+
+    setTutorConfig((prevConfig) => ({
+      ...prevConfig,
+      subTopic: newSubTopicOptions[0]?.value || '',
+      selectedQuestionTypes: [],
+    }));
+  }, [tutorConfig.topic, tutorConfig.examType]);
+
+  // Visualizer References
+  const visualizerCanvas = useRef(null);
+  const animationFrameId = useRef(null);
+
+  // Particle Class
+  class Particle {
+    constructor(canvasWidth, canvasHeight, config) {
+      this.canvasWidth = canvasWidth;
+      this.canvasHeight = canvasHeight;
+      this.config = config;
+      this.reset();
+    }
+
+    reset() {
+      // Initialize particle at a random position
+      this.x = Math.random() * this.canvasWidth;
+      this.y = Math.random() * this.canvasHeight;
+      // Assign a random velocity
+      const speed = Math.random() * this.config.maxSpeed;
+      const angle = Math.random() * Math.PI * 2;
+      this.vx = Math.cos(angle) * speed;
+      this.vy = Math.sin(angle) * speed;
+      this.size = Math.random() * this.config.maxSize + 1;
+      this.color = this.config.colors[Math.floor(Math.random() * this.config.colors.length)];
+      this.alpha = Math.random() * 0.5 + 0.5; // Opacity between 0.5 and 1
+    }
+
+    update() {
+      this.x += this.vx;
+      this.y += this.vy;
+
+      // Bounce off the edges
+      if (this.x <= 0 || this.x >= this.canvasWidth) {
+        this.vx *= -1;
+      }
+      if (this.y <= 0 || this.y >= this.canvasHeight) {
+        this.vy *= -1;
+      }
+
+      // Optionally, reset particle if it moves out of bounds significantly
+      if (this.x < -50 || this.x > this.canvasWidth + 50 || this.y < -50 || this.y > this.canvasHeight + 50) {
+        this.reset();
+      }
+    }
+
+    draw(ctx) {
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(${hexToRgb(this.color)}, ${this.alpha})`;
+      ctx.shadowColor = this.color;
+      ctx.shadowBlur = 15;
+      ctx.fill();
+    }
+  }
+
+  // Helper function to convert hex to RGB
+  function hexToRgb(hex) {
+    // Remove '#' if present
+    hex = hex.replace('#', '');
+    if (hex.length === 3) {
+      hex = hex.split('').map((h) => h + h).join('');
+    }
+    const bigint = parseInt(hex, 16);
+    const r = (bigint >> 16) & 255;
+    const g = (bigint >> 8) & 255;
+    const b = bigint & 255;
+    return `${r}, ${g}, ${b}`;
+  }
+
+  // Particle Configuration
+  const particleConfig = {
+    numParticles: 100,
+    maxSpeed: 1.0,
+    maxSize: 4,
+    colors: ['#00FFFF', '#7B68EE', '#1E90FF', '#BA55D3', '#00CED1'], // Updated AI-like colors
+  };
+
+  // Initialize and Animate Particles
+  useEffect(() => {
+    const canvas = visualizerCanvas.current;
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+
+    const initializeParticles = () => {
+      particles = [];
+      for (let i = 0; i < particleConfig.numParticles; i++) {
+        particles.push(new Particle(canvas.width, canvas.height, particleConfig));
+      }
+    };
+
+    const resizeCanvas = () => {
+      canvas.width = canvas.parentElement.clientWidth;
+      canvas.height = canvas.parentElement.clientHeight;
+      initializeParticles();
+    };
+
+    const draw = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.globalAlpha = 0.7;
+
+      particles.forEach((particle) => {
+        particle.update();
+        particle.draw(ctx);
+      });
+
+      // Optionally, draw lines between nearby particles for a network effect
+      connectParticles(ctx, particles, canvas.width, canvas.height);
+
+      animationFrameId.current = requestAnimationFrame(draw);
+    };
+
+    // Function to connect nearby particles
+    const connectParticles = (ctx, particles, width, height) => {
+      const maxDistance = 100; // Maximum distance to draw a line
+      ctx.beginPath();
+      for (let i = 0; i < particles.length; i++) {
+        for (let j = i + 1; j < particles.length; j++) {
+          const dx = particles[i].x - particles[j].x;
+          const dy = particles[i].y - particles[j].y;
+          const distance = Math.sqrt(dx * dx + dy * dy);
+          if (distance < maxDistance) {
+            ctx.strokeStyle = `rgba(${hexToRgb(particles[i].color)}, ${(1 - distance / maxDistance) * 0.2})`;
+            ctx.lineWidth = 1;
+            ctx.moveTo(particles[i].x, particles[i].y);
+            ctx.lineTo(particles[j].x, particles[j].y);
+          }
         }
+      }
+      ctx.stroke();
+    };
 
-        const data = await response.json();
-        const { analysis, highlights } = data;
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
 
-        setReviewResult(analysis);
-        setHighlights(highlights);
-      };
-    } catch (error) {
-      console.error('Error during contract review:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+    draw(); // Start the particle animation
+
+    return () => {
+      window.removeEventListener('resize', resizeCanvas);
+      if (animationFrameId.current) {
+        cancelAnimationFrame(animationFrameId.current);
+      }
+    };
+  }, []); // Empty dependency array ensures this runs once on mount
 
   const toggleSidebar = () => {
     setIsSidebarVisible(!isSidebarVisible);
   };
 
-  const HighlightPopup = ({ highlight }) => (
-    <div className="Highlight__popup">{highlight.comment.text}</div>
-  );
+  const handleGetQuestion = async () => {
+    setIsLoading(true);
+    setIsCommunicating(true);
+    setQuestionText('');
+    setQuestionStem('');
+    setOptions([]);
+    setAnswerResult('');
+    setInputText('');
+
+    try {
+      const response = await fetch('/api/get-ai-question', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(tutorConfig),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to get AI question');
+      }
+
+      const { question } = await response.json();
+
+      const { stem, choices } = parseQuestion(question);
+      setQuestionStem(stem);
+      setOptions(choices); // Although multiple-choice is removed, this can be used for structured responses
+
+      setQuestionText(question);
+      setIsSessionActive(true);
+    } catch (error) {
+      console.error('Error fetching AI question:', error);
+      setQuestionText('An error occurred while fetching the AI question.');
+    } finally {
+      setIsLoading(false);
+      setIsCommunicating(false);
+    }
+  };
+
+  const parseQuestion = (text) => {
+    // Since multiple-choice is removed, parsing may differ. Assuming AI returns a question prompt.
+    return { stem: text, choices: [] };
+  };
+
+  const handleSubmitAnswer = async () => {
+    if (!inputText.trim()) return;
+
+    setIsLoading(true);
+    setIsCommunicating(true);
+    setAnswerResult('');
+
+    try {
+      const response = await fetch('/api/submit-ai-answer', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          question: questionText,
+          answer: inputText,
+          examType: tutorConfig.examType,
+          topic: tutorConfig.topic,
+          subTopic: tutorConfig.subTopic,
+          selectedQuestionTypes: tutorConfig.selectedQuestionTypes,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to submit answer');
+      }
+
+      const { feedback, correct } = await response.json();
+
+      const feedbackText = feedback !== undefined ? feedback : 'No feedback provided.';
+      const isCorrect = typeof correct === 'boolean' ? correct : false;
+
+      setAnswerResult(feedbackText);
+
+      setAnsweredQuestions((prevQuestions) => [
+        ...prevQuestions,
+        {
+          question: questionText || 'No question text provided.',
+          answer: inputText || 'No answer provided.',
+          feedback: feedbackText,
+          correct: isCorrect,
+        },
+      ]);
+
+      setCurrentQuestionCount((prevCount) => prevCount + 1);
+
+      if (tutorConfig.instantFeedback) {
+        openResultModal();
+      } else {
+        setTimeout(() => {
+          handleGetQuestion();
+        }, 500);
+      }
+    } catch (error) {
+      console.error('Error submitting answer:', error);
+      setAnswerResult('An error occurred while submitting your answer.');
+      openResultModal();
+    } finally {
+      setIsLoading(false);
+      setIsCommunicating(false);
+    }
+  };
+
+  useEffect(() => {
+    if (currentQuestionCount >= tutorConfig.questionLimit && questionText !== '') {
+      setCurrentQuestionCount(0);
+      openFinalFeedbackModal();
+    }
+  }, [currentQuestionCount, tutorConfig.questionLimit, questionText]);
+
+  const openConfigModal = () => {
+    setIsConfigModalOpen(true);
+  };
+
+  const closeConfigModal = () => {
+    setIsConfigModalOpen(false);
+  };
+
+  const openResultModal = () => {
+    setIsResultModalOpen(true);
+  };
+
+  const closeResultModal = () => {
+    setIsResultModalOpen(false);
+  };
+
+  const openLoadProgressModal = () => {
+    fetchSavedProgresses();
+    setIsLoadProgressModalOpen(true);
+  };
+
+  const closeLoadProgressModal = () => {
+    setIsLoadProgressModalOpen(false);
+  };
+
+  const openFinalFeedbackModal = () => {
+    setIsFinalFeedbackModalOpen(true);
+  };
+
+  const closeFinalFeedbackModal = () => {
+    setIsFinalFeedbackModalOpen(false);
+  };
+
+  const handleConfigChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setTutorConfig((prevConfig) => ({
+      ...prevConfig,
+      [name]: type === 'checkbox' ? checked : value,
+    }));
+  };
+
+  const handleQuestionTypeChange = (e, type) => {
+    const { checked } = e.target;
+    setTutorConfig((prevConfig) => {
+      let newSelectedQuestionTypes = [...prevConfig.selectedQuestionTypes];
+      if (checked) {
+        newSelectedQuestionTypes.push(type);
+      } else {
+        newSelectedQuestionTypes = newSelectedQuestionTypes.filter((t) => t !== type);
+      }
+      return {
+        ...prevConfig,
+        selectedQuestionTypes: newSelectedQuestionTypes,
+      };
+    });
+  };
+
+  const handleStartTutoringSession = () => {
+    closeConfigModal();
+    handleGetQuestion();
+  };
+
+  const handleSaveProgress = async () => {
+    if (!currentUser) {
+      alert('You need to be logged in to save your progress.');
+      return;
+    }
+
+    try {
+      const progressData = {
+        userId: currentUser.uid,
+        tutorConfig: {
+          examType: tutorConfig.examType || 'LSAT',
+          topic: tutorConfig.topic || 'Logical Reasoning',
+          subTopic: tutorConfig.subTopic || '',
+          complexity: tutorConfig.complexity || 'Intermediate',
+          questionLimit: tutorConfig.questionLimit || 5,
+          instantFeedback:
+            tutorConfig.instantFeedback !== undefined ? tutorConfig.instantFeedback : true,
+          selectedQuestionTypes: tutorConfig.selectedQuestionTypes || [],
+        },
+        questionText: questionText || '',
+        inputText: inputText || '',
+        answerResult: answerResult || '',
+        currentQuestionCount: currentQuestionCount || 0,
+        answeredQuestions: answeredQuestions.map((q) => ({
+          question: q.question || 'No question text provided.',
+          answer: q.answer || 'No answer provided.',
+          feedback: q.feedback || 'No feedback provided.',
+          correct: typeof q.correct === 'boolean' ? q.correct : false,
+        })),
+        timestamp: new Date().toISOString(),
+      };
+
+      await addDoc(collection(db, 'tutorProgress'), progressData);
+
+      alert('Progress saved successfully!');
+    } catch (error) {
+      console.error('Error saving progress:', error);
+      alert('An error occurred while saving your progress.');
+    }
+  };
+
+  const fetchSavedProgresses = async () => {
+    if (!currentUser) {
+      alert('You need to be logged in to load your progress.');
+      return;
+    }
+
+    try {
+      const q = query(collection(db, 'tutorProgress'), where('userId', '==', currentUser.uid));
+      const querySnapshot = await getDocs(q);
+
+      const progresses = [];
+      querySnapshot.forEach((doc) => {
+        progresses.push({ id: doc.id, ...doc.data() });
+      });
+
+      setSavedProgresses(progresses);
+    } catch (error) {
+      console.error('Error fetching saved progresses:', error);
+      alert('An error occurred while fetching saved progresses.');
+    }
+  };
+
+  const handleLoadProgress = (progress) => {
+    setTutorConfig(progress.tutorConfig);
+    setQuestionText(progress.questionText);
+    setInputText(progress.inputText);
+    setAnswerResult(progress.answerResult);
+    setCurrentQuestionCount(progress.currentQuestionCount);
+    setAnsweredQuestions(progress.answeredQuestions || []);
+    setIsSessionActive(true);
+
+    const { stem, choices } = parseQuestion(progress.questionText);
+    setQuestionStem(stem);
+    setOptions(choices);
+
+    closeLoadProgressModal();
+  };
+
+  const handleDeleteProgress = async (id) => {
+    if (!currentUser) {
+      alert('You need to be logged in to delete your progress.');
+      return;
+    }
+
+    try {
+      await deleteDoc(doc(db, 'tutorProgress', id));
+      fetchSavedProgresses();
+    } catch (error) {
+      console.error('Error deleting progress:', error);
+      alert('An error occurred while deleting the progress.');
+    }
+  };
+
+  if (!currentUser) {
+    return (
+      <div className="flex items-center justify-center h-screen bg-gray-100">
+        <div className="text-center p-6 bg-white rounded shadow-md">
+          <p className="text-gray-700 mb-4">
+            Please{' '}
+            <a href="/login" className="text-blue-900 underline">
+              log in
+            </a>{' '}
+            to use the AI Law Tutor.
+          </p>
+          <button
+            onClick={() => router.push('/login')}
+            className="px-4 py-2 bg-blue-900 text-white rounded hover:bg-blue-700"
+          >
+            Go to Login
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  const isProUser =
+    userDataObj?.billing?.plan === 'Pro' || userDataObj?.billing?.plan === 'Developer';
+
+  // Define the messageDisplay function inside the component
+  function messageDisplay() {
+    return isCommunicating ? 'AI is communicating...' : 'Cadex is ready.';
+  }
 
   return (
-    <div className="flex h-screen bg-gray-100">
-      {/* Sidebar */}
-      {isSidebarVisible && <Sidebar activeLink="/ailawtools/contractreview" />}
+    <div className="flex h-screen bg-gradient-to-br from-purple-900 to-blue-800">
+      <AnimatePresence>
+        {isSidebarVisible && (
+          <>
+            <Sidebar
+              activeLink="/ailawtools/contractreview"
+              isSidebarVisible={isSidebarVisible}
+              toggleSidebar={toggleSidebar} // Pass as toggleSidebar
+              isAiTutor={true} // Pass isAiTutor as true
+            />
+            <motion.div
+              className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 0.5 }}
+              exit={{ opacity: 0 }}
+              onClick={toggleSidebar} // Use toggleSidebar here
+            />
+          </>
+        )}
+      </AnimatePresence>
 
-      {/* Main Content Area */}
-      <main className="flex-1 flex flex-col items-center p-4 bg-white">
-                <div className="flex-1 w-full max-w-4xl p-4 bg-gray-100 max-h-128 rounded-lg shadow-md">
-                    <div className="flex flex-col h-full">
-            {/* Hide button at the top left */}
-            <div className="flex items-start justify-start w-full mb-4">
-               {/* Animated Toggle Sidebar Button */}
-               <button
-                                    onClick={toggleSidebar}
-                                         className=" bg-transparent text-blue-950 p-2 rounded duration-200 flex items-center justify-center"
-                                    aria-label={isSidebarVisible ? 'Hide Sidebar' : 'Show Sidebar'}
-                                >
-                                    <AnimatePresence mode="wait" initial={false}>
-                                        {isSidebarVisible ? (
-                                            <motion.div
-                                                key="close-icon"
-                                                initial={{ rotate: 90, opacity: 0 }}
-                                                animate={{ rotate: 0, opacity: 1 }}
-                                                exit={{ rotate: -90, opacity: 0 }}
-                                                transition={{ duration: 0.3 }}
-                                            >
-                                                <FaTimes size={20} />
-                                            </motion.div>
-                                        ) : (
-                                            <motion.div
-                                                key="menu-icon"
-                                                initial={{ rotate: -90, opacity: 0 }}
-                                                animate={{ rotate: 0, opacity: 1 }}
-                                                exit={{ rotate: 90, opacity: 0 }}
-                                                transition={{ duration: 0.3 }}
-                                            >
-                                                <FaBars size={20} />
-                                            </motion.div>
-                                        )}
-                                    </AnimatePresence>
-                                </button>
-            </div>
-
-            {/* PDF Upload */}
-            <div className="mb-4">
-              <input
-                type="file"
-                accept="application/pdf"
-                onChange={handlePdfUpload}
-                disabled={isLoading}
-              />
-            </div>
-
-            {pdfUrl && (
-              <div
-                style={{
-                  position: 'relative',
-                  width: '100%',
-                  height: '600px',
-                  border: '1px solid #ccc',
-                  overflow: 'auto',
-                }}
-              >
-                <PdfLoader url={pdfUrl} beforeLoad={<div>Loading PDF...</div>}>
-                  {(pdfDocument) => (
-                    <PdfHighlighter
-                      pdfDocument={pdfDocument}
-                      enableAreaSelection={false}
-                      onScrollChange={() => {}}
-                      scrollRef={(ref) => {
-                        // Keep a reference to the scroll container if needed
-                      }}
-                      highlights={highlights}
-                      onSelectionFinished={() => {
-                        // Disable user selection
-                        return null;
-                      }}
-                      highlightTransform={(
-                        highlight,
-                        index,
-                        setTip,
-                        hideTip,
-                        viewportToScaled,
-                        screenshot,
-                        isScrolledTo
-                      ) => {
-                        const component = (
-                          <Highlight
-                            isScrolledTo={isScrolledTo}
-                            position={highlight.position}
-                            comment={highlight.comment}
-                          />
-                        );
-
-                        return (
-                          <Popup
-                            popupContent={<HighlightPopup highlight={highlight} />}
-                            onMouseOver={() => setTip(highlight)}
-                            onMouseOut={hideTip}
-                            key={index}
-                          >
-                            {component}
-                          </Popup>
-                        );
-                      }}
-                      pdfScaleValue="page-width"
-                      style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}
-                    />
-                  )}
-                </PdfLoader>
-              </div>
-            )}
-
-            <button
-              onClick={handleAnalyzeContract}
-              className="mt-4 border border-solid border-blue-950 bg-white text-blue-950 px-4 py-2 rounded-md duration-200 hover:bg-blue-950 hover:text-white"
-              disabled={isLoading || !pdfFile}
-            >
-              {isLoading ? 'Reviewing...' : 'Review Contract'}
-            </button>
-
-            <div className="flex-1 overflow-y-scroll p-4 mt-4 rounded bg-white">
-              {reviewResult ? (
-                <div className="mb-4 p-4 border border-gray-300 rounded-lg">
-                  <h3 className="text-lg font-semibold text-blue-600">Review Result</h3>
-                  <p className="text-gray-700 whitespace-pre-wrap">{reviewResult}</p>
-                </div>
+      <main className="flex-1 flex flex-col items-center p-6 overflow-auto">
+        {/* Header */}
+        <div className="w-full max-w-5xl flex items-center justify-between mb-6">
+          <button
+            onClick={toggleSidebar} // Use toggleSidebar here
+            className="text-gray-200 hover:text-white"
+            aria-label={isSidebarVisible ? 'Hide Sidebar' : 'Show Sidebar'}
+          >
+            <AnimatePresence mode="wait" initial={false}>
+              {isSidebarVisible ? (
+                <motion.div
+                  key="close-icon"
+                  initial={{ rotate: 90, opacity: 0 }}
+                  animate={{ rotate: 0, opacity: 1 }}
+                  exit={{ rotate: -90, opacity: 0 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <FaTimes size={24} />
+                </motion.div>
               ) : (
-                <p className="text-gray-400">
-                  {isLoading
-                    ? 'Reviewing the contract...'
-                    : 'Upload a PDF and click "Review Contract" to get started.'}
-                </p>
+                <motion.div
+                  key="menu-icon"
+                  initial={{ rotate: -90, opacity: 0 }}
+                  animate={{ rotate: 0, opacity: 1 }}
+                  exit={{ rotate: 90, opacity: 0 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <FaBars size={24} />
+                </motion.div>
               )}
+            </AnimatePresence>
+          </button>
+
+          {/* Pro+ Mode Button */}
+          <button
+            onClick={() => {
+              if (isProUser) {
+                router.push('/ailawtools/aiTutor/full-mode');
+              } else {
+                alert('Professional Mode is only available for Pro users. Upgrade to access this feature.');
+              }
+            }}
+            className={`px-4 py-2 rounded-md transition-colors duration-200 ${
+              isProUser
+                ? 'bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white shadow-lg hover:from-indigo-600 hover:via-purple-600 hover:to-pink-600'
+                : 'bg-gray-300 text-gray-600 cursor-not-allowed'
+            }`}
+            disabled={!isProUser}
+            aria-label="Professional Mode"
+          >
+            Pro Mode
+          </button>
+        </div>
+
+        {/* Configuration and Control Buttons */}
+        <div className="w-full max-w-5xl flex justify-end mb-4 space-x-4">
+          <button
+            onClick={openLoadProgressModal}
+            className="relative h-12 w-56 overflow-hidden rounded bg-blue-700 text-white shadow-lg hover:bg-blue-800 transition-colors duration-200 before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-56"
+            aria-label="Load Progress"
+          >
+            Load Progress
+          </button>
+          <button
+            onClick={openConfigModal}
+            className="relative h-12 w-56 overflow-hidden rounded bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white shadow-lg hover:from-indigo-600 hover:via-purple-600 hover:to-pink-600 transition-colors duration-200 before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-56"
+            aria-label="Configure AI Tutor"
+          >
+            Configure AI Tutor
+          </button>
+        </div>
+
+        {/* Question Counter */}
+        {isSessionActive && (
+          <div className="w-full max-w-5xl mb-4 p-4 bg-white bg-opacity-20 backdrop-blur-md rounded-lg shadow-md flex justify-between items-center">
+            <span className="text-white">
+              Questions Answered: {currentQuestionCount} / {tutorConfig.questionLimit}
+            </span>
+            <span
+              className={`px-3 py-1 rounded-full text-sm font-semibold uppercase ${
+                isProUser ? 'bg-blue-500 text-white' : 'bg-emerald-500 text-white'
+              }`}
+            >
+              {isProUser ? 'Pro User' : 'Base User'}
+            </span>
+          </div>
+        )}
+
+        {/* Visualizer and Question Container */}
+        <div className="w-full max-w-5xl flex flex-col items-center">
+          {/* Visualizer Container */}
+          <div className="relative w-96 h-96 mb-6">
+            {/* Visualizer Canvas */}
+            <canvas
+              ref={visualizerCanvas}
+              className="absolute top-0 left-0 w-full h-full rounded-full"
+            ></canvas>
+
+            {/* Center Textbox */}
+            <div className="absolute inset-0 flex items-center justify-center">
+              <textarea
+                className="w-64 h-24 bg-transparent text-center p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-white font-semibold text-lg"
+                value={messageDisplay()}
+                readOnly
+                aria-label="AI Communication Status"
+              ></textarea>
             </div>
           </div>
+
+          {/* Law Question */}
+          {questionStem && (
+            <div className="w-full max-w-5xl mb-6 p-6 bg-white bg-opacity-20 backdrop-blur-md rounded-lg shadow-md overflow-y-scroll">
+              <h3 className="text-2xl font-semibold text-blue-300 mb-2">Law Question</h3>
+              <h3 className="text-sm font-medium text-gray-200 mb-6">LExAPI Version: 0.3.4</h3>
+              <p className="text-gray-100 mb-4">{questionStem}</p>
+              {/* Since multiple-choice is removed, options can be used for structured responses or omitted */}
+            </div>
+          )}
+
+          {/* Answer Input */}
+          {questionStem && (
+            <div className="w-full max-w-5xl mb-6">
+              <textarea
+                className="w-full p-4 border border-gray-300 rounded resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-200 text-black"
+                value={inputText}
+                onChange={(e) => setInputText(e.target.value)}
+                placeholder="Enter your answer here..."
+                rows="6"
+                disabled={isLoading}
+                aria-label="Answer Input"
+              ></textarea>
+            </div>
+          )}
+
+          {/* Action Buttons */}
+          {questionStem && (
+            <div className="w-full max-w-5xl flex space-x-4">
+              <button
+                onClick={handleSubmitAnswer}
+                className={`flex-1 px-4 py-3 rounded font-semibold text-white transition-colors duration-200 shadow-lg ${
+                  isLoading || !inputText.trim()
+                    ? 'bg-gray-500 cursor-not-allowed'
+                    : 'bg-blue-600 hover:bg-blue-700'
+                }`}
+                disabled={isLoading || !inputText.trim()}
+                aria-label="Submit Answer"
+              >
+                {isLoading ? 'Submitting...' : 'Submit Answer'}
+              </button>
+              <button
+                onClick={handleSaveProgress}
+                className="flex items-center justify-center px-4 py-3 bg-transparent text-blue-300 rounded font-semibold duration-200 hover:text-blue-500"
+                disabled={!currentUser}
+                aria-label="Save Progress"
+              >
+                <motion.div
+                  whileHover={{ scale: 1.2, rotate: 360 }}
+                  transition={{ duration: 0.5 }}
+                >
+                  <FaSave size={24} />
+                </motion.div>
+              </button>
+              <button
+                onClick={handleGetQuestion}
+                className="flex items-center justify-center px-4 py-3 bg-transparent text-blue-300 rounded font-semibold duration-200 hover:text-blue-500"
+                disabled={isLoading}
+                aria-label="Generate New Question"
+              >
+                <motion.div
+                  whileHover={{ scale: 1.2, rotate: -360 }}
+                  transition={{ duration: 0.5 }}
+                >
+                  <FaSyncAlt size={24} />
+                </motion.div>
+              </button>
+            </div>
+          )}
+
+          {/* Placeholder Content */}
+          {!questionStem && !questionText && (
+            <div className="w-full max-w-5xl p-6 bg-white bg-opacity-20 backdrop-blur-md rounded-lg shadow-md text-center">
+              <p className="text-gray-200 mb-4">
+                Click <span className="font-semibold">Configure AI Tutor</span> to start.
+              </p>
+              <p className="text-gray-400 text-sm">
+                <strong>Important Note:</strong> This AI Tutor is designed to help you understand various law topics by providing explanations, analyses, and feedback. It is not a substitute for professional legal advice.
+              </p>
+            </div>
+          )}
+
+          {/* Configuration Modal */}
+          {isConfigModalOpen && (
+            <motion.div
+              className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-70 z-50"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+            >
+              <motion.div
+                className="bg-gray-800 p-8 rounded-lg w-11/12 max-w-md shadow-lg overflow-y-auto max-h-screen"
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.8, opacity: 0 }}
+                transition={{ duration: 0.3 }}
+              >
+                <h2 className="text-2xl font-semibold text-white mb-6">Configure AI Tutor</h2>
+                <form>
+                  {/* Exam Type Selection */}
+                  <div className="mb-4">
+                    <label className="block text-gray-300 mb-2">Exam Type:</label>
+                    <select
+                      name="examType"
+                      value={tutorConfig.examType}
+                      onChange={handleConfigChange}
+                      className="w-full p-3 border border-gray-500 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-200 bg-gray-700 text-white"
+                      aria-label="Select Exam Type"
+                    >
+                      {Object.keys(examMapping).map((exam) => (
+                        <option key={exam} value={exam}>
+                          {exam}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* Topic Selection */}
+                  <div className="mb-4">
+                    <label className="block text-gray-300 mb-2">Primary Topic:</label>
+                    <select
+                      name="topic"
+                      value={tutorConfig.topic}
+                      onChange={handleConfigChange}
+                      className="w-full p-3 border border-gray-500 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-200 bg-gray-700 text-white"
+                      aria-label="Select Primary Topic"
+                    >
+                      {topicOptions.map((topic, index) => (
+                        <option key={index} value={topic.value}>
+                          {topic.label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* Sub-Topic Selection */}
+                  <div className="mb-4">
+                    <label className="block text-gray-300 mb-2">Sub-Topic:</label>
+                    <select
+                      name="subTopic"
+                      value={tutorConfig.subTopic}
+                      onChange={handleConfigChange}
+                      className="w-full p-3 border border-gray-500 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-200 bg-gray-700 text-white"
+                      aria-label="Select Sub-Topic"
+                    >
+                      {subTopicOptions.map((subTopic, index) => (
+                        <option key={index} value={subTopic.value}>
+                          {subTopic.label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* Complexity Level */}
+                  <div className="mb-4">
+                    <label className="block text-gray-300 mb-2">Complexity Level:</label>
+                    <select
+                      name="complexity"
+                      value={tutorConfig.complexity}
+                      onChange={handleConfigChange}
+                      className="w-full p-3 border border-gray-500 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-200 bg-gray-700 text-white"
+                      aria-label="Select Complexity Level"
+                    >
+                      {complexityOptions.map((option) => (
+                        <option key={option.value} value={option.value}>
+                          {option.label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* Question Types */}
+                  <div className="mb-4">
+                    <label className="block text-gray-300 mb-2">Question Types:</label>
+                    {questionTypes.map((type) => (
+                      <div key={type} className="flex items-center mb-2">
+                        <input
+                          type="checkbox"
+                          id={`qt-${type}`}
+                          name={type}
+                          checked={tutorConfig.selectedQuestionTypes.includes(type)}
+                          onChange={(e) => handleQuestionTypeChange(e, type)}
+                          className="h-5 w-5 text-blue-500 focus:ring-blue-500 border-gray-300 rounded"
+                          aria-label={`Select ${type} Question Type`}
+                        />
+                        <label htmlFor={`qt-${type}`} className="ml-3 text-gray-300">
+                          {type}
+                        </label>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Instant Feedback Checkbox */}
+                  <div className="mb-6 flex items-center">
+                    <input
+                      type="checkbox"
+                      id="instantFeedback"
+                      name="instantFeedback"
+                      checked={tutorConfig.instantFeedback}
+                      onChange={handleConfigChange}
+                      className="h-5 w-5 text-blue-500 focus:ring-blue-500 border-gray-300 rounded"
+                      aria-label="Enable Instant Feedback"
+                    />
+                    <label htmlFor="instantFeedback" className="ml-3 text-gray-300">
+                      Enable Instant Feedback
+                    </label>
+                  </div>
+
+                  {/* Question Limit Slider */}
+                  <div className="mb-6">
+                    <label className="block text-gray-300 mb-2">
+                      Number of Questions per Session:
+                    </label>
+                    <div className="flex items-center">
+                      <input
+                        type="range"
+                        min="1"
+                        max="20"
+                        value={tutorConfig.questionLimit}
+                        onChange={(e) =>
+                          setTutorConfig((prevConfig) => ({
+                            ...prevConfig,
+                            questionLimit: parseInt(e.target.value, 10),
+                          }))
+                        }
+                        className="w-full h-2 bg-blue-400 rounded-lg appearance-none cursor-pointer"
+                        id="questionLimit"
+                        aria-label="Set Number of Questions"
+                      />
+                      <span className="ml-4 text-gray-300">{tutorConfig.questionLimit}</span>
+                    </div>
+                  </div>
+
+                  {/* Action Buttons */}
+                  <div className="flex justify-end space-x-4">
+                    <button
+                      type="button"
+                      onClick={handleStartTutoringSession}
+                      className="relative h-12 w-56 overflow-hidden rounded bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white shadow-lg hover:from-indigo-600 hover:via-purple-600 hover:to-pink-600 transition-colors duration-200 before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-56"
+                      aria-label="Start Tutoring Session"
+                    >
+                      Start Tutoring
+                      <motion.span
+                        className="absolute right-4 top-3"
+                        initial={{ x: -10, opacity: 0 }}
+                        animate={{ x: 0, opacity: 1 }}
+                        transition={{ delay: 0.3, duration: 0.3 }}
+                      >
+                        <i className="fa-solid fa-arrow-right"></i>
+                      </motion.span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={closeConfigModal}
+                      className="px-6 py-3 bg-gray-600 text-gray-200 rounded hover:bg-gray-700 transition-colors duration-200"
+                      aria-label="Cancel Configuration"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </form>
+              </motion.div>
+            </motion.div>
+          )}
+
+          {/* Result Modal */}
+          {isResultModalOpen && (
+            <motion.div
+              className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-70 z-50"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+            >
+              <motion.div
+                className="bg-gray-800 p-8 rounded-lg w-11/12 max-w-md shadow-lg"
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.8, opacity: 0 }}
+                transition={{ duration: 0.3 }}
+              >
+                <h2 className="text-2xl font-semibold text-white mb-6">Answer Feedback</h2>
+                <p className="text-gray-200 mb-6">{answerResult}</p>
+                <div className="flex justify-end space-x-4">
+                  <button
+                    type="button"
+                    onClick={closeResultModal}
+                    className="px-6 py-3 bg-red-600 text-white rounded hover:bg-red-700 transition-colors duration-200"
+                    aria-label="Close Feedback Modal"
+                  >
+                    Close
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      closeResultModal();
+                      handleGetQuestion();
+                    }}
+                    className="px-6 py-3 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors duration-200"
+                    disabled={isLoading}
+                    aria-label="Next Question"
+                  >
+                    {isLoading ? 'Loading...' : 'Next Question'}
+                  </button>
+                </div>
+              </motion.div>
+            </motion.div>
+          )}
+
+          {/* Final Feedback Modal */}
+          {isFinalFeedbackModalOpen && (
+            <motion.div
+              className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-70 z-50 overflow-y-auto"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+            >
+              <motion.div
+                className="bg-gray-800 p-8 rounded-lg w-11/12 max-w-3xl shadow-lg max-h-[80vh] overflow-y-auto"
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.8, opacity: 0 }}
+                transition={{ duration: 0.3 }}
+              >
+                <h2 className="text-2xl font-semibold text-white mb-6">Session Feedback</h2>
+                <ul className="space-y-4">
+                  {answeredQuestions.map((item, index) => (
+                    <li key={index} className="p-4 border border-gray-700 rounded">
+                      <p className="font-semibold text-blue-300 mb-2">
+                        Question {index + 1}:
+                      </p>
+                      <p className="text-gray-200 mb-2">{item.question}</p>
+                      <p className="text-gray-200 mb-1">
+                        <span className="font-semibold">Your Answer:</span> {item.answer}
+                      </p>
+                      <p className="text-gray-200 mb-1">
+                        <span className="font-semibold">Feedback:</span> {item.feedback}
+                      </p>
+                      <p
+                        className={`font-semibold ${
+                          item.correct ? 'text-emerald-400' : 'text-red-400'
+                        }`}
+                      >
+                        {item.correct ? 'Correct ✅' : 'Incorrect ❌'}
+                      </p>
+                    </li>
+                  ))}
+                </ul>
+                <div className="flex justify-end mt-6">
+                  <button
+                    type="button"
+                    onClick={closeFinalFeedbackModal}
+                    className="px-6 py-3 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors duration-200"
+                    aria-label="Close Final Feedback Modal"
+                  >
+                    Close
+                  </button>
+                </div>
+              </motion.div>
+            </motion.div>
+          )}
+
+          {/* Load Progress Modal */}
+          {isLoadProgressModalOpen && (
+            <motion.div
+              className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-70 z-50"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+            >
+              <motion.div
+                className="bg-gray-800 p-8 rounded-lg w-11/12 max-w-3xl shadow-lg overflow-y-auto max-h-full"
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.8, opacity: 0 }}
+                transition={{ duration: 0.3 }}
+              >
+                <h2 className="text-2xl font-semibold text-white mb-6">Load Saved Progress</h2>
+                {savedProgresses.length === 0 ? (
+                  <p className="text-gray-200">No saved progresses found.</p>
+                ) : (
+                  <ul className="space-y-4">
+                    {savedProgresses.map((progress) => (
+                      <li key={progress.id} className="p-4 border border-gray-700 rounded">
+                        <div className="flex justify-between items-start">
+                          <div>
+                            <p className="font-semibold text-blue-300">
+                              Exam Type: {progress.tutorConfig.examType}
+                            </p>
+                            <p className="text-sm text-gray-400">
+                              Primary Topic: {progress.tutorConfig.topic}
+                            </p>
+                            <p className="text-sm text-gray-400">
+                              Sub-Topic: {progress.tutorConfig.subTopic}
+                            </p>
+                            <p className="text-sm text-gray-400">
+                              Complexity: {progress.tutorConfig.complexity}
+                            </p>
+                            <p className="text-sm text-gray-400">
+                              Questions Set: {progress.tutorConfig.questionLimit}
+                            </p>
+                            <p className="text-sm text-gray-400">
+                              Current Question: {progress.currentQuestionCount}
+                            </p>
+                            <p className="text-sm text-gray-400">
+                              Saved on: {new Date(progress.timestamp).toLocaleString()}
+                            </p>
+                          </div>
+                          <div className="flex space-x-2 mt-2">
+                            <button
+                              onClick={() => handleLoadProgress(progress)}
+                              className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors duration-200"
+                              aria-label="Load Progress"
+                            >
+                              Load
+                            </button>
+                            <button
+                              onClick={() => handleDeleteProgress(progress.id)}
+                              className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors duration-200"
+                              aria-label="Delete Progress"
+                            >
+                              Delete
+                            </button>
+                          </div>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+                <div className="flex justify-end mt-6">
+                  <button
+                    type="button"
+                    onClick={closeLoadProgressModal}
+                    className="px-6 py-3 bg-gray-600 text-gray-200 rounded hover:bg-gray-700 transition-colors duration-200"
+                    aria-label="Close Load Progress Modal"
+                  >
+                    Close
+                  </button>
+                </div>
+              </motion.div>
+            </motion.div>
+          )}
         </div>
       </main>
     </div>

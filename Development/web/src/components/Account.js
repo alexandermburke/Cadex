@@ -103,7 +103,7 @@ export default function Account() {
                 {(plan === 'Basic' || plan === 'Free') && (
                     <Link
                         href="/admin/billing"
-                        className="group before:ease relative h-12 w-56 overflow-hidden rounded goldBackground text-white opacity-80 transition-all before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-56"
+                        className="group before:ease relative h-12 w-56 overflow-hidden rounded bg-white text-blue-950 transition-all before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 before:rotate-6 before:bg-transparent before:opacity-20 before:duration-700 hover:before:-translate-x-56"
                     >
                         <div className="flex items-center justify-center h-full">
                             Upgrade Account
@@ -111,7 +111,7 @@ export default function Account() {
                         </div>
                     </Link>
                 )}
-                {(plan === 'Pro' || plan === 'Basic') && (
+                {(plan === 'Pro' || plan === 'Basic' || plan === 'Developer') && (
                     <Link
                         href="/admin/billing/cancel_subscription"
                         className="group before:ease relative h-12 w-56 overflow-hidden rounded bg-transparent text-blue-950 transition-all before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 before:rotate-6 before:bg-transparent before:opacity-20 before:duration-700 hover:before:-translate-x-56"
@@ -153,7 +153,7 @@ export default function Account() {
                                 ) : entry === 'current_plan' ? (
                                     <p
                                         className={`px-2 py-1 rounded-full capitalize text-xs ${
-                                            plan === 'Pro'
+                                            plan === 'Pro' || plan === 'Developer'
                                                 ? 'bg-blue-100 text-blue-700'
                                                 : plan === 'Basic'
                                                 ? 'bg-green-100 text-green-700'

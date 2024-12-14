@@ -21,7 +21,7 @@ export default function Footer() {
           <div className="flex flex-col mx-auto w-fit">
             <Link href={'/'}>
               <h1 className={'text-lg px-3 sm:text-xl sm:px-4 ' + poppins.className}>
-                Cadex Law
+                CadexLaw
               </h1>
             </Link>
           </div>

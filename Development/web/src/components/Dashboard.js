@@ -1,288 +1,372 @@
 'use client';
-import { useAuth } from '@/context/AuthContext';
-import { Poppins, Open_Sans } from 'next/font/google';
-import React, { useEffect, useState } from 'react';
-import { deleteDoc, doc, setDoc, updateDoc } from 'firebase/firestore';
+import React, { useState, useEffect } from 'react';
 import { db } from '@/firebase';
-import Link from 'next/link';
-import ActionCard from './ActionCard';
-import LogoFiller from './LogoFiller';
-import Modal from './Modal';
-import Button from './Button';
-import { useRouter } from 'next/navigation';
+import {
+  doc,
+  collection,
+  addDoc,
+  getDocs,
+  deleteDoc,
+  query,
+  where,
+} from 'firebase/firestore';
+import { useAuth } from '@/context/AuthContext';
 
-const poppins = Poppins({
-  subsets: ['latin'],
-  weight: ['400', '100', '200', '300', '500', '600', '700'],
-});
-const opensans = Open_Sans({
-  subsets: ['latin'],
-  weight: ['400', '300', '500', '600', '700'],
-  style: ['normal', 'italic'],
-});
+export default function ProModeDashboard() {
+  const { currentUser } = useAuth();
 
-export default function Dashboard() {
-  const [completedSteps, setCompletedSteps] = useState([]);
-  const defaultUserData = { name: '', email: '', website: '', location: '' };
-  const [userData, setUserData] = useState(defaultUserData);
-  const [changedData, setChangedData] = useState(false);
+  const [examConfig, setExamConfig] = useState({
+    examType: 'LSAT',
+    difficulty: '',
+    lawType: 'General Law',
+    questionLimit: 5,
+    timerLimit: 60,
+    instantFeedback: false,
+    analyticsEnabled: false,
+    textHighlighting: true,
+    savePresetName: '',
+  });
+
   const [caseSections, setCaseSections] = useState([]);
-  const [addSection, setAddSection] = useState(false);
-  const [showModal, setShowModal] = useState(null);
-  const [caseToDelete, setCaseToDelete] = useState('');
-  const [instruction, setInstruction] = useState(null);
-  const [savingUserDetails, setSavingUserDetails] = useState(false);
-  const [savingCase, setSavingCase] = useState(false);
-  const [publishingCase, setPublishingCase] = useState(false);
-  const [nextFocusElement, setNextFocusElement] = useState(null);
+  const [savedConfigs, setSavedConfigs] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const router = useRouter();
+  const difficultyMapping = {
+    LSAT: ['Below 150', '150-160', '160-170', '175+'],
+    BAR: ['Below Average', 'Average', 'Above Average', 'Expert'],
+    MPRE: ['Basic', 'Intermediate', 'Advanced'],
+  };
 
-  const { currentUser, loading, userDataObj, setUserDataObj, isPaid } = useAuth();
-  const numberOfCases = Object.keys(userDataObj?.cases || {}).length;
-
-  async function handleSaveCase() {
-    if (savingCase) {
-      return;
-    }
-
-    let currData = localStorage.getItem('cases');
-
-    if (currData) {
-      currData = JSON.parse(currData);
-    } else {
-      currData = {};
-    }
-
-    try {
-      setSavingCase(true);
-      const newData = { ...currData, caseSections };
-      setUserDataObj((curr) => ({ ...curr, caseSections }));
-      localStorage.setItem('cases', JSON.stringify(newData));
-      const userRef = doc(db, 'users', currentUser.uid);
-      await setDoc(userRef, { caseSections }, { merge: true });
-    } catch (err) {
-      console.log('Failed to save data\n', err.message);
-    } finally {
-      setSavingCase(false);
-    }
-  }
-
-  function handleCreateCase() {
-    if (numberOfCases >= 1) {
-      return;
-    }
-    if (isPaid) {
-      router.push('/admin/case');
-      return;
-    }
-
-    if (numberOfCases >= 10) {
-      setShowModal('cases');
-      return;
-    }
-    router.push('/admin/case');
-  }
-
-  async function handleDeleteCase() {
-    if (!caseToDelete || !(caseToDelete in userDataObj.cases)) {
-      return;
-    }
-
-    const newCasesObj = { ...userDataObj.cases };
-    delete newCasesObj[caseToDelete];
-
-    try {
-      const caseRef = doc(db, 'cases', caseToDelete);
-      await deleteDoc(caseRef);
-
-      const userRef = doc(db, 'users', currentUser.uid);
-      await updateDoc(userRef, {
-        cases: newCasesObj,
-      });
-
-      const newDataObj = { ...userDataObj, cases: newCasesObj };
-
-      setUserDataObj(newDataObj);
-      localStorage.setItem('cases', JSON.stringify(newDataObj));
-    } catch (err) {
-      console.log('Failed to delete case', err.message);
-    } finally {
-      setShowModal(null);
-      setCaseToDelete('');
-    }
-  }
-
-  const modalContent = {
-    cases: (
-      <div className="flex flex-1 flex-col gap-4">
-        <p className="font-medium text-lg sm:text-xl md:text-2xl">Case limit reached!</p>
-        <p>Free accounts can manage up to 3 active cases.</p>
-        <p>
-          <i>Please either delete some cases, or upgrade your account to continue.</i>
-        </p>
-        <p className="flex-1">
-          Upgrading your account allows you to manage up to <b>5</b> cases, and gives you access to
-          auto <b>case reposting.</b>
-        </p>
-        <div className="flex items-center gap-4">
-          <button
-            onClick={() => {
-              setShowModal(null);
-            }}
-            className="w-fit p-4 rounded-full mx-auto bg-white border border-solid border-blue-950 px-8 duration-200 hover:opacity-60"
-          >
-            Go back
-          </button>
-          <Button text={'Upgrade Account'} clickHandler={() => router.push('/admin/billing')} />
-        </div>
-      </div>
-    ),
-    deleteCase: (
-      <div>
-        <div className="flex flex-1 flex-col gap-4">
-          <p className="font-medium text-lg sm:text-xl md:text-2xl">
-            Are you sure you want to delete this case?
-          </p>
-          <p>
-            <i>Deleting a case is permanent!</i>
-          </p>
-          <p className="flex-1 capitalize">
-            <b>Case ID:</b> {caseToDelete.replaceAll('_', ' ')}
-          </p>
-          <div className="flex items-center gap-4">
-            <button
-              onClick={() => {
-                setShowModal(null);
-              }}
-              className="p-4 rounded-full mx-auto bg-white border border-solid border-blue-950 text-blue-950 px-8 duration-200 hover:opacity-60"
-            >
-              Go back
-            </button>
-            <button
-              onClick={handleDeleteCase}
-              className="flex-1 p-4 text-pink-400 rounded-full mx-auto bg-white border border-solid border-pink-400 px-8 duration-200 hover:opacity-60"
-            >
-              Confirm Delete
-            </button>
-          </div>
-        </div>
-      </div>
-    ),
+  const lawTypeMapping = {
+    LSAT: ['General Law'],
+    BAR: [
+      'General Law',
+      'Criminal Law',
+      'Civil Law',
+      'Contracts',
+      'Torts',
+      'Constitutional Law',
+      'Evidence',
+      'Real Property',
+      'Civil Procedure',
+      'Business Associations',
+      'Family Law',
+      'Trusts and Estates',
+      'Secured Transactions',
+      'Negotiable Instruments',
+      'Intellectual Property',
+      'Professional Responsibility',
+    ],
+    MPRE: [
+      'Professional Responsibility',
+      'Ethics and Legal Responsibilities',
+      'Disciplinary Actions',
+      'Conflict of Interest',
+      'Confidentiality',
+      'Client Communication',
+      'Fees and Trust Accounts',
+      'Advertising and Solicitation',
+      'Other Professional Conduct',
+    ],
   };
 
   useEffect(() => {
-    if (!nextFocusElement) {
+    const newDifficultyOptions = difficultyMapping[examConfig.examType] || [];
+    const newLawTypeOptions = lawTypeMapping[examConfig.examType] || ['General Law'];
+
+    setExamConfig((prevConfig) => ({
+      ...prevConfig,
+      difficulty: newDifficultyOptions[0] || '',
+      lawType: newLawTypeOptions[0] || 'General Law',
+    }));
+  }, [examConfig.examType]);
+
+  const handleConfigChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setExamConfig((prevConfig) => ({
+      ...prevConfig,
+      [name]: type === 'checkbox' ? checked : value,
+    }));
+  };
+
+  const handleSliderChange = (name, value) => {
+    setExamConfig((prevConfig) => ({
+      ...prevConfig,
+      [name]: value,
+    }));
+  };
+
+  const handleSaveConfig = async () => {
+    if (!currentUser) {
+      alert('You need to be logged in to save your configuration.');
       return;
     }
-    document.getElementById(nextFocusElement) && document.getElementById(nextFocusElement).focus();
-    setNextFocusElement(null);
-  }, [nextFocusElement]);
+
+    setIsLoading(true);
+
+    try {
+      const configData = {
+        userId: currentUser.uid,
+        examConfig,
+        timestamp: new Date().toISOString(),
+      };
+
+      await addDoc(collection(db, 'examConfigs'), configData);
+      alert('Configuration saved successfully!');
+      fetchSavedConfigs();
+    } catch (error) {
+      console.error('Error saving configuration:', error);
+      alert('An error occurred while saving your configuration.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const fetchSavedConfigs = async () => {
+    if (!currentUser) return;
+
+    setIsLoading(true);
+
+    try {
+      const q = query(collection(db, 'examConfigs'), where('userId', '==', currentUser.uid));
+      const querySnapshot = await getDocs(q);
+
+      const configs = [];
+      querySnapshot.forEach((doc) => {
+        configs.push({ id: doc.id, ...doc.data() });
+      });
+
+      setSavedConfigs(configs);
+    } catch (error) {
+      console.error('Error fetching saved configurations:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   useEffect(() => {
-    if (!userDataObj) {
-      return;
+    fetchSavedConfigs();
+  }, [currentUser]);
+
+  const handleDeleteConfig = async (id) => {
+    if (!currentUser) return;
+
+    setIsLoading(true);
+
+    try {
+      await deleteDoc(doc(db, 'examConfigs', id));
+      fetchSavedConfigs();
+    } catch (error) {
+      console.error('Error deleting configuration:', error);
+    } finally {
+      setIsLoading(false);
     }
-    const { userData: localUserData, caseSections: localCaseSections } = userDataObj;
-    localUserData && setUserData(localUserData);
-    localCaseSections && setCaseSections(localCaseSections);
-  }, [userDataObj]);
+  };
 
   return (
-    <>
-      {showModal && (
-        <Modal
-          handleCloseModal={() => {
-            setShowModal(null);
-          }}
-        >
-          {modalContent[showModal]}
-        </Modal>
-      )}
-      <div className="flex flex-col gap-8 flex-1">
-        <ActionCard
-          title={'Cases'}
-          actions={
-            numberOfCases >= 20 ? null : (
-              <div className="flex items-center gap-4">
-                {numberOfCases < 20 && (
-                  <button
-                    onClick={handleCreateCase}
-                    className="flex items-center justify-center gap-4 border border-solid border-x-2 border-y-2 border-blue-950 px-4 py-2 rounded text-xs sm:text-sm text-blue-950 duration-200 hover:bg-blue-950 hover:text-white"
-                  >
-                    <p className="">Create New</p>
-                  </button>
-                )}
-              </div>
-            )
-          }
-        >
-          <div className="flex flex-col gap-2 overflow-x-scroll">
-            <div className="grid grid-cols-4 shrink-0">
-              {['Case ID', 'Title', 'Description', 'Skill Level'].map((label, labelIndex) => (
-                <div key={labelIndex} className="p-1 capitalize px-2 text-xs sm:text-sm font-medium">
-                  <p className="truncate">{label}</p>
-                </div>
-              ))}
-            </div>
-            {Object.keys(userDataObj?.cases || {}).map((caseName, caseIndex) => {
-              const Case = userDataObj?.cases?.[caseName] || {};
-              const { caseMeta } = Case;
-              return (
-                <div className="flex flex-col relative group" key={caseIndex}>
-                  <button
-                    onClick={() => {
-                      setCaseToDelete(caseName);
-                      setShowModal('deleteCase');
-                    }}
-                    className="flex items-center justify-center gap-4 rounded-full text-xs sm:text-sm text-pink-400 duration-200 absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 group-hover:opacity-100 opacity-0 hover:text-pink-200"
-                  >
-                    <i className="fa-regular fa-trash-can"></i>
-                  </button>
-                  <Link
-                    href={'/admin/case?id=' + (caseMeta?.id || caseName)}
-                    className="grid shrink-0 capitalize grid-cols-4 border border-solid border-blue-100 duration-200 hover:bg-blue-50 rounded-lg overflow-hidden"
-                  >
-                    <div className="p-2">
-                      <p className="truncate hover:text-blue-950">{caseMeta?.id}</p>
-                    </div>
-                    <div className="p-2">
-                      <p className="truncate">{caseMeta?.caseTitle}</p>
-                    </div>
-                    <div className="p-2">
-                      <p className="truncate">{caseMeta?.caseDescription}</p>
-                    </div>
-                    <div className="p-2">
-                      <p className="truncate">{caseMeta?.skillLevel}</p>
-                    </div>
-                  </Link>
-                </div>
-              );
-            })}
+    <div className="flex flex-col h-screen bg-gray-50 p-6">
+      <h1 className="text-3xl font-bold mb-4">Pro Mode Dashboard</h1>
+
+      <section className="mb-8">
+        <h2 className="text-xl font-semibold mb-4">Exam Configuration</h2>
+        <form className="space-y-6">
+          <div>
+            <label className="block text-gray-700 mb-2">Exam Type:</label>
+            <select
+              name="examType"
+              value={examConfig.examType}
+              onChange={handleConfigChange}
+              className="w-full p-3 border border-gray-300 rounded"
+            >
+              <option value="LSAT">LSAT</option>
+              <option value="BAR">BAR</option>
+              <option value="MPRE">MPRE</option>
+            </select>
           </div>
-        </ActionCard>
-        {/* Updated Buttons Section */}
-        <div className="flex flex-col sm:flex-row gap-2">
-          <button
-            onClick={handleSaveCase}
-            className="group before:ease relative h-12 w-56 overflow-hidden rounded bg-gradient-to-r from-blue-950 to-slate-700 text-white shadow-2xl transition-all before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-56">     
-             <div className="flex items-center justify-center h-full">
-              <p>{savingCase ? 'Saving ...' : 'Save Progress'}</p>
-              <i className="ml-8 fa-solid fa-save opacity-0 group-hover:opacity-100 transition-opacity duration-200"></i>
+
+          <div>
+            <label className="block text-gray-700 mb-2">Difficulty:</label>
+            <select
+              name="difficulty"
+              value={examConfig.difficulty}
+              onChange={handleConfigChange}
+              className="w-full p-3 border border-gray-300 rounded"
+            >
+              {(difficultyMapping[examConfig.examType] || []).map((option, index) => (
+                <option key={index} value={option}>
+                  {option}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-gray-700 mb-2">Law Type:</label>
+            <select
+              name="lawType"
+              value={examConfig.lawType}
+              onChange={handleConfigChange}
+              className="w-full p-3 border border-gray-300 rounded"
+            >
+              {(lawTypeMapping[examConfig.examType] || []).map((type, index) => (
+                <option key={index} value={type}>
+                  {type}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-gray-700 mb-2">Number of Questions:</label>
+            <input
+              type="range"
+              name="questionLimit"
+              value={examConfig.questionLimit}
+              onChange={(e) => handleSliderChange('questionLimit', parseInt(e.target.value, 10))}
+              min="1"
+              max="100"
+              className="w-full"
+            />
+            <p className="text-gray-600">{examConfig.questionLimit} Questions</p>
+          </div>
+
+          <div>
+            <label className="block text-gray-700 mb-2">Timer Limit (in minutes):</label>
+            <input
+              type="range"
+              name="timerLimit"
+              value={examConfig.timerLimit}
+              onChange={(e) => handleSliderChange('timerLimit', parseInt(e.target.value, 10))}
+              min="5"
+              max="300"
+              className="w-full"
+            />
+            <p className="text-gray-600">{examConfig.timerLimit} Minutes</p>
+          </div>
+
+          <div className="flex items-center">
+            <input
+              type="checkbox"
+              name="instantFeedback"
+              checked={examConfig.instantFeedback}
+              onChange={handleConfigChange}
+              className="h-5 w-5 text-blue-600"
+            />
+            <label className="ml-2 text-gray-700">Enable Live Feedback</label>
+          </div>
+
+          <div className="flex items-center">
+            <input
+              type="checkbox"
+              name="analyticsEnabled"
+              checked={examConfig.analyticsEnabled}
+              onChange={handleConfigChange}
+              className="h-5 w-5 text-blue-600"
+            />
+            <label className="ml-2 text-gray-700">Enable Analytics</label>
+          </div>
+
+          <div className="flex items-center">
+            <input
+              type="checkbox"
+              name="textHighlighting"
+              checked={examConfig.textHighlighting}
+              onChange={handleConfigChange}
+              className="h-5 w-5 text-blue-600"
+            />
+            <label className="ml-2 text-gray-700">Enable Highlighting</label>
+          </div>
+
+          <div>
+            <label className="block text-gray-700 mb-2">Save as Preset:</label>
+            <input
+              type="text"
+              name="savePresetName"
+              value={examConfig.savePresetName}
+              onChange={handleConfigChange}
+              placeholder="Preset Name"
+              className="w-full p-3 border border-gray-300 rounded"
+            />
+          </div>
+        </form>
+      </section>
+
+      <section className="mb-8">
+        <h2 className="text-xl font-semibold mb-4">Case Sections</h2>
+        <div className="space-y-4">
+          {caseSections.map((section, index) => (
+            <div key={index} className="p-4 border border-gray-200 rounded flex justify-between items-center">
+              <span>{section}</span>
+              <button
+                onClick={() => setCaseSections(caseSections.filter((_, i) => i !== index))}
+                className="px-4 py-2 bg-red-600 text-white rounded"
+              >
+                Remove
+              </button>
             </div>
-          </button>
-          <Link
-            href={'/simulation?user=' + currentUser.displayName}
-            target="_blank"
-            className="group before:ease relative h-12 w-56 overflow-hidden rounded bg-gradient-to-r from-blue-950 to-slate-700 text-white shadow-2xl transition-all before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-56">
-                <div className="flex items-center justify-center h-full">
-              <p>Start Simulation</p>
-              <i className="ml-8 fa-solid fa-play opacity-0 group-hover:opacity-100 transition-opacity duration-200"></i>
-            </div>
-          </Link>
+          ))}
         </div>
+        <button
+          onClick={() => setCaseSections([...caseSections, `New Section ${caseSections.length + 1}`])}
+          className="mt-4 px-4 py-2 bg-blue-600 text-white rounded"
+        >
+          Add Section
+        </button>
+      </section>
+
+      <section className="mb-8">
+        <h2 className="text-xl font-semibold mb-4">Saved Configurations</h2>
+        {isLoading ? (
+          <p>Loading...</p>
+        ) : savedConfigs.length === 0 ? (
+          <p>No saved configurations found.</p>
+        ) : (
+          <ul className="space-y-4">
+            {savedConfigs.map((config) => (
+              <li
+                key={config.id}
+                className="p-4 border border-gray-200 rounded flex justify-between items-center"
+              >
+                <div>
+                  <p className="font-semibold">{config.examConfig.examType}</p>
+                  <p className="text-sm text-gray-600">{config.examConfig.lawType}</p>
+                  <p className="text-sm text-gray-600">Questions: {config.examConfig.questionLimit}</p>
+                </div>
+                <div className="flex space-x-2">
+                  <button
+                    onClick={() => setExamConfig(config.examConfig)}
+                    className="px-4 py-2 bg-blue-600 text-white rounded"
+                  >
+                    Load
+                  </button>
+                  <button
+                    onClick={() => handleDeleteConfig(config.id)}
+                    className="px-4 py-2 bg-red-600 text-white rounded"
+                  >
+                    Delete
+                  </button>
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
+
+      <div className="flex space-x-4">
+        <button
+          onClick={handleSaveConfig}
+          className="px-4 py-2 bg-green-600 text-white rounded"
+          disabled={isLoading}
+        >
+          {isLoading ? 'Saving...' : 'Save Configuration'}
+        </button>
+        <button
+          onClick={() => alert('Pro Mode starting soon!')}
+          className="px-4 py-2 bg-blue-600 text-white rounded"
+        >
+          Start Pro Mode
+        </button>
       </div>
-      <LogoFiller />
-    </>
+    </div>
   );
 }

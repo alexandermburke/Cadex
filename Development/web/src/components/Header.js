@@ -72,7 +72,7 @@ export default function Header() {
                 className='p-2 rounded-lg border-solid border duration-200 text-lg hover:text-white hover:bg-blue-950 border-blue-950 border-x-4 border-y-4' 
                 href={'/admin'}
             >
-                <p>Dashboard</p>
+                <p>Pro</p>
             </Link>
             <Link 
                 className='p-2 rounded-lg border-solid border duration-200 text-lg hover:text-white hover:bg-blue-950 border-blue-950 border-x-4 border-y-4' 
@@ -99,7 +99,7 @@ export default function Header() {
                         href={'/admin'} 
                         className='border border-solid duration-200 border-transparent hover:text-slate-200 px-4 grid place-items-center rounded'
                     >
-                        <p>Dashboard</p>
+                        <p>Pro</p>
                     </Link>
                     <Link 
                         href={'/ailawtools/examprep'} 
@@ -141,7 +141,7 @@ export default function Header() {
                     href={'/admin'} 
                     className='p-2 rounded border-solid border duration-200 text-lg hover:text-white hover:bg-blue-950 border-blue-950 border-x-4 border-y-4'
                 >
-                    <p>Dashboard</p>
+                    <p>Pro</p>
                 </Link>
                 <Link 
                     href={'/admin/account'} 
@@ -167,7 +167,7 @@ export default function Header() {
                     <div className='flex items-center gap-2'>
                         <Image 
                             src="/header.avif" 
-                            alt="Cadex Law Logo" 
+                            alt="CadexLaw Logo" 
                             width={44} 
                             height={44} 
                             className={`${logoLoaded ? 'logo-animation' : 'w-12 h-12'}`} 

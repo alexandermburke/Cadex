@@ -7,17 +7,18 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { FaLock } from 'react-icons/fa';
 import { motion } from 'framer-motion';
+import clsx from 'clsx'; // Install clsx if you haven't: npm install clsx
 
-export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar }) {
+export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, isAiTutor }) {
   const router = useRouter();
   const { currentUser, userDataObj } = useAuth();
 
   // Ensure plan names are in lowercase for consistent comparison
-  const plan = userDataObj?.billing?.plan?.toLowerCase() || 'free'; // Default to 'free' if plan is undefined
+  const plan = userDataObj?.billing?.plan?.toLowerCase() || 'free'; 
 
   // Define access variables
-  const hasAccess = plan === 'pro' || plan === 'developer';
-  const hasSimulationAccess = plan === 'pro' || plan === 'basic';
+  const hasAccess = plan === 'free' || plan === 'developer'; // Adjust as needed
+  const hasSimulationAccess = plan === 'free' || plan === 'basic';
 
   // Helper function to render locked links
   const renderLockedLink = (label, IconComponent) => (
@@ -67,9 +68,15 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar })
     <li>{renderLockedLink(label, FaLock)}</li>
   );
 
+  // Determine background gradient based on isAiTutor prop using clsx
+  const sidebarBackground = clsx({
+    'bg-gradient-to-b from-blue-950 to-slate-950': isAiTutor,
+    'bg-gradient-to-b from-blue-950 to-slate-800': !isAiTutor,
+  });
+
   return (
     <motion.aside
-      className="z-[150] fixed top-0 left-0 w-64 h-full bg-gradient-to-b from-blue-950 to-slate-800 text-white flex flex-col md:relative md:translate-x-0 overflow-hidden"
+      className={`z-[150] fixed top-0 left-0 w-64 h-full ${sidebarBackground} text-white flex flex-col md:relative md:translate-x-0 overflow-hidden transition-colors duration-500`}
       initial="hidden"
       animate={isSidebarVisible ? 'visible' : 'hidden'}
       variants={sidebarVariants}
@@ -77,10 +84,10 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar })
     >
       {/* Logo or Brand Name */}
       <div className="p-6 flex items-center justify-center">
-       <h1 className="text-3xl font-bold goldGradient relative overflow-hidden">
-         Dashboard
-          </h1>
-        </div>
+        <h1 className="text-3xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-white font-semibold dropShadow relative overflow-hidden">
+          Dashboard
+        </h1>
+      </div>
 
       {/* Navigation Sections */}
       <nav className="flex-1 overflow-y-auto px-6">
@@ -110,14 +117,14 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar })
           <ul className="space-y-2">
             {hasAccess ? (
               <>
-                {renderNavLink('/ailawtools/analysis', 'fa-solid fa-brain', 'AI Flashcards')}
-                {renderNavLink('/ailawtools/contractreview', 'fa-solid fa-lightbulb', 'Hypothetical Analyzer')}
+                {renderNavLink('/ailawtools/analysis', 'fa-solid fa-lightbulb', 'AI Flashcards')}
+                {renderNavLink('/ailawtools/contractreview', 'fa-solid fa-brain', 'LExAPI Tutor')}
                 {renderNavLink('/ailawtools/predictive', 'fa-solid fa-chart-line', 'Exam Insights')}
               </>
             ) : (
               <>
                 {renderLockedNavLink('AI Flashcards')}
-                {renderLockedNavLink('Hypothetical Analyzer')}
+                {renderLockedNavLink('LExAPI Tutor')}
                 {renderLockedNavLink('Exam Insights')}
               </>
             )}

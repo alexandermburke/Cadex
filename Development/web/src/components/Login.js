@@ -40,7 +40,7 @@ export default function Login() {
       <div className="flex flex-col gap-6 items-center sm:flex-row sm:justify-center sm:items-center py-10">
       <Image
                         src="/header.avif" 
-                        alt="Cadex Law Logo"
+                        alt="CadexLaw Logo"
                         width={144} 
                         height={144} 
                         className='w-24 h-24 sm:mr-4 mb-4'
@@ -53,7 +53,7 @@ export default function Login() {
               poppins.className
             }
           >
-            <span className="goldGradient">Cadex Law</span>
+            <span className="goldGradient">CadexLaw</span>
           </h2>
         </div>
       </div>

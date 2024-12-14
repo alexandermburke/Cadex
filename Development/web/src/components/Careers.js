@@ -25,7 +25,7 @@ export default function Careers() {
                 <div className='flex flex-col items-center'>
                     <Image
                         src="/header.avif" 
-                        alt="Cadex Law Logo"
+                        alt="CadexLaw Logo"
                         width={144} 
                         height={144} 
                         className='w-24 h-24 sm:mr-4 mb-4'
@@ -36,7 +36,7 @@ export default function Careers() {
                     </h2>
                 </div>
                 <p className='text-base sm:text-lg md:text-xl'>
-                    At Cadex Law, we are always looking for talented individuals to join our team. Submit your resume and email for review to start your journey with us.
+                    At CadexLaw, we are always looking for talented individuals to join our team. Submit your resume and email for review to start your journey with us.
                 </p>
                 
                 <form onSubmit={handleSubmit} className='flex flex-col gap-4 w-full lg:max-w-md'>
