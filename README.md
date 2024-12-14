@@ -1,6 +1,6 @@
 
 
-<img src="https://www.cadexlaw.com/header.png" alt="Cadex Law Header" style="width:200px;">
+<img src="https://www.cadexlaw.com/header.avif" alt="Cadex Law Header" style="width:200px;">
 
 #
 
