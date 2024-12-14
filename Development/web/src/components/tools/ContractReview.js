@@ -972,7 +972,7 @@ export default function AiTutor() {
                       aria-label="Enable Instant Feedback"
                     />
                     <label htmlFor="instantFeedback" className="ml-3 text-gray-300">
-                      Enable Instant Feedback
+                      Enable Artificial Voice
                     </label>
                   </div>
 
