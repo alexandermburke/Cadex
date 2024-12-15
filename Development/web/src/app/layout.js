@@ -19,7 +19,7 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <Head />
       <AuthProvider>
-        <body className={'relative flex flex-col text-slate-800 text-sm sm:text-base min-h-screen  ' + inter.className}>
+        <body className={'relative flex flex-col text-slate-800 text-sm sm:text-base min-h-screen' + inter.className}>
           <div id="portal" />
           {children}
         </body>

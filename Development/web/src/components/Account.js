@@ -169,6 +169,21 @@ export default function Account() {
                         ))}
                     </div>
                 </ActionCard>
+                {/* Added Settings ActionCard */}
+                <ActionCard title="Settings">
+                    <div className="flex items-center">
+                    <input
+                      type="checkbox"
+                      id="instantFeedback"
+                      name="instantFeedback"
+                      className="h-5 w-5 text-blue-500 focus:ring-blue-500 border-gray-300 rounded"
+                      aria-label="Enable Instant Feedback"
+                    />
+                    <label htmlFor="" className="ml-3 text-black">
+                      Enable Dark Mode
+                    </label>
+                    </div>
+                </ActionCard>
             </div>
             <LogoFiller />
         </>

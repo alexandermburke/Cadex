@@ -46,7 +46,7 @@ export default function AiTutor() {
     subTopic: '',
     complexity: 'Intermediate',
     questionLimit: 5,
-    instantFeedback: false,
+    instantFeedback: true,
     selectedQuestionTypes: [],
   });
 
@@ -635,7 +635,7 @@ export default function AiTutor() {
 
   // Define the messageDisplay function inside the component
   function messageDisplay() {
-    return isCommunicating ? 'AI is communicating...' : 'Cadex is ready.';
+    return isCommunicating ? 'AI is communicating...' : 'LExAPI v0.3.4 is ready';
   }
 
   return (
