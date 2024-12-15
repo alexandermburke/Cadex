@@ -53,6 +53,7 @@ export default function Plans() {
   const router = useRouter();
 
   const currentPlan = userDataObj?.billing?.plan;
+  const isDarkMode = userDataObj?.darkMode || false;
 
   // Filter plans based on the user's current plan
   let filteredPlans = plans;
@@ -98,14 +99,11 @@ export default function Plans() {
         <>
           {/* Header Section */}
           <div className="flex flex-col gap-6">
-            <h2
-              className={
-                'text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-semibold text-center ' +
-                poppins.className
-              }
-            >
-              Find the <span className="goldGradient">plan</span> for you
-            </h2>
+             <h2
+          className={`text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-semibold text-center ${isDarkMode ? 'text-white' : 'text-blue-950'} ` + poppins.className}
+        >
+          Find the <span className="goldGradient">plan</span> for you
+        </h2>
           </div>
 
           {/* Plans Grid */}
@@ -193,14 +191,11 @@ export default function Plans() {
       {/* Footer Section with Stripe Logo */}
       <div className="flex flex-col items-center gap-2 mt-8">
         <div className="flex items-center justify-center gap-2">
-          <p className="text-center">All transactions are securely handled by</p>
-          <Image
-            src="/stripe-logo.png" // Ensure this path is correct
-            alt="Stripe Logo"
-            width={100}
-            height={24}
-            className="object-contain"
-          />
+        <p
+          className={`text-center ${isDarkMode ? 'text-white' : 'text-black'} ` + poppins.className}
+        >
+          All transactions are handled by Stripe
+        </p>
         </div>
       </div>
     </>

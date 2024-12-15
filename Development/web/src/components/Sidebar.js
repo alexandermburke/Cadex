@@ -117,13 +117,13 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, i
           <ul className="space-y-2">
             {hasAccess ? (
               <>
-                {renderNavLink('/ailawtools/analysis', 'fa-solid fa-lightbulb', 'Flashcards')}
+                {renderNavLink('/ailawtools/analysis', 'fa-solid fa-lightbulb', 'Generative Flashcards')}
                 {renderNavLink('/ailawtools/contractreview', 'fa-solid fa-brain', 'LExAPI Tutor')}
                 {renderNavLink('/ailawtools/predictive', 'fa-solid fa-chart-line', 'Exam Insights')}
               </>
             ) : (
               <>
-                {renderLockedNavLink('Flashcards')}
+                {renderLockedNavLink('Generative Flashcards')}
                 {renderLockedNavLink('LExAPI Tutor')}
                 {renderLockedNavLink('Exam Insights')}
               </>

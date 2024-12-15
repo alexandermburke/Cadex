@@ -50,7 +50,8 @@ export default function Plans() {
   const [selectedPlan, setSelectedPlan] = useState(null);
   const { currentUser, userDataObj, isPaid } = useAuth();
   const router = useRouter();
-
+  const isDarkMode = userDataObj?.darkMode || false;
+  
   async function handleUpdatePlan() {
     if (!selectedPlan) return;
 
@@ -84,6 +85,7 @@ export default function Plans() {
     } catch (error) {
       console.error('Checkout error:', error);
       // Optionally, display an error message to the user
+      alert('Failed to initiate checkout. Please try again later.');
     }
   }
 
@@ -92,10 +94,7 @@ export default function Plans() {
       {/* Header Section */}
       <div className="flex flex-col gap-6">
         <h2
-          className={
-            'text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-semibold text-center ' +
-            poppins.className
-          }
+          className={`text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-semibold text-center ${isDarkMode ? 'text-white' : 'text-blue-950'} ` + poppins.className}
         >
           Find the <span className="goldGradient">plan</span> for you
         </h2>
@@ -170,11 +169,17 @@ export default function Plans() {
             Register now to Begin
           </button>
         </Link>
-        {/* Stripe Logo with Text */}
         <div className="flex items-center gap-2">
-          <p className="text-center">All transactions are handled by Stripe</p>
+        <p
+          className={`text-center ${isDarkMode ? 'text-white' : 'text-black'} ` + poppins.className}
+        >
+          All transactions are handled by Stripe
+        </p>
+
+          
         </div>
       </div>
     </>
+    
   );
 }

@@ -519,7 +519,7 @@ export default function AIExamFlashCard() {
         <div className="w-full max-w-5xl flex justify-end mb-4 space-x-4">
           <button
             onClick={openLoadProgressModal}
-            className="flex items-center px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 transition-colors duration-200"
+            className="flex items-center px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 transition-colors duration-200"
             aria-label="Load Progress"
           >
             <FaSyncAlt className="mr-2" />
@@ -527,7 +527,7 @@ export default function AIExamFlashCard() {
           </button>
           <button
             onClick={openConfigModal}
-            className="flex items-center px-4 py-2 bg-blue-950 text-white rounded-md hover:bg-blue-800 transition-colors duration-200"
+            className="flex items-center px-4 py-2 bg-blue-950 text-white rounded hover:bg-blue-800 transition-colors duration-200"
             aria-label="Configure Flashcards"
           >
             Configure
@@ -817,7 +817,7 @@ export default function AIExamFlashCard() {
                   <button
                     type="button"
                     onClick={handleGenerateFlashcards}
-                    className="px-4 py-2 bg-blue-950 text-white rounded-md hover:bg-blue-800 transition-colors duration-200"
+                    className="px-4 py-2 bg-blue-950 text-white rounded hover:bg-blue-800 transition-colors duration-200"
                     aria-label="Generate Flashcards"
                     disabled={isLoading}
                   >
@@ -826,7 +826,7 @@ export default function AIExamFlashCard() {
                   <button
                     type="button"
                     onClick={closeConfigModal}
-                    className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 transition-colors duration-200"
+                    className="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 transition-colors duration-200"
                     aria-label="Cancel Configuration"
                   >
                     Cancel
@@ -858,7 +858,7 @@ export default function AIExamFlashCard() {
               <p className="text-gray-700 mb-6 whitespace-pre-wrap">{answerFeedback}</p>
               <button
                 onClick={closeResultModalAndContinue}
-                className="px-6 py-3 bg-blue-950 text-white rounded-md hover:bg-blue-700 transition-colors duration-200"
+                className="px-6 py-3 bg-blue-950 text-white rounded hover:bg-blue-700 transition-colors duration-200"
                 aria-label="Close and Continue"
               >
                 Continue
@@ -990,7 +990,7 @@ export default function AIExamFlashCard() {
               <div className="flex justify-end mt-6">
                 <button
                   onClick={closeFinalFeedbackModal}
-                  className="px-6 py-3 bg-blue-950 text-white rounded-md hover:bg-blue-700 transition-colors duration-200"
+                  className="px-6 py-3 bg-blue-950 text-white rounded hover:bg-blue-700 transition-colors duration-200"
                   aria-label="Close Final Feedback Modal"
                 >
                   Close

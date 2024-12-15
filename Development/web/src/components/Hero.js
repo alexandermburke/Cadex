@@ -21,8 +21,8 @@ import {
 import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css';
 import { Autoplay } from 'swiper/modules';
-
 import { useInView } from 'react-intersection-observer';
+import { useAuth } from '@/context/AuthContext';
 
 const targetStats = {
   cases: 400,
@@ -36,6 +36,9 @@ const poppins = Poppins({
 });
 
 export default function Hero() {
+  const { currentUser, userDataObj } = useAuth(); // Ensure useAuth is imported
+  const isDarkMode = userDataObj?.darkMode || false;
+
   const [loaded, setLoaded] = useState(false);
   const [stats, setStats] = useState({
     cases: 0,
@@ -98,45 +101,45 @@ export default function Hero() {
 
   const features = [
     {
-      icon: <FaGavel className="text-blue-950 text-4xl mb-4" />,
+      icon: <FaGavel className={`${isDarkMode ? 'text-white' : 'text-blue-950'} text-4xl mb-4`} />,
       title: 'Interactive Practice Exams',
       description:
         'Experience real exam conditions with AI-generated practice tests.',
     },
     {
-      icon: <FaSearch className="text-blue-950 text-4xl mb-4" />,
+      icon: <FaSearch className={`${isDarkMode ? 'text-white' : 'text-blue-950'} text-4xl mb-4`} />,
       title: 'Personalized Study Materials',
       description:
         'Access study materials tailored to your strengths and weaknesses.',
     },
     {
-      icon: <FaTasks className="text-blue-950 text-4xl mb-4" />,
+      icon: <FaTasks className={`${isDarkMode ? 'text-white' : 'text-blue-950'} text-4xl mb-4`} />,
       title: 'Progress Tracking',
       description: 'Monitor your improvement with detailed analytics.',
     },
     {
-      icon: <FaFileAlt className="text-blue-950 text-4xl mb-4" />,
+      icon: <FaFileAlt className={`${isDarkMode ? 'text-white' : 'text-blue-950'} text-4xl mb-4`} />,
       title: 'Instant Feedback',
       description: 'Immediate feedback to identify areas of improvement.',
     },
     {
-      icon: <FaRobot className="text-blue-950 text-4xl mb-4" />,
+      icon: <FaRobot className={`${isDarkMode ? 'text-white' : 'text-blue-950'} text-4xl mb-4`} />,
       title: 'AI-Powered Tutoring',
       description: '24/7 AI tutors for quick assistance.',
     },
     {
-      icon: <FaChartLine className="text-blue-950 text-4xl mb-4" />,
+      icon: <FaChartLine className={`${isDarkMode ? 'text-white' : 'text-blue-950'} text-4xl mb-4`} />,
       title: 'Adaptive Learning',
       description:
         'Material adapts to your learning style.',
     },
     {
-      icon: <FaFileContract className="text-blue-950 text-4xl mb-4" />,
+      icon: <FaFileContract className={`${isDarkMode ? 'text-white' : 'text-blue-950'} text-4xl mb-4`} />,
       title: 'Exam Strategies',
       description: 'Effective methods for complex questions.',
     },
     {
-      icon: <FaBalanceScale className="text-blue-950 text-4xl mb-4" />,
+      icon: <FaBalanceScale className={`${isDarkMode ? 'text-white' : 'text-blue-950'} text-4xl mb-4`} />,
       title: 'Question Bank',
       description: 'Thousands of questions across topics.',
     },
@@ -217,37 +220,34 @@ export default function Hero() {
 
   const VerticalDivider = () => (
     <div
-      className={`mx-auto w-[2px] my-0 bg-gradient-to-b from-transparent via-slate-500 to-blue-950 transition-all duration-700 ${
+      className={`mx-auto w-[2px] my-0 ${
+        isDarkMode ? 'bg-white' : 'bg-gradient-to-b from-transparent via-slate-500 to-blue-950'
+      } transition-all duration-700 ${
         loaded ? 'h-12 sm:h-16 md:h-20 opacity-0' : 'h-0 opacity-0'
       }`}
     />
   );
 
   const [featuresRef, featuresInView] = useInView({ threshold: 0.1, triggerOnce: true });
-  const [whoRef, whoInView] = useInView({ threshold: 0.1, triggerOnce: true });
-  const [costRef, costInView] = useInView({ threshold: 0.1, triggerOnce: true });
-  const [faqRef, faqInView] = useInView({ threshold: 0.1, triggerOnce: true });
-  const [uniRef, uniInView] = useInView({ threshold: 0.1, triggerOnce: true });
   const [storiesRef, storiesInView] = useInView({ threshold: 0.1, triggerOnce: true });
-  const [processRef, processInView] = useInView({ threshold: 0.1, triggerOnce: true });
 
   return (
     <section className="w-full bg-transparent">
       {/* Disclaimer Popup */}
       {showDisclaimer && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white rounded-lg p-6 max-w-lg mx-auto">
+          <div className="bg-transparent rounded-lg p-6 max-w-lg mx-auto">
             <h2 className="text-3xl font-semibold mb-4">Important Disclaimer</h2>
-            <p className="mb-4 text-gray-700">
+            <p className={`mb-4 ${isDarkMode ? 'text-white ' : 'text-gray-700 '}`}>
               Please note that Cadex is a supplementary tool and not a substitute for professional legal advice or formal exams. Verify all information and refer to our{' '}
-              <Link href="/legal" className="text-blue-600 underline">
+              <Link href="/legal" className={`underline ${isDarkMode ? 'text-white ' : 'text-blue-600 hover:text-blue-600'}`}>
                 Terms and Conditions
               </Link>.
             </p>
             <div className="text-right">
               <button
                 onClick={handleCloseDisclaimer}
-                className="group before:ease relative h-12 w-56 overflow-hidden rounded bg-gradient-to-r from-blue-950 to-slate-700 text-white shadow-2xl transition-all before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-56"
+                className="group before:ease relative h-12 w-56 overflow-hidden rounded bg-gradient-to-r from-blue-950 to-slate-700 text-white shadow-2xl transition-all before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 before:rotate-6 before:bg-transparent before:opacity-20 before:duration-700 hover:before:-translate-x-56"
               >
                 <div className="flex items-center justify-center h-full">
                   I Understand
@@ -267,11 +267,9 @@ export default function Hero() {
           }`}
         >
           <h2
-            className={
-              'text-4xl sm:text-6xl font-semibold py-2 mb-0 ' + poppins.className
-            }
+            className={`text-4xl sm:text-6xl font-semibold py-2 mb-0 ${isDarkMode ? 'text-white' : 'text-blue-950'} ` + poppins.className}
           >
-            <span className="block mb-4 text-blue-950">
+            <span className="block mb-4">
               Your{' '}
               <span className="relative inline-block" key={animationTrigger} aria-hidden="true">
                 {animatedWord.split('').map((letter, letterIndex) => {
@@ -296,14 +294,14 @@ export default function Hero() {
             <span className="sr-only">Your Dream School Awaits.</span>
           </h2>
 
-          <p className="text-center sm:text-lg md:text-xl text-black max-w-2xl my-6">
+          <p className={`text-center sm:text-lg md:text-xl ${isDarkMode ? 'text-white ' : 'text-black '} max-w-2xl my-6`}>
             Cadex combines AI-driven prep and real time feedback to help you excel at a fraction of the cost.
           </p>
 
           <div className="flex justify-center mt-6 mb-6">
-            <Link
+          <Link
               href="/pricing"
-              className="group before:ease relative h-12 w-56 overflow-hidden rounded bg-gradient-to-r from-blue-950 to-slate-700 text-white shadow-2xl transition-all before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-56"
+              className={'group before:ease relative h-12 w-56 overflow-hidden rounded bg-blue-950 text-white shadow-2xl transition-all before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-56'}
             >
               <div className="flex items-center justify-center h-full">
                 Explore Our Plans
@@ -323,7 +321,7 @@ export default function Hero() {
           }`}
         >
           <div className="max-w-7xl w-full">
-            <h3 className="text-4xl sm:text-5xl font-semibold text-center text-blue-950">
+            <h3 className={`text-4xl sm:text-5xl font-semibold text-center ${isDarkMode ? 'text-white ' : 'text-blue-950 hover:text-blue-700'}`}>
               Features
             </h3>
             <Swiper
@@ -345,12 +343,12 @@ export default function Hero() {
                   key={index}
                   style={{ width: '220px', height: '250px' }}
                 >
-                  <div className="w-full h-full flex flex-col items-center justify-center p-4 bg-white rounded shadow-md hover:shadow-xl transition-shadow">
+                  <div className="w-full h-full flex flex-col items-center justify-center p-4 bg-transparent rounded shadow-lg hover:shadow-xl transition-shadow">
                     {feature.icon}
-                    <h4 className="text-lg font-semibold text-blue-950 mb-2 text-center">
+                    <h4 className={`text-lg font-semibold mb-2 text-center ${isDarkMode ? 'text-white ' : 'text-blue-950 hover:text-blue-700'}`}>
                       {feature.title}
                     </h4>
-                    <p className="text-sm text-center text-gray-700">
+                    <p className={`text-sm ${isDarkMode ? 'text-white ' : 'text-gray-700 '}`}>
                       {feature.description}
                     </p>
                   </div>
@@ -370,7 +368,7 @@ export default function Hero() {
           }`}
         >
           <div className="max-w-5xl w-full">
-            <h3 className="text-4xl sm:text-5xl font-semibold my-6 text-center text-blue-950 ">
+            <h3 className={`text-4xl sm:text-5xl font-semibold my-6 text-center ${isDarkMode ? 'text-white ' : 'text-blue-950 hover:text-blue-700'}`}>
               Success Stories
             </h3>
             <Swiper
@@ -397,12 +395,16 @@ export default function Hero() {
             >
               {successStories.map((story, index) => (
                 <SwiperSlide key={index} style={{ width: '320px', height: '320px' }}>
-                  <div className="bg-white rounded shadow-md p-6 h-full flex flex-col justify-between hover:shadow-xl transition-shadow">
+                  <div className="bg-transparent rounded shadow-lg p-6 h-full flex flex-col justify-between hover:shadow-xl transition-shadow">
                     <div>
-                      <h4 className="text-xl font-semibold text-blue-950 mb-2">{story.name}</h4>
-                      <p className="text-base text-gray-700 italic mb-4">&ldquo;{story.quote}&rdquo;</p>
+                      <h4 className={`text-xl font-semibold mb-2 ${isDarkMode ? 'text-white ' : 'text-blue-950 hover:text-blue-700'}`}>
+                        {story.name}
+                      </h4>
+                      <p className={`text-base italic mb-4 ${isDarkMode ? 'text-white ' : 'text-gray-700 '}`}>
+                        &ldquo;{story.quote}&rdquo;
+                      </p>
                     </div>
-                    <div className="flex items-center justify-start gap-4 text-gray-700 mt-auto">
+                    <div className={`flex items-center justify-start gap-4 ${isDarkMode ? 'text-white ' : 'text-gray-700 '} mt-auto`}>
                       <span className="text-sm">
                         {story.initialScore} → {story.newScore} (
                         <span className="font-bold text-emerald-500">+{story.difference}</span>)
