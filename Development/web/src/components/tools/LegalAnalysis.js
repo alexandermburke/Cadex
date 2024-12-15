@@ -21,7 +21,7 @@ import {
 // Authentication context
 import { useAuth } from '@/context/AuthContext';
 
-// Chart.js imports (optional, if you want to use charts)
+// Chart.js imports (optional)
 import { Line, Pie, Bar as ChartBar } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
@@ -36,7 +36,6 @@ import {
   Legend,
 } from 'chart.js';
 
-// Register Chart.js components
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -50,12 +49,11 @@ ChartJS.register(
 );
 
 export default function AIExamFlashCard() {
-  const { currentUser, userDataObj } = useAuth(); // Authentication
+  const { currentUser, userDataObj } = useAuth();
   const isDarkMode = userDataObj?.darkMode || false;
   const router = useRouter();
 
-  // State variables
-  const [flashcards, setFlashcards] = useState([]); // Array to hold generated flashcards
+  const [flashcards, setFlashcards] = useState([]);
   const [isSidebarVisible, setIsSidebarVisible] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [isConfigModalOpen, setIsConfigModalOpen] = useState(false);
@@ -63,29 +61,23 @@ export default function AIExamFlashCard() {
   const [isLoadProgressModalOpen, setIsLoadProgressModalOpen] = useState(false);
   const [isFinalFeedbackModalOpen, setIsFinalFeedbackModalOpen] = useState(false);
   const [savedProgresses, setSavedProgresses] = useState([]);
-  
-  // Track answers and feedback
+
   const [answeredFlashcards, setAnsweredFlashcards] = useState([]);
   const [currentFlashcardIndex, setCurrentFlashcardIndex] = useState(0);
-  
-  // Configuration state
+
   const [examConfig, setExamConfig] = useState({
     examType: 'LSAT',
     difficulty: '',
     lawType: 'General Law',
-    flashcardLimit: 5, // Default to 5 flashcards
-    instantFeedback: false, // Control instant feedback
+    flashcardLimit: 5,
+    instantFeedback: false,
     selectedQuestionTypes: [],
   });
 
-  // Answer mode: 'written' or 'multiple-choice'
   const [answerMode, setAnswerMode] = useState('written');
-  
-  // User's current answer input
   const [inputText, setInputText] = useState('');
   const [answerFeedback, setAnswerFeedback] = useState('');
 
-  // Difficulty and law type mappings based on exam type
   const difficultyMapping = {
     LSAT: [
       { value: 'Below 150', label: 'Below 150' },
@@ -107,7 +99,7 @@ export default function AIExamFlashCard() {
   };
 
   const lawTypeMapping = {
-    LSAT: ['General Law'], // LSAT doesn't cover specific law subjects
+    LSAT: ['General Law'],
     BAR: [
       'General Law',
       'Criminal Law',
@@ -139,7 +131,6 @@ export default function AIExamFlashCard() {
     ],
   };
 
-  // Question Types for LSAT
   const logicalReasoningQuestionTypes = [
     'Assumption Questions',
     'Strengthen/Weaken Questions',
@@ -161,11 +152,9 @@ export default function AIExamFlashCard() {
     'Inference Questions',
   ];
 
-  // Derived state for options
   const [difficultyOptions, setDifficultyOptions] = useState(difficultyMapping['LSAT']);
   const [lawTypeOptions, setLawTypeOptions] = useState(lawTypeMapping['LSAT']);
 
-  // Update difficulty and law type options when exam type changes
   useEffect(() => {
     const newDifficultyOptions = difficultyMapping[examConfig.examType] || [];
     const newLawTypeOptions = lawTypeMapping[examConfig.examType] || ['General Law'];
@@ -181,7 +170,6 @@ export default function AIExamFlashCard() {
     }));
   }, [examConfig.examType]);
 
-  // Function to handle configuration changes
   const handleConfigChange = (e) => {
     const { name, value, type, checked } = e.target;
     setExamConfig((prevConfig) => ({
@@ -190,7 +178,6 @@ export default function AIExamFlashCard() {
     }));
   };
 
-  // Function to handle question type selection
   const handleQuestionTypeChange = (e, type) => {
     const { checked } = e.target;
     setExamConfig((prevConfig) => {
@@ -207,12 +194,10 @@ export default function AIExamFlashCard() {
     });
   };
 
-  // Function to toggle sidebar visibility
   const toggleSidebar = () => {
     setIsSidebarVisible(!isSidebarVisible);
   };
 
-  // Function to handle API call to generate flashcards based on configuration
   const handleGenerateFlashcards = async () => {
     setIsLoading(true);
     setFlashcards([]);
@@ -235,7 +220,7 @@ export default function AIExamFlashCard() {
       }
 
       const { flashcards: generatedFlashcards } = await response.json();
-      setFlashcards(generatedFlashcards); 
+      setFlashcards(generatedFlashcards);
     } catch (error) {
       console.error('Error during flashcard generation:', error);
       alert('An error occurred during flashcard generation.');
@@ -244,7 +229,6 @@ export default function AIExamFlashCard() {
     }
   };
 
-  // When flashcards are loaded, reset progress
   useEffect(() => {
     if (flashcards.length > 0) {
       setAnsweredFlashcards([]);
@@ -254,14 +238,11 @@ export default function AIExamFlashCard() {
     }
   }, [flashcards]);
 
-  // Current flashcard
   const currentFlashcard = flashcards[currentFlashcardIndex];
 
-  // Submit answer for the current flashcard
   const handleSubmitAnswer = () => {
     if (!inputText.trim()) return;
 
-    // Check correctness
     const userAnswer = inputText.trim();
     const correct = currentFlashcard.correctAnswer
       ? userAnswer.toLowerCase() === currentFlashcard.correctAnswer.toLowerCase()
@@ -284,34 +265,28 @@ export default function AIExamFlashCard() {
     setAnswerFeedback(feedback);
 
     if (examConfig.instantFeedback) {
-      // Show result modal if instant feedback is on
       setIsResultModalOpen(true);
     } else {
-      // Move to next question if no instant feedback
       moveToNextFlashcard();
     }
   };
 
   const moveToNextFlashcard = () => {
-    // If this was the last flashcard, show final feedback
     if (currentFlashcardIndex === flashcards.length - 1) {
       setIsFinalFeedbackModalOpen(true);
       return;
     }
 
-    // Move to next flashcard
     setCurrentFlashcardIndex((prevIndex) => prevIndex + 1);
     setInputText('');
     setAnswerFeedback('');
   };
 
-  // Close result modal and go to next flashcard
   const closeResultModalAndContinue = () => {
     setIsResultModalOpen(false);
     moveToNextFlashcard();
   };
 
-  // Configuration modal handlers
   const openConfigModal = () => {
     setIsConfigModalOpen(true);
   };
@@ -320,7 +295,14 @@ export default function AIExamFlashCard() {
     setIsConfigModalOpen(false);
   };
 
-  // Load progress modal handlers
+  const openResultModal = () => {
+    setIsResultModalOpen(true);
+  };
+
+  const closeResultModal = () => {
+    setIsResultModalOpen(false);
+  };
+
   const openLoadProgressModal = () => {
     fetchSavedProgresses();
     setIsLoadProgressModalOpen(true);
@@ -330,7 +312,6 @@ export default function AIExamFlashCard() {
     setIsLoadProgressModalOpen(false);
   };
 
-  // Final feedback modal handlers
   const openFinalFeedbackModal = () => {
     setIsFinalFeedbackModalOpen(true);
   };
@@ -339,7 +320,6 @@ export default function AIExamFlashCard() {
     setIsFinalFeedbackModalOpen(false);
   };
 
-  // Function to handle saving progress
   const handleSaveProgress = async () => {
     if (!currentUser) {
       alert('You need to be logged in to save your progress.');
@@ -373,7 +353,6 @@ export default function AIExamFlashCard() {
     }
   };
 
-  // Function to fetch saved progresses
   const fetchSavedProgresses = async () => {
     if (!currentUser) {
       alert('You need to be logged in to load your progress.');
@@ -396,7 +375,6 @@ export default function AIExamFlashCard() {
     }
   };
 
-  // Function to handle loading a progress
   const handleLoadProgress = (progress) => {
     setExamConfig(progress.examConfig);
     setFlashcards(progress.flashcards);
@@ -405,7 +383,6 @@ export default function AIExamFlashCard() {
     closeLoadProgressModal();
   };
 
-  // Function to handle deleting a progress
   const handleDeleteProgress = async (id) => {
     if (!currentUser) {
       alert('You need to be logged in to delete your progress.');
@@ -421,26 +398,22 @@ export default function AIExamFlashCard() {
     }
   };
 
-  // Check if user is Pro or Developer
   const isProUser = userDataObj?.billing?.plan === 'Pro' || userDataObj?.billing?.plan === 'Developer';
 
-  // Redirect unauthenticated users to login
   if (!currentUser) {
     return (
-      <div className={`flex items-center justify-center h-screen ${isDarkMode ? 'bg-gray-900' : 'bg-gray-100'}`}>
-        <div className={`text-center p-6 rounded shadow-md ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
-          <p className={`text-gray-300 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'} mb-4`}>
+      <div className={`flex items-center justify-center h-screen ${isDarkMode ? 'bg-gray-800' : 'bg-gray-100'}`}>
+        <div className={`text-center p-6 rounded shadow-md ${isDarkMode ? 'bg-gray-700' : 'bg-white'}`}>
+          <p className={`mb-4 ${isDarkMode ? 'text-white' : 'text-gray-700'}`}>
             Please{' '}
-            <a href="/login" className={`text-blue-500 underline ${isDarkMode ? 'text-blue-400' : 'text-blue-700'}`}>
+            <a href="/login" className={`underline ${isDarkMode ? 'text-blue-400' : 'text-blue-900'}`}>
               log in
             </a>{' '}
             to use the AI Exam Flashcard tool.
           </p>
           <button
             onClick={() => router.push('/login')}
-            className={`px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700 transition-colors duration-200 ${
-              isDarkMode ? 'bg-blue-600 hover:bg-blue-700' : ''
-            }`}
+            className={`px-4 py-2 rounded ${isDarkMode ? 'bg-blue-600 text-white hover:bg-blue-500' : 'bg-blue-900 text-white hover:bg-blue-700'}`}
           >
             Go to Login
           </button>
@@ -451,7 +424,6 @@ export default function AIExamFlashCard() {
 
   return (
     <div className={`flex h-screen ${isDarkMode ? 'bg-gray-900' : 'bg-gray-50'} rounded shadow-sm`}>
-      {/* Sidebar with AnimatePresence for smooth transitions */}
       <AnimatePresence>
         {isSidebarVisible && (
           <>
@@ -461,7 +433,6 @@ export default function AIExamFlashCard() {
               toggleSidebar={toggleSidebar}
               isDarkMode={isDarkMode}
             />
-            {/* Overlay for mobile devices */}
             <motion.div
               className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
               initial={{ opacity: 0 }}
@@ -473,14 +444,11 @@ export default function AIExamFlashCard() {
         )}
       </AnimatePresence>
 
-      {/* Main Content Area */}
-      <main className="flex-1 flex flex-col items-center p-6 overflow-auto">
-        {/* Header */}
+      <main className={`flex-1 flex flex-col items-center p-6 overflow-auto ${isDarkMode ? 'text-white' : 'text-black'}`}>
         <div className="w-full max-w-5xl flex items-center justify-between mb-6">
-          {/* Toggle Sidebar Button */}
           <button
             onClick={toggleSidebar}
-            className={`text-gray-600 hover:text-gray-800 ${isDarkMode ? 'text-gray-200 hover:text-white' : ''}`}
+            className={`text-gray-600 ${isDarkMode ? 'text-white' : ''} hover:text-slate-500`}
             aria-label={isSidebarVisible ? 'Hide Sidebar' : 'Show Sidebar'}
           >
             <AnimatePresence mode="wait" initial={false}>
@@ -507,14 +475,10 @@ export default function AIExamFlashCard() {
               )}
             </AnimatePresence>
           </button>
-
-          {/* Save Progress Button */}
           <button
             onClick={handleSaveProgress}
             className={`flex items-center px-4 py-2 rounded hover:bg-opacity-80 transition-colors duration-200 ${
-              isDarkMode
-                ? 'bg-blue-700 text-white hover:bg-blue-600'
-                : 'bg-blue-950 text-white hover:bg-blue-800'
+              isDarkMode ? 'bg-blue-700 text-white hover:bg-blue-600' : 'bg-blue-950 text-white hover:bg-blue-800'
             }`}
             aria-label="Save Progress"
           >
@@ -523,14 +487,11 @@ export default function AIExamFlashCard() {
           </button>
         </div>
 
-        {/* Configuration and Control Buttons */}
         <div className="w-full max-w-5xl flex justify-end mb-4 space-x-4">
           <button
             onClick={openLoadProgressModal}
             className={`flex items-center px-4 py-2 rounded hover:bg-opacity-80 transition-colors duration-200 ${
-              isDarkMode
-                ? 'bg-gray-700 text-white hover:bg-gray-600'
-                : 'bg-gray-300 text-gray-700 hover:bg-gray-400'
+              isDarkMode ? 'bg-gray-700 text-white hover:bg-gray-600' : 'bg-gray-300 text-gray-700 hover:bg-gray-400'
             }`}
             aria-label="Load Progress"
           >
@@ -540,9 +501,7 @@ export default function AIExamFlashCard() {
           <button
             onClick={openConfigModal}
             className={`flex items-center px-4 py-2 rounded hover:bg-opacity-80 transition-colors duration-200 ${
-              isDarkMode
-                ? 'bg-blue-700 text-white hover:bg-blue-600'
-                : 'bg-blue-950 text-white hover:bg-blue-800'
+              isDarkMode ? 'bg-blue-700 text-white hover:bg-blue-600' : 'bg-blue-950 text-white hover:bg-blue-800'
             }`}
             aria-label="Configure Flashcards"
           >
@@ -550,46 +509,43 @@ export default function AIExamFlashCard() {
           </button>
         </div>
 
-        {/* If we have flashcards, show current progress */}
         {flashcards.length > 0 && (
           <div
-            className={`w-full max-w-5xl mb-4 p-4 rounded ${
-              isDarkMode ? 'bg-gray-800' : 'bg-gray-100'
-            } shadow-md flex justify-between items-center`}
+            className={`w-full max-w-5xl mb-4 p-4 rounded shadow-md flex justify-between items-center ${
+              isDarkMode ? 'bg-gray-700' : 'bg-gray-100'
+            }`}
           >
-            <span
-              className={`text-gray-700 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}
-            >
+            <span className={`${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
               Questions Answered: {answeredFlashcards.length} / {examConfig.flashcardLimit}
             </span>
             <span
               className={`px-3 py-1 rounded-full text-sm font-semibold uppercase ${
-                isProUser ? 'bg-blue-100 text-blue-700' : 'bg-emerald-100 text-emerald-700'
+                (userDataObj?.billing?.plan === 'Pro' || userDataObj?.billing?.plan === 'Developer')
+                  ? 'bg-blue-100 text-blue-700'
+                  : 'bg-emerald-100 text-emerald-700'
               }`}
             >
-              {isProUser ? 'Pro User' : 'Base User'}
+              {(userDataObj?.billing?.plan === 'Pro' || userDataObj?.billing?.plan === 'Developer') ? 'Pro User' : 'Base User'}
             </span>
           </div>
         )}
 
-        {/* Display current flashcard if any */}
         {currentFlashcard && (
           <div
             className={`w-full max-w-5xl mb-6 p-6 rounded-lg shadow-md overflow-y-scroll ${
-              isDarkMode ? 'bg-gray-800 text-white' : 'bg-white text-gray-700'
+              isDarkMode ? 'bg-gray-700 text-white' : 'bg-white text-gray-700'
             }`}
           >
-            <h4 className="font-semibold text-blue-400 mb-2">Flashcard {currentFlashcardIndex + 1}</h4>
+            <h4 className={`font-semibold mb-2 ${isDarkMode ? 'text-blue-400' : 'text-blue-700'}`}>
+              Flashcard {currentFlashcardIndex + 1}
+            </h4>
             <h3 className="text-xl font-semibold mb-4">Question:</h3>
             <p className="mb-6">{currentFlashcard.question}</p>
-            
-            {/* Answer mode toggle */}
+
             <div className="w-full max-w-5xl mb-4 flex items-center justify-center">
-              <div className="relative flex bg-gray-300 rounded-full p-0.5">
+              <div className="relative flex bg-gray-200 rounded-full p-0.5">
                 <motion.div
-                  className={`absolute top-0 left-0 w-1/2 h-full rounded-full ${
-                    isDarkMode ? 'bg-blue-700' : 'bg-blue-900'
-                  }`}
+                  className="absolute top-0 left-0 w-1/2 h-full bg-blue-900 rounded-full"
                   initial={false}
                   animate={{ x: answerMode === 'written' ? 0 : '100%' }}
                   transition={{ type: 'spring', stiffness: 700, damping: 30 }}
@@ -597,9 +553,7 @@ export default function AIExamFlashCard() {
                 <button
                   onClick={() => setAnswerMode('written')}
                   className={`relative w-1/2 px-2 py-1 text-sm rounded-full focus:outline-none ${
-                    answerMode === 'written'
-                      ? 'text-white'
-                      : 'text-gray-700'
+                    answerMode === 'written' ? 'text-white' : 'text-gray-700'
                   }`}
                 >
                   Written
@@ -607,9 +561,7 @@ export default function AIExamFlashCard() {
                 <button
                   onClick={() => setAnswerMode('multiple-choice')}
                   className={`relative w-1/2 px-2 py-1 text-sm rounded-full focus:outline-none ${
-                    answerMode === 'multiple-choice'
-                      ? 'text-white'
-                      : 'text-gray-700'
+                    answerMode === 'multiple-choice' ? 'text-white' : 'text-gray-700'
                   }`}
                 >
                   Multiple Choice
@@ -618,11 +570,10 @@ export default function AIExamFlashCard() {
             </div>
 
             {answerMode === 'written' ? (
-              // Written answer input
               <textarea
-                className={`w-full p-4 border ${
-                  isDarkMode ? 'border-gray-700 bg-gray-700 text-white' : 'border-gray-300 bg-white text-gray-700'
-                } rounded resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-200 mb-4`}
+                className={`w-full p-4 border rounded resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-200 mb-4 ${
+                  isDarkMode ? 'border-gray-600 bg-gray-600 text-white' : 'border-gray-300 bg-white text-gray-700'
+                }`}
                 value={inputText}
                 onChange={(e) => setInputText(e.target.value)}
                 placeholder="Enter your answer..."
@@ -630,13 +581,12 @@ export default function AIExamFlashCard() {
                 disabled={isLoading}
               />
             ) : (
-              // Multiple choice mode
               <div className="flex flex-col space-y-2 mb-4">
                 {(currentFlashcard.options || []).map((option, index) => (
                   <label
                     key={index}
                     className={`flex items-center p-2 rounded ${
-                      isDarkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-200'
+                      isDarkMode ? 'hover:bg-gray-600' : 'hover:bg-gray-200'
                     }`}
                   >
                     <input
@@ -660,12 +610,12 @@ export default function AIExamFlashCard() {
             <div className="flex space-x-4">
               <button
                 onClick={handleSubmitAnswer}
-                className={`flex-1 px-4 py-3 rounded font-semibold text-white transition-colors duration-200 shadow-md ${
+                className={`flex-1 px-4 py-3 rounded font-semibold transition-colors duration-200 shadow-md ${
                   isLoading || !inputText.trim()
-                    ? 'bg-gray-300 text-gray-600 cursor-not-allowed'
+                    ? `bg-gray-300 text-gray-600 cursor-not-allowed`
                     : isDarkMode
-                    ? 'bg-blue-700 hover:bg-blue-600'
-                    : 'bg-blue-900 hover:bg-blue-950'
+                    ? 'bg-blue-700 hover:bg-blue-600 text-white'
+                    : 'bg-blue-900 hover:bg-blue-950 text-white'
                 }`}
                 disabled={isLoading || !inputText.trim()}
                 aria-label="Submit Answer"
@@ -674,16 +624,13 @@ export default function AIExamFlashCard() {
               </button>
               <button
                 onClick={handleGenerateFlashcards}
-                className={`flex items-center justify-center px-4 py-3 bg-transparent text-blue-950 rounded font-semibold duration-200 ${
-                  isDarkMode ? 'hover:text-blue-400' : 'hover:text-blue-700'
+                className={`flex items-center justify-center px-4 py-3 rounded font-semibold duration-200 ${
+                  isDarkMode ? 'text-white hover:text-slate-500' : 'text-blue-950 hover:text-slate-200'
                 }`}
                 disabled={isLoading}
                 aria-label="Regenerate Flashcards"
               >
-                <motion.div
-                  whileHover={{ scale: 1.2, rotate: -360 }}
-                  transition={{ duration: 0.5 }}
-                >
+                <motion.div whileHover={{ scale: 1.2, rotate: -360 }} transition={{ duration: 0.5 }}>
                   <FaSyncAlt size={24} />
                 </motion.div>
               </button>
@@ -691,58 +638,51 @@ export default function AIExamFlashCard() {
           </div>
         )}
 
-        {/* If no flashcards and none loading */}
         {flashcards.length === 0 && !isLoading && (
           <div
             className={`w-full max-w-5xl p-6 rounded-lg shadow-md text-center ${
-              isDarkMode ? 'bg-gray-800 text-white' : 'bg-white text-gray-700'
+              isDarkMode ? 'bg-gray-700 text-white' : 'bg-white text-black'
             }`}
           >
-            <p className="mb-4">
-              Click{' '}
-              <span className="font-semibold">
-                Configure
-              </span>{' '}
-              to generate flashcards.
+            <p className={`mb-4 ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+              Click <span className="font-semibold">Configure Exam Prep</span> to start.
             </p>
-            <p className="text-sm">
-              <strong>Note:</strong> This is a practice tool. Not affiliated with official exams.
+            <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+              <strong>Important Note:</strong> This is not an official test prep for any law exam.
             </p>
           </div>
         )}
       </main>
 
-      {/* Configuration Modal */}
+      {/* Configuration Modal (Copied visually from ExamPrep's style) */}
       <AnimatePresence>
         {isConfigModalOpen && (
           <motion.div
-            className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 overflow-y-auto"
+            className={`fixed inset-0 flex items-center justify-center ${isDarkMode ? 'bg-black bg-opacity-70' : 'bg-black bg-opacity-50'} z-[151] overflow-y-auto`}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
           >
             <motion.div
-              className={`bg-white p-8 rounded-lg w-11/12 max-w-md shadow-lg overflow-y-auto max-h-screen ${
-                isDarkMode ? 'bg-gray-800 text-white' : 'bg-white text-gray-700'
-              }`}
+              className={`p-8 rounded-lg w-11/12 max-w-md shadow-lg overflow-y-auto max-h-screen ${isDarkMode ? 'bg-gray-700 text-white' : 'bg-white text-black'}`}
               initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.8, opacity: 0 }}
               transition={{ duration: 0.3 }}
             >
-              <h2 className="text-2xl font-semibold mb-6">Configure Flashcards</h2>
+              <h2 className={`text-2xl font-semibold mb-6 ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>
+                Configure Exam Prep
+              </h2>
               <form>
                 {/* Exam Type */}
                 <div className="mb-4">
-                  <label className="block text-gray-700 mb-2">Exam Type:</label>
+                  <label className={`block mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>Exam Type:</label>
                   <select
                     name="examType"
                     value={examConfig.examType}
                     onChange={handleConfigChange}
                     className={`w-full p-3 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-200 ${
-                      isDarkMode
-                        ? 'bg-gray-700 border-gray-600 text-white'
-                        : 'bg-white border-gray-300 text-gray-700'
+                      isDarkMode ? 'bg-gray-600 border-gray-500 text-white' : 'bg-white border-gray-300 text-gray-800'
                     }`}
                   >
                     <option value="LSAT">LSAT</option>
@@ -753,15 +693,13 @@ export default function AIExamFlashCard() {
 
                 {/* Difficulty */}
                 <div className="mb-4">
-                  <label className="block text-gray-700 mb-2">Difficulty:</label>
+                  <label className={`block mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>Score Range:</label>
                   <select
                     name="difficulty"
                     value={examConfig.difficulty}
                     onChange={handleConfigChange}
                     className={`w-full p-3 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-200 ${
-                      isDarkMode
-                        ? 'bg-gray-700 border-gray-600 text-white'
-                        : 'bg-white border-gray-300 text-gray-700'
+                      isDarkMode ? 'bg-gray-600 border-gray-500 text-white' : 'bg-white border-gray-300 text-gray-800'
                     }`}
                   >
                     {difficultyOptions.map((option) => (
@@ -774,15 +712,13 @@ export default function AIExamFlashCard() {
 
                 {/* Law Type */}
                 <div className="mb-4">
-                  <label className="block text-gray-700 mb-2">Law Type:</label>
+                  <label className={`block mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>Law Type:</label>
                   <select
                     name="lawType"
                     value={examConfig.lawType}
                     onChange={handleConfigChange}
                     className={`w-full p-3 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-200 ${
-                      isDarkMode
-                        ? 'bg-gray-700 border-gray-600 text-white'
-                        : 'bg-white border-gray-300 text-gray-700'
+                      isDarkMode ? 'bg-gray-600 border-gray-500 text-white' : 'bg-white border-gray-300 text-gray-800'
                     }`}
                   >
                     {lawTypeOptions.map((lawType, index) => (
@@ -798,7 +734,7 @@ export default function AIExamFlashCard() {
                   <div className="mb-4">
                     {/* Logical Reasoning Question Types */}
                     <div className="mb-2">
-                      <label className="block text-gray-700 mb-2">Logical Reasoning Types:</label>
+                      <label className={`block mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>Logical Reasoning Types:</label>
                       {logicalReasoningQuestionTypes.map((type) => (
                         <div key={type} className="flex items-center mb-1">
                           <input
@@ -808,10 +744,10 @@ export default function AIExamFlashCard() {
                             checked={examConfig.selectedQuestionTypes.includes(type)}
                             onChange={(e) => handleQuestionTypeChange(e, type)}
                             className={`h-5 w-5 focus:ring-blue-500 border-gray-300 rounded ${
-                              isDarkMode ? 'bg-gray-700 text-white' : ''
+                              isDarkMode ? 'bg-gray-600 text-white' : ''
                             }`}
                           />
-                          <label htmlFor={`lr-${type}`} className="ml-3 block text-gray-700">
+                          <label htmlFor={`lr-${type}`} className={`ml-3 block ${isDarkMode ? 'text-white' : 'text-gray-700'}`}>
                             {type}
                           </label>
                         </div>
@@ -820,7 +756,7 @@ export default function AIExamFlashCard() {
 
                     {/* Reading Comprehension Question Types */}
                     <div className="mb-2">
-                      <label className="block text-gray-700 mb-2">Reading Comprehension Types:</label>
+                      <label className={`block mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>Reading Comprehension Types:</label>
                       {readingComprehensionQuestionTypes.map((type) => (
                         <div key={type} className="flex items-center mb-1">
                           <input
@@ -830,10 +766,10 @@ export default function AIExamFlashCard() {
                             checked={examConfig.selectedQuestionTypes.includes(type)}
                             onChange={(e) => handleQuestionTypeChange(e, type)}
                             className={`h-5 w-5 focus:ring-blue-500 border-gray-300 rounded ${
-                              isDarkMode ? 'bg-gray-700 text-white' : ''
+                              isDarkMode ? 'bg-gray-600 text-white' : ''
                             }`}
                           />
-                          <label htmlFor={`rc-${type}`} className="ml-3 block text-gray-700">
+                          <label htmlFor={`rc-${type}`} className={`ml-3 block ${isDarkMode ? 'text-white' : 'text-gray-700'}`}>
                             {type}
                           </label>
                         </div>
@@ -851,38 +787,36 @@ export default function AIExamFlashCard() {
                     checked={examConfig.instantFeedback}
                     onChange={handleConfigChange}
                     className={`h-5 w-5 focus:ring-blue-500 border-gray-300 rounded ${
-                      isDarkMode ? 'bg-gray-700 text-white' : ''
+                      isDarkMode ? 'bg-gray-600 text-white' : ''
                     }`}
                   />
-                  <label htmlFor="instantFeedback" className="ml-3 block text-gray-700">
+                  <label htmlFor="instantFeedback" className={`ml-3 block ${isDarkMode ? 'text-white' : 'text-gray-700'}`}>
                     Enable Instant Feedback
                   </label>
                 </div>
 
-                {/* Flashcard Limit Slider */}
+                {/* Question Limit Slider */}
                 <div className="mb-6">
-                  <label className="block text-gray-700 mb-2">
-                    Number of Flashcards to Generate:
+                  <label className={`block mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                    Number of Questions in a Row:
                   </label>
                   <div className="flex items-center">
                     <input
                       type="range"
                       min="1"
                       max="20"
-                      value={examConfig.flashcardLimit}
+                      value={examConfig.questionLimit}
                       onChange={(e) =>
                         setExamConfig((prevConfig) => ({
                           ...prevConfig,
-                          flashcardLimit: parseInt(e.target.value, 10),
+                          questionLimit: parseInt(e.target.value, 10),
                         }))
                       }
-                      className={`w-full h-2 rounded-lg appearance-none cursor-pointer ${
-                        isDarkMode ? 'bg-gray-700' : 'bg-blue-200'
-                      }`}
-                      id="flashcardLimit"
+                      className={`w-full h-2 ${isDarkMode ? 'bg-blue-700' : 'bg-blue-200'} rounded-lg appearance-none cursor-pointer`}
+                      id="questionLimit"
                     />
-                    <span className={`ml-4 text-gray-700 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                      {examConfig.flashcardLimit}
+                    <span className={`ml-4 ${isDarkMode ? 'text-white' : 'text-gray-700'}`}>
+                      {examConfig.questionLimit}
                     </span>
                   </div>
                 </div>
@@ -891,26 +825,31 @@ export default function AIExamFlashCard() {
                 <div className="flex justify-end space-x-4">
                   <button
                     type="button"
-                    onClick={handleGenerateFlashcards}
-                    className={`px-4 py-2 rounded hover:bg-opacity-80 transition-colors duration-200 font-semibold ${
-                      isDarkMode
-                        ? 'bg-blue-700 text-white hover:bg-blue-600'
-                        : 'bg-blue-950 text-white hover:bg-blue-800'
-                    }`}
-                    aria-label="Generate Flashcards"
-                    disabled={isLoading}
+                    onClick={() => {
+                      closeConfigModal();
+                      handleGetQuestion();
+                    }}
+                    className={`group relative h-12 w-56 overflow-hidden rounded ${
+                      isDarkMode ? 'bg-blue-700' : 'bg-gradient-to-r from-blue-950 to-slate-700'
+                    } text-white shadow-2xl transition-all before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-56 hover:text-slate-500`}
+                    aria-label="Start Exam Prep"
                   >
-                    {isLoading ? 'Generating...' : 'Generate Flashcards'}
+                    Start Exam Prep
+                    <motion.span
+                      className="absolute right-4 top-3"
+                      initial={{ x: -10, opacity: 0 }}
+                      animate={{ x: 0, opacity: 1 }}
+                      transition={{ delay: 0.3, duration: 0.3 }}
+                    >
+                      <i className="fa-solid fa-arrow-right"></i>
+                    </motion.span>
                   </button>
                   <button
                     type="button"
                     onClick={closeConfigModal}
-                    className={`px-4 py-2 rounded hover:bg-opacity-80 transition-colors duration-200 font-semibold ${
-                      isDarkMode
-                        ? 'bg-gray-700 text-white hover:bg-gray-600'
-                        : 'bg-gray-300 text-gray-700 hover:bg-gray-400'
-                    }`}
-                    aria-label="Cancel Configuration"
+                    className={`px-6 py-3 rounded ${
+                      isDarkMode ? 'bg-gray-600 text-gray-300 hover:bg-gray-500' : 'bg-gray-300 text-gray-700 hover:bg-gray-400'
+                    } transition-colors duration-200`}
                   >
                     Cancel
                   </button>
@@ -925,33 +864,33 @@ export default function AIExamFlashCard() {
       <AnimatePresence>
         {isResultModalOpen && (
           <motion.div
-            className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50"
+            className={`fixed inset-0 flex items-center justify-center ${isDarkMode ? 'bg-black bg-opacity-70' : 'bg-black bg-opacity-50'} z-50`}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
           >
             <motion.div
-              className={`bg-white p-6 rounded-lg shadow-lg max-w-lg w-full ${
-                isDarkMode ? 'bg-gray-800 text-white' : 'bg-white text-gray-700'
-              }`}
+              className={`p-8 rounded-lg w-11/12 max-w-md shadow-lg overflow-y-auto ${isDarkMode ? 'bg-gray-700 text-white' : 'bg-white text-black'}`}
               initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.8, opacity: 0 }}
               transition={{ duration: 0.3 }}
             >
-              <h2 className="text-2xl font-semibold mb-4">Answer Feedback</h2>
-              <p className="mb-6 whitespace-pre-wrap">{answerFeedback}</p>
-              <button
-                onClick={closeResultModalAndContinue}
-                className={`px-6 py-3 rounded hover:bg-opacity-80 transition-colors duration-200 font-semibold ${
-                  isDarkMode
-                    ? 'bg-blue-700 text-white hover:bg-blue-600'
-                    : 'bg-blue-950 text-white hover:bg-blue-800'
-                }`}
-                aria-label="Close and Continue"
-              >
-                Continue
-              </button>
+              <h2 className={`text-2xl font-semibold mb-6 ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>Answer Feedback</h2>
+              <p className={`mb-6 ${isDarkMode ? 'text-gray-300' : 'text-gray-800'}`}>{answerFeedback}</p>
+              <div className="flex justify-end space-x-4">
+                <button
+                  type="button"
+                  onClick={() => {
+                    closeResultModal();
+                    moveToNextFlashcard();
+                  }}
+                  className={`px-6 py-3 rounded ${isDarkMode ? 'bg-blue-600 hover:bg-blue-700 text-white hover:text-slate-500' : 'bg-blue-900 hover:bg-blue-700 text-white hover:text-slate-500'} transition-colors duration-200`}
+                  aria-label="Close and Continue"
+                >
+                  Continue
+                </button>
+              </div>
             </motion.div>
           </motion.div>
         )}
@@ -961,67 +900,57 @@ export default function AIExamFlashCard() {
       <AnimatePresence>
         {isLoadProgressModalOpen && (
           <motion.div
-            className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 overflow-y-auto"
-            initial={{ opacity: 0 }}
+          className={`fixed inset-0 flex items-center justify-center ${isDarkMode ? 'bg-black bg-opacity-70' : 'bg-black bg-opacity-50'} z-[151]`}
+           initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
           >
             <motion.div
-              className={`bg-white p-8 rounded-lg w-11/12 max-w-3xl shadow-lg overflow-y-auto max-h-full ${
-                isDarkMode ? 'bg-gray-800 text-white' : 'bg-white text-gray-700'
-              }`}
-              initial={{ scale: 0.8, opacity: 0 }}
+             className={`p-8 rounded-lg w-11/12 max-w-3xl shadow-lg overflow-y-auto max-h-screen ${isDarkMode ? 'bg-gray-700 text-white' : 'bg-white text-black'}`}
+             initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.8, opacity: 0 }}
               transition={{ duration: 0.3 }}
             >
-              <h2 className="text-2xl font-semibold mb-6">Load Saved Progress</h2>
+              <h2 className={`text-2xl font-semibold mb-6 ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>Load Saved Progress</h2>
               {savedProgresses.length === 0 ? (
-                <p className="text-gray-700">No saved progresses found.</p>
+                <p className={`text-gray-700 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>No saved progresses found.</p>
               ) : (
                 <ul className="space-y-4">
                   {savedProgresses.map((progress) => (
-                    <li key={progress.id} className={`p-4 border rounded ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
+                    <li key={progress.id} className={`p-4 border ${isDarkMode ? 'border-gray-600' : 'border-gray-200'} rounded`}>
                       <div className="flex justify-between items-start">
                         <div>
-                          <p className={`font-semibold text-blue-900 ${isDarkMode ? 'text-blue-400' : 'text-blue-900'}`}>
+                          <p className={`font-semibold ${isDarkMode ? 'text-blue-400' : 'text-blue-900'}`}>
                             Exam Type: {progress.examConfig.examType}
                           </p>
-                          <p className="text-sm text-gray-600">
+                          <p className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
                             Law Type: {progress.examConfig.lawType}
                           </p>
-                          <p className="text-sm text-gray-600">
+                          <p className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
                             Difficulty: {progress.examConfig.difficulty}
                           </p>
-                          <p className="text-sm text-gray-600">
+                          <p className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
                             Number of Flashcards: {progress.examConfig.flashcardLimit}
                           </p>
-                          <p className="text-sm text-gray-600">
+                          <p className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
                             Current Flashcard: {progress.currentFlashcardIndex + 1}
                           </p>
-                          <p className="text-sm text-gray-600">
+                          <p className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
                             Saved on: {new Date(progress.timestamp).toLocaleString()}
                           </p>
                         </div>
                         <div className="flex space-x-2 mt-2">
                           <button
                             onClick={() => handleLoadProgress(progress)}
-                            className={`flex items-center px-4 py-2 rounded hover:bg-opacity-80 transition-colors duration-200 font-semibold ${
-                              isDarkMode
-                                ? 'bg-blue-700 text-white hover:bg-blue-600'
-                                : 'bg-blue-900 text-white hover:bg-blue-800'
-                            }`}
+                            className={`px-4 py-2 rounded ${isDarkMode ? 'bg-blue-600 hover:bg-blue-700 text-white hover:text-slate-500' : 'bg-blue-900 hover:bg-blue-700 text-white hover:text-slate-500'} transition-colors duration-200`}
                             aria-label="Load Progress"
                           >
                             Load
                           </button>
                           <button
                             onClick={() => handleDeleteProgress(progress.id)}
-                            className={`flex items-center px-4 py-2 rounded hover:bg-opacity-80 transition-colors duration-200 font-semibold ${
-                              isDarkMode
-                                ? 'bg-red-600 text-white hover:bg-red-700'
-                                : 'bg-red-600 text-white hover:bg-red-700'
-                            }`}
+                            className={`px-4 py-2 rounded ${isDarkMode ? 'bg-red-600 hover:bg-red-700 text-white hover:text-slate-500' : 'bg-red-600 hover:bg-red-700 text-white hover:text-slate-500'} transition-colors duration-200`}
                             aria-label="Delete Progress"
                           >
                             Delete
@@ -1034,12 +963,11 @@ export default function AIExamFlashCard() {
               )}
               <div className="flex justify-end mt-6">
                 <button
+                  type="button"
                   onClick={closeLoadProgressModal}
-                  className={`px-6 py-3 rounded hover:bg-opacity-80 transition-colors duration-200 font-semibold ${
-                    isDarkMode
-                      ? 'bg-gray-700 text-gray-200 hover:bg-gray-600'
-                      : 'bg-gray-300 text-gray-700 hover:bg-gray-400'
-                  }`}
+                  className={`px-6 py-3 rounded ${
+                    isDarkMode ? 'bg-gray-600 hover:bg-gray-500 text-gray-300' : 'bg-gray-300 hover:bg-gray-400 text-gray-700'
+                  } transition-colors duration-200`}
                   aria-label="Close Load Progress Modal"
                 >
                   Close
@@ -1054,25 +982,27 @@ export default function AIExamFlashCard() {
       <AnimatePresence>
         {isFinalFeedbackModalOpen && (
           <motion.div
-            className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 overflow-y-auto"
+            className={`fixed inset-0 flex items-center justify-center ${isDarkMode ? 'bg-black bg-opacity-70' : 'bg-black bg-opacity-50'} z-50 overflow-y-auto`}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
           >
             <motion.div
-              className={`bg-white p-8 rounded-lg w-11/12 max-w-3xl shadow-lg max-h-[80vh] overflow-y-auto ${
-                isDarkMode ? 'bg-gray-800 text-white' : 'bg-white text-gray-700'
+              className={`p-8 rounded-lg w-11/12 max-w-3xl shadow-lg max-h-[80vh] overflow-y-auto ${
+                isDarkMode ? 'bg-gray-700 text-white' : 'bg-white text-black'
               }`}
               initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.8, opacity: 0 }}
               transition={{ duration: 0.3 }}
             >
-              <h2 className="text-2xl font-semibold mb-6">Session Feedback</h2>
+              <h2 className={`text-2xl font-semibold mb-6 ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>
+                Session Feedback
+              </h2>
               <ul className="space-y-4">
                 {answeredFlashcards.map((card, index) => (
-                  <li key={index} className={`p-4 border rounded ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
-                    <p className="font-semibold text-blue-400 mb-2">
+                  <li key={index} className={`p-4 border rounded ${isDarkMode ? 'border-gray-600' : 'border-gray-200'}`}>
+                    <p className={`font-semibold ${isDarkMode ? 'text-blue-400' : 'text-blue-900'} mb-2`}>
                       Flashcard {index + 1}:
                     </p>
                     <p className="mb-2">{card.question}</p>
@@ -1082,11 +1012,7 @@ export default function AIExamFlashCard() {
                     <p className="mb-1">
                       <span className="font-semibold">Correct Answer:</span> {card.correctAnswer || 'No answer provided.'}
                     </p>
-                    <p
-                      className={`font-semibold ${
-                        card.isCorrect ? 'text-emerald-500' : 'text-red-500'
-                      }`}
-                    >
+                    <p className={`font-semibold ${card.isCorrect ? 'text-emerald-500' : 'text-red-500'}`}>
                       {card.isCorrect ? 'Correct ✅' : 'Incorrect ❌'}
                     </p>
                   </li>
@@ -1094,12 +1020,11 @@ export default function AIExamFlashCard() {
               </ul>
               <div className="flex justify-end mt-6">
                 <button
-                  onClick={closeFinalFeedbackModal}
-                  className={`px-6 py-3 rounded hover:bg-opacity-80 transition-colors duration-200 font-semibold ${
-                    isDarkMode
-                      ? 'bg-blue-700 text-white hover:bg-blue-600'
-                      : 'bg-blue-950 text-white hover:bg-blue-800'
-                  }`}
+                  type="button"
+                  onClick={() => setIsFinalFeedbackModalOpen(false)}
+                  className={`px-6 py-3 rounded ${
+                    isDarkMode ? 'bg-blue-600 hover:bg-blue-700 text-white hover:text-slate-500' : 'bg-blue-950 hover:bg-blue-800 text-white hover:text-slate-500'
+                  } transition-colors duration-200`}
                   aria-label="Close Final Feedback Modal"
                 >
                   Close

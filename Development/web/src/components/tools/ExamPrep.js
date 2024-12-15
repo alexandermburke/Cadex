@@ -465,7 +465,7 @@ export default function ExamPrep() {
 
   if (!currentUser) {
     return (
-      <div className={`flex items-center justify-center h-screen ${isDarkMode ? 'bg-gray-900' : 'bg-gray-50'}`}>
+      <div className={`flex items-center justify-center h-screen ${isDarkMode ? 'bg-gray-800' : 'bg-gray-100'}`}>
         <div className={`text-center p-6 ${isDarkMode ? 'bg-gray-700' : 'bg-white'} rounded shadow-md`}>
           <p className={`mb-4 ${isDarkMode ? 'text-white' : 'text-gray-700'}`}>
             Please{' '}
@@ -476,7 +476,7 @@ export default function ExamPrep() {
           </p>
           <button
             onClick={() => router.push('/login')}
-            className={`px-4 py-2 rounded ${isDarkMode ? 'bg-blue-600 text-white hover:bg-blue-500' : 'bg-blue-900 text-white hover:bg-blue-800'}`}
+            className={`px-4 py-2 rounded ${isDarkMode ? 'bg-blue-600 text-white hover:bg-blue-500' : 'bg-blue-900 text-white hover:bg-blue-700'}`}
           >
             Go to Login
           </button>
@@ -488,7 +488,7 @@ export default function ExamPrep() {
   const isProUser = userDataObj?.billing?.plan === 'Pro' || userDataObj?.billing?.plan === 'Developer';
 
   return (
-    <div className={`flex h-screen ${isDarkMode ? 'bg-gray-800' : 'bg-gray-50'} shadow-md rounded`}>
+    <div className={`flex h-screen ${isDarkMode ? 'bg-gray-900' : 'bg-gray-50'} rounded shadow-sm`}>
       {/* AnimatePresence for Sidebar */}
       <AnimatePresence>
         {isSidebarVisible && (
@@ -572,7 +572,7 @@ export default function ExamPrep() {
         <div className="w-full max-w-5xl flex justify-end mb-4 space-x-4">
           <button
             onClick={openLoadProgressModal}
-            className={`group relative h-12 w-56 overflow-hidden rounded ${isDarkMode ? 'bg-blue-800' : 'bg-blue-950'} text-white shadow-2xl transition-all before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-56 hover:text-slate-500`}
+            className={`group relative h-12 w-56 overflow-hidden rounded ${isDarkMode ? 'bg-blue-700' : 'bg-blue-950'} text-white shadow-2xl transition-all before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-56 hover:text-slate-500`}
             aria-label="Load Progress"
           >
             Load Progress
@@ -700,7 +700,7 @@ export default function ExamPrep() {
               className={`flex-1 px-4 py-3 rounded font-semibold transition-colors duration-200 shadow-md ${
                 isLoading || !inputText.trim()
                   ? `${isDarkMode ? 'bg-gray-600 text-gray-400 cursor-not-allowed' : 'bg-gray-300 text-gray-600 cursor-not-allowed'}`
-                  : `${isDarkMode ? 'bg-blue-600 hover:bg-blue-800 text-white hover:text-slate-500' : 'bg-blue-900 hover:bg-blue-950 text-white hover:text-slate-500'}`
+                  : `${isDarkMode ? 'bg-blue-600 hover:bg-blue-700 text-white hover:text-slate-500' : 'bg-blue-900 hover:bg-blue-950 text-white hover:text-slate-500'}`
               }`}
               disabled={isLoading || !inputText.trim()}
               aria-label="Submit Answer"
@@ -893,7 +893,7 @@ export default function ExamPrep() {
                           questionLimit: parseInt(e.target.value, 10),
                         }))
                       }
-                      className={`w-full h-2 ${isDarkMode ? 'bg-blue-800' : 'bg-blue-200'} rounded-lg appearance-none cursor-pointer`}
+                      className={`w-full h-2 ${isDarkMode ? 'bg-blue-700' : 'bg-blue-200'} rounded-lg appearance-none cursor-pointer`}
                       id="questionLimit"
                     />
                     <span className={`ml-4 ${isDarkMode ? 'text-white' : 'text-gray-700'}`}>{examConfig.questionLimit}</span>
@@ -905,7 +905,7 @@ export default function ExamPrep() {
                   <button
                     type="button"
                     onClick={handleStartExamPrep}
-                    className={`group relative h-12 w-56 overflow-hidden rounded ${isDarkMode ? 'bg-blue-800' : 'bg-gradient-to-r from-blue-950 to-slate-700'} text-white shadow-2xl transition-all before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-56 hover:text-slate-500`}
+                    className={`group relative h-12 w-56 overflow-hidden rounded ${isDarkMode ? 'bg-blue-700' : 'bg-gradient-to-r from-blue-950 to-slate-700'} text-white shadow-2xl transition-all before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-56 hover:text-slate-500`}
                     aria-label="Start Exam Prep"
                   >
                     Start Exam Prep
@@ -963,7 +963,7 @@ export default function ExamPrep() {
                     closeResultModal();
                     handleGetQuestion();
                   }}
-                  className={`px-6 py-3 rounded ${isDarkMode ? 'bg-blue-600 hover:bg-blue-800 text-white hover:text-slate-500' : 'bg-blue-900 hover:bg-blue-950 text-white hover:text-slate-500'} transition-colors duration-200`}
+                  className={`px-6 py-3 rounded ${isDarkMode ? 'bg-blue-600 hover:bg-blue-700 text-white hover:text-slate-500' : 'bg-blue-900 hover:bg-blue-950 text-white hover:text-slate-500'} transition-colors duration-200`}
                   disabled={isLoading}
                   aria-label="Next Question"
                 >
@@ -1017,7 +1017,7 @@ export default function ExamPrep() {
                 <button
                   type="button"
                   onClick={closeFinalFeedbackModal}
-                  className={`px-6 py-3 rounded ${isDarkMode ? 'bg-blue-600 hover:bg-blue-800 text-white hover:text-slate-500' : 'bg-blue-900 hover:bg-blue-800 text-white hover:text-slate-500'} transition-colors duration-200`}
+                  className={`px-6 py-3 rounded ${isDarkMode ? 'bg-blue-600 hover:bg-blue-700 text-white hover:text-slate-500' : 'bg-blue-900 hover:bg-blue-700 text-white hover:text-slate-500'} transition-colors duration-200`}
                   aria-label="Close Final Feedback Modal"
                 >
                   Close
@@ -1030,13 +1030,13 @@ export default function ExamPrep() {
         {/* Load Progress Modal */}
         {isLoadProgressModalOpen && (
           <motion.div
-            className={`fixed inset-0 flex items-center justify-center ${isDarkMode ? 'bg-black bg-opacity-70' : 'bg-black bg-opacity-50'} z-[151]`}
+          className={`fixed inset-0 flex items-center justify-center ${isDarkMode ? 'bg-black bg-opacity-70' : 'bg-black bg-opacity-50'} z-[151]`}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
           >
             <motion.div
-              className={`bg-white p-8 rounded-lg w-11/12 max-w-3xl shadow-lg overflow-y-auto max-h-full ${isDarkMode ? 'bg-gray-700 text-white' : 'bg-white text-black'}`}
+             className={`p-8 rounded-lg w-11/12 max-w-3xl shadow-lg overflow-y-auto max-h-screen ${isDarkMode ? 'bg-gray-700 text-white' : 'bg-white text-black'}`}
               initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.8, opacity: 0 }}
@@ -1073,7 +1073,7 @@ export default function ExamPrep() {
                         <div className="flex space-x-2 mt-2">
                           <button
                             onClick={() => handleLoadProgress(progress)}
-                            className={`px-4 py-2 rounded ${isDarkMode ? 'bg-blue-600 hover:bg-blue-800 text-white hover:text-slate-500' : 'bg-blue-900 hover:bg-blue-800 text-white hover:text-slate-500'} transition-colors duration-200`}
+                            className={`px-4 py-2 rounded ${isDarkMode ? 'bg-blue-600 hover:bg-blue-700 text-white hover:text-slate-500' : 'bg-blue-900 hover:bg-blue-700 text-white hover:text-slate-500'} transition-colors duration-200`}
                             aria-label="Load Progress"
                           >
                             Load
