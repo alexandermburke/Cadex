@@ -465,7 +465,7 @@ export default function ExamPrep() {
 
   if (!currentUser) {
     return (
-      <div className={`flex items-center justify-center h-screen ${isDarkMode ? 'bg-gray-800' : 'bg-gray-100'}`}>
+      <div className={`flex items-center justify-center h-screen ${isDarkMode ? 'bg-gray-900' : 'bg-gray-50'}`}>
         <div className={`text-center p-6 ${isDarkMode ? 'bg-gray-700' : 'bg-white'} rounded shadow-md`}>
           <p className={`mb-4 ${isDarkMode ? 'text-white' : 'text-gray-700'}`}>
             Please{' '}

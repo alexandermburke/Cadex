@@ -13,14 +13,14 @@ You are a knowledgeable assistant. The user has a certain accuracy score on thei
 For each recommended school, add:
 - "name": the school's name
 - "notes": either "(Optimistic)" if it's more competitive or "(More Likely)" if it aligns better with their score
-- "brief": a short paragraph describing key benefits of attending that school, prioritize including a typical GPA & LSAT acceptance scores, notable program strengths, and any unique opportunities (e.g., clinics, networking, externships).
+- "brief": Provide recommended LSAT and/or GPA requirements for school provided.
 
 Return only a JSON array like:
 [
   {
     "name": "Harvard Law School",
     "notes": "(Optimistic)",
-    "brief": "Typically admits with LSAT ~173 and GPA ~3.9. Offers extensive clinics, strong alumni network, and international opportunities."
+    "brief": "Typically admits with LSAT ~173 and GPA ~3.9"
   }
 ]
 
