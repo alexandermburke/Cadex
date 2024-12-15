@@ -221,6 +221,7 @@ export default function AIExamFlashCard() {
     setCurrentFlashcardIndex(0);
     setInputText('');
     setAnswerFeedback('');
+    closeConfigModal();
 
     try {
       const response = await fetch('/api/generate-flashcards', {
