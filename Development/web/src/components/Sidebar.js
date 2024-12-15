@@ -71,7 +71,7 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, i
   // Determine background gradient based on isAiTutor prop using clsx
   const sidebarBackground = clsx({
     'bg-gradient-to-b from-blue-950 to-slate-950': isAiTutor,
-    'bg-gradient-to-b from-blue-950 to-slate-950': !isAiTutor,
+    'bg-gradient-to-b from-blue-950 to-gray-950': !isAiTutor,
   });
 
   return (
