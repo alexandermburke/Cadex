@@ -1,12 +1,16 @@
+// components/Account.js
+
 'use client';
 import Link from 'next/link';
 import React, { useState, useEffect } from 'react';
 import ActionCard from './ActionCard';
 import { useAuth } from '@/context/AuthContext';
 import LogoFiller from './LogoFiller';
+import { doc, updateDoc } from 'firebase/firestore';
+import { db } from '@/firebase';
 
 export default function Account() {
-    const { currentUser, userDataObj } = useAuth();
+    const { currentUser, userDataObj, refreshUserData } = useAuth();
     const [subscriptionData, setSubscriptionData] = useState({
         plan: userDataObj?.billing?.plan || 'Free',
         status: 'Inactive',
@@ -16,6 +20,7 @@ export default function Account() {
     });
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [isDarkMode, setIsDarkMode] = useState(userDataObj?.darkMode || false);
 
     const plan = subscriptionData.plan || 'Free';
 
@@ -64,6 +69,11 @@ export default function Account() {
         fetchBillingData();
     }, [currentUser?.uid]);
 
+    useEffect(() => {
+        // Sync local dark mode state with userDataObj
+        setIsDarkMode(userDataObj?.darkMode || false);
+    }, [userDataObj?.darkMode]);
+
     const vals = {
         email: currentUser?.email || 'Not available',
         username: currentUser?.displayName || 'Not available',
@@ -96,14 +106,20 @@ export default function Account() {
     const billingObj = {
         current_plan: plan,
         status: subscriptionData.status || 'Inactive',
-        payment_due: paymentDueDisplay, // Actual date or 'N/A' or status
+        payment_due: paymentDueDisplay,
         amount_due: amountDueDisplay,
         actions: (
             <div className="flex flex-col gap-2">
                 {(plan === 'Basic' || plan === 'Free') && (
                     <Link
                         href="/admin/billing"
-                        className="group before:ease relative h-12 w-56 overflow-hidden rounded bg-white text-blue-950 transition-all before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 before:rotate-6 before:bg-transparent before:opacity-20 before:duration-700 hover:before:-translate-x-56"
+                        className={
+                            `group relative h-12 w-56 overflow-hidden rounded bg-transparent transition-all 
+                            before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 
+                            before:rotate-6 before:bg-transparent before:opacity-20 before:duration-700 
+                            hover:before:-translate-x-56 ` +
+                            (isDarkMode ? 'text-white' : 'text-black')
+                        }
                     >
                         <div className="flex items-center justify-center h-full">
                             Upgrade Account
@@ -114,7 +130,13 @@ export default function Account() {
                 {(plan === 'Pro' || plan === 'Basic' || plan === 'Developer') && (
                     <Link
                         href="/admin/billing/cancel_subscription"
-                        className="group before:ease relative h-12 w-56 overflow-hidden rounded bg-transparent text-blue-950 transition-all before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 before:rotate-6 before:bg-transparent before:opacity-20 before:duration-700 hover:before:-translate-x-56"
+                        className={
+                            `group relative h-12 w-56 overflow-hidden rounded bg-transparent transition-all 
+                            before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 
+                            before:rotate-6 before:bg-transparent before:opacity-20 before:duration-700 
+                            hover:before:-translate-x-56 ` +
+                            (isDarkMode ? 'text-white' : 'text-black')
+                        }
                     >
                         <div className="flex items-center justify-center h-full">
                             Cancel Subscription
@@ -126,66 +148,97 @@ export default function Account() {
         ),
     };
 
+    const currentPlanClasses = (() => {
+        if (plan === 'Pro' || plan === 'Developer') {
+            return 'bg-blue-100 text-blue-700';
+        } else if (plan === 'Basic') {
+            return 'bg-green-100 text-green-700';
+        } else {
+            return isDarkMode
+                ? 'bg-gray-800 text-white'
+                : 'bg-gray-100 text-gray-700';
+        }
+    })();
+
+    const handleDarkModeToggle = async (e) => {
+        const newDarkMode = e.target.checked;
+        setIsDarkMode(newDarkMode);
+
+        if (!currentUser?.uid) {
+            alert('You need to be logged in to update your settings.');
+            return;
+        }
+
+        try {
+            const userDocRef = doc(db, 'users', currentUser.uid);
+
+            await updateDoc(userDocRef, {
+                darkMode: newDarkMode,
+            });
+
+            await refreshUserData();
+
+            alert('Dark mode preference updated successfully!');
+        } catch (updateError) {
+            console.error('Error updating dark mode preference:', updateError);
+            alert('Failed to update dark mode preference.');
+            // Revert the toggle in case of error
+            setIsDarkMode(!newDarkMode);
+        }
+    };
+
     return (
-        <>
-            <div className="flex flex-col gap-8 flex-1">
-                <ActionCard title="Account Details">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        {Object.keys(vals).map((entry, entryIndex) => (
-                            <div className="flex items-center gap-4" key={entryIndex}>
-                                <p className="font-medium w-24 sm:w-32 capitalize">
-                                    {entry.replace('_', ' ')}
+        <div className={`flex flex-col gap-8 flex-1 ${isDarkMode ? 'text-white' : 'text-black'}`}>
+            <ActionCard title="Account Details">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {Object.keys(vals).map((entry, entryIndex) => (
+                        <div className="flex items-center gap-4" key={entryIndex}>
+                            <p className="font-medium w-24 sm:w-32 capitalize">
+                                {entry.replace('_', ' ')}
+                            </p>
+                            <p>{vals[entry]}</p>
+                        </div>
+                    ))}
+                </div>
+            </ActionCard>
+            <ActionCard title="Billing & Plan">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {Object.keys(billingObj).map((entry, entryIndex) => (
+                        <div className="flex items-center gap-4" key={entryIndex}>
+                            <p className="font-medium w-24 sm:w-32 capitalize">
+                                {entry === 'payment_due' ? 'Payment Due' : entry.replace('_', ' ')}
+                            </p>
+                            {entry === 'actions' ? (
+                                billingObj[entry]
+                            ) : entry === 'current_plan' ? (
+                                <p className={`px-2 py-1 rounded-full capitalize text-xs ${currentPlanClasses}`}>
+                                    {billingObj[entry]}
                                 </p>
-                                <p>{vals[entry]}</p>
-                            </div>
-                        ))}
-                    </div>
-                </ActionCard>
-                <ActionCard title="Billing & Plan">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        {Object.keys(billingObj).map((entry, entryIndex) => (
-                            <div className="flex items-center gap-4" key={entryIndex}>
-                                <p className="font-medium w-24 sm:w-32 capitalize">
-                                    {entry === 'payment_due' ? 'Payment Due' : entry.replace('_', ' ')}
-                                </p>
-                                {entry === 'actions' ? (
-                                    billingObj[entry]
-                                ) : entry === 'current_plan' ? (
-                                    <p
-                                        className={`px-2 py-1 rounded-full capitalize text-xs ${
-                                            plan === 'Pro' || plan === 'Developer'
-                                                ? 'bg-blue-100 text-blue-700'
-                                                : plan === 'Basic'
-                                                ? 'bg-green-100 text-green-700'
-                                                : 'bg-gray-100 text-gray-700'
-                                        }`}
-                                    >
-                                        {billingObj[entry]}
-                                    </p>
-                                ) : (
-                                    <p>{billingObj[entry]}</p>
-                                )}
-                            </div>
-                        ))}
-                    </div>
-                </ActionCard>
-                {/* Added Settings ActionCard */}
-                <ActionCard title="Settings">
-                    <div className="flex items-center">
+                            ) : (
+                                <p>{billingObj[entry]}</p>
+                            )}
+                        </div>
+                    ))}
+                </div>
+            </ActionCard>
+            {/* Settings ActionCard with Dark Mode Toggle */}
+            <ActionCard title="Settings">
+                <div className="flex items-center">
                     <input
-                      type="checkbox"
-                      id="instantFeedback"
-                      name="instantFeedback"
-                      className="h-5 w-5 text-blue-500 focus:ring-blue-500 border-gray-300 rounded"
-                      aria-label="Enable Instant Feedback"
+                        type="checkbox"
+                        id="darkModeToggle"
+                        name="darkModeToggle"
+                        checked={isDarkMode}
+                        onChange={handleDarkModeToggle}
+                        className="h-5 w-5 text-blue-500 focus:ring-blue-500 border-gray-300 rounded"
+                        aria-label="Enable Dark Mode"
                     />
-                    <label htmlFor="" className="ml-3 text-black">
-                      Enable Dark Mode
+                    <label htmlFor="darkModeToggle" className="ml-3">
+                        Enable Dark Mode
                     </label>
-                    </div>
-                </ActionCard>
-            </div>
+                </div>
+            </ActionCard>
             <LogoFiller />
-        </>
+        </div>
     );
 }

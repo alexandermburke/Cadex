@@ -36,7 +36,7 @@ export default function CaseManagement() {
     };
 
     return (
-        <div className="flex h-screen bg-gray-100">
+        <div className="flex h-screen bg-gray-50 rounded drop-shadow-sm">
             {/* Sidebar */}
             {isSidebarVisible && <Sidebar activeLink="/lawtools/casemanagement" />} {/* Pass activeLink as a prop */}
 

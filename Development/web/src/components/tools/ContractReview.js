@@ -639,7 +639,7 @@ export default function AiTutor() {
   }
 
   return (
-    <div className="flex h-screen bg-gradient-to-br from-purple-900 to-blue-800">
+    <div className="flex h-screen bg-gradient-to-br from-purple-900 to-blue-800 rounded shadow-sm">
       <AnimatePresence>
         {isSidebarVisible && (
           <>
@@ -1132,7 +1132,7 @@ export default function AiTutor() {
           {/* Load Progress Modal */}
           {isLoadProgressModalOpen && (
             <motion.div
-              className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-70 z-50"
+              className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-70 z-[151]"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}

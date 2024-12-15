@@ -281,7 +281,7 @@ export default function ExamInsight() {
     };
 
     return (
-        <div className="flex h-screen bg-gray-50">
+        <div className="flex h-screen bg-gray-50 rounded drop-shadow-sm">
             {/* AnimatePresence for Sidebar */}
             <AnimatePresence>
                 {isSidebarVisible && (

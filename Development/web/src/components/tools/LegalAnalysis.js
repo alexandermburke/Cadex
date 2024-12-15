@@ -21,7 +21,7 @@ import {
 // Authentication context
 import { useAuth } from '@/context/AuthContext';
 
-// Chart.js imports (optional, in case you want to add charts)
+// Chart.js imports (optional, if you want to use charts)
 import { Line, Pie, Bar as ChartBar } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
@@ -62,8 +62,11 @@ export default function AIExamFlashCard() {
   const [isLoadProgressModalOpen, setIsLoadProgressModalOpen] = useState(false);
   const [isFinalFeedbackModalOpen, setIsFinalFeedbackModalOpen] = useState(false);
   const [savedProgresses, setSavedProgresses] = useState([]);
-  const [selectedFlashcard, setSelectedFlashcard] = useState(null); // Flashcard selected for modal
-
+  
+  // Track answers and feedback
+  const [answeredFlashcards, setAnsweredFlashcards] = useState([]);
+  const [currentFlashcardIndex, setCurrentFlashcardIndex] = useState(0);
+  
   // Configuration state
   const [examConfig, setExamConfig] = useState({
     examType: 'LSAT',
@@ -71,8 +74,15 @@ export default function AIExamFlashCard() {
     lawType: 'General Law',
     flashcardLimit: 5, // Default to 5 flashcards
     instantFeedback: false, // Control instant feedback
-    selectedQuestionTypes: [], // Selected question types
+    selectedQuestionTypes: [],
   });
+
+  // Answer mode: 'written' or 'multiple-choice'
+  const [answerMode, setAnswerMode] = useState('written');
+  
+  // User's current answer input
+  const [inputText, setInputText] = useState('');
+  const [answerFeedback, setAnswerFeedback] = useState('');
 
   // Difficulty and law type mappings based on exam type
   const difficultyMapping = {
@@ -205,9 +215,13 @@ export default function AIExamFlashCard() {
   const handleGenerateFlashcards = async () => {
     setIsLoading(true);
     setFlashcards([]);
+    setAnsweredFlashcards([]);
+    setCurrentFlashcardIndex(0);
+    setInputText('');
+    setAnswerFeedback('');
 
     try {
-      const response = await fetch('/api/generate-flashcards', { // Ensure this API endpoint exists
+      const response = await fetch('/api/generate-flashcards', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -220,7 +234,7 @@ export default function AIExamFlashCard() {
       }
 
       const { flashcards: generatedFlashcards } = await response.json();
-      setFlashcards(generatedFlashcards); // Assuming the API returns an array of flashcards
+      setFlashcards(generatedFlashcards); 
     } catch (error) {
       console.error('Error during flashcard generation:', error);
       alert('An error occurred during flashcard generation.');
@@ -229,45 +243,97 @@ export default function AIExamFlashCard() {
     }
   };
 
-  // Function to open modal with selected flashcard
-  const openModal = (flashcard) => {
-    setSelectedFlashcard(flashcard);
-    setIsResultModalOpen(true);
+  // When flashcards are loaded, reset progress
+  useEffect(() => {
+    if (flashcards.length > 0) {
+      setAnsweredFlashcards([]);
+      setCurrentFlashcardIndex(0);
+      setInputText('');
+      setAnswerFeedback('');
+    }
+  }, [flashcards]);
+
+  // Current flashcard
+  const currentFlashcard = flashcards[currentFlashcardIndex];
+
+  // Submit answer for the current flashcard
+  const handleSubmitAnswer = () => {
+    if (!inputText.trim()) return;
+
+    // Check correctness
+    const userAnswer = inputText.trim();
+    const correct = currentFlashcard.correctAnswer
+      ? userAnswer.toLowerCase() === currentFlashcard.correctAnswer.toLowerCase()
+      : userAnswer.toLowerCase() === currentFlashcard.answer.toLowerCase();
+
+    const feedback = correct
+      ? 'Correct! ✅'
+      : `Incorrect ❌ The correct answer is: ${currentFlashcard.correctAnswer || currentFlashcard.answer}`;
+
+    setAnsweredFlashcards((prev) => [
+      ...prev,
+      {
+        question: currentFlashcard.question,
+        userAnswer,
+        correctAnswer: currentFlashcard.correctAnswer || currentFlashcard.answer,
+        isCorrect: correct,
+      },
+    ]);
+
+    setAnswerFeedback(feedback);
+
+    if (examConfig.instantFeedback) {
+      // Show result modal if instant feedback is on
+      setIsResultModalOpen(true);
+    } else {
+      // Move to next question if no instant feedback
+      moveToNextFlashcard();
+    }
   };
 
-  // Function to close modal
-  const closeModal = () => {
+  const moveToNextFlashcard = () => {
+    // If this was the last flashcard, show final feedback
+    if (currentFlashcardIndex === flashcards.length - 1) {
+      setIsFinalFeedbackModalOpen(true);
+      return;
+    }
+
+    // Move to next flashcard
+    setCurrentFlashcardIndex((prevIndex) => prevIndex + 1);
+    setInputText('');
+    setAnswerFeedback('');
+  };
+
+  // Close result modal and go to next flashcard
+  const closeResultModalAndContinue = () => {
     setIsResultModalOpen(false);
-    setSelectedFlashcard(null);
+    moveToNextFlashcard();
   };
 
-  // Function to open configuration modal
+  // Configuration modal handlers
   const openConfigModal = () => {
     setIsConfigModalOpen(true);
   };
 
-  // Function to close configuration modal
   const closeConfigModal = () => {
     setIsConfigModalOpen(false);
   };
 
-  // Function to open load progress modal
+  // Load progress modal handlers
   const openLoadProgressModal = () => {
     fetchSavedProgresses();
     setIsLoadProgressModalOpen(true);
   };
 
-  // Function to close load progress modal
   const closeLoadProgressModal = () => {
     setIsLoadProgressModalOpen(false);
   };
 
-  // Function to open final feedback modal
+  // Final feedback modal handlers
   const openFinalFeedbackModal = () => {
     setIsFinalFeedbackModalOpen(true);
   };
 
-  // Function to close final feedback modal
   const closeFinalFeedbackModal = () => {
     setIsFinalFeedbackModalOpen(false);
   };
@@ -280,7 +346,6 @@ export default function AIExamFlashCard() {
     }
 
     try {
-      // Ensure all fields are defined
       const progressData = {
         userId: currentUser.uid,
         examConfig: {
@@ -293,6 +358,8 @@ export default function AIExamFlashCard() {
           selectedQuestionTypes: examConfig.selectedQuestionTypes || [],
         },
         flashcards: flashcards || [],
+        answeredFlashcards: answeredFlashcards || [],
+        currentFlashcardIndex,
         timestamp: new Date().toISOString(),
       };
 
@@ -332,6 +399,8 @@ export default function AIExamFlashCard() {
   const handleLoadProgress = (progress) => {
     setExamConfig(progress.examConfig);
     setFlashcards(progress.flashcards);
+    setAnsweredFlashcards(progress.answeredFlashcards || []);
+    setCurrentFlashcardIndex(progress.currentFlashcardIndex || 0);
     closeLoadProgressModal();
   };
 
@@ -378,7 +447,7 @@ export default function AIExamFlashCard() {
   }
 
   return (
-    <div className="flex h-screen bg-gray-50">
+    <div className="flex h-screen bg-gray-50 rounded drop-shadow-sm">
       {/* Sidebar with AnimatePresence for smooth transitions */}
       <AnimatePresence>
         {isSidebarVisible && (
@@ -438,7 +507,7 @@ export default function AIExamFlashCard() {
           {/* Save Progress Button */}
           <button
             onClick={handleSaveProgress}
-            className="flex items-center px-4 py-2 bg-blue-950 text-white rounded-md hover:bg-blue-800 transition-colors duration-200"
+            className="flex items-center px-4 py-2 bg-blue-950 text-white rounded hover:bg-blue-800 transition-colors duration-200"
             aria-label="Save Progress"
           >
             <FaSave className="mr-2" />
@@ -465,30 +534,131 @@ export default function AIExamFlashCard() {
           </button>
         </div>
 
-        {/* Flashcards Section */}
-        <div className="w-full max-w-5xl p-4 bg-white rounded-lg shadow-md">
-          {/* Flashcards Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {flashcards.length > 0 ? (
-              flashcards.map((card, index) => (
-                <div
-                  key={index}
-                  className="p-4 border border-gray-300 rounded-lg bg-white cursor-pointer hover:bg-gray-50 transition-colors duration-200"
-                  onClick={() => openModal(card)}
-                  aria-label={`Flashcard ${index + 1}`}
-                >
-                  <h4 className="font-semibold text-blue-700 mb-2">Flashcard {index + 1}</h4>
-                  <p className="text-gray-700">Topic: {card.topic}</p>
-                  <p className="text-gray-700">Difficulty: {card.difficulty}</p>
-                </div>
-              ))
-            ) : (
-              <p className="text-gray-500 col-span-full text-center">
-                No flashcards generated. Please configure your preferences to generate flashcards.
-              </p>
-            )}
+        {/* If we have flashcards, show current progress */}
+        {flashcards.length > 0 && (
+          <div className="w-full max-w-5xl mb-4 p-4 bg-white rounded-lg shadow-md flex justify-between items-center">
+            <span className="text-gray-700">
+              Questions Answered: {answeredFlashcards.length} / {examConfig.flashcardLimit}
+            </span>
+            <span
+              className={`px-3 py-1 rounded-full text-sm font-semibold uppercase ${
+                isProUser ? 'bg-blue-100 text-blue-700' : 'bg-emerald-100 text-emerald-700'
+              }`}
+            >
+              {isProUser ? 'Pro User' : 'Base User'}
+            </span>
           </div>
-        </div>
+        )}
+
+        {/* Display current flashcard if any */}
+        {currentFlashcard && (
+          <div className="w-full max-w-5xl mb-6 p-6 bg-white rounded-lg shadow-md overflow-y-scroll">
+            <h4 className="font-semibold text-blue-700 mb-2">Flashcard {currentFlashcardIndex + 1}</h4>
+            <h3 className="text-xl font-semibold mb-4">Question:</h3>
+            <p className="text-gray-700 mb-6">{currentFlashcard.question}</p>
+            
+            {/* Answer mode toggle */}
+            <div className="w-full max-w-5xl mb-4 flex items-center justify-center">
+              <div className="relative flex bg-gray-200 rounded-full p-0.5">
+                <motion.div
+                  className="absolute top-0 left-0 w-1/2 h-full bg-blue-900 rounded-full"
+                  initial={false}
+                  animate={{ x: answerMode === 'written' ? 0 : '100%' }}
+                  transition={{ type: 'spring', stiffness: 700, damping: 30 }}
+                />
+                <button
+                  onClick={() => setAnswerMode('written')}
+                  className={`relative w-1/2 px-2 py-1 text-sm rounded-full focus:outline-none ${
+                    answerMode === 'written' ? 'text-white' : 'text-gray-700'
+                  }`}
+                >
+                  Written
+                </button>
+                <button
+                  onClick={() => setAnswerMode('multiple-choice')}
+                  className={`relative w-1/2 px-2 py-1 text-sm rounded-full focus:outline-none ${
+                    answerMode === 'multiple-choice' ? 'text-white' : 'text-gray-700'
+                  }`}
+                >
+                  Multiple Choice
+                </button>
+              </div>
+            </div>
+
+            {answerMode === 'written' ? (
+              // Written answer input
+              <textarea
+                className="w-full p-4 border border-gray-300 rounded resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-200 mb-4"
+                value={inputText}
+                onChange={(e) => setInputText(e.target.value)}
+                placeholder="Enter your answer..."
+                rows="6"
+                disabled={isLoading}
+              />
+            ) : (
+              // Multiple choice mode
+              <div className="flex flex-col space-y-2 mb-4">
+                {(currentFlashcard.options || []).map((option, index) => (
+                  <label key={index} className="flex items-center">
+                    <input
+                      type="radio"
+                      name="multipleChoiceAnswer"
+                      value={option}
+                      checked={inputText === option}
+                      onChange={(e) => setInputText(e.target.value)}
+                      className="form-radio h-4 w-4 text-blue-900"
+                      disabled={isLoading}
+                    />
+                    <span className="ml-2">{option}</span>
+                  </label>
+                ))}
+                {(!currentFlashcard.options || currentFlashcard.options.length === 0) && (
+                  <p className="text-gray-500">No multiple-choice options provided for this flashcard.</p>
+                )}
+              </div>
+            )}
+
+            <div className="flex space-x-4">
+              <button
+                onClick={handleSubmitAnswer}
+                className={`flex-1 px-4 py-3 rounded font-semibold text-white transition-colors duration-200 shadow-md ${
+                  isLoading || !inputText.trim()
+                    ? 'bg-gray-300 text-gray-600 cursor-not-allowed'
+                    : 'bg-blue-900 hover:bg-blue-950 shadow-md'
+                }`}
+                disabled={isLoading || !inputText.trim()}
+                aria-label="Submit Answer"
+              >
+                {isLoading ? 'Submitting...' : 'Submit Answer'}
+              </button>
+              <button
+                onClick={handleGenerateFlashcards}
+                className="flex items-center justify-center px-4 py-3 bg-transparent text-blue-950 rounded font-semibold duration-200"
+                disabled={isLoading}
+                aria-label="Regenerate Flashcards"
+              >
+                <motion.div
+                  whileHover={{ scale: 1.2, rotate: -360 }}
+                  transition={{ duration: 0.5 }}
+                >
+                  <FaSyncAlt size={24} />
+                </motion.div>
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* If no flashcards and none loading */}
+        {flashcards.length === 0 && !isLoading && (
+          <div className="w-full max-w-5xl p-6 bg-white rounded-lg shadow-md text-center">
+            <p className="text-gray-600 mb-4">
+              Click <span className="font-semibold">Configure</span> to generate flashcards.
+            </p>
+            <p className="text-gray-500 text-sm">
+              <strong>Note:</strong> This is a practice tool. Not affiliated with official exams.
+            </p>
+          </div>
+        )}
       </main>
 
       {/* Configuration Modal */}
@@ -668,9 +838,9 @@ export default function AIExamFlashCard() {
         )}
       </AnimatePresence>
 
-      {/* Flashcard Detail Modal */}
+      {/* Flashcard Result Modal (Instant Feedback) */}
       <AnimatePresence>
-        {isResultModalOpen && selectedFlashcard && (
+        {isResultModalOpen && (
           <motion.div
             className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50"
             initial={{ opacity: 0 }}
@@ -684,21 +854,14 @@ export default function AIExamFlashCard() {
               exit={{ scale: 0.8, opacity: 0 }}
               transition={{ duration: 0.3 }}
             >
-              <h2 className="text-2xl font-semibold mb-4">Flashcard Detail</h2>
-              <div className="mb-4">
-                <h3 className="text-lg font-semibold text-blue-600">Question:</h3>
-                <p className="text-gray-700">{selectedFlashcard.question}</p>
-              </div>
-              <div className="mb-4">
-                <h3 className="text-lg font-semibold text-blue-600">Answer:</h3>
-                <p className="text-gray-700 whitespace-pre-wrap">{selectedFlashcard.answer}</p>
-              </div>
+              <h2 className="text-2xl font-semibold mb-4">Answer Feedback</h2>
+              <p className="text-gray-700 mb-6 whitespace-pre-wrap">{answerFeedback}</p>
               <button
-                onClick={closeModal}
+                onClick={closeResultModalAndContinue}
                 className="px-6 py-3 bg-blue-950 text-white rounded-md hover:bg-blue-700 transition-colors duration-200"
-                aria-label="Close Flashcard Detail Modal"
+                aria-label="Close and Continue"
               >
-                Close
+                Continue
               </button>
             </motion.div>
           </motion.div>
@@ -740,10 +903,10 @@ export default function AIExamFlashCard() {
                             Difficulty: {progress.examConfig.difficulty}
                           </p>
                           <p className="text-sm text-gray-600">
-                            Number of Flashcards Set: {progress.examConfig.flashcardLimit}
+                            Number of Flashcards: {progress.examConfig.flashcardLimit}
                           </p>
                           <p className="text-sm text-gray-600">
-                            Instant Feedback: {progress.examConfig.instantFeedback ? 'Enabled' : 'Disabled'}
+                            Current Flashcard: {progress.currentFlashcardIndex + 1}
                           </p>
                           <p className="text-sm text-gray-600">
                             Saved on: {new Date(progress.timestamp).toLocaleString()}
@@ -802,7 +965,7 @@ export default function AIExamFlashCard() {
             >
               <h2 className="text-2xl font-semibold mb-6">Session Feedback</h2>
               <ul className="space-y-4">
-                {flashcards.map((card, index) => (
+                {answeredFlashcards.map((card, index) => (
                   <li key={index} className="p-4 border border-gray-200 rounded">
                     <p className="font-semibold text-blue-900 mb-2">
                       Flashcard {index + 1}:

@@ -76,7 +76,7 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, i
 
   return (
     <motion.aside
-      className={`z-[150] fixed top-0 left-0 w-64 h-full ${sidebarBackground} text-white flex flex-col md:relative md:translate-x-0 overflow-hidden transition-colors duration-500`}
+      className={`z-[150] fixed top-0 left-0 w-64 h-full ${sidebarBackground} text-white flex flex-col md:relative md:translate-x-0 overflow-hidden transition-colors duration-500 shadow-md rounded`}
       initial="hidden"
       animate={isSidebarVisible ? 'visible' : 'hidden'}
       variants={sidebarVariants}
@@ -117,13 +117,13 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, i
           <ul className="space-y-2">
             {hasAccess ? (
               <>
-                {renderNavLink('/ailawtools/analysis', 'fa-solid fa-lightbulb', 'AI Flashcards')}
+                {renderNavLink('/ailawtools/analysis', 'fa-solid fa-lightbulb', 'Flashcards')}
                 {renderNavLink('/ailawtools/contractreview', 'fa-solid fa-brain', 'LExAPI Tutor')}
                 {renderNavLink('/ailawtools/predictive', 'fa-solid fa-chart-line', 'Exam Insights')}
               </>
             ) : (
               <>
-                {renderLockedNavLink('AI Flashcards')}
+                {renderLockedNavLink('Flashcards')}
                 {renderLockedNavLink('LExAPI Tutor')}
                 {renderLockedNavLink('Exam Insights')}
               </>
