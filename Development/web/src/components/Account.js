@@ -177,8 +177,6 @@ export default function Account() {
             });
 
             await refreshUserData();
-
-            alert('Dark mode preference updated successfully!');
         } catch (updateError) {
             console.error('Error updating dark mode preference:', updateError);
             alert('Failed to update dark mode preference.');
