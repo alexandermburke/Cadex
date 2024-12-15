@@ -567,7 +567,7 @@ export default function ExamInsight() {
                                                 ) : (recommendedUniversities[pid] && recommendedUniversities[pid].length > 0) ? (
                                                     <div className="space-y-4">
                                                         <p className={`${isDarkMode ? 'text-gray-200' : 'text-gray-700'}`}>
-                                                            Based on your performance, the following ABA-accredited law schools in North America are recommended. Each recommendation includes whether it's more or less likely for you to gain admission, as well as some distinctive benefits that each school offers to aspiring law students:
+                                                            Based on your performance, the following ABA-accredited law schools in North America are recommended. Each recommendation includes whether it&#39;s more or less likely for you to gain admission, as well as some distinctive benefits that each school offers to aspiring law students:
                                                         </p>
                                                         <ul className="list-disc list-inside mt-2 space-y-2">
                                                             {recommendedUniversities[pid].map((uni, index) => {

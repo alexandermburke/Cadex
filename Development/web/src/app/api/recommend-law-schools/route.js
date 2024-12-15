@@ -1,3 +1,5 @@
+// /app/api/recommended-law-schools/route.js
+
 import { NextResponse } from 'next/server';
 import OpenAI from 'openai';
 
@@ -25,9 +27,10 @@ Return only a JSON array like:
 The user's accuracy is: ${accuracy}%
 `;
 
-        const openai = new OpenAI({
-            apiKey: process.env.OPENAI_API_KEY,
-        });
+       const openai = new OpenAI({
+            apiKey: process.env.OPENAI_API_KEY, 
+          });
+      
 
         const response = await openai.chat.completions.create({
             model: 'gpt-3.5-turbo',
