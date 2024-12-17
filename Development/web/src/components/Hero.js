@@ -233,21 +233,21 @@ export default function Hero() {
 
   return (
     <section className="w-full bg-transparent">
-      {/* Disclaimer Popup */}
-      {showDisclaimer && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-transparent rounded-lg p-6 max-w-lg mx-auto">
+        {/* Disclaimer Popup */}
+        {showDisclaimer && (
+        <div className="fixed inset-0 z-[151] flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white rounded-lg p-6 max-w-lg mx-auto">
             <h2 className="text-3xl font-semibold mb-4">Important Disclaimer</h2>
-            <p className={`mb-4 ${isDarkMode ? 'text-white ' : 'text-gray-700 '}`}>
+            <p className="mb-4 text-gray-700">
               Please note that Cadex is a supplementary tool and not a substitute for professional legal advice or formal exams. Verify all information and refer to our{' '}
-              <Link href="/legal" className={`underline ${isDarkMode ? 'text-white ' : 'text-blue-600 hover:text-blue-600'}`}>
+              <Link href="/legal" className="text-blue-600 underline">
                 Terms and Conditions
               </Link>.
             </p>
             <div className="text-right">
               <button
                 onClick={handleCloseDisclaimer}
-                className="group before:ease relative h-12 w-56 overflow-hidden rounded bg-gradient-to-r from-blue-950 to-slate-700 text-white shadow-2xl transition-all before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 before:rotate-6 before:bg-transparent before:opacity-20 before:duration-700 hover:before:-translate-x-56"
+                className="group before:ease relative h-12 w-56 overflow-hidden rounded bg-gradient-to-r from-blue-950 to-slate-700 text-white shadow-2xl transition-all before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-56"
               >
                 <div className="flex items-center justify-center h-full">
                   I Understand
@@ -295,7 +295,7 @@ export default function Hero() {
           </h2>
 
           <p className={`text-center sm:text-lg md:text-xl ${isDarkMode ? 'text-white ' : 'text-black '} max-w-2xl my-6`}>
-            Cadex combines AI-driven prep and real time feedback to help you excel at a fraction of the cost.
+          By law students, for law students. CadexLaw uses AI to deliver high-quality prep at up to <span className='goldGradient font-semibold'>85%</span> lower costs than traditional competitors.
           </p>
 
           <div className="flex justify-center mt-6 mb-6">

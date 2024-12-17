@@ -66,13 +66,10 @@ export default function Home() {
   const [animationTrigger, setAnimationTrigger] = useState(0);
   const animationInterval = 12;
 
-  const [showDisclaimer, setShowDisclaimer] = useState(false);
+  // Removed the disclaimer state and related logic
 
   useEffect(() => {
-    const hasSeenDisclaimer = localStorage.getItem('hasSeenDisclaimer');
-    if (!hasSeenDisclaimer) {
-      setShowDisclaimer(true);
-    }
+    // Removed the disclaimer logic
 
     setLoaded(true);
 
@@ -93,10 +90,7 @@ export default function Home() {
     return () => clearInterval(interval);
   }, []);
 
-  const handleCloseDisclaimer = () => {
-    setShowDisclaimer(false);
-    localStorage.setItem('hasSeenDisclaimer', 'true');
-  };
+  // Removed the handleCloseDisclaimer function
 
   const VerticalDivider = () => (
     <div
@@ -120,31 +114,7 @@ export default function Home() {
 
   return (
     <section className="w-full bg-transparent">
-      {/* Disclaimer Popup */}
-      {showDisclaimer && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-transparent rounded-lg p-6 max-w-lg mx-auto">
-            <h2 className="text-3xl font-semibold mb-4">Important Disclaimer</h2>
-            <p className={`mb-4 ${isDarkMode ? 'text-white' : 'text-gray-700'}`}>
-              Please note that Cadex is a supplementary tool and not a substitute for professional legal advice or formal exams. Verify all information and refer to our{' '}
-              <Link href="/legal" className={`underline ${isDarkMode ? 'text-white' : 'text-blue-600'}`}>
-                Terms and Conditions
-              </Link>.
-            </p>
-            <div className="text-right">
-              <button
-                onClick={handleCloseDisclaimer}
-                className="group before:ease relative h-12 w-56 overflow-hidden rounded bg-gradient-to-r from-blue-950 to-slate-700 text-white shadow-2xl transition-all before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 before:rotate-6 before:bg-transparent before:opacity-20 before:duration-700 hover:before:-translate-x-56"
-              >
-                <div className="flex items-center justify-center h-full">
-                  I Understand
-                  <i className="ml-8 fa-solid fa-arrow-right opacity-0 group-hover:opacity-100 transition-opacity duration-200"></i>
-                </div>
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Removed Disclaimer Popup */}
 
       <div className="max-w-7xl mx-auto px-4 py-0">
 
@@ -224,19 +194,31 @@ export default function Home() {
         <VerticalDivider />
 
         {/* Universities Section */}
-        <div
-          ref={uniRef}
-          className={`flex flex-col items-center px-4 md:px-8 lg:px-16 transition-all duration-1000 ${
-            uniInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
-          }`}
-        >
-          <div className="max-w-5xl w-full">
-            <h3 className={`text-4xl sm:text-5xl font-semibold my-8 text-center ${isDarkMode ? 'text-white' : 'text-blue-950'}`}>
-              Universities We Partner With
-            </h3>
-            <CarouselComponent />
+        <section>
+          <div
+            ref={uniRef}
+            className={`flex flex-col items-center px-4 md:px-8 lg:px-16 transition-all duration-1000 ${
+              uniInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+            }`}
+          >
+            <div className="max-w-5xl w-full">
+              <h3 className={`text-4xl sm:text-5xl font-semibold my-8 text-center ${isDarkMode ? 'text-white' : 'text-blue-950'}`}>
+                Universities We Partner With
+              </h3>
+              <CarouselComponent />
+
+              {/* Added Text Below the Carousel */}
+              <p className={`mt-4 text-center text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                Are you associated with a university and interested in partnering with CadexLaw? Please email us at{' '}
+                <a href="mailto:businessinquires@cadexlaw.com" className="text-blue-500 hover:underline">
+                  businessinquires@cadexlaw.com
+                </a>
+                .
+              </p>
+            </div>
           </div>
-        </div>
+        </section>
+
       </div>
     </section>
   );

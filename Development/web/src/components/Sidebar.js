@@ -7,20 +7,18 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { FaLock } from 'react-icons/fa';
 import { motion } from 'framer-motion';
-import clsx from 'clsx'; // Install clsx if you haven't: npm install clsx
+import clsx from 'clsx'; // Ensure clsx is installed: npm install clsx
 
 export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, isAiTutor }) {
   const router = useRouter();
   const { currentUser, userDataObj } = useAuth();
 
-  // Ensure plan names are in lowercase for consistent comparison
   const plan = userDataObj?.billing?.plan?.toLowerCase() || 'free'; 
+  const isDarkMode = userDataObj?.darkMode || false;
 
-  // Define access variables
-  const hasAccess = plan === 'free' || plan === 'developer'; // Adjust as needed
+  const hasAccess = plan === 'free' || plan === 'developer'; 
   const hasSimulationAccess = plan === 'free' || plan === 'basic';
 
-  // Helper function to render locked links
   const renderLockedLink = (label, IconComponent) => (
     <div className="flex items-center gap-4 p-2 text-gray-400 cursor-not-allowed group">
       <IconComponent className="text-gray-400" size={20} />
@@ -28,7 +26,6 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, i
     </div>
   );
 
-  // Sidebar animation variants
   const sidebarVariants = {
     hidden: {
       x: '-100%',
@@ -46,7 +43,6 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, i
     },
   };
 
-  // Helper function to render navigation links
   const renderNavLink = (href, iconClass, label) => (
     <li>
       <Link
@@ -65,31 +61,28 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, i
 
   const colorfulrenderNavLink = (href, iconClass, label) => (
     <li>
-    <Link
-      href={href}
-      className={`flex items-center gap-3 p-3 rounded transition-colors duration-200 ${
-        activeLink === href
-          ? 'bg-blue-800'
-          : 'bg-transparent hover:bg-blue-800 hover:bg-opacity-75'
-      }`}
-    >
-      <i className={`${iconClass} bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 bg-clip-text text-transparent`}></i>
-      <span className="text-white">
-        {label}
-      </span>
-    </Link>
-  </li>
-);
+      <Link
+        href={href}
+        className={`flex items-center gap-3 p-3 rounded transition-colors duration-200 ${
+          activeLink === href
+            ? 'bg-blue-800'
+            : 'bg-transparent hover:bg-blue-800 hover:bg-opacity-75'
+        }`}
+      >
+        <i className={`${iconClass} bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 bg-clip-text text-transparent`}></i>
+        <span className="text-white">{label}</span>
+      </Link>
+    </li>
+  );
 
-  // Helper function to render locked navigation links
   const renderLockedNavLink = (label) => (
     <li>{renderLockedLink(label, FaLock)}</li>
   );
 
-  // Determine background gradient based on isAiTutor prop using clsx
+  // Determine background gradient based on dark mode
   const sidebarBackground = clsx({
-    'bg-gradient-to-b from-blue-950 to-slate-950': isAiTutor,
-    'bg-gradient-to-b from-blue-950 to-gray-950': !isAiTutor,
+    'bg-gradient-to-b from-blue-900 to-slate-900': isDarkMode,
+    'bg-gradient-to-b from-blue-950 to-slate-950': !isDarkMode,
   });
 
   return (
@@ -100,16 +93,13 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, i
       variants={sidebarVariants}
       exit="hidden"
     >
-      {/* Logo or Brand Name */}
       <div className="p-6 flex items-center justify-center">
-        <h1 className="text-3xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-white font-semibold dropShadow relative overflow-hidden">
+        <h1 className="text-3xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-white font-semibold relative overflow-hidden">
           Dashboard
         </h1>
       </div>
 
-      {/* Navigation Sections */}
       <nav className="flex-1 overflow-y-auto px-6">
-        {/* Study & Research Section */}
         <section className="mb-6">
           <h2 className="text-lg font-semibold mb-4">Study & Research</h2>
           <ul className="space-y-2">
@@ -129,7 +119,6 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, i
           </ul>
         </section>
 
-        {/* AI Study Aids Section */}
         <section className="mb-6">
           <h2 className="text-lg font-semibold mb-4">AI Study Aids</h2>
           <ul className="space-y-2">
@@ -149,7 +138,6 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, i
           </ul>
         </section>
 
-        {/* Exam Preparation Section */}
         <section className="mb-6">
           <h2 className="text-lg font-semibold mb-4">Exam Preparation</h2>
           <ul className="space-y-2">
@@ -162,13 +150,12 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, i
                 {renderLockedNavLink('LSAT/BAR Prep')}
               </>
             )}
-            {/* Feature Request Button (Always visible, not locked) */}
             <li>
               <Link
                 href="https://discord.gg/wKgH9ussWc"
                 className="flex items-center gap-3 p-3 rounded transition-colors duration-200 hover:bg-blue-800 hover:bg-opacity-75"
               >
-                <i className="fa-solid fa-lightbulb"></i>
+                <i className="fa-solid fa-comment"></i>
                 <span>Requests/Suggestions</span>
               </Link>
             </li>
@@ -176,7 +163,6 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, i
         </section>
       </nav>
 
-      {/* User Info Section */}
       <footer className="px-6 py-4 bg-transparent">
         <div className="flex items-center gap-4">
           <div className="flex-1 min-w-0">
