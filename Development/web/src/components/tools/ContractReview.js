@@ -1,4 +1,3 @@
-// AiTutor.js
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
@@ -25,12 +24,11 @@ export default function AiTutor() {
   const [inputText, setInputText] = useState('');
   const [questionText, setQuestionText] = useState('');
   const [questionStem, setQuestionStem] = useState('');
-  const [options, setOptions] = useState([]);
+  const [highlightedSections, setHighlightedSections] = useState([]);
   const [answerResult, setAnswerResult] = useState('');
   const [isSidebarVisible, setIsSidebarVisible] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [isConfigModalOpen, setIsConfigModalOpen] = useState(false);
-  const [isResultModalOpen, setIsResultModalOpen] = useState(false);
   const [isLoadProgressModalOpen, setIsLoadProgressModalOpen] = useState(false);
   const [isFinalFeedbackModalOpen, setIsFinalFeedbackModalOpen] = useState(false);
   const [savedProgresses, setSavedProgresses] = useState([]);
@@ -38,21 +36,22 @@ export default function AiTutor() {
   const [currentQuestionCount, setCurrentQuestionCount] = useState(0);
   const [answeredQuestions, setAnsweredQuestions] = useState([]);
   const [isSessionActive, setIsSessionActive] = useState(false);
-  const [isCommunicating, setIsCommunicating] = useState(false); // Define isCommunicating
+  const [isCommunicating, setIsCommunicating] = useState(false);
+  const isDarkMode = userDataObj?.darkMode || false;
 
   const [tutorConfig, setTutorConfig] = useState({
-    examType: 'LSAT', // Default Exam Type
+    examType: 'LSAT',
     topic: 'Logical Reasoning',
     subTopic: '',
     complexity: 'Intermediate',
     questionLimit: 5,
     instantFeedback: true,
     selectedQuestionTypes: [],
+    userPrompt: '',
   });
 
-  const [answerMode, setAnswerMode] = useState('written'); // Only 'written' mode remains
+  const [answerMode, setAnswerMode] = useState('written');
 
-  // Mapping of Exam Types to their respective Topics and Subtopics
   const examMapping = {
     LSAT: {
       topics: [
@@ -65,17 +64,14 @@ export default function AiTutor() {
           { value: 'Assumption', label: 'Assumption' },
           { value: 'Strengthen', label: 'Strengthen' },
           { value: 'Weaken', label: 'Weaken' },
-          // Add more LSAT Logical Reasoning subtopics as needed
         ],
         'Reading Comprehension': [
           { value: 'Main Idea', label: 'Main Idea' },
           { value: 'Detail', label: 'Detail' },
           { value: 'Inference', label: 'Inference' },
-          // Add more LSAT Reading Comprehension subtopics as needed
         ],
         'Analytical Reasoning': [
           { value: 'Logic Games', label: 'Logic Games' },
-          // Add more LSAT Analytical Reasoning subtopics as needed
         ],
       },
     },
@@ -84,26 +80,22 @@ export default function AiTutor() {
         { value: 'Criminal Law', label: 'Criminal Law' },
         { value: 'Civil Procedure', label: 'Civil Procedure' },
         { value: 'Contracts', label: 'Contracts' },
-        // Add more Bar exam topics as needed
       ],
       subTopics: {
         'Criminal Law': [
           { value: 'Homicide', label: 'Homicide' },
           { value: 'Theft', label: 'Theft' },
           { value: 'Fraud', label: 'Fraud' },
-          // Add more Bar Criminal Law subtopics as needed
         ],
         'Civil Procedure': [
           { value: 'Jurisdiction', label: 'Jurisdiction' },
           { value: 'Pleadings', label: 'Pleadings' },
           { value: 'Discovery', label: 'Discovery' },
-          // Add more Bar Civil Procedure subtopics as needed
         ],
         'Contracts': [
           { value: 'Formation', label: 'Formation' },
           { value: 'Performance', label: 'Performance' },
           { value: 'Breach', label: 'Breach' },
-          // Add more Bar Contracts subtopics as needed
         ],
       },
     },
@@ -111,22 +103,18 @@ export default function AiTutor() {
       topics: [
         { value: 'Professional Responsibility', label: 'Professional Responsibility' },
         { value: 'Ethics', label: 'Ethics' },
-        // Add more MPRE topics as needed
       ],
       subTopics: {
         'Professional Responsibility': [
           { value: 'Confidentiality', label: 'Confidentiality' },
           { value: 'Conflict of Interest', label: 'Conflict of Interest' },
-          // Add more MPRE Professional Responsibility subtopics as needed
         ],
         'Ethics': [
           { value: 'Advertising', label: 'Advertising' },
           { value: 'Fees', label: 'Fees' },
-          // Add more MPRE Ethics subtopics as needed
         ],
       },
     },
-    // Add more Exams as needed
   };
 
   const complexityMapping = {
@@ -158,7 +146,6 @@ export default function AiTutor() {
   );
   const [complexityOptions, setComplexityOptions] = useState(complexityMapping['Intermediate']);
 
-  // Update Topics and Subtopics when Exam Type changes
   useEffect(() => {
     const selectedExam = tutorConfig.examType;
     const newTopicOptions = examMapping[selectedExam]?.topics || [];
@@ -175,7 +162,6 @@ export default function AiTutor() {
     }));
   }, [tutorConfig.examType]);
 
-  // Update Subtopics when Topic changes
   useEffect(() => {
     const selectedExam = tutorConfig.examType;
     const selectedTopic = tutorConfig.topic;
@@ -190,11 +176,9 @@ export default function AiTutor() {
     }));
   }, [tutorConfig.topic, tutorConfig.examType]);
 
-  // Visualizer References
   const visualizerCanvas = useRef(null);
   const animationFrameId = useRef(null);
 
-  // Particle Class
   class Particle {
     constructor(canvasWidth, canvasHeight, config) {
       this.canvasWidth = canvasWidth;
@@ -204,24 +188,21 @@ export default function AiTutor() {
     }
 
     reset() {
-      // Initialize particle at a random position
       this.x = Math.random() * this.canvasWidth;
       this.y = Math.random() * this.canvasHeight;
-      // Assign a random velocity
       const speed = Math.random() * this.config.maxSpeed;
       const angle = Math.random() * Math.PI * 2;
       this.vx = Math.cos(angle) * speed;
       this.vy = Math.sin(angle) * speed;
       this.size = Math.random() * this.config.maxSize + 1;
       this.color = this.config.colors[Math.floor(Math.random() * this.config.colors.length)];
-      this.alpha = Math.random() * 0.5 + 0.5; // Opacity between 0.5 and 1
+      this.alpha = Math.random() * 0.5 + 0.5;
     }
 
     update() {
       this.x += this.vx;
       this.y += this.vy;
 
-      // Bounce off the edges
       if (this.x <= 0 || this.x >= this.canvasWidth) {
         this.vx *= -1;
       }
@@ -229,7 +210,6 @@ export default function AiTutor() {
         this.vy *= -1;
       }
 
-      // Optionally, reset particle if it moves out of bounds significantly
       if (this.x < -50 || this.x > this.canvasWidth + 50 || this.y < -50 || this.y > this.canvasHeight + 50) {
         this.reset();
       }
@@ -245,9 +225,7 @@ export default function AiTutor() {
     }
   }
 
-  // Helper function to convert hex to RGB
   function hexToRgb(hex) {
-    // Remove '#' if present
     hex = hex.replace('#', '');
     if (hex.length === 3) {
       hex = hex.split('').map((h) => h + h).join('');
@@ -259,15 +237,13 @@ export default function AiTutor() {
     return `${r}, ${g}, ${b}`;
   }
 
-  // Particle Configuration
   const particleConfig = {
     numParticles: 100,
     maxSpeed: 1.0,
     maxSize: 4,
-    colors: ['#00FFFF', '#7B68EE', '#1E90FF', '#BA55D3', '#00CED1'], // Updated AI-like colors
+    colors: ['#00FFFF', '#7B68EE', '#1E90FF', '#BA55D3', '#00CED1'],
   };
 
-  // Initialize and Animate Particles
   useEffect(() => {
     const canvas = visualizerCanvas.current;
     const ctx = canvas.getContext('2d');
@@ -295,15 +271,13 @@ export default function AiTutor() {
         particle.draw(ctx);
       });
 
-      // Optionally, draw lines between nearby particles for a network effect
       connectParticles(ctx, particles, canvas.width, canvas.height);
 
       animationFrameId.current = requestAnimationFrame(draw);
     };
 
-    // Function to connect nearby particles
     const connectParticles = (ctx, particles, width, height) => {
-      const maxDistance = 100; // Maximum distance to draw a line
+      const maxDistance = 100;
       ctx.beginPath();
       for (let i = 0; i < particles.length; i++) {
         for (let j = i + 1; j < particles.length; j++) {
@@ -324,7 +298,7 @@ export default function AiTutor() {
     resizeCanvas();
     window.addEventListener('resize', resizeCanvas);
 
-    draw(); // Start the particle animation
+    draw();
 
     return () => {
       window.removeEventListener('resize', resizeCanvas);
@@ -332,7 +306,7 @@ export default function AiTutor() {
         cancelAnimationFrame(animationFrameId.current);
       }
     };
-  }, []); // Empty dependency array ensures this runs once on mount
+  }, []);
 
   const toggleSidebar = () => {
     setIsSidebarVisible(!isSidebarVisible);
@@ -343,12 +317,12 @@ export default function AiTutor() {
     setIsCommunicating(true);
     setQuestionText('');
     setQuestionStem('');
-    setOptions([]);
+    setHighlightedSections([]);
     setAnswerResult('');
     setInputText('');
 
     try {
-      const response = await fetch('/api/get-ai-question', {
+      const response = await fetch('/api/tutor/get-ai-question', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -360,12 +334,10 @@ export default function AiTutor() {
         throw new Error('Failed to get AI question');
       }
 
-      const { question } = await response.json();
+      const { question, highlightedSections } = await response.json();
+      setHighlightedSections(highlightedSections || []);
 
-      const { stem, choices } = parseQuestion(question);
-      setQuestionStem(stem);
-      setOptions(choices); // Although multiple-choice is removed, this can be used for structured responses
-
+      setQuestionStem(question);
       setQuestionText(question);
       setIsSessionActive(true);
     } catch (error) {
@@ -377,11 +349,6 @@ export default function AiTutor() {
     }
   };
 
-  const parseQuestion = (text) => {
-    // Since multiple-choice is removed, parsing may differ. Assuming AI returns a question prompt.
-    return { stem: text, choices: [] };
-  };
-
   const handleSubmitAnswer = async () => {
     if (!inputText.trim()) return;
 
@@ -390,7 +357,7 @@ export default function AiTutor() {
     setAnswerResult('');
 
     try {
-      const response = await fetch('/api/submit-ai-answer', {
+      const response = await fetch('/api/tutor/submit-ai-answer', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -409,12 +376,16 @@ export default function AiTutor() {
         throw new Error('Failed to submit answer');
       }
 
-      const { feedback, correct } = await response.json();
+      const { feedback, correct, highlightedSections: newHighlights } = await response.json();
 
       const feedbackText = feedback !== undefined ? feedback : 'No feedback provided.';
       const isCorrect = typeof correct === 'boolean' ? correct : false;
 
       setAnswerResult(feedbackText);
+
+      if (newHighlights && newHighlights.length > 0) {
+        setHighlightedSections(newHighlights);
+      }
 
       setAnsweredQuestions((prevQuestions) => [
         ...prevQuestions,
@@ -427,18 +398,9 @@ export default function AiTutor() {
       ]);
 
       setCurrentQuestionCount((prevCount) => prevCount + 1);
-
-      if (tutorConfig.instantFeedback) {
-        openResultModal();
-      } else {
-        setTimeout(() => {
-          handleGetQuestion();
-        }, 500);
-      }
     } catch (error) {
       console.error('Error submitting answer:', error);
       setAnswerResult('An error occurred while submitting your answer.');
-      openResultModal();
     } finally {
       setIsLoading(false);
       setIsCommunicating(false);
@@ -458,14 +420,6 @@ export default function AiTutor() {
 
   const closeConfigModal = () => {
     setIsConfigModalOpen(false);
-  };
-
-  const openResultModal = () => {
-    setIsResultModalOpen(true);
-  };
-
-  const closeResultModal = () => {
-    setIsResultModalOpen(false);
   };
 
   const openLoadProgressModal = () => {
@@ -532,6 +486,7 @@ export default function AiTutor() {
           instantFeedback:
             tutorConfig.instantFeedback !== undefined ? tutorConfig.instantFeedback : true,
           selectedQuestionTypes: tutorConfig.selectedQuestionTypes || [],
+          userPrompt: tutorConfig.userPrompt || ''
         },
         questionText: questionText || '',
         inputText: inputText || '',
@@ -585,10 +540,8 @@ export default function AiTutor() {
     setCurrentQuestionCount(progress.currentQuestionCount);
     setAnsweredQuestions(progress.answeredQuestions || []);
     setIsSessionActive(true);
-
-    const { stem, choices } = parseQuestion(progress.questionText);
-    setQuestionStem(stem);
-    setOptions(choices);
+    setQuestionStem(progress.questionText);
+    setHighlightedSections([]);
 
     closeLoadProgressModal();
   };
@@ -633,9 +586,11 @@ export default function AiTutor() {
   const isProUser =
     userDataObj?.billing?.plan === 'Pro' || userDataObj?.billing?.plan === 'Developer';
 
-  // Define the messageDisplay function inside the component
+  // Update messageDisplay to incorporate answerResult if present
   function messageDisplay() {
-    return isCommunicating ? 'AI is communicating...' : 'LExAPI v0.3.4 is ready';
+    if (answerResult) return answerResult;
+    if (isCommunicating) return 'AI is communicating...';
+    return 'LExAPI v0.3.4 is ready';
   }
 
   return (
@@ -646,15 +601,15 @@ export default function AiTutor() {
             <Sidebar
               activeLink="/ailawtools/contractreview"
               isSidebarVisible={isSidebarVisible}
-              toggleSidebar={toggleSidebar} // Pass as toggleSidebar
-              isAiTutor={true} // Pass isAiTutor as true
+              toggleSidebar={toggleSidebar}
+              isAiTutor={true}
             />
             <motion.div
               className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
               initial={{ opacity: 0 }}
               animate={{ opacity: 0.5 }}
               exit={{ opacity: 0 }}
-              onClick={toggleSidebar} // Use toggleSidebar here
+              onClick={toggleSidebar}
             />
           </>
         )}
@@ -664,7 +619,7 @@ export default function AiTutor() {
         {/* Header */}
         <div className="w-full max-w-5xl flex items-center justify-between mb-6">
           <button
-            onClick={toggleSidebar} // Use toggleSidebar here
+            onClick={toggleSidebar}
             className="text-gray-200 hover:text-white"
             aria-label={isSidebarVisible ? 'Hide Sidebar' : 'Show Sidebar'}
           >
@@ -693,7 +648,7 @@ export default function AiTutor() {
             </AnimatePresence>
           </button>
 
-          {/* Pro+ Mode Button */}
+          {/* Pro Mode Button */}
           <button
             onClick={() => {
               if (isProUser) {
@@ -718,14 +673,14 @@ export default function AiTutor() {
         <div className="w-full max-w-5xl flex justify-end mb-4 space-x-4">
           <button
             onClick={openLoadProgressModal}
-            className="relative h-12 w-56 overflow-hidden rounded bg-blue-700 text-white shadow-lg hover:bg-blue-800 transition-colors duration-200 before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-56"
+            className="relative h-12 w-56 overflow-hidden rounded bg-blue-700 text-white shadow-lg hover:bg-blue-800 transition-colors duration-200"
             aria-label="Load Progress"
           >
             Load Progress
           </button>
           <button
             onClick={openConfigModal}
-            className="relative h-12 w-56 overflow-hidden rounded bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white shadow-lg hover:from-indigo-600 hover:via-purple-600 hover:to-pink-600 transition-colors duration-200 before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-56"
+            className="relative h-12 w-56 overflow-hidden rounded bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white shadow-lg hover:from-indigo-600 hover:via-purple-600 hover:to-pink-600 transition-colors duration-200"
             aria-label="Configure AI Tutor"
           >
             Configure AI Tutor
@@ -752,19 +707,18 @@ export default function AiTutor() {
         <div className="w-full max-w-5xl flex flex-col items-center">
           {/* Visualizer Container */}
           <div className="relative w-96 h-96 mb-6">
-            {/* Visualizer Canvas */}
             <canvas
               ref={visualizerCanvas}
               className="absolute top-0 left-0 w-full h-full rounded-full"
             ></canvas>
 
-            {/* Center Textbox */}
             <div className="absolute inset-0 flex items-center justify-center">
               <textarea
                 className="w-64 h-24 bg-transparent text-center p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-white font-semibold text-lg"
                 value={messageDisplay()}
                 readOnly
                 aria-label="AI Communication Status"
+                style={{resize:'none'}}
               ></textarea>
             </div>
           </div>
@@ -774,71 +728,96 @@ export default function AiTutor() {
             <div className="w-full max-w-5xl mb-6 p-6 bg-white bg-opacity-20 backdrop-blur-md rounded-lg shadow-md overflow-y-scroll">
               <h3 className="text-2xl font-semibold text-blue-300 mb-2">Law Question</h3>
               <h3 className="text-sm font-medium text-gray-200 mb-6">LExAPI Version: 0.3.4</h3>
-              <p className="text-gray-100 mb-4">{questionStem}</p>
-              {/* Since multiple-choice is removed, options can be used for structured responses or omitted */}
+
+              <div className="text-gray-100 mb-4 whitespace-pre-wrap">
+                {highlightedSections && highlightedSections.length > 0 ? (
+                  highlightedSections.map((section, idx) =>
+                    section.highlight ? (
+                      <span key={idx} style={{ backgroundColor: 'rgba(255,255,0,0.5)' }} title={section.reason}>
+                        {section.text}
+                      </span>
+                    ) : (
+                      <span key={idx}>{section.text}</span>
+                    )
+                  )
+                ) : (
+                  <p>{questionStem}</p>
+                )}
+              </div>
             </div>
           )}
 
-          {/* Answer Input */}
-          {questionStem && (
+          {/* Answer Input and Buttons */}
+          {questionStem && currentQuestionCount < tutorConfig.questionLimit && (
             <div className="w-full max-w-5xl mb-6">
-              <textarea
-                className="w-full p-4 border border-gray-300 rounded resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-200 text-black"
+              {/* Only show answer box if we don't have answerResult yet or if user wants to try again */}
+              {!answerResult && (
+                <textarea
+                className={`w-full p-4 border ${isDarkMode ? 'border-gray-600 bg-gray-700 text-white' : 'border-gray-300 bg-white text-gray-800'} rounded resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-200`}
                 value={inputText}
-                onChange={(e) => setInputText(e.target.value)}
-                placeholder="Enter your answer here..."
-                rows="6"
-                disabled={isLoading}
-                aria-label="Answer Input"
-              ></textarea>
+                  onChange={(e) => setInputText(e.target.value)}
+                  placeholder="Enter your answer here..."
+                  rows="6"
+                  disabled={isLoading}
+                  aria-label="Answer Input"
+                ></textarea>
+              )}
+
+              <div className="flex space-x-4 mt-4">
+                {!answerResult ? (
+                  <button
+                    onClick={handleSubmitAnswer}
+                    className={`flex-1 px-4 py-3 rounded font-semibold text-white transition-colors duration-200 shadow-lg ${
+                      isLoading || !inputText.trim()
+                        ? 'bg-gray-500 cursor-not-allowed'
+                        : 'bg-blue-600 hover:bg-blue-700'
+                    }`}
+                    disabled={isLoading || !inputText.trim()}
+                    aria-label="Submit Answer"
+                  >
+                    {isLoading ? 'Submitting...' : 'Submit Answer'}
+                  </button>
+                ) : (
+                  <button
+                    onClick={handleGetQuestion}
+                    className="flex-1 px-4 py-3 rounded font-semibold text-white bg-blue-600 hover:bg-blue-700 transition-colors duration-200 shadow-lg"
+                    disabled={isLoading}
+                    aria-label="Continue to Next Question"
+                  >
+                    {isLoading ? 'Loading...' : 'Continue'}
+                  </button>
+                )}
+
+                <button
+                  onClick={handleSaveProgress}
+                  className="flex items-center justify-center px-4 py-3 bg-transparent text-blue-300 rounded font-semibold duration-200 hover:text-blue-500"
+                  disabled={!currentUser}
+                  aria-label="Save Progress"
+                >
+                  <motion.div
+                    whileHover={{ scale: 1.2, rotate: 360 }}
+                    transition={{ duration: 0.5 }}
+                  >
+                    <FaSave size={24} />
+                  </motion.div>
+                </button>
+                <button
+                  onClick={handleGetQuestion}
+                  className="flex items-center justify-center px-4 py-3 bg-transparent text-blue-300 rounded font-semibold duration-200 hover:text-blue-500"
+                  disabled={isLoading}
+                  aria-label="Generate New Question"
+                >
+                  <motion.div
+                    whileHover={{ scale: 1.2, rotate: -360 }}
+                    transition={{ duration: 0.5 }}
+                  >
+                    <FaSyncAlt size={24} />
+                  </motion.div>
+                </button>
+              </div>
             </div>
           )}
 
-          {/* Action Buttons */}
-          {questionStem && (
-            <div className="w-full max-w-5xl flex space-x-4">
-              <button
-                onClick={handleSubmitAnswer}
-                className={`flex-1 px-4 py-3 rounded font-semibold text-white transition-colors duration-200 shadow-lg ${
-                  isLoading || !inputText.trim()
-                    ? 'bg-gray-500 cursor-not-allowed'
-                    : 'bg-blue-600 hover:bg-blue-700'
-                }`}
-                disabled={isLoading || !inputText.trim()}
-                aria-label="Submit Answer"
-              >
-                {isLoading ? 'Submitting...' : 'Submit Answer'}
-              </button>
-              <button
-                onClick={handleSaveProgress}
-                className="flex items-center justify-center px-4 py-3 bg-transparent text-blue-300 rounded font-semibold duration-200 hover:text-blue-500"
-                disabled={!currentUser}
-                aria-label="Save Progress"
-              >
-                <motion.div
-                  whileHover={{ scale: 1.2, rotate: 360 }}
-                  transition={{ duration: 0.5 }}
-                >
-                  <FaSave size={24} />
-                </motion.div>
-              </button>
-              <button
-                onClick={handleGetQuestion}
-                className="flex items-center justify-center px-4 py-3 bg-transparent text-blue-300 rounded font-semibold duration-200 hover:text-blue-500"
-                disabled={isLoading}
-                aria-label="Generate New Question"
-              >
-                <motion.div
-                  whileHover={{ scale: 1.2, rotate: -360 }}
-                  transition={{ duration: 0.5 }}
-                >
-                  <FaSyncAlt size={24} />
-                </motion.div>
-              </button>
-            </div>
-          )}
-
-          {/* Placeholder Content */}
           {!questionStem && !questionText && (
             <div className="w-full max-w-5xl p-6 bg-white bg-opacity-20 backdrop-blur-md rounded-lg shadow-md text-center">
               <p className="text-gray-200 mb-4">
@@ -867,6 +846,20 @@ export default function AiTutor() {
               >
                 <h2 className="text-2xl font-semibold text-white mb-6">Configure AI Tutor</h2>
                 <form>
+                  {/* Prompt / Custom Input */}
+                  <div className="mb-4">
+                    <label className="block text-gray-300 mb-2">Custom Prompt or Topic:</label>
+                    <input
+                      type="text"
+                      name="userPrompt"
+                      value={tutorConfig.userPrompt}
+                      onChange={handleConfigChange}
+                      placeholder="e.g. 'Tort Law Basics', or leave blank for system defaults"
+                      className="w-full p-3 border border-gray-500 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-200 bg-gray-700 text-white"
+                      aria-label="Custom Prompt"
+                    />
+                  </div>
+
                   {/* Exam Type Selection */}
                   <div className="mb-4">
                     <label className="block text-gray-300 mb-2">Exam Type:</label>
@@ -1006,7 +999,7 @@ export default function AiTutor() {
                     <button
                       type="button"
                       onClick={handleStartTutoringSession}
-                      className="relative h-12 w-56 overflow-hidden rounded bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white shadow-lg hover:from-indigo-600 hover:via-purple-600 hover:to-pink-600 transition-colors duration-200 before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-56"
+                      className="relative h-12 w-56 overflow-hidden rounded bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white shadow-lg hover:from-indigo-600 hover:via-purple-600 hover:to-pink-600 transition-colors duration-200"
                       aria-label="Start Tutoring Session"
                     >
                       Start Tutoring
@@ -1029,49 +1022,6 @@ export default function AiTutor() {
                     </button>
                   </div>
                 </form>
-              </motion.div>
-            </motion.div>
-          )}
-
-          {/* Result Modal */}
-          {isResultModalOpen && (
-            <motion.div
-              className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-70 z-50"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-            >
-              <motion.div
-                className="bg-gray-800 p-8 rounded-lg w-11/12 max-w-md shadow-lg"
-                initial={{ scale: 0.8, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                exit={{ scale: 0.8, opacity: 0 }}
-                transition={{ duration: 0.3 }}
-              >
-                <h2 className="text-2xl font-semibold text-white mb-6">Answer Feedback</h2>
-                <p className="text-gray-200 mb-6">{answerResult}</p>
-                <div className="flex justify-end space-x-4">
-                  <button
-                    type="button"
-                    onClick={closeResultModal}
-                    className="px-6 py-3 bg-red-600 text-white rounded hover:bg-red-700 transition-colors duration-200"
-                    aria-label="Close Feedback Modal"
-                  >
-                    Close
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      closeResultModal();
-                      handleGetQuestion();
-                    }}
-                    className="px-6 py-3 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors duration-200"
-                    disabled={isLoading}
-                    aria-label="Next Question"
-                  >
-                    {isLoading ? 'Loading...' : 'Next Question'}
-                  </button>
-                </div>
               </motion.div>
             </motion.div>
           )}

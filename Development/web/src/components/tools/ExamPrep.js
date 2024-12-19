@@ -174,7 +174,7 @@ export default function ExamPrep() {
     setInputText('');
 
     try {
-      const response = await fetch('/api/get-exam-question', {
+      const response = await fetch('/api/examprep/get-exam-question', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -243,7 +243,7 @@ export default function ExamPrep() {
     );
 
     try {
-      const response = await fetch('/api/submit-exam-answer', {
+      const response = await fetch('/api/examprep/submit-exam-answer', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
