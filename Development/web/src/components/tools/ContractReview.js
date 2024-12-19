@@ -21,6 +21,7 @@ export default function AiTutor() {
   const { currentUser, userDataObj } = useAuth();
   const router = useRouter();
 
+  const isDarkMode = userDataObj?.darkMode || false;
   const [inputText, setInputText] = useState('');
   const [questionText, setQuestionText] = useState('');
   const [questionStem, setQuestionStem] = useState('');
@@ -741,7 +742,7 @@ export default function AiTutor() {
             <div className="w-full max-w-5xl mb-6">
               {!answerResult && (
                 <textarea
-                  className="w-full p-4 border border-gray-300 rounded resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-200 text-black"
+                className={`w-full p-4 border ${isDarkMode ? 'border-gray-600 bg-gray-700 text-white' : 'border-gray-300 bg-white text-gray-800'} rounded resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-200`}
                   value={inputText}
                   onChange={(e) => setInputText(e.target.value)}
                   placeholder="Enter your answer here..."
