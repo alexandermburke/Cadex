@@ -37,7 +37,6 @@ export default function AiTutor() {
   const [answeredQuestions, setAnsweredQuestions] = useState([]);
   const [isSessionActive, setIsSessionActive] = useState(false);
   const [isCommunicating, setIsCommunicating] = useState(false);
-  const isDarkMode = userDataObj?.darkMode || false;
 
   const [tutorConfig, setTutorConfig] = useState({
     examType: 'LSAT',
@@ -45,12 +44,17 @@ export default function AiTutor() {
     subTopic: '',
     complexity: 'Intermediate',
     questionLimit: 5,
-    instantFeedback: true,
-    selectedQuestionTypes: [],
     userPrompt: '',
+    showLegalReferences: false,
+    provideApproach: false,
   });
 
-  const [answerMode, setAnswerMode] = useState('written');
+  const complexityOptions = [
+    { value: 'Basic', label: 'Basic' },
+    { value: 'Intermediate', label: 'Intermediate' },
+    { value: 'Advanced', label: 'Advanced' },
+    { value: 'Expert', label: 'Expert' },
+  ];
 
   const examMapping = {
     LSAT: {
@@ -117,34 +121,10 @@ export default function AiTutor() {
     },
   };
 
-  const complexityMapping = {
-    Beginner: [
-      { value: 'Basic', label: 'Basic' },
-      { value: 'Fundamental', label: 'Fundamental' },
-    ],
-    Intermediate: [
-      { value: 'Intermediate', label: 'Intermediate' },
-      { value: 'Advanced', label: 'Advanced' },
-    ],
-    Advanced: [
-      { value: 'Advanced', label: 'Advanced' },
-      { value: 'Expert', label: 'Expert' },
-    ],
-  };
-
-  const questionTypes = [
-    'Explanation',
-    'Application',
-    'Analysis',
-    'Synthesis',
-    'Evaluation',
-  ];
-
   const [topicOptions, setTopicOptions] = useState(examMapping['LSAT'].topics);
   const [subTopicOptions, setSubTopicOptions] = useState(
     examMapping['LSAT'].subTopics['Logical Reasoning'] || []
   );
-  const [complexityOptions, setComplexityOptions] = useState(complexityMapping['Intermediate']);
 
   useEffect(() => {
     const selectedExam = tutorConfig.examType;
@@ -158,7 +138,6 @@ export default function AiTutor() {
       ...prevConfig,
       topic: newTopicOptions[0]?.value || '',
       subTopic: newSubTopicOptions[0]?.value || '',
-      selectedQuestionTypes: [],
     }));
   }, [tutorConfig.examType]);
 
@@ -166,13 +145,11 @@ export default function AiTutor() {
     const selectedExam = tutorConfig.examType;
     const selectedTopic = tutorConfig.topic;
     const newSubTopicOptions = examMapping[selectedExam]?.subTopics[selectedTopic] || [];
-
     setSubTopicOptions(newSubTopicOptions);
 
     setTutorConfig((prevConfig) => ({
       ...prevConfig,
       subTopic: newSubTopicOptions[0]?.value || '',
-      selectedQuestionTypes: [],
     }));
   }, [tutorConfig.topic, tutorConfig.examType]);
 
@@ -368,7 +345,8 @@ export default function AiTutor() {
           examType: tutorConfig.examType,
           topic: tutorConfig.topic,
           subTopic: tutorConfig.subTopic,
-          selectedQuestionTypes: tutorConfig.selectedQuestionTypes,
+          showLegalReferences: tutorConfig.showLegalReferences,
+          provideApproach: tutorConfig.provideApproach,
         }),
       });
 
@@ -447,22 +425,6 @@ export default function AiTutor() {
     }));
   };
 
-  const handleQuestionTypeChange = (e, type) => {
-    const { checked } = e.target;
-    setTutorConfig((prevConfig) => {
-      let newSelectedQuestionTypes = [...prevConfig.selectedQuestionTypes];
-      if (checked) {
-        newSelectedQuestionTypes.push(type);
-      } else {
-        newSelectedQuestionTypes = newSelectedQuestionTypes.filter((t) => t !== type);
-      }
-      return {
-        ...prevConfig,
-        selectedQuestionTypes: newSelectedQuestionTypes,
-      };
-    });
-  };
-
   const handleStartTutoringSession = () => {
     closeConfigModal();
     handleGetQuestion();
@@ -483,10 +445,9 @@ export default function AiTutor() {
           subTopic: tutorConfig.subTopic || '',
           complexity: tutorConfig.complexity || 'Intermediate',
           questionLimit: tutorConfig.questionLimit || 5,
-          instantFeedback:
-            tutorConfig.instantFeedback !== undefined ? tutorConfig.instantFeedback : true,
-          selectedQuestionTypes: tutorConfig.selectedQuestionTypes || [],
-          userPrompt: tutorConfig.userPrompt || ''
+          userPrompt: tutorConfig.userPrompt || '',
+          showLegalReferences: tutorConfig.showLegalReferences || false,
+          provideApproach: tutorConfig.provideApproach || false,
         },
         questionText: questionText || '',
         inputText: inputText || '',
@@ -586,15 +547,18 @@ export default function AiTutor() {
   const isProUser =
     userDataObj?.billing?.plan === 'Pro' || userDataObj?.billing?.plan === 'Developer';
 
-  // Update messageDisplay to incorporate answerResult if present
   function messageDisplay() {
-    if (answerResult) return answerResult;
     if (isCommunicating) return 'AI is communicating...';
     return 'LExAPI v0.3.4 is ready';
   }
 
+  // Extract reasons for highlighted sections
+  const highlightedReasons = highlightedSections
+    .filter((section) => section.highlight && section.reason && section.reason !== 'Not crucial')
+    .map((section) => ({ text: section.text, reason: section.reason }));
+
   return (
-    <div className="flex h-screen bg-gradient-to-br from-purple-900 to-blue-800 rounded shadow-sm">
+    <div className="flex h-screen bg-gradient-to-br from-purple-900 to-blue-800 rounded shadow-sm z-[151]">
       <AnimatePresence>
         {isSidebarVisible && (
           <>
@@ -723,6 +687,17 @@ export default function AiTutor() {
             </div>
           </div>
 
+          {/* Feedback Textbox (Wider) */}
+          <div className="w-full max-w-5xl mb-6">
+            <textarea
+              className="w-full h-32 p-4 rounded resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-200 text-white bg-transparent"
+              value={answerResult || ""}
+              readOnly
+              aria-label="AI Feedback"
+              style={{resize:'none'}}
+            ></textarea>
+          </div>
+
           {/* Law Question */}
           {questionStem && (
             <div className="w-full max-w-5xl mb-6 p-6 bg-white bg-opacity-20 backdrop-blur-md rounded-lg shadow-md overflow-y-scroll">
@@ -744,17 +719,30 @@ export default function AiTutor() {
                   <p>{questionStem}</p>
                 )}
               </div>
+
+              {/* Why These Areas Are Highlighted Section */}
+              {highlightedReasons.length > 0 && (
+                <div className="mt-4 p-4 bg-gray-900 bg-opacity-50 rounded">
+                  <h4 className="text-lg text-blue-300 font-semibold mb-2">Why These Areas Are Highlighted</h4>
+                  <ul className="list-disc list-inside text-gray-200">
+                    {highlightedReasons.map((hr, i) => (
+                      <li key={i}>
+                        <span className="font-semibold">&quot;{hr.text.trim()}&quot;</span>: {hr.reason}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
             </div>
           )}
 
           {/* Answer Input and Buttons */}
           {questionStem && currentQuestionCount < tutorConfig.questionLimit && (
             <div className="w-full max-w-5xl mb-6">
-              {/* Only show answer box if we don't have answerResult yet or if user wants to try again */}
               {!answerResult && (
                 <textarea
-                className={`w-full p-4 border ${isDarkMode ? 'border-gray-600 bg-gray-700 text-white' : 'border-gray-300 bg-white text-gray-800'} rounded resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-200`}
-                value={inputText}
+                  className="w-full p-4 border border-gray-300 rounded resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-200 text-black"
+                  value={inputText}
                   onChange={(e) => setInputText(e.target.value)}
                   placeholder="Enter your answer here..."
                   rows="6"
@@ -824,7 +812,7 @@ export default function AiTutor() {
                 Click <span className="font-semibold">Configure AI Tutor</span> to start.
               </p>
               <p className="text-gray-400 text-sm">
-                <strong>Important Note:</strong> This AI Tutor is designed to help you understand various law topics by providing explanations, analyses, and feedback. It is not a substitute for professional legal advice.
+                <strong>Important Note:</strong> This AI Tutor helps you understand law topics by providing explanations, analyses, and feedback. It’s not a substitute for professional legal advice, but can guide you through reasoning steps, highlight key points, and reference principles to strengthen your legal acumen.
               </p>
             </div>
           )}
@@ -848,13 +836,13 @@ export default function AiTutor() {
                 <form>
                   {/* Prompt / Custom Input */}
                   <div className="mb-4">
-                    <label className="block text-gray-300 mb-2">Custom Prompt or Topic:</label>
+                    <label className="block text-gray-300 mb-2">Custom Prompt or Topic (Optional):</label>
                     <input
                       type="text"
                       name="userPrompt"
                       value={tutorConfig.userPrompt}
                       onChange={handleConfigChange}
-                      placeholder="e.g. 'Tort Law Basics', or leave blank for system defaults"
+                      placeholder="e.g. 'Tort Law Basics'"
                       className="w-full p-3 border border-gray-500 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-200 bg-gray-700 text-white"
                       aria-label="Custom Prompt"
                     />
@@ -867,7 +855,7 @@ export default function AiTutor() {
                       name="examType"
                       value={tutorConfig.examType}
                       onChange={handleConfigChange}
-                      className="w-full p-3 border border-gray-500 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-200 bg-gray-700 text-white"
+                      className="w-full p-3 border border-gray-500 rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                       aria-label="Select Exam Type"
                     >
                       {Object.keys(examMapping).map((exam) => (
@@ -885,7 +873,7 @@ export default function AiTutor() {
                       name="topic"
                       value={tutorConfig.topic}
                       onChange={handleConfigChange}
-                      className="w-full p-3 border border-gray-500 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-200 bg-gray-700 text-white"
+                      className="w-full p-3 border border-gray-500 rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                       aria-label="Select Primary Topic"
                     >
                       {topicOptions.map((topic, index) => (
@@ -903,7 +891,7 @@ export default function AiTutor() {
                       name="subTopic"
                       value={tutorConfig.subTopic}
                       onChange={handleConfigChange}
-                      className="w-full p-3 border border-gray-500 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-200 bg-gray-700 text-white"
+                      className="w-full p-3 border border-gray-500 rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                       aria-label="Select Sub-Topic"
                     >
                       {subTopicOptions.map((subTopic, index) => (
@@ -921,7 +909,7 @@ export default function AiTutor() {
                       name="complexity"
                       value={tutorConfig.complexity}
                       onChange={handleConfigChange}
-                      className="w-full p-3 border border-gray-500 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-200 bg-gray-700 text-white"
+                      className="w-full p-3 border border-gray-500 rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                       aria-label="Select Complexity Level"
                     >
                       {complexityOptions.map((option) => (
@@ -932,41 +920,38 @@ export default function AiTutor() {
                     </select>
                   </div>
 
-                  {/* Question Types */}
+                  {/* Additional Helpful Features */}
                   <div className="mb-4">
-                    <label className="block text-gray-300 mb-2">Question Types:</label>
-                    {questionTypes.map((type) => (
-                      <div key={type} className="flex items-center mb-2">
-                        <input
-                          type="checkbox"
-                          id={`qt-${type}`}
-                          name={type}
-                          checked={tutorConfig.selectedQuestionTypes.includes(type)}
-                          onChange={(e) => handleQuestionTypeChange(e, type)}
-                          className="h-5 w-5 text-blue-500 focus:ring-blue-500 border-gray-300 rounded"
-                          aria-label={`Select ${type} Question Type`}
-                        />
-                        <label htmlFor={`qt-${type}`} className="ml-3 text-gray-300">
-                          {type}
-                        </label>
-                      </div>
-                    ))}
-                  </div>
-
-                  {/* Instant Feedback Checkbox */}
-                  <div className="mb-6 flex items-center">
-                    <input
-                      type="checkbox"
-                      id="instantFeedback"
-                      name="instantFeedback"
-                      checked={tutorConfig.instantFeedback}
-                      onChange={handleConfigChange}
-                      className="h-5 w-5 text-blue-500 focus:ring-blue-500 border-gray-300 rounded"
-                      aria-label="Enable Instant Feedback"
-                    />
-                    <label htmlFor="instantFeedback" className="ml-3 text-gray-300">
-                      Enable Artificial Voice
+                    <label className="block text-gray-300 mb-2 font-semibold">
+                      Additional Aids for Law Students:
                     </label>
+                    <div className="flex items-center mb-2">
+                      <input
+                        type="checkbox"
+                        id="showLegalReferences"
+                        name="showLegalReferences"
+                        checked={tutorConfig.showLegalReferences}
+                        onChange={handleConfigChange}
+                        className="h-5 w-5 text-blue-500 focus:ring-blue-500 border-gray-300 rounded"
+                      />
+                      <label htmlFor="showLegalReferences" className="ml-3 text-gray-300">
+                        Show references to relevant legal principles
+                      </label>
+                    </div>
+
+                    <div className="flex items-center mb-2">
+                      <input
+                        type="checkbox"
+                        id="provideApproach"
+                        name="provideApproach"
+                        checked={tutorConfig.provideApproach}
+                        onChange={handleConfigChange}
+                        className="h-5 w-5 text-blue-500 focus:ring-blue-500 border-gray-300 rounded"
+                      />
+                      <label htmlFor="provideApproach" className="ml-3 text-gray-300">
+                        Provide a structured approach to solving the problem
+                      </label>
+                    </div>
                   </div>
 
                   {/* Question Limit Slider */}
