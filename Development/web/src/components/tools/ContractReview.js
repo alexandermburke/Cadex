@@ -48,6 +48,8 @@ export default function AiTutor() {
     userPrompt: '',
     showLegalReferences: false,
     provideApproach: false,
+    liveMode: false, 
+    highlightHue: 60, // Default highlight hue (approximately neon yellow)
   });
 
   const complexityOptions = [
@@ -449,6 +451,8 @@ export default function AiTutor() {
           userPrompt: tutorConfig.userPrompt || '',
           showLegalReferences: tutorConfig.showLegalReferences || false,
           provideApproach: tutorConfig.provideApproach || false,
+          liveMode: tutorConfig.liveMode || false,
+          highlightHue: tutorConfig.highlightHue || 60,
         },
         questionText: questionText || '',
         inputText: inputText || '',
@@ -553,10 +557,12 @@ export default function AiTutor() {
     return 'LExAPI v0.3.4 is ready';
   }
 
-  // Extract reasons for highlighted sections
   const highlightedReasons = highlightedSections
     .filter((section) => section.highlight && section.reason && section.reason !== 'Not crucial')
     .map((section) => ({ text: section.text, reason: section.reason }));
+
+  const showHighlights = tutorConfig.liveMode || answerResult;
+  const highlightColor = `hsl(${tutorConfig.highlightHue}, 100%, 50%)`;
 
   return (
     <div className="flex h-screen bg-gradient-to-br from-purple-900 to-blue-800 rounded shadow-sm z-[151]">
@@ -668,9 +674,8 @@ export default function AiTutor() {
           </div>
         )}
 
-        {/* Visualizer and Question Container */}
+        {/* Visualizer and Feedback */}
         <div className="w-full max-w-5xl flex flex-col items-center">
-          {/* Visualizer Container */}
           <div className="relative w-96 h-96 mb-6">
             <canvas
               ref={visualizerCanvas}
@@ -688,7 +693,6 @@ export default function AiTutor() {
             </div>
           </div>
 
-          {/* Feedback Textbox (Wider) */}
           <div className="w-full max-w-5xl mb-6">
             <textarea
               className="w-full h-32 p-4 rounded resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-200 text-white bg-transparent"
@@ -702,14 +706,18 @@ export default function AiTutor() {
           {/* Law Question */}
           {questionStem && (
             <div className="w-full max-w-5xl mb-6 p-6 bg-white bg-opacity-20 backdrop-blur-md rounded-lg shadow-md overflow-y-scroll">
-              <h3 className="text-2xl font-semibold text-blue-300 mb-2">Law Question</h3>
+              <h3 className="text-2xl font-semibold text-white mb-2">Law Question</h3>
               <h3 className="text-sm font-medium text-gray-200 mb-6">LExAPI Version: 0.3.4</h3>
 
               <div className="text-gray-100 mb-4 whitespace-pre-wrap">
-                {highlightedSections && highlightedSections.length > 0 ? (
+                {showHighlights && highlightedSections && highlightedSections.length > 0 ? (
                   highlightedSections.map((section, idx) =>
                     section.highlight ? (
-                      <span key={idx} style={{ backgroundColor: 'rgba(255,255,0,0.5)' }} title={section.reason}>
+                      <span
+                        key={idx}
+                        style={{ backgroundColor: highlightColor }}
+                        title={section.reason}
+                      >
                         {section.text}
                       </span>
                     ) : (
@@ -722,7 +730,7 @@ export default function AiTutor() {
               </div>
 
               {/* Why These Areas Are Highlighted Section */}
-              {highlightedReasons.length > 0 && (
+              {showHighlights && highlightedReasons.length > 0 && (
                 <div className="mt-4 p-4 bg-gray-900 bg-opacity-50 rounded">
                   <h4 className="text-lg text-blue-300 font-semibold mb-2">Why These Areas Are Highlighted</h4>
                   <ul className="list-disc list-inside text-gray-200">
@@ -742,7 +750,7 @@ export default function AiTutor() {
             <div className="w-full max-w-5xl mb-6">
               {!answerResult && (
                 <textarea
-                className={`w-full p-4 border ${isDarkMode ? 'border-gray-600 bg-gray-700 text-white' : 'border-gray-300 bg-white text-gray-800'} rounded resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-200`}
+                  className={`w-full p-4 border ${isDarkMode ? 'border-gray-600 bg-gray-700 text-white' : 'border-gray-300 bg-white text-gray-800'} rounded resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-200`}
                   value={inputText}
                   onChange={(e) => setInputText(e.target.value)}
                   placeholder="Enter your answer here..."
@@ -953,6 +961,50 @@ export default function AiTutor() {
                         Provide a structured approach to solving the problem
                       </label>
                     </div>
+
+                    {/* Live Mode Checkbox */}
+                    <div className="flex items-center mb-2">
+                      <input
+                        type="checkbox"
+                        id="liveMode"
+                        name="liveMode"
+                        checked={tutorConfig.liveMode}
+                        onChange={handleConfigChange}
+                        className="h-5 w-5 text-blue-500 focus:ring-blue-500 border-gray-300 rounded"
+                      />
+                      <label htmlFor="liveMode" className="ml-3 text-gray-300">
+                        Live Mode (Show highlights before answering)
+                      </label>
+                    </div>
+                  </div>
+
+                  {/* Highlight Color Slider */}
+                  <div className="mb-6">
+                    <label className="block text-gray-300 mb-2">
+                      Highlight Color Hue:
+                    </label>
+                    <div className="flex items-center space-x-4">
+                      <input
+                        type="range"
+                        min="0"
+                        max="360"
+                        value={tutorConfig.highlightHue}
+                        onChange={(e) =>
+                          setTutorConfig((prevConfig) => ({
+                            ...prevConfig,
+                            highlightHue: parseInt(e.target.value, 10),
+                          }))
+                        }
+                        className="h-2 w-full bg-blue-400 rounded-lg appearance-none cursor-pointer"
+                      />
+                      <div
+                        className="w-10 h-10 rounded"
+                        style={{ backgroundColor: `hsl(${tutorConfig.highlightHue}, 100%, 50%)` }}
+                      ></div>
+                    </div>
+                    <p className="text-sm mt-2 text-gray-300">
+                      Adjust the hue to change the highlight color. Default is neon yellow.
+                    </p>
                   </div>
 
                   {/* Question Limit Slider */}

@@ -35,8 +35,7 @@ export async function POST(request) {
 Please identify key sentences or phrases in the question that are crucial for answering it. For each highlighted section, explain why it's important. 
 Return a JSON array of objects in the format: [{ "text": "...", "highlight": true/false, "reason": "..." }] 
 Make sure to cover the entire question text in sequence, splitting it into chunks. Chunks that are not important should have "highlight": false and reason "Not crucial".
-Don't say "Sure, here's a.." or anything of that nature. Only provide the prompt, options, etc.
-`;
+Do not include any introductory phrases or apologies, just return the JSON array directly.`;
 
     const highlightResponse = await openai.chat.completions.create({
       model: 'gpt-3.5-turbo',
