@@ -177,7 +177,7 @@ export default function Header() {
     }
 
     return (
-        <header className={`z-[100] fixed top-0 left-0 right-0 bg-transparent ${isDarkMode ? 'text-white' : 'text-black'}`}>
+        <header className={`z-[150] fixed top-0 left-0 right-0 bg-transparent ${isDarkMode ? 'text-white' : 'text-black'}`}>
             <div className='flex items-center justify-between gap-4 max-w-[1400px] mx-auto w-full overflow-hidden p-2 drop-shadow-sm'>
                 <Link href={'/'}>
                     <div className='flex items-center gap-2'>
@@ -208,7 +208,7 @@ export default function Header() {
             </div>
 
             {showMenu && (
-                <div className={`absolute flex flex-col left-4 right-4 md:hidden top-full pt-4 rounded drop-down-animation ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
+                <div className={`absolute flex flex-col left-4 right-4 md:hidden top-full pt-4 rounded drop-down-animation ${isDarkMode ? 'bg-blue-950 text-white' : 'bg-white'}`}>
                     <div className={`flex flex-col rounded-2xl p-4 ${isDarkMode ? 'text-white' : 'text-black'}`}>
                         {menuActions}
                     </div>

@@ -46,10 +46,11 @@ export default function AiTutor() {
     complexity: 'Intermediate',
     questionLimit: 5,
     userPrompt: '',
-    showLegalReferences: false,
-    provideApproach: false,
+    showLegalReferences: true,
+    provideApproach: true,
     liveMode: false, 
-    highlightHue: 60, // Default highlight hue (approximately neon yellow)
+    highlightHue: 60,
+    highlightOpacity: 0.6,
   });
 
   const complexityOptions = [
@@ -453,6 +454,7 @@ export default function AiTutor() {
           provideApproach: tutorConfig.provideApproach || false,
           liveMode: tutorConfig.liveMode || false,
           highlightHue: tutorConfig.highlightHue || 60,
+          highlightOpacity: tutorConfig.highlightOpacity || 0.5,
         },
         questionText: questionText || '',
         inputText: inputText || '',
@@ -562,10 +564,10 @@ export default function AiTutor() {
     .map((section) => ({ text: section.text, reason: section.reason }));
 
   const showHighlights = tutorConfig.liveMode || answerResult;
-  const highlightColor = `hsl(${tutorConfig.highlightHue}, 100%, 50%)`;
+  const highlightColor = `hsla(${tutorConfig.highlightHue}, 100%, 50%, ${tutorConfig.highlightOpacity})`;
 
   return (
-    <div className="flex h-screen bg-gradient-to-br from-purple-900 to-blue-800 rounded shadow-sm z-[151]">
+    <div className="flex h-screen bg-gradient-to-br from-purple-900 to-blue-800 rounded shadow-sm z-[150]">
       <AnimatePresence>
         {isSidebarVisible && (
           <>
@@ -676,6 +678,7 @@ export default function AiTutor() {
 
         {/* Visualizer and Feedback */}
         <div className="w-full max-w-5xl flex flex-col items-center">
+          {/* Visualizer Container */}
           <div className="relative w-96 h-96 mb-6">
             <canvas
               ref={visualizerCanvas}
@@ -688,18 +691,19 @@ export default function AiTutor() {
                 value={messageDisplay()}
                 readOnly
                 aria-label="AI Communication Status"
-                style={{resize:'none'}}
+                style={{ resize: 'none' }}
               ></textarea>
             </div>
           </div>
 
+          {/* Feedback Textbox */}
           <div className="w-full max-w-5xl mb-6">
             <textarea
               className="w-full h-32 p-4 rounded resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-200 text-white bg-transparent"
               value={answerResult || ""}
               readOnly
               aria-label="AI Feedback"
-              style={{resize:'none'}}
+              style={{ resize: 'none' }}
             ></textarea>
           </div>
 
@@ -713,13 +717,16 @@ export default function AiTutor() {
                 {showHighlights && highlightedSections && highlightedSections.length > 0 ? (
                   highlightedSections.map((section, idx) =>
                     section.highlight ? (
-                      <span
+                      <motion.span
                         key={idx}
-                        style={{ backgroundColor: highlightColor }}
+                        style={{ backgroundColor: highlightColor, display: 'inline-block', transformOrigin: 'left center' }}
                         title={section.reason}
+                        initial={{ scaleX: 0 }}
+                        animate={{ scaleX: 1 }}
+                        transition={{ duration: 1 }}
                       >
                         {section.text}
-                      </span>
+                      </motion.span>
                     ) : (
                       <span key={idx}>{section.text}</span>
                     )
