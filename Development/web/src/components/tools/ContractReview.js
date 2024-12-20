@@ -554,7 +554,7 @@ export default function AiTutor() {
 
   function messageDisplay() {
     if (isCommunicating) return 'AI is communicating...';
-    return 'LExAPI v0.3.4 is ready';
+    return 'LExAPI v0.3.6 is ready';
   }
 
   const highlightedReasons = highlightedSections
@@ -707,7 +707,7 @@ export default function AiTutor() {
           {questionStem && (
             <div className="w-full max-w-5xl mb-6 p-6 bg-white bg-opacity-20 backdrop-blur-md rounded-lg shadow-md overflow-y-scroll">
               <h3 className="text-2xl font-semibold text-white mb-2">Law Question</h3>
-              <h3 className="text-sm font-medium text-gray-200 mb-6">LExAPI Version: 0.3.4</h3>
+              <h3 className="text-sm font-medium text-gray-200 mb-6">LExAPI Version: 0.3.6</h3>
 
               <div className="text-gray-100 mb-4 whitespace-pre-wrap">
                 {showHighlights && highlightedSections && highlightedSections.length > 0 ? (
