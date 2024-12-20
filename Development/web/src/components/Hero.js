@@ -294,9 +294,10 @@ export default function Hero() {
             <span className="sr-only">Your Dream School Awaits.</span>
           </h2>
 
-          <p className={`text-center sm:text-3xl md:text-3xl ${isDarkMode ? 'text-white ' : 'text-black '} max-w-2xl my-6`}>
-          By law students, for law students. CadexLaw uses AI to deliver high-quality prep at up to <span className='goldGradient font-bold'>85%</span> lower costs than traditional competitors.
-          </p>
+          <p className={`text-center text-3xl sm:text-3xl md:text-3xl ${isDarkMode ? 'text-white' : 'text-black'} max-w-2xl my-6`}>
+  By law students, for law students. CadexLaw uses AI to deliver high-quality prep at up to <span className='goldGradient font-bold'>85%</span> lower costs than traditional competitors.
+</p>
+
 
           <div className="flex justify-center mt-6 mb-6">
           <Link
