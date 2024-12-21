@@ -679,27 +679,37 @@ export default function AiTutor() {
         {/* Visualizer and Feedback */}
         <div className="w-full max-w-5xl flex flex-col items-center">
           {/* Visualizer Container */}
-          <div className="relative w-96 h-96 mb-6">
-            <canvas
-              ref={visualizerCanvas}
-              className="absolute top-0 left-0 w-full h-full rounded-full"
-            ></canvas>
+          <AnimatePresence>
+            {!isSessionActive && (
+              <motion.div
+                className="relative w-96 h-96 mb-6"
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.5 }}
+                transition={{ duration: 0.3 }}
+              >
+                <canvas
+                  ref={visualizerCanvas}
+                  className="absolute top-0 left-0 w-full h-full rounded-full"
+                ></canvas>
 
-            <div className="absolute inset-0 flex items-center justify-center">
-              <textarea
-                className="w-64 h-24 bg-transparent text-center p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-white font-semibold text-lg"
-                value={messageDisplay()}
-                readOnly
-                aria-label="AI Communication Status"
-                style={{ resize: 'none' }}
-              ></textarea>
-            </div>
-          </div>
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <textarea
+                    className="w-64 h-24 bg-transparent text-center p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-white font-semibold text-lg"
+                    value={messageDisplay()}
+                    readOnly
+                    aria-label="AI Communication Status"
+                    style={{ resize: 'none' }}
+                  ></textarea>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           {/* Feedback Textbox */}
           <div className="w-full max-w-5xl mb-6">
             <textarea
-              className="w-full h-32 p-4 rounded resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-200 text-white bg-transparent"
+              className="w-full h-48 p-4 rounded resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-200 text-white bg-transparent"
               value={answerResult || ""}
               readOnly
               aria-label="AI Feedback"
