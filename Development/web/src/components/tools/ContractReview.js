@@ -621,43 +621,23 @@ export default function AiTutor() {
             </AnimatePresence>
           </button>
 
-          {/* Pro Mode Button */}
-          <button
-            onClick={() => {
-              if (isProUser) {
-                router.push('/ailawtools/aiTutor/full-mode');
-              } else {
-                alert('Professional Mode is only available for Pro users. Upgrade to access this feature.');
-              }
-            }}
-            className={`px-4 py-2 rounded-md transition-colors duration-200 ${
-              isProUser
-                ? 'bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white shadow-lg hover:from-indigo-600 hover:via-purple-600 hover:to-pink-600'
-                : 'bg-gray-300 text-gray-600 cursor-not-allowed'
-            }`}
-            disabled={!isProUser}
-            aria-label="Professional Mode"
-          >
-            Pro Mode
-          </button>
-        </div>
-
-        {/* Configuration and Control Buttons */}
-        <div className="w-full max-w-5xl flex justify-end mb-4 space-x-4">
-          <button
-            onClick={openLoadProgressModal}
-            className="relative h-12 w-56 overflow-hidden rounded bg-blue-700 text-white shadow-lg hover:bg-blue-800 transition-colors duration-200"
-            aria-label="Load Progress"
-          >
-            Load Progress
-          </button>
-          <button
-            onClick={openConfigModal}
-            className="relative h-12 w-56 overflow-hidden rounded bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white shadow-lg hover:from-indigo-600 hover:via-purple-600 hover:to-pink-600 transition-colors duration-200"
-            aria-label="Configure AI Tutor"
-          >
-            Configure AI Tutor
-          </button>
+          {/* Load Progress and Configure AI Tutor Buttons */}
+          <div className="flex space-x-4">
+            <button
+              onClick={openLoadProgressModal}
+              className="relative h-12 w-56 overflow-hidden rounded bg-blue-700 text-white shadow-lg hover:bg-blue-800 transition-colors duration-200"
+              aria-label="Load Progress"
+            >
+              Load Progress
+            </button>
+            <button
+              onClick={openConfigModal}
+              className="relative h-12 w-56 overflow-hidden rounded bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white shadow-lg hover:from-indigo-600 hover:via-purple-600 hover:to-pink-600 transition-colors duration-200"
+              aria-label="Configure AI Tutor"
+            >
+              Configure AI Tutor
+            </button>
+          </div>
         </div>
 
         {/* Question Counter */}
