@@ -590,7 +590,7 @@ export default function AiTutor() {
 
       <main className="flex-1 flex flex-col items-center p-6 overflow-auto">
         {/* Header */}
-        <div className="w-full max-w-5xl flex items-center justify-between mb-6">
+        <div className="w-full max-w-5xl flex items-center justify-between mb-20">
           <button
             onClick={toggleSidebar}
             className="text-gray-200 hover:text-white"
@@ -625,14 +625,14 @@ export default function AiTutor() {
           <div className="flex space-x-4">
             <button
               onClick={openLoadProgressModal}
-              className="relative h-12 w-56 overflow-hidden rounded bg-blue-700 text-white shadow-lg hover:bg-blue-800 transition-colors duration-200"
+              className="relative h-12 w-56 overflow-hidden rounded bg-blue-700 text-white shadow-lg transition-colors duration-200 before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-56"
               aria-label="Load Progress"
             >
               Load Progress
             </button>
             <button
               onClick={openConfigModal}
-              className="relative h-12 w-56 overflow-hidden rounded bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white shadow-lg hover:from-indigo-600 hover:via-purple-600 hover:to-pink-600 transition-colors duration-200"
+              className="relative h-12 w-56 overflow-hidden rounded bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white shadow-lg transition-colors duration-200 before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-56"
               aria-label="Configure AI Tutor"
             >
               Configure AI Tutor
@@ -1034,7 +1034,7 @@ export default function AiTutor() {
                     <button
                       type="button"
                       onClick={handleStartTutoringSession}
-                      className="relative h-12 w-56 overflow-hidden rounded bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white shadow-lg hover:from-indigo-600 hover:via-purple-600 hover:to-pink-600 transition-colors duration-200"
+                      className="relative h-12 w-56 overflow-hidden rounded bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white shadow-lg transition-colors duration-200 before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-56"
                       aria-label="Start Tutoring Session"
                     >
                       Start Tutoring
