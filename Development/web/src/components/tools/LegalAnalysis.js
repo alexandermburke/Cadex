@@ -188,6 +188,9 @@ export default function AIExamFlashCard() {
   }
 
   // Dynamic difficulty/lawType updates
+  const [difficultyOptions, setDifficultyOptions] = useState(difficultyMapping['LSAT']);
+  const [lawTypeOptions, setLawTypeOptions] = useState(lawTypeMapping['LSAT']);
+
   useEffect(() => {
     const newDiffOptions = difficultyMapping[examConfig.examType] || [];
     const newLawOptions = lawTypeMapping[examConfig.examType] || ['General Law'];
@@ -203,7 +206,7 @@ export default function AIExamFlashCard() {
       selectedQuestionTypes: [],
     }));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [examConfig.examType]); // includes examType in dependency
+  }, [examConfig.examType]);
 
   // Start or reset the timer
   const startTimer = (minutes) => {
@@ -243,7 +246,6 @@ export default function AIExamFlashCard() {
     const seconds = timeLeft % 60;
     return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
   };
-  const timeDisplay = timeLeft > 0 ? `Time Left: ${formatTime()}` : '';
 
   // Save progress to Firestore
   const handleSaveProgress = async () => {
@@ -290,6 +292,7 @@ export default function AIExamFlashCard() {
       alert('Error fetching saves');
     }
   };
+
   const handleLoadProgress = (progress) => {
     setExamConfig(progress.examConfig);
     setFlashcards(progress.flashcards);
@@ -305,6 +308,7 @@ export default function AIExamFlashCard() {
     }
     closeLoadProgressModal();
   };
+
   const handleDeleteProgress = async (id) => {
     try {
       await deleteDoc(doc(db, 'examProgress', id));
@@ -318,9 +322,6 @@ export default function AIExamFlashCard() {
   // Configuration
   const openConfigModal = () => setIsConfigModalOpen(true);
   const closeConfigModal = () => setIsConfigModalOpen(false);
-
-  const [difficultyOptions, setDifficultyOptions] = useState(difficultyMapping['LSAT']);
-  const [lawTypeOptions, setLawTypeOptions] = useState(lawTypeMapping['LSAT']);
 
   const handleConfigChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -342,7 +343,7 @@ export default function AIExamFlashCard() {
 
   // Generate flashcards
   const handleGenerateFlashcards = async () => {
-    setIsLoading(true);
+    setIsLoading(true); // show loading bar
     setFlashcards([]);
     setAnsweredFlashcards([]);
     setCurrentFlashcardIndex(0);
@@ -350,7 +351,7 @@ export default function AIExamFlashCard() {
     closeConfigModal();
 
     try {
-      // Mock API call
+      // Mock API call (replace with your real endpoint)
       const response = await fetch('/api/generate-flashcards', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -369,7 +370,7 @@ export default function AIExamFlashCard() {
       console.error('Error generating flashcards:', err);
       alert('Error generating flashcards');
     } finally {
-      setIsLoading(false);
+      setIsLoading(false); // hide loading bar
     }
   };
 
@@ -417,10 +418,18 @@ export default function AIExamFlashCard() {
 
   return (
     <div
-      className={`flex h-screen ${
+      className={`flex h-screen rounded shadow-md ${
         isDarkMode ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-800'
       }`}
     >
+      {/* 
+        LOADING BAR 
+        This appears at the top whenever isLoading is true.
+      */}
+      {isLoading && (
+        <div className="fixed top-0 left-0 w-full h-1 bg-blue-500 z-50 animate-pulse" />
+      )}
+
       {/* Sidebar */}
       <AnimatePresence>
         {isSidebarVisible && (
@@ -478,7 +487,9 @@ export default function AIExamFlashCard() {
           </button>
 
           {/* Timer center */}
-          <div className="text-lg font-semibold">{timeLeft > 0 ? `Time Left: ${formatTime()}` : ''}</div>
+          <div className="text-lg font-semibold">
+            {timeLeft > 0 ? `Time Left: ${formatTime()}` : ''}
+          </div>
 
           {/* Buttons: Save, Load, Configure */}
           <div className="flex space-x-4">
@@ -525,7 +536,11 @@ export default function AIExamFlashCard() {
             </div>
           )}
 
-          {isLoading && <p className="text-center">Generating flashcards...</p>}
+          {isLoading && (
+            <p className="text-center mt-4 text-blue-500">
+              Generating flashcards... Please wait.
+            </p>
+          )}
 
           {/* Display current flashcard */}
           {flashcards.length > 0 && currentFlashcard && (
@@ -728,7 +743,9 @@ export default function AIExamFlashCard() {
                 <button
                   onClick={closeFinalFeedbackModal}
                   className={`px-4 py-2 rounded font-semibold ${
-                    isDarkMode ? 'bg-blue-700 hover:bg-blue-600 text-white' : 'bg-blue-600 hover:bg-blue-700 text-white'
+                    isDarkMode
+                      ? 'bg-blue-700 hover:bg-blue-600 text-white'
+                      : 'bg-blue-600 hover:bg-blue-700 text-white'
                   }`}
                 >
                   Close
@@ -914,7 +931,9 @@ export default function AIExamFlashCard() {
                 <button
                   onClick={closeConfigModal}
                   className={`px-4 py-2 rounded ${
-                    isDarkMode ? 'bg-gray-700 hover:bg-gray-600 text-white' : 'bg-gray-300 hover:bg-gray-400 text-gray-800'
+                    isDarkMode
+                      ? 'bg-gray-700 hover:bg-gray-600 text-white'
+                      : 'bg-gray-300 hover:bg-gray-400 text-gray-800'
                   }`}
                 >
                   Cancel
