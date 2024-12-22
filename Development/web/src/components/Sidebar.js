@@ -75,22 +75,6 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, i
     </li>
   );
 
-  const flashcardrenderNavLink = (href, iconClass, label) => (
-    <li>
-      <Link
-        href={href}
-        className={`flex items-center gap-3 p-3 rounded transition-colors duration-200 ${
-          activeLink === href
-            ? 'bg-blue-800'
-            : 'bg-transparent hover:bg-blue-800 hover:bg-opacity-75'
-        }`}
-      >
-        <i className={`${iconClass} bg-yellow-100 bg-clip-text text-transparent`}></i>
-        <span className="text-white">{label}</span>
-      </Link>
-    </li>
-  );
-
 
   const renderLockedNavLink = (label) => (
     <li>{renderLockedLink(label, FaLock)}</li>
@@ -141,7 +125,7 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, i
           <ul className="space-y-2">
             {hasAccess ? (
               <>
-                {flashcardrenderNavLink('/ailawtools/analysis', 'fa-solid fa-lightbulb', 'Generative Flashcards')}
+                {renderNavLink('/ailawtools/analysis', 'fa-solid fa-lightbulb', 'Generative Flashcards')}
                 {colorfulrenderNavLink('/ailawtools/contractreview', 'fa-solid fa-brain', 'LExAPI Tutor')}
                 {renderNavLink('/ailawtools/predictive', 'fa-solid fa-chart-line', 'Exam Insights')}
               </>
