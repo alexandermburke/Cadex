@@ -118,7 +118,7 @@ export default function Account() {
                             before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 
                             before:rotate-6 before:bg-transparent before:opacity-20 before:duration-700 
                             hover:before:-translate-x-56 ` +
-                            (isDarkMode ? 'text-white' : 'text-black')
+                            (isDarkMode ? 'text-white' : 'text-blue-950')
                         }
                     >
                         <div className="flex items-center justify-center h-full">
@@ -135,7 +135,7 @@ export default function Account() {
                             before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 
                             before:rotate-6 before:bg-transparent before:opacity-20 before:duration-700 
                             hover:before:-translate-x-56 ` +
-                            (isDarkMode ? 'text-white' : 'text-black')
+                            (isDarkMode ? 'text-white' : 'text-blue-950')
                         }
                     >
                         <div className="flex items-center justify-center h-full">
