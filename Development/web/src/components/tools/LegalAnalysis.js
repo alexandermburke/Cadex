@@ -127,24 +127,20 @@ export default function AIExamFlashCard() {
   const { currentUser, userDataObj } = useAuth();
   const isDarkMode = userDataObj?.darkMode || false;
 
-  // Sidebar toggle
+  // --- All Hooks and state declarations up top ---
   const [isSidebarVisible, setIsSidebarVisible] = useState(true);
   const toggleSidebar = () => setIsSidebarVisible(!isSidebarVisible);
 
-  // Flashcards & answers
   const [flashcards, setFlashcards] = useState([]);
   const [answeredFlashcards, setAnsweredFlashcards] = useState([]);
   const [currentFlashcardIndex, setCurrentFlashcardIndex] = useState(0);
 
-  // For answer reveal
   const [isAnswerRevealed, setIsAnswerRevealed] = useState(false);
 
-  // Timer
   const [timerDuration, setTimerDuration] = useState(0); // minutes from config
   const [timeLeft, setTimeLeft] = useState(0); // seconds
   const timerRef = useRef(null);
 
-  // Config state
   const [examConfig, setExamConfig] = useState({
     examType: 'LSAT',
     difficulty: '',
@@ -155,14 +151,64 @@ export default function AIExamFlashCard() {
     resetTimerEveryQuestion: true, // toggle in config
   });
 
-  // Modals
   const [isConfigModalOpen, setIsConfigModalOpen] = useState(false);
   const [isLoadProgressModalOpen, setIsLoadProgressModalOpen] = useState(false);
   const [isFinalFeedbackModalOpen, setIsFinalFeedbackModalOpen] = useState(false);
   const [savedProgresses, setSavedProgresses] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
-  // If user is not logged in, optionally redirect or show a message
+  const [difficultyOptions, setDifficultyOptions] = useState(difficultyMapping['LSAT']);
+  const [lawTypeOptions, setLawTypeOptions] = useState(lawTypeMapping['LSAT']);
+
+  // Update difficulty / law types when examType changes
+  useEffect(() => {
+    const newDiffOptions = difficultyMapping[examConfig.examType] || [];
+    const newLawOptions = lawTypeMapping[examConfig.examType] || ['General Law'];
+
+    setDifficultyOptions(newDiffOptions);
+    setLawTypeOptions(newLawOptions);
+
+    setExamConfig((prev) => ({
+      ...prev,
+      difficulty: newDiffOptions[0]?.value || '',
+      lawType: newLawOptions[0] || 'General Law',
+      selectedQuestionTypes: [],
+    }));
+  }, [examConfig.examType]);
+
+  // Clear timer on unmount
+  useEffect(() => {
+    return () => {
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+      }
+    };
+  }, []);
+
+  // --- Helper function to start / reset timer ---
+  const startTimer = (minutes) => {
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+      timerRef.current = null;
+    }
+    const totalSeconds = minutes * 60;
+    setTimeLeft(totalSeconds);
+
+    timerRef.current = setInterval(() => {
+      setTimeLeft((prev) => {
+        if (prev <= 1) {
+          clearInterval(timerRef.current);
+          timerRef.current = null;
+          // Timer ended -> show final feedback
+          setIsFinalFeedbackModalOpen(true);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+  };
+
+  // --- Early return if user is not logged in ---
   if (!currentUser) {
     return (
       <div
@@ -187,67 +233,14 @@ export default function AIExamFlashCard() {
     );
   }
 
-  // Dynamic difficulty/lawType updates
-  const [difficultyOptions, setDifficultyOptions] = useState(difficultyMapping['LSAT']);
-  const [lawTypeOptions, setLawTypeOptions] = useState(lawTypeMapping['LSAT']);
-
-  useEffect(() => {
-    const newDiffOptions = difficultyMapping[examConfig.examType] || [];
-    const newLawOptions = lawTypeMapping[examConfig.examType] || ['General Law'];
-
-    setDifficultyOptions(newDiffOptions);
-    setLawTypeOptions(newLawOptions);
-
-    // Reset certain fields if examType changes
-    setExamConfig((prev) => ({
-      ...prev,
-      difficulty: newDiffOptions[0]?.value || '',
-      lawType: newLawOptions[0] || 'General Law',
-      selectedQuestionTypes: [],
-    }));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [examConfig.examType]);
-
-  // Start or reset the timer
-  const startTimer = (minutes) => {
-    if (timerRef.current) {
-      clearInterval(timerRef.current);
-      timerRef.current = null;
-    }
-    const totalSeconds = minutes * 60;
-    setTimeLeft(totalSeconds);
-
-    timerRef.current = setInterval(() => {
-      setTimeLeft((prev) => {
-        if (prev <= 1) {
-          clearInterval(timerRef.current);
-          timerRef.current = null;
-          // Timer ended -> final feedback
-          setIsFinalFeedbackModalOpen(true);
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-  };
-
-  // On unmount, clear timer
-  useEffect(() => {
-    return () => {
-      if (timerRef.current) {
-        clearInterval(timerRef.current);
-      }
-    };
-  }, []);
-
-  // Format time
+  // --- Timer formatting ---
   const formatTime = () => {
     const minutes = Math.floor(timeLeft / 60);
     const seconds = timeLeft % 60;
     return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
   };
 
-  // Save progress to Firestore
+  // --- Save progress to Firestore ---
   const handleSaveProgress = async () => {
     if (!currentUser) {
       alert('You must be logged in to save progress.');
@@ -272,14 +265,13 @@ export default function AIExamFlashCard() {
     }
   };
 
-  // Load progress modal
+  // --- Load progress logic ---
   const openLoadProgressModal = () => {
     fetchSavedProgresses();
     setIsLoadProgressModalOpen(true);
   };
   const closeLoadProgressModal = () => setIsLoadProgressModalOpen(false);
 
-  // Fetch saved from Firestore
   const fetchSavedProgresses = async () => {
     try {
       const q = query(collection(db, 'examProgress'), where('userId', '==', currentUser.uid));
@@ -301,7 +293,7 @@ export default function AIExamFlashCard() {
     setTimerDuration(progress.timerDuration || 0);
     setTimeLeft(progress.timeLeft || 0);
 
-    // If flashcards are present, start or continue the timer
+    // Restart or continue timer if applicable
     if (progress.flashcards?.length && progress.timerDuration) {
       startTimer(progress.timerDuration);
       setTimeLeft(progress.timeLeft || progress.timerDuration * 60);
@@ -319,7 +311,7 @@ export default function AIExamFlashCard() {
     }
   };
 
-  // Configuration
+  // --- Configuration modal ---
   const openConfigModal = () => setIsConfigModalOpen(true);
   const closeConfigModal = () => setIsConfigModalOpen(false);
 
@@ -341,7 +333,7 @@ export default function AIExamFlashCard() {
     });
   };
 
-  // Generate flashcards
+  // --- Generate flashcards ---
   const handleGenerateFlashcards = async () => {
     setIsLoading(true); // show loading bar
     setFlashcards([]);
@@ -374,7 +366,7 @@ export default function AIExamFlashCard() {
     }
   };
 
-  // Flashcard logic
+  // --- Flashcard logic ---
   const currentFlashcard = flashcards[currentFlashcardIndex] || null;
   const handleShowAnswer = () => setIsAnswerRevealed(true);
 
@@ -384,7 +376,7 @@ export default function AIExamFlashCard() {
   const recordAnswer = (isCorrect) => {
     // If already answered, skip
     const existing = answeredFlashcards.findIndex(
-      (item) => item.question === currentFlashcard.question
+      (item) => item.question === currentFlashcard?.question
     );
     if (existing >= 0) {
       nextFlashcard();
@@ -393,8 +385,8 @@ export default function AIExamFlashCard() {
     setAnsweredFlashcards((prev) => [
       ...prev,
       {
-        question: currentFlashcard.question,
-        correctAnswer: currentFlashcard.correctAnswer || currentFlashcard.answer || '',
+        question: currentFlashcard?.question || '',
+        correctAnswer: currentFlashcard?.correctAnswer || currentFlashcard?.answer || '',
         isCorrect,
       },
     ]);
@@ -422,10 +414,7 @@ export default function AIExamFlashCard() {
         isDarkMode ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-800'
       }`}
     >
-      {/* 
-        LOADING BAR 
-        This appears at the top whenever isLoading is true.
-      */}
+      {/* Loading Bar */}
       {isLoading && (
         <div className="fixed top-0 left-0 w-full h-1 bg-blue-500 z-50 animate-pulse" />
       )}
@@ -775,7 +764,7 @@ export default function AIExamFlashCard() {
               transition={{ duration: 0.3 }}
             >
               <div className="flex justify-between items-center mb-4">
-                <h2 className="text-xl font-semibold">Exam Configuration</h2>
+                <h2 className="text-xl font-semibold">Flashcard Configuration</h2>
                 <button onClick={closeConfigModal} className="text-gray-500 hover:text-gray-700">
                   ✕
                 </button>
