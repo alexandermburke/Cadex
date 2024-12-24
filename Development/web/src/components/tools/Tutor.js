@@ -600,7 +600,8 @@ export default function AiTutor() {
 
       <main className="flex-1 flex flex-col items-center p-4 sm:p-6 overflow-auto">
         {/* Header */}
-        <div className="w-full max-w-5xl flex flex-col sm:flex-row items-center justify-between mb-10 sm:mb-20 space-y-4 sm:space-y-0">
+        <div className="w-full max-w-5xl flex flex-row flex-nowrap items-center justify-between gap-2 sm:gap-4 mb-10 sm:mb-20">
+          {/* Sidebar Toggle */}
           <button
             onClick={toggleSidebar}
             className="text-gray-200 hover:text-white"
@@ -632,20 +633,20 @@ export default function AiTutor() {
           </button>
 
           {/* Load Progress and Configure AI Tutor Buttons */}
-          <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
+          <div className="inline-flex flex-row flex-nowrap items-center gap-2 sm:gap-4">
             <button
               onClick={openLoadProgressModal}
-              className="relative h-12 w-full sm:w-56 overflow-hidden rounded bg-blue-700 text-white shadow-lg transition-colors duration-200 before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-56"
+              className="relative h-10 sm:h-12 w-28 sm:w-40 overflow-hidden rounded bg-blue-700 text-white shadow-lg transition-colors duration-200 before:absolute before:right-0 before:top-0 before:h-full before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-56 text-sm sm:text-base"
               aria-label="Load Progress"
             >
               Load Progress
             </button>
             <button
               onClick={openConfigModal}
-              className="relative h-12 w-full sm:w-56 overflow-hidden rounded bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white shadow-lg transition-colors duration-200 before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-56"
+              className="relative h-10 sm:h-12 w-28 sm:w-40 overflow-hidden rounded bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white shadow-lg transition-colors duration-200 before:absolute before:right-0 before:top-0 before:h-full before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-56 text-sm sm:text-base"
               aria-label="Configure AI Tutor"
             >
-              Configure AI Tutor
+              Configure
             </button>
           </div>
         </div>
@@ -719,7 +720,11 @@ export default function AiTutor() {
                     section.highlight ? (
                       <motion.span
                         key={idx}
-                        style={{ backgroundColor: highlightColor, display: 'inline-block', transformOrigin: 'left center' }}
+                        style={{
+                          backgroundColor: highlightColor,
+                          display: 'inline-block',
+                          transformOrigin: 'left center',
+                        }}
                         title={section.reason}
                         initial={{ scaleX: 0 }}
                         animate={{ scaleX: 1 }}
@@ -1119,7 +1124,7 @@ export default function AiTutor() {
                   <button
                     type="button"
                     onClick={closeFinalFeedbackModal}
-                    className="px-6 py-3 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors duration=200"
+                    className="px-6 py-3 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors duration-200"
                     aria-label="Close Final Feedback Modal"
                   >
                     Close

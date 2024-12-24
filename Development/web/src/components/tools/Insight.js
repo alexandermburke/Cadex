@@ -89,24 +89,14 @@ export default function ExamInsight() {
     setIsLoadProgressModalOpen(false);
   };
 
-  /**
-   * fetchSavedProgresses:
-   * - If autoLoadLast is true, tries to load the doc with id = lastProgressId.
-   */
-  const fetchSavedProgresses = async (
-    autoLoadLast = false,
-    lastProgressId = ''
-  ) => {
+  const fetchSavedProgresses = async (autoLoadLast = false, lastProgressId = '') => {
     if (!currentUser) {
       return;
     }
     setIsLoading(true);
 
     try {
-      const q = query(
-        collection(db, 'examProgress'),
-        where('userId', '==', currentUser.uid)
-      );
+      const q = query(collection(db, 'examProgress'), where('userId', '==', currentUser.uid));
       const querySnapshot = await getDocs(q);
 
       const progresses = [];
@@ -119,7 +109,6 @@ export default function ExamInsight() {
       if (autoLoadLast && lastProgressId) {
         const matching = progresses.find((p) => p.id === lastProgressId);
         if (matching) {
-          // If we haven't selected it yet, load it
           if (!selectedProgresses.find((sp) => sp.id === lastProgressId)) {
             setSelectedProgresses([matching]);
             analyzeProgress(matching);
@@ -134,14 +123,10 @@ export default function ExamInsight() {
   };
 
   const handleLoadProgress = (progress) => {
-    // If not already in selectedProgresses, add it
-    const alreadySelected = selectedProgresses.find(
-      (p) => p.id === progress.id
-    );
+    const alreadySelected = selectedProgresses.find((p) => p.id === progress.id);
     if (!alreadySelected) {
       setSelectedProgresses((prev) => [...prev, progress]);
     }
-    // Save the last opened progress ID
     localStorage.setItem('lastProgressId', progress.id);
   };
 
@@ -153,12 +138,9 @@ export default function ExamInsight() {
 
     try {
       await deleteDoc(doc(db, 'examProgress', id));
-      // Refresh the savedProgress list
       fetchSavedProgresses();
-      // Also remove from selected progress if it's there
       setSelectedProgresses((prev) => prev.filter((p) => p.id !== id));
 
-      // If the lastProgressId was this doc, remove from localStorage
       const lastProgressId = localStorage.getItem('lastProgressId');
       if (lastProgressId === id) {
         localStorage.removeItem('lastProgressId');
@@ -169,7 +151,6 @@ export default function ExamInsight() {
     }
   };
 
-  // Whenever a new progress is added to selectedProgresses, analyze it
   useEffect(() => {
     selectedProgresses.forEach((progress) => {
       analyzeProgress(progress);
@@ -195,7 +176,6 @@ export default function ExamInsight() {
         typeDistribution[qType]++;
       }
 
-      // Performance Over Time
       const timestamp = new Date(q.timestamp || progress.timestamp);
       const date = `${timestamp.getMonth() + 1}/${timestamp.getDate()}`;
       performanceTimeline.push({ date, correct: q.correct ? 1 : 0 });
@@ -215,28 +195,15 @@ export default function ExamInsight() {
       perfMap[entry.date].correct += entry.correct;
     });
 
-    const sortedDates = Object.keys(perfMap).sort(
-      (a, b) => new Date(a) - new Date(b)
-    );
-
+    const sortedDates = Object.keys(perfMap).sort((a, b) => new Date(a) - new Date(b));
     const perfData = sortedDates.map((date) => ({
       date,
-      accuracy: Number(
-        ((perfMap[date].correct / perfMap[date].total) * 100).toFixed(2)
-      ),
+      accuracy: Number(((perfMap[date].correct / perfMap[date].total) * 100).toFixed(2)),
     }));
 
-    setPerformanceOverTime((prev) => ({
-      ...prev,
-      [progressId]: perfData,
-    }));
+    setPerformanceOverTime((prev) => ({ ...prev, [progressId]: perfData }));
+    setQuestionTypeDistribution((prev) => ({ ...prev, [progressId]: typeDistribution }));
 
-    setQuestionTypeDistribution((prev) => ({
-      ...prev,
-      [progressId]: typeDistribution,
-    }));
-
-    // Finally, fetch recommended schools
     const totalAnswers = correct + incorrect;
     const accuracy = totalAnswers ? (correct / totalAnswers) * 100 : 0;
     recommendLawSchools(progressId, accuracy);
@@ -265,23 +232,23 @@ export default function ExamInsight() {
     }
   };
 
-  // Chart Colors / Minimal styling
+  // Chart Colors
   const chartColors = {
     pie: {
-      correct: isDarkMode ? '#6EE7B7' : '#4CAF50', // success-green variants
-      incorrect: isDarkMode ? '#FCA5A5' : '#F44336', // error-red variants
+      correct: isDarkMode ? '#6EE7B7' : '#4CAF50',
+      incorrect: isDarkMode ? '#FCA5A5' : '#F44336',
     },
     bar: {
-      background: isDarkMode ? '#A5B4FC' : '#3F51B5', // Indigo-ish
+      background: isDarkMode ? '#A5B4FC' : '#3F51B5',
     },
     line: {
-      background: isDarkMode ? '#f9a8d4' : '#E91E63', // Pink-ish
+      background: isDarkMode ? '#f9a8d4' : '#E91E63',
     },
     axisColor: isDarkMode ? '#FFFFFF' : '#000000',
     gridColor: isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)',
   };
 
-  // Pie Chart (Performance Overview)
+  // Pie Chart
   const getPieData = (pid) => {
     const correct = correctAnswersCount[pid] || 0;
     const incorrect = incorrectAnswersCount[pid] || 0;
@@ -315,7 +282,7 @@ export default function ExamInsight() {
     },
   };
 
-  // Bar Chart (Question Distribution)
+  // Bar Chart
   const getBarData = (pid) => {
     const distribution = questionTypeDistribution[pid] || {};
     return {
@@ -366,7 +333,7 @@ export default function ExamInsight() {
     },
   };
 
-  // Line Chart (Performance Over Time)
+  // Line Chart
   const getLineData = (pid) => {
     const perf = performanceOverTime[pid] || [];
     return {
@@ -421,7 +388,7 @@ export default function ExamInsight() {
     },
   };
 
-  // Slick slider settings for chart carousel
+  // Slick slider settings
   const chartSettings = {
     centerMode: true,
     infinite: true,
@@ -433,6 +400,30 @@ export default function ExamInsight() {
     arrows: false,
     adaptiveHeight: true,
   };
+
+  if (!currentUser) {
+    return (
+      <div
+        className={`flex items-center justify-center h-screen ${
+          isDarkMode ? 'bg-slate-900 text-white' : 'bg-gray-100 text-gray-800'
+        }`}
+      >
+        <div className="p-6 rounded shadow-md text-center">
+          <p className="mb-4">Please log in to view Exam Insights.</p>
+          <button
+            onClick={() => window.location.assign('/login')}
+            className={`px-4 py-2 rounded ${
+              isDarkMode
+                ? 'bg-blue-700 hover:bg-blue-600 text-white'
+                : 'bg-blue-600 hover:bg-blue-700 text-white'
+            }`}
+          >
+            Go to Login
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={`flex h-screen ${isDarkMode ? 'bg-slate-900' : 'bg-white'} rounded shadow-md`}>
@@ -457,13 +448,11 @@ export default function ExamInsight() {
       </AnimatePresence>
 
       <main className="flex-1 flex flex-col items-center p-6 overflow-auto">
-        {/* Top row: Toggle sidebar, load progress button */}
-        <div className="w-full max-w-5xl flex items-center justify-between mb-6">
+        {/* Top row */}
+        <div className="w-full max-w-5xl flex flex-row flex-wrap items-center justify-between mb-6 gap-2 sm:gap-4">
           <button
             onClick={toggleSidebar}
-            className={`${
-              isDarkMode ? 'text-gray-200' : 'text-gray-600'
-            } hover:text-white`}
+            className={`${isDarkMode ? 'text-gray-200' : 'text-gray-600'} hover:text-white`}
             aria-label={isSidebarVisible ? 'Hide Sidebar' : 'Show Sidebar'}
           >
             <AnimatePresence mode="wait" initial={false}>
@@ -491,13 +480,16 @@ export default function ExamInsight() {
             </AnimatePresence>
           </button>
 
-          <button
-            onClick={openLoadProgressModal}
-            className="px-4 py-2 bg-blue-700 text-white rounded-md hover:bg-blue-600 transition-colors duration-200"
-            aria-label="Load Progress"
-          >
-            Load Progress
-          </button>
+          {/* Load Progress Button */}
+          <div className="inline-flex flex-row flex-nowrap items-center gap-2 sm:gap-4">
+            <button
+              onClick={openLoadProgressModal}
+              className="relative h-10 sm:h-12 w-28 sm:w-36 overflow-hidden rounded bg-blue-700 text-white shadow-lg transition-colors duration-200 before:absolute before:right-0 before:top-0 before:h-full before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-56 text-sm sm:text-base"
+              aria-label="Load Progress"
+            >
+              Load Progress
+            </button>
+          </div>
         </div>
 
         {/* Main content box */}
@@ -533,43 +525,25 @@ export default function ExamInsight() {
                     >
                       {prog.examConfig.examType} - {prog.examConfig.lawType}
                     </h3>
-                    <p
-                      className={`${
-                        isDarkMode ? 'text-gray-200' : 'text-gray-700'
-                      } mb-1`}
-                    >
+                    <p className={`${isDarkMode ? 'text-gray-200' : 'text-gray-700'} mb-1`}>
                       <strong>Difficulty:</strong> {prog.examConfig.difficulty}
                     </p>
-                    <p
-                      className={`${
-                        isDarkMode ? 'text-gray-200' : 'text-gray-700'
-                      } mb-1`}
-                    >
+                    <p className={`${isDarkMode ? 'text-gray-200' : 'text-gray-700'} mb-1`}>
                       <strong>Questions:</strong>{' '}
-                      {prog.examConfig.flashcardLimit ||
-                        prog.examConfig.questionLimit}
+                      {prog.examConfig.flashcardLimit || prog.examConfig.questionLimit}
                     </p>
-                    <p
-                      className={`${
-                        isDarkMode ? 'text-gray-200' : 'text-gray-700'
-                      } mb-1`}
-                    >
+                    <p className={`${isDarkMode ? 'text-gray-200' : 'text-gray-700'} mb-1`}>
                       <strong>Instant Feedback:</strong>{' '}
                       {prog.examConfig.instantFeedback ? 'Enabled' : 'Disabled'}
                     </p>
-                    <p
-                      className={`${
-                        isDarkMode ? 'text-gray-200' : 'text-gray-700'
-                      } mb-4`}
-                    >
-                      <strong>Saved on:</strong>{' '}
-                      {new Date(prog.timestamp).toLocaleString()}
+                    <p className={`${isDarkMode ? 'text-gray-200' : 'text-gray-700'} mb-4`}>
+                      <strong>Saved on:</strong> {new Date(prog.timestamp).toLocaleString()}
                     </p>
 
-                    {/* CHART CAROUSEL */}
-                    <div style={{ height: '320px' /* to fix chart size */ }}>
+                    {/* Charts */}
+                    <div style={{ height: '320px' }}>
                       <Slider {...chartSettings}>
-                        {/* Slide 1: Pie Chart */}
+                        {/* Pie Chart */}
                         <div
                           className="p-2"
                           style={{ background: 'transparent', height: '300px' }}
@@ -586,7 +560,7 @@ export default function ExamInsight() {
                           </div>
                         </div>
 
-                        {/* Slide 2: Bar Chart */}
+                        {/* Bar Chart */}
                         <div
                           className="p-2"
                           style={{ background: 'transparent', height: '300px' }}
@@ -599,14 +573,11 @@ export default function ExamInsight() {
                             Question Distribution
                           </h4>
                           <div className="h-full relative">
-                            <ChartBar
-                              data={getBarData(pid)}
-                              options={barOptions}
-                            />
+                            <ChartBar data={getBarData(pid)} options={barOptions} />
                           </div>
                         </div>
 
-                        {/* Slide 3: Line Chart */}
+                        {/* Line Chart */}
                         <div
                           className="p-2"
                           style={{ background: 'transparent', height: '300px' }}
@@ -619,10 +590,7 @@ export default function ExamInsight() {
                             Performance Over Time
                           </h4>
                           <div className="h-full relative">
-                            <Line
-                              data={getLineData(pid)}
-                              options={lineOptions}
-                            />
+                            <Line data={getLineData(pid)} options={lineOptions} />
                           </div>
                         </div>
                       </Slider>
@@ -638,45 +606,29 @@ export default function ExamInsight() {
                         Recommended Law Schools
                       </h4>
                       {isRecommending ? (
-                        <p
-                          className={`${
-                            isDarkMode ? 'text-white' : 'text-gray-800'
-                          }`}
-                        >
+                        <p className={`${isDarkMode ? 'text-white' : 'text-gray-800'}`}>
                           Generating recommendations...
                         </p>
-                      ) : recommendedUniversities[pid] &&
-                        recommendedUniversities[pid].length > 0 ? (
+                      ) : recommendedUniversities[pid] && recommendedUniversities[pid].length > 0 ? (
                         <ul className="list-disc list-inside ml-5 space-y-3">
                           {recommendedUniversities[pid].map((uni, idx) => {
-                            // We'll keep the colored text to highlight notes
                             const notesClass = uni.notes.includes('(More Likely)')
                               ? 'text-emerald-400'
                               : 'text-red-400';
                             return (
                               <li
                                 key={idx}
-                                className={`${
-                                  isDarkMode ? 'text-gray-100' : 'text-gray-800'
-                                }`}
+                                className={`${isDarkMode ? 'text-gray-100' : 'text-gray-800'}`}
                               >
                                 <span className="font-semibold">{uni.name}</span>{' '}
-                                <span className={`ml-2 opacity-90 ${notesClass}`}>
-                                  {uni.notes}
-                                </span>
-                                <div className="text-sm mt-1 ml-4 opacity-90">
-                                  {uni.brief}
-                                </div>
+                                <span className={`ml-2 opacity-90 ${notesClass}`}>{uni.notes}</span>
+                                <div className="text-sm mt-1 ml-4 opacity-90">{uni.brief}</div>
                               </li>
                             );
                           })}
                         </ul>
                       ) : (
-                        <p
-                          className={`${
-                            isDarkMode ? 'text-gray-200' : 'text-gray-700'
-                          }`}
-                        >
+                        <p className={`${isDarkMode ? 'text-gray-200' : 'text-gray-700'}`}>
                           No recommendations available.
                         </p>
                       )}
@@ -687,20 +639,15 @@ export default function ExamInsight() {
             </div>
           ) : (
             <div className="text-center">
-              <p
-                className={`${
-                  isDarkMode ? 'text-gray-300' : 'text-gray-500'
-                }`}
-              >
-                Please load one or more saved progresses to view insights and
-                analysis.
+              <p className={`${isDarkMode ? 'text-gray-300' : 'text-gray-500'}`}>
+                Please load one or more saved progresses to view insights and analysis.
               </p>
             </div>
           )}
         </div>
       </main>
 
-      {/* LOAD PROGRESS MODAL */}
+      {/* Load Progress Modal */}
       <AnimatePresence>
         {isLoadProgressModalOpen && (
           <motion.div
@@ -726,19 +673,9 @@ export default function ExamInsight() {
                 Load Saved Progress
               </h2>
               {isLoading ? (
-                <p
-                  className={`${
-                    isDarkMode ? 'text-gray-300' : 'text-gray-700'
-                  }`}
-                >
-                  Loading...
-                </p>
+                <p className={`${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>Loading...</p>
               ) : savedProgresses.length === 0 ? (
-                <p
-                  className={`${
-                    isDarkMode ? 'text-gray-300' : 'text-gray-700'
-                  }`}
-                >
+                <p className={`${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                   No saved progresses found.
                 </p>
               ) : (
@@ -794,21 +731,20 @@ export default function ExamInsight() {
                               isDarkMode ? 'text-gray-300' : 'text-gray-600'
                             }`}
                           >
-                            Saved on:{' '}
-                            {new Date(progress.timestamp).toLocaleString()}
+                            Saved on: {new Date(progress.timestamp).toLocaleString()}
                           </p>
                         </div>
-                        <div className="flex space-x-2 mt-2">
+                        <div className="flex space-x-2 mt-2 sm:mt-0">
                           <button
                             onClick={() => handleLoadProgress(progress)}
-                            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-500 transition-colors duration-200"
+                            className="h-10 w-20 sm:w-24 overflow-hidden rounded bg-blue-600 text-white shadow-lg transition-colors duration-200 hover:bg-blue-500 text-sm sm:text-base"
                             aria-label="Load Progress"
                           >
                             Load
                           </button>
                           <button
                             onClick={() => handleDeleteProgress(progress.id)}
-                            className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-500 transition-colors duration-200"
+                            className="h-10 w-20 sm:w-24 overflow-hidden rounded bg-red-600 text-white shadow-lg transition-colors duration-200 hover:bg-red-500 text-sm sm:text-base"
                             aria-label="Delete Progress"
                           >
                             Delete
@@ -821,12 +757,13 @@ export default function ExamInsight() {
               )}
               <div className="flex justify-end mt-6">
                 <button
+                  type="button"
                   onClick={closeLoadProgressModal}
-                  className={`px-6 py-3 ${
+                  className={`h-10 sm:h-12 px-4 py-2 rounded ${
                     isDarkMode
                       ? 'bg-gray-700 text-gray-200 hover:bg-gray-600'
                       : 'bg-gray-300 text-gray-700 hover:bg-gray-400'
-                  } rounded transition-colors duration-200`}
+                  } transition-colors duration-200 text-sm sm:text-base`}
                   aria-label="Close Load Progress Modal"
                 >
                   Close
