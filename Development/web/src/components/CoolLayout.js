@@ -24,7 +24,7 @@ export default function CoolLayout({ children }) {
 
     return (
         <div className={`flex flex-col flex-1 w-full transition-colors duration-300 ${
-            isDarkMode ? 'bg-gradient-to-b from-blue-950 to-slate-950' : 'bg-white'
+            isDarkMode ? 'bg-gradient-to-b from-blue-950 to-slate-950' : 'bg-gray-50'
         }`}>
             <Header />
             {children}
