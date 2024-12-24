@@ -125,9 +125,9 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, i
           <ul className="space-y-2">
             {hasAccess ? (
               <>
-                {renderNavLink('/ailawtools/analysis', 'fa-solid fa-lightbulb', 'Generative Flashcards')}
-                {colorfulrenderNavLink('/ailawtools/contractreview', 'fa-solid fa-brain', 'LExAPI Tutor')}
-                {renderNavLink('/ailawtools/predictive', 'fa-solid fa-chart-line', 'Exam Insights')}
+                {renderNavLink('/ailawtools/flashcards', 'fa-solid fa-lightbulb', 'Generative Flashcards')}
+                {colorfulrenderNavLink('/ailawtools/lexapi', 'fa-solid fa-brain', 'LExAPI Tutor')}
+                {renderNavLink('/ailawtools/insights', 'fa-solid fa-chart-line', 'Exam Insights')}
               </>
             ) : (
               <>

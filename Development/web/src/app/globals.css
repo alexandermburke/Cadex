@@ -1,6 +1,10 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* ------------------------------
+   Your global custom CSS starts 
+   ------------------------------ */
 @keyframes fadeInSlide {
     0% {
         opacity: 0;
@@ -64,7 +68,6 @@ html {
 .goldShadow {
   box-shadow: 5px 8px 20px rgba(218, 202, 131, 0.5);
 }
-
 
 .dropShadow {
   filter: drop-shadow(-10.8923px 14.523px 35.0973px rgba(0, 0, 0, 0.35));
@@ -131,20 +134,8 @@ html {
   from {
     opacity: 1;
   }
-
   to {
     opacity: 0;
-  }
-}
-
-@keyframes fadeInSlide {
-  0% {
-      opacity: 0;
-      transform: translateY(-20px);
-  }
-  100% {
-      opacity: 1;
-      transform: translateY(0);
   }
 }
 
@@ -164,13 +155,7 @@ html {
   animation: dropdown 0.3s ease-out forwards;
 }
 
-
-.logo-animation {
-  animation: fadeInSlide 1s ease-out forwards;
-}
-
 /* Flare animation for "Your Legal Practice" */
-
 .flare-letter {
   display: inline-block;
   background: linear-gradient(30deg, #D4B44A, #ecddaa);
@@ -203,4 +188,48 @@ html {
     opacity: 1;
     text-shadow: 0 0 1px rgb(255, 255, 255);
   }
+}
+
+/* ------------------------------
+   Apple-like toggle switches
+   ------------------------------ */
+
+/* Base styles for the hidden checkbox */
+.toggle-checkbox {
+  height: 0;
+  width: 0;
+  visibility: hidden;
+}
+
+/* The background (track) of the toggle */
+.toggle-label {
+  display: block;
+  position: relative;
+  cursor: pointer;
+  background-color: #d1d5db; /* Tailwind gray-300 */
+  transition: background-color 0.3s ease-in-out;
+}
+
+/* The circle ("thumb") inside the toggle */
+.toggle-label::after {
+  content: '';
+  position: absolute;
+  left: 2px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 1.4rem;  /* ~22px */
+  height: 1.4rem; /* ~22px */
+  background-color: #fff;
+  border-radius: 9999px;
+  box-shadow: 0 0 2px rgba(0, 0, 0, 0.2);
+  transition: transform 0.3s ease-in-out;
+}
+
+/* When checked, change background color and move the toggle circle */
+.toggle-checkbox:checked + .toggle-label {
+  background-color: #2563eb; /* Tailwind blue-950 */
+}
+
+.toggle-checkbox:checked + .toggle-label::after {
+  transform: translate(1.6rem, -50%);
 }

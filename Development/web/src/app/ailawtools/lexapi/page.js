@@ -1,10 +1,10 @@
-import LegalAnalysis from '@/components/tools/LegalAnalysis'
+import ContractReview from '@/components/tools/Tutor'
 import CoolLayout from '@/components/CoolLayout'
 import Main from '@/components/Main'
 import React from 'react'
 
 export default function ApplicationPage() {
     return (
-        <LegalAnalysis />
+        <ContractReview />
     )
 }

@@ -435,16 +435,12 @@ export default function ExamInsight() {
   };
 
   return (
-    <div
-      className={`flex h-screen ${
-        isDarkMode ? 'bg-gray-900' : 'bg-gray-50'
-      } rounded shadow-sm`}
-    >
+    <div className={`flex h-screen ${isDarkMode ? 'bg-slate-900' : 'bg-white'} rounded shadow-md`}>
       <AnimatePresence>
         {isSidebarVisible && (
           <>
             <Sidebar
-              activeLink="/ailawtools/predictive"
+              activeLink="/ailawtools/insights"
               isSidebarVisible={isSidebarVisible}
               toggleSidebar={toggleSidebar}
               isDarkMode={isDarkMode}

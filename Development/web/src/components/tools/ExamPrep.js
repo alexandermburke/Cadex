@@ -488,8 +488,8 @@ export default function ExamPrep() {
   const isProUser = userDataObj?.billing?.plan === 'Pro' || userDataObj?.billing?.plan === 'Developer';
 
   return (
-    <div className={`flex h-screen ${isDarkMode ? 'bg-gray-900' : 'bg-gray-50'} rounded shadow-sm`}>
-      {/* AnimatePresence for Sidebar */}
+    <div className={`flex h-screen ${isDarkMode ? 'bg-slate-900' : 'bg-white'} rounded shadow-md`}>
+       {/* AnimatePresence for Sidebar */}
       <AnimatePresence>
         {isSidebarVisible && (
           <>

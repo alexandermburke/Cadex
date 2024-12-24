@@ -408,12 +408,8 @@ export default function AIExamFlashCard() {
 
   const closeFinalFeedbackModal = () => setIsFinalFeedbackModalOpen(false);
 
-  return (
-    <div
-      className={`flex h-screen rounded shadow-md ${
-        isDarkMode ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-800'
-      }`}
-    >
+  return (   
+    <div className={`flex h-screen ${isDarkMode ? 'bg-slate-900' : 'bg-white'} rounded shadow-md`}>
       {/* Loading Bar */}
       {isLoading && (
         <div className="fixed top-0 left-0 w-full h-1 bg-blue-500 z-50 animate-pulse" />
@@ -424,7 +420,7 @@ export default function AIExamFlashCard() {
         {isSidebarVisible && (
           <>
             <Sidebar
-              activeLink="/ailawtools/analysis"
+              activeLink="/ailawtools/flashcards"
               isSidebarVisible={isSidebarVisible}
               toggleSidebar={toggleSidebar}
               isDarkMode={isDarkMode}

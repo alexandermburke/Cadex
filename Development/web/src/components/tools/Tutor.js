@@ -48,7 +48,7 @@ export default function AiTutor() {
     userPrompt: '',
     showLegalReferences: true,
     provideApproach: true,
-    liveMode: false, 
+    liveMode: false,
     highlightHue: 60,
     highlightOpacity: 0.6,
   });
@@ -191,7 +191,12 @@ export default function AiTutor() {
         this.vy *= -1;
       }
 
-      if (this.x < -50 || this.x > this.canvasWidth + 50 || this.y < -50 || this.y > this.canvasHeight + 50) {
+      if (
+        this.x < -50 ||
+        this.x > this.canvasWidth + 50 ||
+        this.y < -50 ||
+        this.y > this.canvasHeight + 50
+      ) {
         this.reset();
       }
     }
@@ -209,7 +214,10 @@ export default function AiTutor() {
   function hexToRgb(hex) {
     hex = hex.replace('#', '');
     if (hex.length === 3) {
-      hex = hex.split('').map((h) => h + h).join('');
+      hex = hex
+        .split('')
+        .map((h) => h + h)
+        .join('');
     }
     const bigint = parseInt(hex, 16);
     const r = (bigint >> 16) & 255;
@@ -266,7 +274,9 @@ export default function AiTutor() {
           const dy = particles[i].y - particles[j].y;
           const distance = Math.sqrt(dx * dx + dy * dy);
           if (distance < maxDistance) {
-            ctx.strokeStyle = `rgba(${hexToRgb(particles[i].color)}, ${(1 - distance / maxDistance) * 0.2})`;
+            ctx.strokeStyle = `rgba(${hexToRgb(particles[i].color)}, ${
+              (1 - distance / maxDistance) * 0.2
+            })`;
             ctx.lineWidth = 1;
             ctx.moveTo(particles[i].x, particles[i].y);
             ctx.lineTo(particles[j].x, particles[j].y);
@@ -567,12 +577,12 @@ export default function AiTutor() {
   const highlightColor = `hsla(${tutorConfig.highlightHue}, 100%, 50%, ${tutorConfig.highlightOpacity})`;
 
   return (
-    <div className="flex h-screen bg-gradient-to-br from-purple-900 to-blue-800 rounded shadow-sm z-[150]">
+    <div className="flex h-screen bg-gradient-to-br from-purple-900 to-blue-800 rounded shadow-md z-[150]">
       <AnimatePresence>
         {isSidebarVisible && (
           <>
             <Sidebar
-              activeLink="/ailawtools/contractreview"
+              activeLink="/ailawtools/lexapi"
               isSidebarVisible={isSidebarVisible}
               toggleSidebar={toggleSidebar}
               isAiTutor={true}
@@ -588,9 +598,9 @@ export default function AiTutor() {
         )}
       </AnimatePresence>
 
-      <main className="flex-1 flex flex-col items-center p-6 overflow-auto">
+      <main className="flex-1 flex flex-col items-center p-4 sm:p-6 overflow-auto">
         {/* Header */}
-        <div className="w-full max-w-5xl flex items-center justify-between mb-20">
+        <div className="w-full max-w-5xl flex flex-col sm:flex-row items-center justify-between mb-10 sm:mb-20 space-y-4 sm:space-y-0">
           <button
             onClick={toggleSidebar}
             className="text-gray-200 hover:text-white"
@@ -622,17 +632,17 @@ export default function AiTutor() {
           </button>
 
           {/* Load Progress and Configure AI Tutor Buttons */}
-          <div className="flex space-x-4">
+          <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
             <button
               onClick={openLoadProgressModal}
-              className="relative h-12 w-56 overflow-hidden rounded bg-blue-700 text-white shadow-lg transition-colors duration-200 before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-56"
+              className="relative h-12 w-full sm:w-56 overflow-hidden rounded bg-blue-700 text-white shadow-lg transition-colors duration-200 before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-56"
               aria-label="Load Progress"
             >
               Load Progress
             </button>
             <button
               onClick={openConfigModal}
-              className="relative h-12 w-56 overflow-hidden rounded bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white shadow-lg transition-colors duration-200 before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-56"
+              className="relative h-12 w-full sm:w-56 overflow-hidden rounded bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white shadow-lg transition-colors duration-200 before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-56"
               aria-label="Configure AI Tutor"
             >
               Configure AI Tutor
@@ -662,7 +672,7 @@ export default function AiTutor() {
           <AnimatePresence>
             {!isSessionActive && (
               <motion.div
-                className="relative w-96 h-96 mb-6"
+                className="relative w-64 h-64 sm:w-80 sm:h-80 md:w-96 md:h-96 mb-6"
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.5 }}
@@ -675,7 +685,7 @@ export default function AiTutor() {
 
                 <div className="absolute inset-0 flex items-center justify-center">
                   <textarea
-                    className="w-64 h-24 bg-transparent text-center p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-white font-semibold text-lg"
+                    className="w-48 sm:w-64 h-24 bg-transparent text-center p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-white font-semibold text-lg"
                     value={messageDisplay()}
                     readOnly
                     aria-label="AI Communication Status"
@@ -690,7 +700,7 @@ export default function AiTutor() {
           <div className="w-full max-w-5xl mb-6">
             <textarea
               className="w-full h-48 p-4 rounded resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-200 text-white bg-transparent"
-              value={answerResult || ""}
+              value={answerResult || ''}
               readOnly
               aria-label="AI Feedback"
               style={{ resize: 'none' }}
@@ -729,7 +739,9 @@ export default function AiTutor() {
               {/* Why These Areas Are Highlighted Section */}
               {showHighlights && highlightedReasons.length > 0 && (
                 <div className="mt-4 p-4 bg-gray-900 bg-opacity-50 rounded">
-                  <h4 className="text-lg text-blue-300 font-semibold mb-2">Why These Areas Are Highlighted</h4>
+                  <h4 className="text-lg text-blue-300 font-semibold mb-2">
+                    Why These Areas Are Highlighted
+                  </h4>
                   <ul className="list-disc list-inside text-gray-200">
                     {highlightedReasons.map((hr, i) => (
                       <li key={i}>
@@ -747,7 +759,9 @@ export default function AiTutor() {
             <div className="w-full max-w-5xl mb-6">
               {!answerResult && (
                 <textarea
-                  className={`w-full p-4 border ${isDarkMode ? 'border-gray-600 bg-gray-700 text-white' : 'border-gray-300 bg-white text-gray-800'} rounded resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-200`}
+                  className={`w-full p-4 border ${
+                    isDarkMode ? 'border-gray-600 bg-gray-700 text-white' : 'border-gray-300 bg-white text-gray-800'
+                  } rounded resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-200`}
                   value={inputText}
                   onChange={(e) => setInputText(e.target.value)}
                   placeholder="Enter your answer here..."
@@ -818,7 +832,10 @@ export default function AiTutor() {
                 Click <span className="font-semibold">Configure AI Tutor</span> to start.
               </p>
               <p className="text-gray-400 text-sm">
-                <strong>Important Note:</strong> This AI Tutor helps you understand law topics by providing explanations, analyses, and feedback. It’s not a substitute for professional legal advice, but can guide you through reasoning steps, highlight key points, and reference principles to strengthen your legal acumen.
+                <strong>Important Note:</strong> This AI Tutor helps you understand law topics by
+                providing explanations, analyses, and feedback. It’s not a substitute for
+                professional legal advice, but can guide you through reasoning steps, highlight key
+                points, and reference principles to strengthen your legal acumen.
               </p>
             </div>
           )}
@@ -977,9 +994,7 @@ export default function AiTutor() {
 
                   {/* Highlight Color Slider */}
                   <div className="mb-6">
-                    <label className="block text-gray-300 mb-2">
-                      Highlight Color Hue:
-                    </label>
+                    <label className="block text-gray-300 mb-2">Highlight Color Hue:</label>
                     <div className="flex items-center space-x-4">
                       <input
                         type="range"
@@ -1034,7 +1049,7 @@ export default function AiTutor() {
                     <button
                       type="button"
                       onClick={handleStartTutoringSession}
-                      className="relative h-12 w-56 overflow-hidden rounded bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white shadow-lg transition-colors duration-200 before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-56"
+                      className="relative h-12 w-full sm:w-56 overflow-hidden rounded bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white shadow-lg transition-colors duration-200 before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-56"
                       aria-label="Start Tutoring Session"
                     >
                       Start Tutoring
@@ -1104,7 +1119,7 @@ export default function AiTutor() {
                   <button
                     type="button"
                     onClick={closeFinalFeedbackModal}
-                    className="px-6 py-3 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors duration-200"
+                    className="px-6 py-3 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors duration=200"
                     aria-label="Close Final Feedback Modal"
                   >
                     Close
@@ -1136,7 +1151,7 @@ export default function AiTutor() {
                   <ul className="space-y-4">
                     {savedProgresses.map((progress) => (
                       <li key={progress.id} className="p-4 border border-gray-700 rounded">
-                        <div className="flex justify-between items-start">
+                        <div className="flex flex-col sm:flex-row sm:justify-between items-start sm:items-center">
                           <div>
                             <p className="font-semibold text-blue-300">
                               Exam Type: {progress.tutorConfig.examType}
@@ -1160,7 +1175,7 @@ export default function AiTutor() {
                               Saved on: {new Date(progress.timestamp).toLocaleString()}
                             </p>
                           </div>
-                          <div className="flex space-x-2 mt-2">
+                          <div className="flex space-x-2 mt-2 sm:mt-0">
                             <button
                               onClick={() => handleLoadProgress(progress)}
                               className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors duration-200"

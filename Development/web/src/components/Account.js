@@ -11,6 +11,10 @@ import { db } from '@/firebase';
 
 export default function Account() {
     const { currentUser, userDataObj, refreshUserData } = useAuth();
+
+    // --------------------------
+    // Local subscription/billing state
+    // --------------------------
     const [subscriptionData, setSubscriptionData] = useState({
         plan: userDataObj?.billing?.plan || 'Free',
         status: 'Inactive',
@@ -20,10 +24,23 @@ export default function Account() {
     });
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [isDarkMode, setIsDarkMode] = useState(userDataObj?.darkMode || false);
 
+    // --------------------------
+    // Local settings states
+    // --------------------------
+    const [isDarkMode, setIsDarkMode] = useState(userDataObj?.darkMode || false);
+    const [emailNotifications, setEmailNotifications] = useState(
+        userDataObj?.emailNotifications || true
+    );
+
+    // --------------------------
+    // Grab the subscription plan
+    // --------------------------
     const plan = subscriptionData.plan || 'Free';
 
+    // --------------------------
+    // Fetch subscription data
+    // --------------------------
     useEffect(() => {
         async function fetchBillingData() {
             if (!currentUser?.uid) {
@@ -69,11 +86,17 @@ export default function Account() {
         fetchBillingData();
     }, [currentUser?.uid]);
 
+    // --------------------------
+    // Sync local dark mode state with userDataObj
+    // --------------------------
     useEffect(() => {
-        // Sync local dark mode state with userDataObj
         setIsDarkMode(userDataObj?.darkMode || false);
-    }, [userDataObj?.darkMode]);
+        setEmailNotifications(userDataObj?.emailNotifications || false);
+    }, [userDataObj?.darkMode, userDataObj?.emailNotifications]);
 
+    // --------------------------
+    // Account & Billing values
+    // --------------------------
     const vals = {
         email: currentUser?.email || 'Not available',
         username: currentUser?.displayName || 'Not available',
@@ -83,7 +106,6 @@ export default function Account() {
             : 'Not available',
     };
 
-    // Determine what to display for payment due
     let paymentDueDisplay = 'N/A';
     if (loading) {
         paymentDueDisplay = 'Loading...';
@@ -93,7 +115,6 @@ export default function Account() {
         paymentDueDisplay = new Date(subscriptionData.nextPaymentDue * 1000).toLocaleDateString();
     }
 
-    // Determine what to display for amount due
     let amountDueDisplay = 'N/A';
     if (loading) {
         amountDueDisplay = 'Loading...';
@@ -113,13 +134,12 @@ export default function Account() {
                 {(plan === 'Basic' || plan === 'Free') && (
                     <Link
                         href="/admin/billing"
-                        className={
-                            `group relative h-12 w-56 overflow-hidden rounded bg-transparent transition-all 
+                        className={`group relative h-12 w-56 overflow-hidden rounded bg-transparent transition-all 
                             before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 
                             before:rotate-6 before:bg-transparent before:opacity-20 before:duration-700 
-                            hover:before:-translate-x-56 ` +
-                            (isDarkMode ? 'text-white' : 'text-blue-950')
-                        }
+                            hover:before:-translate-x-56 ${
+                                isDarkMode ? 'text-white' : 'text-blue-950'
+                            }`}
                     >
                         <div className="flex items-center justify-center h-full">
                             Upgrade Account
@@ -130,13 +150,12 @@ export default function Account() {
                 {(plan === 'Pro' || plan === 'Basic' || plan === 'Developer') && (
                     <Link
                         href="/admin/billing/cancel_subscription"
-                        className={
-                            `group relative h-12 w-56 overflow-hidden rounded bg-transparent transition-all 
+                        className={`group relative h-12 w-56 overflow-hidden rounded bg-transparent transition-all 
                             before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 
                             before:rotate-6 before:bg-transparent before:opacity-20 before:duration-700 
-                            hover:before:-translate-x-56 ` +
-                            (isDarkMode ? 'text-white' : 'text-blue-950')
-                        }
+                            hover:before:-translate-x-56 ${
+                                isDarkMode ? 'text-white' : 'text-blue-950'
+                            }`}
                     >
                         <div className="flex items-center justify-center h-full">
                             Cancel Subscription
@@ -148,18 +167,22 @@ export default function Account() {
         ),
     };
 
+    // --------------------------
+    // Styling for current plan
+    // --------------------------
     const currentPlanClasses = (() => {
         if (plan === 'Pro' || plan === 'Developer') {
             return 'bg-blue-100 text-blue-700';
         } else if (plan === 'Basic') {
             return 'bg-green-100 text-green-700';
         } else {
-            return isDarkMode
-                ? 'bg-gray-800 text-white'
-                : 'bg-gray-100 text-gray-700';
+            return isDarkMode ? 'bg-gray-800 text-white' : 'bg-gray-100 text-gray-700';
         }
     })();
 
+    // --------------------------
+    // Handlers for toggles
+    // --------------------------
     const handleDarkModeToggle = async (e) => {
         const newDarkMode = e.target.checked;
         setIsDarkMode(newDarkMode);
@@ -171,20 +194,42 @@ export default function Account() {
 
         try {
             const userDocRef = doc(db, 'users', currentUser.uid);
-
             await updateDoc(userDocRef, {
                 darkMode: newDarkMode,
             });
-
             await refreshUserData();
         } catch (updateError) {
             console.error('Error updating dark mode preference:', updateError);
             alert('Failed to update dark mode preference.');
-            // Revert the toggle in case of error
             setIsDarkMode(!newDarkMode);
         }
     };
 
+    const handleEmailNotificationsToggle = async (e) => {
+        const newValue = e.target.checked;
+        setEmailNotifications(newValue);
+
+        if (!currentUser?.uid) {
+            alert('You need to be logged in to update your settings.');
+            return;
+        }
+
+        try {
+            const userDocRef = doc(db, 'users', currentUser.uid);
+            await updateDoc(userDocRef, {
+                emailNotifications: newValue,
+            });
+            await refreshUserData();
+        } catch (updateError) {
+            console.error('Error updating email notifications:', updateError);
+            alert('Failed to update email notifications.');
+            setEmailNotifications(!newValue);
+        }
+    };
+
+    // --------------------------
+    // Render
+    // --------------------------
     return (
         <div className={`flex flex-col gap-8 flex-1 ${isDarkMode ? 'text-white' : 'text-black'}`}>
             <ActionCard title="Account Details">
@@ -199,6 +244,7 @@ export default function Account() {
                     ))}
                 </div>
             </ActionCard>
+
             <ActionCard title="Billing & Plan">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     {Object.keys(billingObj).map((entry, entryIndex) => (
@@ -209,7 +255,9 @@ export default function Account() {
                             {entry === 'actions' ? (
                                 billingObj[entry]
                             ) : entry === 'current_plan' ? (
-                                <p className={`px-2 py-1 rounded-full capitalize text-xs ${currentPlanClasses}`}>
+                                <p
+                                    className={`px-2 py-1 rounded-full capitalize text-xs ${currentPlanClasses}`}
+                                >
                                     {billingObj[entry]}
                                 </p>
                             ) : (
@@ -219,23 +267,51 @@ export default function Account() {
                     ))}
                 </div>
             </ActionCard>
-            {/* Settings ActionCard with Dark Mode Toggle */}
+
             <ActionCard title="Settings">
-                <div className="flex items-center">
-                    <input
-                        type="checkbox"
-                        id="darkModeToggle"
-                        name="darkModeToggle"
-                        checked={isDarkMode}
-                        onChange={handleDarkModeToggle}
-                        className="h-5 w-5 text-blue-500 focus:ring-blue-500 border-gray-300 rounded"
-                        aria-label="Enable Dark Mode"
-                    />
-                    <label htmlFor="darkModeToggle" className="ml-3">
+                {/* Dark Mode Toggle */}
+                <div className="flex items-center gap-4 mb-4">
+                    <div className="relative inline-block w-14 h-8 select-none transition duration-200 ease-in">
+                        <input
+                            type="checkbox"
+                            name="darkModeToggle"
+                            id="darkModeToggle"
+                            checked={isDarkMode}
+                            onChange={handleDarkModeToggle}
+                            className="toggle-checkbox absolute h-0 w-0 opacity-0"
+                        />
+                        <label
+                            htmlFor="darkModeToggle"
+                            className="toggle-label block overflow-hidden h-8 rounded-full bg-gray-300 cursor-pointer"
+                        ></label>
+                    </div>
+                    <label htmlFor="darkModeToggle" className="cursor-pointer">
                         Enable Dark Mode
                     </label>
                 </div>
+
+                {/* Email Notifications Toggle */}
+                <div className="flex items-center gap-4 mb-4">
+                    <div className="relative inline-block w-14 h-8 select-none transition duration-200 ease-in">
+                        <input
+                            type="checkbox"
+                            name="emailNotificationsToggle"
+                            id="emailNotificationsToggle"
+                            checked={emailNotifications}
+                            onChange={handleEmailNotificationsToggle}
+                            className="toggle-checkbox absolute h-0 w-0 opacity-0"
+                        />
+                        <label
+                            htmlFor="emailNotificationsToggle"
+                            className="toggle-label block overflow-hidden h-8 rounded-full bg-gray-300 cursor-pointer"
+                        ></label>
+                    </div>
+                    <label htmlFor="emailNotificationsToggle" className="cursor-pointer">
+                        Enable Email Notifications
+                    </label>
+                </div>
             </ActionCard>
+
             <LogoFiller />
         </div>
     );
