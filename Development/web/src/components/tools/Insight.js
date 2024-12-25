@@ -484,7 +484,7 @@ export default function ExamInsight() {
           <div className="inline-flex flex-row flex-nowrap items-center gap-2 sm:gap-4">
             <button
               onClick={openLoadProgressModal}
-              className="relative h-10 sm:h-12 w-28 sm:w-36 overflow-hidden rounded bg-blue-700 text-white shadow-lg transition-colors duration-200 before:absolute before:right-0 before:top-0 before:h-full before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-56 text-sm sm:text-base"
+              className="relative h-10 sm:h-12 w-28 sm:w-36 overflow-hidden rounded bg-blue-950 text-white shadow-lg transition-colors duration-200 before:absolute before:right-0 before:top-0 before:h-full before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-56 text-sm sm:text-base"
               aria-label="Load Progress"
             >
               Load Progress
@@ -495,7 +495,7 @@ export default function ExamInsight() {
         {/* Main content box */}
         <div
           className={`w-full max-w-5xl p-6 ${
-            isDarkMode ? 'bg-gray-800' : 'bg-white'
+            isDarkMode ? 'bg-slate-700' : 'bg-white'
           } rounded-lg shadow-md`}
         >
           <h2

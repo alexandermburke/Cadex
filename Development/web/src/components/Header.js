@@ -1,5 +1,3 @@
-// components/Header.js
-
 'use client';
 import { Poppins } from 'next/font/google';
 import Link from 'next/link';
@@ -46,7 +44,7 @@ export default function Header() {
     let navActions = (
         <nav className='hidden items-stretch md:flex'>
             <Link 
-                href={'/ailawtools/examprep'} 
+                href={'/ailawtools/splash'} 
                 className={`border border-solid duration-200 border-transparent px-4 grid place-items-center rounded 
                 ${isDarkMode ? 'hover:text-slate-500' : 'hover:text-slate-200'} text-${isDarkMode ? 'white' : 'black'}`}
             >
@@ -76,14 +74,14 @@ export default function Header() {
         <nav className='flex flex-col gap-2'>
             <Link 
                 className={`p-2 rounded-lg border-solid border duration-200 text-lg border-blue-950 border-x-4 border-y-4 
-                ${isDarkMode ? 'hover:text-slate-500 hover:bg-blue-950 text-white' : 'hover:text-white hover:bg-blue-950 text-black'}`}
-                href={'/ailawtools/examprep'}
+                ${isDarkMode ? 'hover:text-slate-500 hover:bg-blue-950 text-white' : 'hover:text-slate-200 hover:bg-blue-950 text-black'}`}
+                href={'/ailawtools/splash'}
             >
                 <p>Dashboard</p>
             </Link>
             <Link 
                 className={`p-2 rounded-lg border-solid border duration-200 text-lg border-blue-950 border-x-4 border-y-4 
-                ${isDarkMode ? 'hover:text-slate-500 hover:bg-blue-950 text-white' : 'hover:text-white hover:bg-blue-950 text-black'}`}
+                ${isDarkMode ? 'hover:text-slate-500 hover:bg-blue-950 text-white' : 'hover:text-slate-200 hover:bg-blue-950 text-black'}`}
                 href={'/pricing'}
             >
                 <p>Pricing</p>
@@ -111,7 +109,7 @@ export default function Header() {
                         <p>Pro</p>
                     </Link>
                     <Link 
-                        href={'/ailawtools/examprep'} 
+                        href={'/ailawtools/splash'} 
                         className={`border border-solid duration-200 border-transparent px-4 grid place-items-center rounded
                         ${isDarkMode ? 'hover:text-slate-500' : 'hover:text-slate-200'} text-${isDarkMode ? 'white' : 'black'}`}
                     >
@@ -141,7 +139,7 @@ export default function Header() {
         menuActions = (
             <nav className='flex flex-col gap-2'>
                 <Link 
-                    href={'/ailawtools/examprep'} 
+                    href={'/ailawtools/splash'} 
                     className={`p-2 rounded border-solid border duration-200 text-lg border-blue-950 border-x-4 border-y-4
                     ${isDarkMode ? 'hover:text-slate-500 hover:bg-blue-950 text-white' : 'hover:text-slate-500 hover:bg-blue-950 text-black'}`}
                 >
@@ -177,7 +175,7 @@ export default function Header() {
     }
 
     return (
-        <header className={`z-[150] fixed top-0 left-0 right-0 bg-transparent ${isDarkMode ? 'text-white' : 'text-black'}`}>
+        <header className={`z-[155] fixed top-0 left-0 right-0 bg-transparent ${isDarkMode ? 'text-white' : 'text-black'}`}>
             <div className='flex items-center justify-between gap-4 max-w-[1400px] mx-auto w-full overflow-hidden p-2 drop-shadow-sm'>
                 <Link href={'/'}>
                     <div className='flex items-center gap-2'>
@@ -208,8 +206,12 @@ export default function Header() {
             </div>
 
             {showMenu && (
-                <div className={`absolute flex flex-col left-4 right-4 md:hidden top-full pt-4 rounded drop-down-animation ${isDarkMode ? 'bg-blue-950 text-white' : 'bg-white'}`}>
-                    <div className={`flex flex-col rounded-2xl p-4 ${isDarkMode ? 'text-white' : 'text-black'}`}>
+                <div 
+                    className={`absolute md:hidden top-full left-4 right-4 pt-4 z-50 drop-down-animation 
+                    flex flex-col gap-2 rounded-2xl shadow-lg transition-all duration-300 
+                    ${isDarkMode ? 'bg-blue-950 text-white border border-slate-700' : 'bg-white text-black border border-gray-200'}`}
+                >
+                    <div className={`flex flex-col p-4 ${isDarkMode ? 'text-white' : 'text-black'}`}>
                         {menuActions}
                     </div>
                 </div>

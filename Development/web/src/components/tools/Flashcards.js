@@ -150,8 +150,8 @@ export default function AIExamFlashCard() {
     selectedQuestionTypes: [],
     timerMinutes: 2,
     resetTimerEveryQuestion: true,
-    instantFeedback: false,     // NEW: Toggle to reveal answer immediately after user selects
-    includeExplanations: false, // NEW: Toggle to include extended explanations (if you wish to implement it)
+    instantFeedback: false,
+    includeExplanations: false,
   });
 
   const [isConfigModalOpen, setIsConfigModalOpen] = useState(false);
@@ -217,7 +217,7 @@ export default function AIExamFlashCard() {
     return (
       <div
         className={`flex items-center justify-center h-screen ${
-          isDarkMode ? 'bg-slate-900 text-white' : 'bg-gray-100 text-gray-800'
+          isDarkMode ? 'bg-slate-800 text-white' : 'bg-gray-100 text-gray-800'
         }`}
       >
         <div className="p-6 rounded shadow-md text-center">
@@ -426,12 +426,7 @@ export default function AIExamFlashCard() {
   const closeFinalFeedbackModal = () => setIsFinalFeedbackModalOpen(false);
 
   return (
-    <div className={`flex h-screen ${isDarkMode ? 'bg-slate-900' : 'bg-white'} rounded shadow-md`}>
-      {/* Loading Bar */}
-      {isLoading && (
-        <div className="fixed top-0 left-0 w-full h-1 bg-blue-500 z-50 animate-pulse" />
-      )}
-
+    <div className={`flex h-screen ${isDarkMode ? 'bg-slate-800' : 'bg-white'} rounded shadow-md`}>
       {/* Sidebar */}
       <AnimatePresence>
         {isSidebarVisible && (
@@ -496,31 +491,20 @@ export default function AIExamFlashCard() {
           {/* Buttons: Save, Load, Configure */}
           <div className="inline-flex flex-row flex-nowrap items-center gap-2 sm:gap-4">
             <button
-              onClick={handleSaveProgress}
-              className={`flex items-center h-10 sm:h-12 px-3 sm:px-4 rounded hover:bg-opacity-80 transition-colors duration-200 ${
-                isDarkMode
-                  ? 'bg-blue-700 text-white hover:bg-blue-600'
-                  : 'bg-blue-950 text-white hover:bg-blue-800'
-              } text-sm sm:text-base`}
-            >
-              <FaSave className="mr-2" />
-              Save
-            </button>
-
-            <button
               onClick={openLoadProgressModal}
-              className={`group relative h-10 sm:h-12 w-24 sm:w-36 overflow-hidden rounded ${
+              className={`group relative h-10 sm:h-12 w-28 sm:w-40 overflow-hidden rounded ${
                 isDarkMode ? 'bg-blue-700' : 'bg-blue-950'
-              } text-white shadow-2xl transition-all hover:text-slate-500 text-sm sm:text-base`}
+              } text-white duration-200 before:absolute before:right-0 before:top-0 before:h-full before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-56 text-sm sm:text-base shadow-md`}
+              aria-label="Load Progress"
             >
-              Load
+              Load Progress
             </button>
-
             <button
               onClick={openConfigModal}
-              className={`group relative h-10 sm:h-12 w-24 sm:w-36 overflow-hidden rounded ${
-                isDarkMode ? 'bg-blue-800' : 'bg-gradient-to-r from-blue-950 to-slate-700'
-              } text-white shadow-2xl transition-all hover:text-slate-500 text-sm sm:text-base`}
+              className={`group relative h-10 sm:h-12 w-28 sm:w-40 overflow-hidden rounded ${
+                isDarkMode ? 'bg-blue-700' : 'bg-blue-950'
+              } text-white duration-200 before:absolute before:right-0 before:top-0 before:h-full before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-56 text-sm sm:text-base shadow-md`}
+              aria-label="Configure Exam Prep"
             >
               Configure
             </button>
@@ -531,16 +515,31 @@ export default function AIExamFlashCard() {
         <div className="flex-1 flex flex-col items-center justify-center w-full max-w-3xl mx-auto">
           {/* No flashcards yet */}
           {flashcards.length === 0 && !isLoading && (
-            <div className="text-center p-6 rounded-lg border border-dashed">
-              <p className="mb-2 text-lg">No flashcards generated yet.</p>
-              <p className="text-sm text-gray-400">
+            <div
+              className={`w-full max-w-3xl p-6 ${
+                isDarkMode ? 'bg-slate-700' : 'bg-white'
+              } rounded-lg shadow-md text-center`}
+            >
+              <h2
+                className={`text-2xl font-semibold mb-4 ${
+                  isDarkMode ? 'text-white' : 'text-blue-900'
+                }`}
+              >
+                No flashcards generated yet.
+              </h2>
+              <p
+                className={`${
+                  isDarkMode ? 'text-gray-300' : 'text-gray-500'
+                }`}
+              >
                 Click <strong>Configure</strong> to set up your exam and generate flashcards.
               </p>
             </div>
           )}
 
+          {/* Loading bar in place of text */}
           {isLoading && (
-            <p className="text-center mt-4 text-blue-500">Generating flashcards... Please wait.</p>
+            <div className="w-full h-1 bg-blue-500 z-50 animate-pulse my-4" />
           )}
 
           {/* Display current flashcard */}
@@ -553,9 +552,7 @@ export default function AIExamFlashCard() {
               initial={{ opacity: 0, y: 50 }}
               animate={{ opacity: 1, y: 0 }}
             >
-              <div className="absolute top-2 right-2 text-sm text-gray-500">
-                {currentFlashcardIndex + 1} / {flashcards.length}
-              </div>
+              <div className="absolute top-2 right-2 text-sm text-gray-500"></div>
               <h2 className="text-xl font-semibold mb-2">Question:</h2>
               <p className="mb-4">{currentFlashcard.question}</p>
 
@@ -644,12 +641,8 @@ export default function AIExamFlashCard() {
                             Exam Type: {prog.examConfig.examType}
                           </p>
                           <p className="text-sm">Difficulty: {prog.examConfig.difficulty}</p>
-                          <p className="text-sm">
-                            Questions: {prog.examConfig.questionLimit}
-                          </p>
-                          <p className="text-sm">
-                            Timer: {prog.examConfig.timerMinutes || 0} min
-                          </p>
+                          <p className="text-sm">Questions: {prog.examConfig.questionLimit}</p>
+                          <p className="text-sm">Timer: {prog.examConfig.timerMinutes || 0} min</p>
                           <p className="text-sm">
                             Reset Timer:{' '}
                             {prog.examConfig.resetTimerEveryQuestion ? 'Yes' : 'No'}
@@ -765,7 +758,7 @@ export default function AIExamFlashCard() {
       <AnimatePresence>
         {isConfigModalOpen && (
           <motion.div
-            className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50"
+            className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 overflow-y-scroll"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}

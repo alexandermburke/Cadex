@@ -1,4 +1,3 @@
-// Sidebar.js
 'use client';
 
 import React from 'react';
@@ -17,13 +16,19 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, i
   const isDarkMode = userDataObj?.darkMode || false;
 
   const hasAccess = plan === 'free' || plan === 'developer'; 
-  const hasSimulationAccess = plan === 'free' || plan === 'basic';
+  const hasSimulationAccess = plan === 'free' || plan === 'basic'; //change 'free' to 'Pro' when ready to launch
 
-  const renderLockedLink = (label, IconComponent) => (
-    <div className="flex items-center gap-4 p-2 text-gray-400 cursor-not-allowed group">
-      <IconComponent className="text-gray-400" size={20} />
-      <span className="relative">{label}</span>
-    </div>
+  // For locked links, keep original icon on the left + smaller lock on the right
+  const renderLockedNavLink = (href, iconClass, label) => (
+    <li>
+      <div className="flex items-center justify-between gap-2 p-3 text-gray-400 cursor-not-allowed">
+        <div className="flex items-center gap-3">
+          <i className={iconClass}></i>
+          <span className="relative">{label}</span>
+        </div>
+        <FaLock className="text-gray-400" size={14} />
+      </div>
+    </li>
   );
 
   const sidebarVariants = {
@@ -75,11 +80,6 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, i
     </li>
   );
 
-
-  const renderLockedNavLink = (label) => (
-    <li>{renderLockedLink(label, FaLock)}</li>
-  );
-
   // Determine background gradient based on dark mode
   const sidebarBackground = clsx({
     'bg-gradient-to-b from-blue-900 to-slate-900': isDarkMode,
@@ -88,8 +88,8 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, i
 
   return (
     <motion.aside
-    className={`z-[9999] fixed top-0 left-0 w-64 h-full ${sidebarBackground} text-white flex flex-col md:relative md:translate-x-0 overflow-hidden transition-colors duration-500 shadow-md rounded`}
-    initial="hidden"
+      className={`z-[9999] fixed top-0 left-0 w-64 h-full ${sidebarBackground} text-white flex flex-col md:relative md:translate-x-0 overflow-hidden transition-colors duration-500 shadow-md rounded`}
+      initial="hidden"
       animate={isSidebarVisible ? 'visible' : 'hidden'}
       variants={sidebarVariants}
       exit="hidden"
@@ -101,20 +101,21 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, i
       </div>
 
       <nav className="flex-1 overflow-y-auto px-6">
+        {/* Replaced "Study & Research" with new items */}
         <section className="mb-6">
           <h2 className="text-lg font-semibold mb-4">Study & Research</h2>
           <ul className="space-y-2">
             {hasAccess ? (
               <>
-                {renderNavLink('/lawtools/research', 'fa-solid fa-file-lines', 'Case Summaries')}
-                {renderNavLink('/lawtools/casemanagement', 'fa-solid fa-list', 'Outline Builder')}
-                {renderNavLink('/lawtools/documentdrafting', 'fa-solid fa-scroll', 'Statute Explorer')}
+                {renderNavLink('/lawtools/dictionary', 'fa-solid fa-book', 'Legal Dictionary')}
+                {renderNavLink('/lawtools/briefeditor', 'fa-solid fa-file-pen', 'Brief Editor')}
+                {renderNavLink('/lawtools/lecturesummaries', 'fa-solid fa-chalkboard-user', 'Lecture Summaries')}
               </>
             ) : (
               <>
-                {renderLockedNavLink('Case Summaries')}
-                {renderLockedNavLink('Outline Builder')}
-                {renderLockedNavLink('Statute Explorer')}
+                {renderLockedNavLink('/lawtools/dictionary', 'fa-solid fa-book', 'Legal Dictionary')}
+                {renderLockedNavLink('/lawtools/briefeditor', 'fa-solid fa-file-pen', 'Brief Editor')}
+                {renderLockedNavLink('/lawtools/lecturesummaries', 'fa-solid fa-chalkboard-user', 'Lecture Summaries')}
               </>
             )}
           </ul>
@@ -131,9 +132,9 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, i
               </>
             ) : (
               <>
-                {renderLockedNavLink('Generative Flashcards')}
-                {renderLockedNavLink('LExAPI Tutor')}
-                {renderLockedNavLink('Exam Insights')}
+                {renderLockedNavLink('/ailawtools/flashcards', 'fa-solid fa-lightbulb', 'Generative Flashcards')}
+                {renderLockedNavLink('/ailawtools/lexapi', 'fa-solid fa-brain', 'LExAPI Tutor')}
+                {renderLockedNavLink('/ailawtools/insights', 'fa-solid fa-chart-line', 'Exam Insights')}
               </>
             )}
           </ul>
@@ -148,7 +149,7 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, i
               </>
             ) : (
               <>
-                {renderLockedNavLink('LSAT/BAR Prep')}
+                {renderLockedNavLink('/ailawtools/examprep', 'fa-solid fa-flask', 'LSAT/BAR Prep')}
               </>
             )}
             <li>

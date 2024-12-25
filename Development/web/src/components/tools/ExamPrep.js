@@ -455,7 +455,7 @@ export default function ExamPrep() {
   return (
     <div
       className={`flex h-screen ${
-        isDarkMode ? 'bg-slate-900' : 'bg-white'
+        isDarkMode ? 'bg-slate-800' : 'bg-white'
       } rounded shadow-md`}
     >
       <AnimatePresence>
@@ -532,8 +532,8 @@ export default function ExamPrep() {
               isProUser
                 ? `${
                     isDarkMode
-                      ? 'bg-blue-600 hover:bg-blue-500'
-                      : 'bg-blue-900 hover:bg-blue-800'
+                      ? 'goldBackground goldShadow text-white hover:opacity-80'
+                      : 'goldBackground goldShadow text-white hover:opacity-80'
                   } text-white`
                 : 'bg-gray-300 text-gray-600 cursor-not-allowed'
             }`}
@@ -550,7 +550,7 @@ export default function ExamPrep() {
             onClick={openLoadProgressModal}
             className={`group relative h-10 sm:h-12 w-28 sm:w-40 overflow-hidden rounded ${
               isDarkMode ? 'bg-blue-700' : 'bg-blue-950'
-            } text-white duration-200 before:absolute before:right-0 before:top-0 before:h-full before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-56 text-sm sm:text-base shadow-sm`}
+            } text-white duration-200 before:absolute before:right-0 before:top-0 before:h-full before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-56 text-sm sm:text-base shadow-md`}
             aria-label="Load Progress"
           >
             Load Progress
@@ -559,10 +559,10 @@ export default function ExamPrep() {
             onClick={openConfigModal}
             className={`group relative h-10 sm:h-12 w-28 sm:w-40 overflow-hidden rounded ${
               isDarkMode ? 'bg-blue-700' : 'bg-blue-950'
-            } text-white duration-200 before:absolute before:right-0 before:top-0 before:h-full before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-56 text-sm sm:text-base shadow-sm`}
+            } text-white duration-200 before:absolute before:right-0 before:top-0 before:h-full before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-56 text-sm sm:text-base shadow-md`}
             aria-label="Configure Exam Prep"
           >
-            Configure Exam Prep
+            Configure
           </button>
         </div>
 
@@ -761,7 +761,7 @@ export default function ExamPrep() {
         {!questionStem && !questionText && (
           <div
             className={`w-full max-w-5xl p-6 rounded-lg shadow-md text-center ${
-              isDarkMode ? 'bg-gray-700 text-white' : 'bg-white text-black'
+              isDarkMode ? 'bg-slate-700 text-white' : 'bg-white text-black'
             }`}
           >
             <p className={`mb-4 ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
