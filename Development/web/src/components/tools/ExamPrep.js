@@ -1,4 +1,3 @@
-// ExamPrep.js
 'use client';
 
 import React, { useState, useEffect } from 'react';
@@ -24,6 +23,26 @@ export default function ExamPrep() {
   const { currentUser, userDataObj } = useAuth();
   const router = useRouter();
 
+  // Identify if the user is the demo user
+  const isDemoUser = currentUser?.uid === 'demo-user-uid';
+
+  // We will manage dark mode locally. If it's a demo user, read/write from localStorage.
+  const [isDarkMode, setIsDarkMode] = useState(false);
+
+  // -------------------------
+  // Sync isDarkMode on mount or changes
+  // -------------------------
+  useEffect(() => {
+    if (isDemoUser) {
+      // Demo user => read from localStorage
+      const storedDarkMode = localStorage.getItem('demoDarkMode');
+      setIsDarkMode(storedDarkMode === 'true');
+    } else {
+      // Normal user => read from Firestore userDataObj
+      setIsDarkMode(userDataObj?.darkMode || false);
+    }
+  }, [isDemoUser, userDataObj?.darkMode]);
+
   // Only one declaration of inputText:
   const [inputText, setInputText] = useState('');
 
@@ -38,8 +57,6 @@ export default function ExamPrep() {
   const [isLoadProgressModalOpen, setIsLoadProgressModalOpen] = useState(false);
   const [isFinalFeedbackModalOpen, setIsFinalFeedbackModalOpen] = useState(false);
   const [savedProgresses, setSavedProgresses] = useState([]);
-
-  const isDarkMode = userDataObj?.darkMode || false;
 
   const [currentQuestionCount, setCurrentQuestionCount] = useState(0);
   const [answeredQuestions, setAnsweredQuestions] = useState([]);
@@ -427,7 +444,7 @@ export default function ExamPrep() {
           <p className={`mb-4 ${isDarkMode ? 'text-white' : 'text-gray-700'}`}>
             Please{' '}
             <a
-              href="/login"
+              href="/admin/account"
               className={`underline ${isDarkMode ? 'text-blue-400' : 'text-blue-900'}`}
             >
               log in
@@ -578,10 +595,10 @@ export default function ExamPrep() {
             </span>
             <span
               className={`px-3 py-1 rounded-full text-sm font-semibold uppercase ${
-                isProUser ? 'bg-blue-100 text-blue-700' : 'bg-emerald-100 text-emerald-700'
+                isDemoUser ? 'bg-blue-100 text-blue-700' : 'bg-emerald-100 text-emerald-700'
               }`}
             >
-              {isProUser ? 'Pro User' : 'Base User'}
+              {isDemoUser ? 'Demo User' : 'Demo User'}
             </span>
           </div>
         )}
@@ -1003,22 +1020,22 @@ export default function ExamPrep() {
                 </div>
 
                 <div className="flex justify-end space-x-4">
-                <button
-                                        type="button"
-                                        onClick={handleStartExamPrep}
-                                        className="relative h-12 w-full sm:w-56 overflow-hidden rounded bg-blue-950 text-white shadow-lg transition-colors duration-200 before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-56"
-                                        aria-label="Start Tutoring Session"
-                                      >
-                                        Start Tutoring
-                                        <motion.span
-                                          className="absolute right-4 top-3"
-                                          initial={{ x: -10, opacity: 0 }}
-                                          animate={{ x: 0, opacity: 1 }}
-                                          transition={{ delay: 0.3, duration: 0.3 }}
-                                        >
-                                          <i className="fa-solid fa-arrow-right"></i>
-                                        </motion.span>
-                                      </button>
+                  <button
+                    type="button"
+                    onClick={handleStartExamPrep}
+                    className="relative h-12 w-full sm:w-56 overflow-hidden rounded bg-blue-950 text-white shadow-lg transition-colors duration-200 before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-56"
+                    aria-label="Start Session"
+                  >
+                    Start Exam
+                    <motion.span
+                      className="absolute right-4 top-3"
+                      initial={{ x: -10, opacity: 0 }}
+                      animate={{ x: 0, opacity: 1 }}
+                      transition={{ delay: 0.3, duration: 0.3 }}
+                    >
+                      <i className="fa-solid fa-arrow-right"></i>
+                    </motion.span>
+                  </button>
                   <button
                     type="button"
                     onClick={closeConfigModal}

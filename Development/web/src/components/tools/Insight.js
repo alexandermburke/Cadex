@@ -46,8 +46,6 @@ ChartJS.register(
 );
 
 export default function ExamInsight() {
-  const { currentUser, userDataObj } = useAuth();
-  const isDarkMode = userDataObj?.darkMode || false;
 
   const [isSidebarVisible, setIsSidebarVisible] = useState(true);
   const [isLoadProgressModalOpen, setIsLoadProgressModalOpen] = useState(false);
@@ -65,7 +63,25 @@ export default function ExamInsight() {
   // Track recommended schools for each progress
   const [recommendedUniversities, setRecommendedUniversities] = useState({});
   const [isRecommending, setIsRecommending] = useState(false);
+  const { currentUser, userDataObj } = useAuth();
+  const isDemoUser = currentUser?.uid === 'demo-user-uid';
+  const [isDarkMode, setIsDarkMode] = useState(false);
 
+  useEffect(() => {
+    if (isDemoUser) {
+      const storedDarkMode = localStorage.getItem('demoDarkMode');
+      setIsDarkMode(storedDarkMode === 'true');
+    } else {
+      setIsDarkMode(userDataObj?.darkMode || false);
+    }
+  }, [isDemoUser, userDataObj?.darkMode]);
+  useEffect(() => {
+    if (isDarkMode) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }, [isDarkMode]);
   // We'll store the last opened progress ID in local storage
   useEffect(() => {
     const lastProgressId = localStorage.getItem('lastProgressId');

@@ -123,8 +123,6 @@ const readingComprehensionQuestionTypes = [
 
 export default function AIExamFlashCard() {
   const router = useRouter();
-  const { currentUser, userDataObj } = useAuth();
-  const isDarkMode = userDataObj?.darkMode || false;
 
   // Sidebar
   const [isSidebarVisible, setIsSidebarVisible] = useState(true);
@@ -159,7 +157,25 @@ export default function AIExamFlashCard() {
   const [isFinalFeedbackModalOpen, setIsFinalFeedbackModalOpen] = useState(false);
   const [savedProgresses, setSavedProgresses] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const { currentUser, userDataObj } = useAuth();
+  const isDemoUser = currentUser?.uid === 'demo-user-uid';
+  const [isDarkMode, setIsDarkMode] = useState(false);
 
+  useEffect(() => {
+    if (isDemoUser) {
+      const storedDarkMode = localStorage.getItem('demoDarkMode');
+      setIsDarkMode(storedDarkMode === 'true');
+    } else {
+      setIsDarkMode(userDataObj?.darkMode || false);
+    }
+  }, [isDemoUser, userDataObj?.darkMode]);
+  useEffect(() => {
+    if (isDarkMode) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }, [isDarkMode]);
   // Difficulty + Law type options
   const [difficultyOptions, setDifficultyOptions] = useState(difficultyMapping['LSAT']);
   const [lawTypeOptions, setLawTypeOptions] = useState(lawTypeMapping['LSAT']);

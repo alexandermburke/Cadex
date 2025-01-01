@@ -1,6 +1,7 @@
 // components/Account.js
 
 'use client';
+
 import Link from 'next/link';
 import React, { useState, useEffect } from 'react';
 import ActionCard from './ActionCard';
@@ -11,6 +12,11 @@ import { db } from '@/firebase';
 
 export default function Account() {
     const { currentUser, userDataObj, refreshUserData } = useAuth();
+
+    // --------------------------
+    // Check for demo user
+    // --------------------------
+    const isDemoUser = currentUser?.uid === 'demo-user-uid';
 
     // --------------------------
     // Local subscription/billing state
@@ -28,10 +34,8 @@ export default function Account() {
     // --------------------------
     // Local settings states
     // --------------------------
-    const [isDarkMode, setIsDarkMode] = useState(userDataObj?.darkMode || false);
-    const [emailNotifications, setEmailNotifications] = useState(
-        userDataObj?.emailNotifications || true
-    );
+    const [isDarkMode, setIsDarkMode] = useState(false);
+    const [emailNotifications, setEmailNotifications] = useState(true);
 
     // --------------------------
     // Grab the subscription plan
@@ -43,12 +47,28 @@ export default function Account() {
     // --------------------------
     useEffect(() => {
         async function fetchBillingData() {
+            // If no user is logged in, skip
             if (!currentUser?.uid) {
                 console.warn('No current user logged in, skipping billing fetch.');
                 setLoading(false);
                 return;
             }
 
+            // If it's a demo user, skip hitting Firestore or the billing API
+            if (isDemoUser) {
+                console.log('Demo user, skipping /api/billing request');
+                setSubscriptionData({
+                    plan: 'Demo',
+                    status: 'Active',
+                    nextPaymentDue: null,
+                    amountDue: null,
+                    currency: null,
+                });
+                setLoading(false);
+                return;
+            }
+
+            // Otherwise, fetch real billing data from your /api/billing endpoint
             try {
                 console.log('Fetching subscription data for userId:', currentUser.uid);
                 const response = await fetch('/api/billing', {
@@ -84,15 +104,24 @@ export default function Account() {
         }
 
         fetchBillingData();
-    }, [currentUser?.uid]);
+    }, [currentUser?.uid, isDemoUser]);
 
     // --------------------------
-    // Sync local dark mode state with userDataObj
+    // On mount, sync local toggles from either userDataObj or localStorage
     // --------------------------
     useEffect(() => {
-        setIsDarkMode(userDataObj?.darkMode || false);
-        setEmailNotifications(userDataObj?.emailNotifications || false);
-    }, [userDataObj?.darkMode, userDataObj?.emailNotifications]);
+        // If it's a demo user, read from localStorage
+        if (isDemoUser) {
+            const storedDarkMode = localStorage.getItem('demoDarkMode');
+            const storedEmailNotifications = localStorage.getItem('demoEmailNotifications');
+            setIsDarkMode(storedDarkMode === 'true'); // localStorage returns string
+            setEmailNotifications(storedEmailNotifications === 'true');
+        } else {
+            // If normal user, rely on Firestore userDataObj
+            setIsDarkMode(userDataObj?.darkMode || false);
+            setEmailNotifications(userDataObj?.emailNotifications || false);
+        }
+    }, [isDemoUser, userDataObj?.darkMode, userDataObj?.emailNotifications]);
 
     // --------------------------
     // Account & Billing values
@@ -112,7 +141,9 @@ export default function Account() {
     } else if (error) {
         paymentDueDisplay = `Error: ${error}`;
     } else if (subscriptionData.nextPaymentDue) {
-        paymentDueDisplay = new Date(subscriptionData.nextPaymentDue * 1000).toLocaleDateString();
+        paymentDueDisplay = new Date(
+            subscriptionData.nextPaymentDue * 1000
+        ).toLocaleDateString();
     }
 
     let amountDueDisplay = 'N/A';
@@ -129,42 +160,7 @@ export default function Account() {
         status: subscriptionData.status || 'Inactive',
         payment_due: paymentDueDisplay,
         amount_due: amountDueDisplay,
-        actions: (
-            <div className="flex flex-col gap-2">
-                {(plan === 'Basic' || plan === 'Free') && (
-                    <Link
-                        href="/admin/billing"
-                        className={`group relative h-12 w-56 overflow-hidden rounded bg-transparent transition-all 
-                            before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 
-                            before:rotate-6 before:bg-transparent before:opacity-20 before:duration-700 
-                            hover:before:-translate-x-56 ${
-                                isDarkMode ? 'text-white' : 'text-blue-950'
-                            }`}
-                    >
-                        <div className="flex items-center justify-center h-full">
-                            Upgrade Account
-                            <i className="ml-8 fa-solid fa-arrow-right opacity-0 group-hover:opacity-100 transition-opacity duration-200"></i>
-                        </div>
-                    </Link>
-                )}
-                {(plan === 'Pro' || plan === 'Basic' || plan === 'Developer') && (
-                    <Link
-                        href="/admin/billing/cancel_subscription"
-                        className={`group relative h-12 w-56 overflow-hidden rounded bg-transparent transition-all 
-                            before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 
-                            before:rotate-6 before:bg-transparent before:opacity-20 before:duration-700 
-                            hover:before:-translate-x-56 ${
-                                isDarkMode ? 'text-white' : 'text-blue-950'
-                            }`}
-                    >
-                        <div className="flex items-center justify-center h-full">
-                            Cancel Subscription
-                            <i className="ml-8 fa-solid fa-arrow-right opacity-0 group-hover:opacity-100 transition-opacity duration-200"></i>
-                        </div>
-                    </Link>
-                )}
-            </div>
-        ),
+  
     };
 
     // --------------------------
@@ -175,6 +171,8 @@ export default function Account() {
             return 'bg-blue-100 text-blue-700';
         } else if (plan === 'Basic') {
             return 'bg-green-100 text-green-700';
+        } else if (plan === 'Demo') {
+            return 'bg-purple-100 text-purple-700';
         } else {
             return isDarkMode ? 'bg-gray-800 text-white' : 'bg-gray-100 text-gray-700';
         }
@@ -187,6 +185,13 @@ export default function Account() {
         const newDarkMode = e.target.checked;
         setIsDarkMode(newDarkMode);
 
+        // If it's a demo user, store in localStorage
+        if (isDemoUser) {
+            localStorage.setItem('demoDarkMode', newDarkMode.toString());
+            return;
+        }
+
+        // Otherwise, attempt Firestore update
         if (!currentUser?.uid) {
             alert('You need to be logged in to update your settings.');
             return;
@@ -194,9 +199,7 @@ export default function Account() {
 
         try {
             const userDocRef = doc(db, 'users', currentUser.uid);
-            await updateDoc(userDocRef, {
-                darkMode: newDarkMode,
-            });
+            await updateDoc(userDocRef, { darkMode: newDarkMode });
             await refreshUserData();
         } catch (updateError) {
             console.error('Error updating dark mode preference:', updateError);
@@ -209,6 +212,13 @@ export default function Account() {
         const newValue = e.target.checked;
         setEmailNotifications(newValue);
 
+        // If it's a demo user, store in localStorage
+        if (isDemoUser) {
+            localStorage.setItem('demoEmailNotifications', newValue.toString());
+            return;
+        }
+
+        // Otherwise, attempt Firestore update
         if (!currentUser?.uid) {
             alert('You need to be logged in to update your settings.');
             return;

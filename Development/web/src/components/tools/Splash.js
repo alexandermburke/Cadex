@@ -108,7 +108,7 @@ export default function Splash() {
             variants={headlineVariants}
           >
             Welcome to Your Dashboard,{' '}
-            <span>{currentUser.displayName}</span>
+            <span>{'Demo'}</span>
           </motion.h1>
           <motion.p
             className="text-lg sm:text-xl text-gray-100 mb-8"

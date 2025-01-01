@@ -1,5 +1,7 @@
+'use client'
 import React, { useState } from 'react';
-import Image from 'next/image'; // Import Image from next/image
+import { useRouter } from 'next/navigation'; // <-- Import the hook
+import Image from 'next/image';
 import Button from './Button';
 import { Poppins } from 'next/font/google';
 import Link from 'next/link';
@@ -12,23 +14,23 @@ const poppins = Poppins({
 });
 
 export default function Login() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const router = useRouter(); // <-- Initialize router
+  const [code, setCode] = useState('');
   const [authenticating, setAuthenticating] = useState(false);
   const [error, setError] = useState(null);
 
-  const { login } = useAuth();
+  const { demoLogin } = useAuth();
 
   async function handleSubmit() {
-    if (authenticating) {
-      return;
-    }
-    setError(false);
+    if (authenticating) return;
+    setError(null);
     setAuthenticating(true);
+
     try {
-      await login(email, password);
+      await demoLogin(code);
+      router.push('/ailawtools/splash');
     } catch (err) {
-      console.log(err.message);
+      console.error(err.message);
       setError(err.message);
     } finally {
       setAuthenticating(false);
@@ -38,14 +40,14 @@ export default function Login() {
   return (
     <>
       <div className="flex flex-col gap-6 items-center sm:flex-row sm:justify-center sm:items-center py-10">
-      <Image
-                        src="/header.avif" 
-                        alt="CadexLaw Logo"
-                        width={144} 
-                        height={144} 
-                        className='w-24 h-24 sm:mr-4 mb-4'
-                        unoptimized={true}
-                    />
+        <Image
+          src="/header.avif"
+          alt="CadexLaw Logo"
+          width={144}
+          height={144}
+          className="w-24 h-24 sm:mr-4 mb-4"
+          unoptimized={true}
+        />
         <div className="text-center sm:text-left">
           <h2
             className={
@@ -58,22 +60,15 @@ export default function Login() {
         </div>
       </div>
       <div className="flex flex-col gap-2 items-center sm:flex-row sm:justify-center sm:items-center">
-        <p>Login to your account!</p>
+        <p>Enter your demo code!</p>
       </div>
       <div className="flex flex-col gap-4 text-base sm:text-lg">
         {error && <AuthError errMessage={error} />}
         <input
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          value={code}
+          onChange={(e) => setCode(e.target.value)}
           className="flex-1 bg-white rounded max-w-[600px] mx-auto w-full outline-none border border-solid border-white p-4"
-          placeholder="Email"
-        />
-        <input
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          type="password"
-          className="flex-1 bg-white rounded max-w-[600px] mx-auto w-full outline-none border border-solid border-white p-4"
-          placeholder="Password"
+          placeholder="Demo Code (e.g. 1234)"
         />
         <div
           className={
@@ -88,7 +83,7 @@ export default function Login() {
           />
         </div>
         <p className="mx-auto text-sm sm:text-base">
-          Don&#39;t have an account?{' '}
+          Prefer the real app?{' '}
           <Link className="goldGradient pl-2" href={'/register'}>
             Sign up
           </Link>

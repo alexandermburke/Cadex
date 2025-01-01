@@ -15,33 +15,35 @@ import { doc, getDoc, setDoc } from 'firebase/firestore';
 const AuthContext = React.createContext();
 
 export function useAuth() {
-    // Create a useAuth hook to access the context throughout our app
     return useContext(AuthContext);
 }
 
 export function AuthProvider({ children }) {
-    // Create the auth wrapper component for our application
     const [currentUser, setCurrentUser] = useState(null);
     const [userDataObj, setUserDataObj] = useState({});
     const [loading, setLoading] = useState(true);
 
+    // Updated logic to include "Demo" plan
+    // This will be true if plan is "Pro" or "Demo" AND billing status is truthy.
     const isPaid =
-        userDataObj?.billing?.plan === 'Pro' && userDataObj?.billing?.status;
+        (userDataObj?.billing?.plan === 'Pro' ||
+            userDataObj?.billing?.plan === 'Demo') &&
+        userDataObj?.billing?.status;
 
-    // Function to sign up a new user
+    // 1) Normal sign-up
     function signup(email, password) {
         return createUserWithEmailAndPassword(auth, email, password);
     }
 
-    // Function to log in an existing user
+    // 2) Normal login
     function login(email, password) {
         return signInWithEmailAndPassword(auth, email, password);
     }
 
-    // Function to add a username to the user's profile
+    // 3) Add username
     async function addUsername(user, username) {
         const usernameRef = doc(db, 'usernames', username);
-        const res = await setDoc(
+        await setDoc(
             usernameRef,
             {
                 status: 'active',
@@ -52,12 +54,12 @@ export function AuthProvider({ children }) {
         return updateProfile(user, { displayName: username });
     }
 
-    // Function to log out the current user
+    // 4) Logout
     function logout() {
         return signOut(auth);
     }
 
-    // Function to refresh user data from Firestore
+    // 5) Refresh user data
     const refreshUserData = async () => {
         if (!currentUser) return;
         try {
@@ -66,7 +68,6 @@ export function AuthProvider({ children }) {
             if (userDocSnap.exists()) {
                 const data = userDocSnap.data();
                 setUserDataObj(data);
-                // Update localStorage with the latest data
                 localStorage.setItem(
                     'hyr',
                     JSON.stringify({ ...data, metadata: currentUser.metadata })
@@ -79,12 +80,44 @@ export function AuthProvider({ children }) {
         }
     };
 
+    // 6) Demo login function
+    function demoLogin(code) {
+        // Optional: require a specific code
+        if (code !== '1234') {
+            throw new Error('Invalid demo code');
+        }
+
+        // Create a fake user object
+        const demoUser = {
+            uid: 'demo-user-uid',
+            email: 'default@default.com',
+            metadata: { lastLoginAt: Date.now().toString() },
+        };
+
+        // User data with plan "Demo"
+        const demoUserData = {
+            billing: {
+                plan: 'Demo',
+                status: true, // treat as "active"
+            },
+            email: 'default@default.com',
+            createdAt: new Date().toISOString(),
+        };
+
+        // Update state & localStorage
+        setCurrentUser(demoUser);
+        setUserDataObj(demoUserData);
+        localStorage.setItem(
+            'hyr',
+            JSON.stringify({ ...demoUserData, metadata: demoUser.metadata })
+        );
+    }
+
+    // 7) onAuthStateChanged effect
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, async (user) => {
             try {
                 setLoading(true);
-                console.log('CURRENT USER: ', user);
-
                 setCurrentUser(user);
 
                 if (!user) {
@@ -95,33 +128,25 @@ export function AuthProvider({ children }) {
 
                 let localUserData = localStorage.getItem('hyr');
                 if (!localUserData) {
-                    // Fetch from Firestore if no local data
                     await fetchUserData();
                     return;
                 }
 
                 localUserData = JSON.parse(localUserData);
                 if (user?.metadata?.lastLoginAt === localUserData?.metadata?.lastLoginAt) {
-                    // Use local storage data if last login matches
-                    console.log('Used local data');
                     setUserDataObj(localUserData);
                     return;
                 }
 
-                // Fetch from Firestore if last login doesn't match
                 await fetchUserData();
 
                 async function fetchUserData() {
                     try {
                         const docRef = doc(db, 'users', user.uid);
                         const docSnap = await getDoc(docRef);
-                        console.log('Fetching user data');
-                        let firebaseData = {};
                         if (docSnap.exists()) {
-                            console.log('Found user data');
-                            firebaseData = docSnap.data();
+                            const firebaseData = docSnap.data();
                             setUserDataObj(firebaseData);
-                            // Cache fetched data in localStorage
                             localStorage.setItem(
                                 'hyr',
                                 JSON.stringify({ ...firebaseData, metadata: user.metadata })
@@ -142,6 +167,7 @@ export function AuthProvider({ children }) {
         return unsubscribe;
     }, []);
 
+    // 8) Provide context value
     const value = {
         currentUser,
         signup,
@@ -152,7 +178,8 @@ export function AuthProvider({ children }) {
         userDataObj,
         setUserDataObj,
         isPaid,
-        refreshUserData, // Added refreshUserData to the context
+        refreshUserData,
+        demoLogin, // Expose demoLogin here
     };
 
     return (

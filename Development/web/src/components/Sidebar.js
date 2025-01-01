@@ -8,17 +8,34 @@ import { FaLock } from 'react-icons/fa';
 import { motion } from 'framer-motion';
 import clsx from 'clsx'; // Ensure clsx is installed: npm install clsx
 
-export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, isAiTutor }) {
+export default function Sidebar({
+  activeLink,
+  isSidebarVisible,
+  toggleSidebar,
+  isAiTutor,
+}) {
   const router = useRouter();
   const { currentUser, userDataObj } = useAuth();
 
-  const plan = userDataObj?.billing?.plan?.toLowerCase() || 'free'; 
+  // Convert plan to lowercase so we can do simple equality checks
+  const plan = userDataObj?.billing?.plan?.toLowerCase() || 'free';
   const isDarkMode = userDataObj?.darkMode || false;
 
-  const hasAccess = plan === 'free' || plan === 'developer'; 
-  const hasSimulationAccess = plan === 'free' || plan === 'basic'; //change 'free' to 'Pro' when ready to launch
+  // ---------------------------------------
+  // Access booleans
+  // ---------------------------------------
+  // 1) "Study & Research" => only "Pro" plan
+  const hasStudyAccess = plan === 'pro';
 
-  // For locked links, keep original icon on the left + smaller lock on the right
+  // 2) "AI Study Aids" => "Pro" OR "Demo"
+  const hasAiAccess = plan === 'pro' || plan === 'demo';
+
+  // 3) "Exam Preparation" => "Pro" OR "Demo"
+  const hasExamPrepAccess = plan === 'pro' || plan === 'demo';
+
+  // ---------------------------------------
+  // For locked links, we keep the original icon + a lock
+  // ---------------------------------------
   const renderLockedNavLink = (href, iconClass, label) => (
     <li>
       <div className="flex items-center justify-between gap-2 p-3 text-gray-400 cursor-not-allowed">
@@ -31,6 +48,9 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, i
     </li>
   );
 
+  // ---------------------------------------
+  // Sidebar slide animation
+  // ---------------------------------------
   const sidebarVariants = {
     hidden: {
       x: '-100%',
@@ -48,6 +68,9 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, i
     },
   };
 
+  // ---------------------------------------
+  // Helpers to render nav links
+  // ---------------------------------------
   const renderNavLink = (href, iconClass, label) => (
     <li>
       <Link
@@ -80,7 +103,9 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, i
     </li>
   );
 
-  // Determine background gradient based on dark mode
+  // ---------------------------------------
+  // Background gradient based on dark mode
+  // ---------------------------------------
   const sidebarBackground = clsx({
     'bg-gradient-to-b from-blue-900 to-slate-900': isDarkMode,
     'bg-gradient-to-b from-blue-950 to-slate-950': !isDarkMode,
@@ -94,6 +119,7 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, i
       variants={sidebarVariants}
       exit="hidden"
     >
+      {/* Header / Title */}
       <div className="p-6 flex items-center justify-center">
         <h1 className="text-3xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-white font-semibold relative overflow-hidden">
           Dashboard
@@ -101,11 +127,11 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, i
       </div>
 
       <nav className="flex-1 overflow-y-auto px-6">
-        {/* Replaced "Study & Research" with new items */}
+        {/* Study & Research - Only Pro */}
         <section className="mb-6">
           <h2 className="text-lg font-semibold mb-4">Study & Research</h2>
           <ul className="space-y-2">
-            {hasAccess ? (
+            {hasStudyAccess ? (
               <>
                 {renderNavLink('/lawtools/dictionary', 'fa-solid fa-book', 'Legal Dictionary')}
                 {renderNavLink('/lawtools/briefeditor', 'fa-solid fa-file-pen', 'Brief Editor')}
@@ -121,10 +147,11 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, i
           </ul>
         </section>
 
+        {/* AI Study Aids - Pro OR Demo */}
         <section className="mb-6">
           <h2 className="text-lg font-semibold mb-4">AI Study Aids</h2>
           <ul className="space-y-2">
-            {hasAccess ? (
+            {hasAiAccess ? (
               <>
                 {renderNavLink('/ailawtools/flashcards', 'fa-solid fa-lightbulb', 'Generative Flashcards')}
                 {colorfulrenderNavLink('/ailawtools/lexapi', 'fa-solid fa-brain', 'LExAPI Tutor')}
@@ -140,10 +167,11 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, i
           </ul>
         </section>
 
+        {/* Exam Preparation - Pro OR Demo */}
         <section className="mb-6">
           <h2 className="text-lg font-semibold mb-4">Exam Preparation</h2>
           <ul className="space-y-2">
-            {hasSimulationAccess ? (
+            {hasExamPrepAccess ? (
               <>
                 {renderNavLink('/ailawtools/examprep', 'fa-solid fa-flask', 'LSAT/BAR Prep')}
               </>
@@ -168,15 +196,19 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, i
       <footer className="px-6 py-4 bg-transparent">
         <div className="flex items-center gap-4">
           <div className="flex-1 min-w-0">
-            <p className="font-semibold truncate">{currentUser?.displayName || 'User'}</p>
+            <p className="font-semibold truncate">
+              {currentUser?.displayName || 'User'}
+            </p>
             <p className="text-sm text-blue-200 truncate">
               {currentUser?.email || 'user@example.com'}
             </p>
           </div>
           <span
             className={`px-3 py-1 rounded text-xs font-semibold uppercase whitespace-nowrap ${
-              hasAccess
+              plan === 'pro'
                 ? 'bg-gradient-to-r from-blue-400 to-blue-600 text-white'
+                : plan === 'demo'
+                ? 'bg-gradient-to-r from-purple-400 to-purple-600 text-white'
                 : 'bg-gradient-to-r from-emerald-400 to-emerald-600 text-white'
             }`}
           >

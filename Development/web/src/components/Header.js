@@ -17,7 +17,24 @@ export default function Header() {
     const pathname = usePathname();
     const router = useRouter();
 
-    const isDarkMode = userDataObj?.darkMode || false;
+      const isDemoUser = currentUser?.uid === 'demo-user-uid';
+      const [isDarkMode, setIsDarkMode] = useState(false);
+    
+      useEffect(() => {
+        if (isDemoUser) {
+          const storedDarkMode = localStorage.getItem('demoDarkMode');
+          setIsDarkMode(storedDarkMode === 'true');
+        } else {
+          setIsDarkMode(userDataObj?.darkMode || false);
+        }
+      }, [isDemoUser, userDataObj?.darkMode]);
+      useEffect(() => {
+        if (isDarkMode) {
+          document.documentElement.classList.add('dark');
+        } else {
+          document.documentElement.classList.remove('dark');
+        }
+      }, [isDarkMode]);
 
     useEffect(() => {
         if (pathname === '/') {
@@ -100,20 +117,13 @@ export default function Header() {
               
                 <div className='hidden items-stretch md:flex'>
                     <Link 
-                        href={'/admin'} 
-                        className={`border border-solid duration-200 border-transparent px-4 grid place-items-center rounded
-                        ${isDarkMode ? 'hover:text-slate-500' : 'hover:text-slate-200'} text-${isDarkMode ? 'white' : 'black'}`}
-                    >
-                        <p>Pro</p>
-                    </Link>
-                    <Link 
                         href={'/ailawtools/splash'} 
                         className={`border border-solid duration-200 border-transparent px-4 grid place-items-center rounded
                         ${isDarkMode ? 'hover:text-slate-500' : 'hover:text-slate-200'} text-${isDarkMode ? 'white' : 'black'}`}
                     >
                         <div className="flex items-center">
                             <p>Tools</p>
-                            <span className={`ml-2 px-2 py-1 text-xs rounded ${isDarkMode ? 'bg-emerald-600 text-white' : 'bg-emerald-400 text-white'}`}>Beta</span>
+                            <span className={`ml-2 px-2 py-1 text-xs rounded ${isDarkMode ? 'bg-emerald-600 text-white' : 'bg-emerald-400 text-white'}`}>Demo</span>
                         </div>
                     </Link>
                     <Link 
@@ -143,15 +153,8 @@ export default function Header() {
                 >
                     <div className="flex items-center">
                         <p>Tools</p>
-                        <span className={`ml-2 px-2 py-1 text-xs rounded ${isDarkMode ? 'bg-emerald-600 text-white' : 'bg-emerald-400 text-white'}`}>Beta</span>
+                        <span className={`ml-2 px-2 py-1 text-xs rounded ${isDarkMode ? 'bg-emerald-600 text-white' : 'bg-emerald-400 text-white'}`}>Demo</span>
                     </div>
-                </Link>
-                <Link 
-                    href={'/admin'} 
-                    className={`p-2 rounded border-solid border duration-200 text-lg border-blue-950 border-x-4 border-y-4
-                    ${isDarkMode ? 'hover:text-slate-500 hover:bg-blue-950 text-white' : 'hover:text-slate-500 hover:bg-blue-950 text-black'}`}
-                >
-                    <p>Pro</p>
                 </Link>
                 <Link 
                     href={'/admin/account'} 
@@ -186,7 +189,7 @@ export default function Header() {
                             unoptimized={true}
                         />
                         <h1 className={`text-xl sm:text-2xl goldGradient font-medium ${poppins.className}`}>
-                            CadexLaw
+                            CadexLaw // Demo
                         </h1>
                     </div>
                 </Link>
