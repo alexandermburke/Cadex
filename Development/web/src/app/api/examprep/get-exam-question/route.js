@@ -121,7 +121,7 @@ ${questionTypesDescription ? questionTypesDescription : ''}
     // Initialize OpenAI API client
     const openai = new OpenAI({
       apiKey: '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',
-      organization: 'org-GlmR3M6uGsW47UCXYi5CyZph', 
+      organization: 'org-GlmR3M6uGsW47UCXYi5CyZph',
     });
 
     // Make the API request to OpenAI, now with GPT-4

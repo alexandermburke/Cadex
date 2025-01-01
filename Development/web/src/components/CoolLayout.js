@@ -6,6 +6,7 @@ import React, { useEffect, useState } from 'react';
 import Header from './Header';
 import Footer from './Footer';
 import { useAuth } from '@/context/AuthContext';
+import { Analytics } from "@vercel/analytics/react"
 
 export default function CoolLayout({ children }) {
  
@@ -39,6 +40,7 @@ export default function CoolLayout({ children }) {
     >
       <Header />
       {children}
+      <Analytics />
       <Footer />
     </div>
   );

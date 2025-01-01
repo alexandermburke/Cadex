@@ -12,6 +12,7 @@
   "dependencies": {
     "@headlessui/react": "^2.0.4",
     "@heroicons/react": "^1.0.6",
+    "@vercel/analytics": "^1.4.1",
     "ai": "^4.0.18",
     "axios": "^1.7.4",
     "chart.js": "^4.4.4",
