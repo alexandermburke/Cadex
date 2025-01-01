@@ -1,9 +1,9 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Poppins } from 'next/font/google';
 import Image from 'next/image';
-// Import your AuthContext or theme context
+import { usePathname, useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 
 const poppins = Poppins({
@@ -12,10 +12,26 @@ const poppins = Poppins({
 });
 
 export default function LogoFiller() {
-  // Grab your dark mode setting from Auth or theme context
-  const { userDataObj } = useAuth() || {};
-  const isDarkMode = userDataObj?.darkMode || false;
-
+   const pathname = usePathname();
+   const { currentUser, logout, userDataObj } = useAuth();
+   const isDemoUser = currentUser?.uid === 'demo-user-uid';
+   const [isDarkMode, setIsDarkMode] = useState(false);
+    
+      useEffect(() => {
+        if (isDemoUser) {
+          const storedDarkMode = localStorage.getItem('demoDarkMode');
+          setIsDarkMode(storedDarkMode === 'true');
+        } else {
+          setIsDarkMode(userDataObj?.darkMode || false);
+        }
+      }, [isDemoUser, userDataObj?.darkMode]);
+      useEffect(() => {
+        if (isDarkMode) {
+          document.documentElement.classList.add('dark');
+        } else {
+          document.documentElement.classList.remove('dark');
+        }
+      }, [isDarkMode]);
   return (
     <div
       className={`
@@ -29,8 +45,8 @@ export default function LogoFiller() {
           <Image
             src="/header.avif"
             alt="CadexLaw Logo"
-            width={144}
-            height={144}
+            width={16}
+            height={16}
             className="w-12 h-12 sm:mr-4 mb-4"
             unoptimized={true}
           />

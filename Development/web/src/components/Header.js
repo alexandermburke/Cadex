@@ -67,7 +67,6 @@ export default function Header() {
             >
                 <div className="flex items-center">
                     <p>Dashboard</p>
-                    <span className={`ml-2 px-2 py-1 text-xs rounded ${isDarkMode ? 'bg-emerald-600 text-white' : 'bg-emerald-400 text-white'}`}>New</span>
                 </div>
             </Link>
             <Link 
@@ -122,8 +121,7 @@ export default function Header() {
                         ${isDarkMode ? 'hover:text-slate-500' : 'hover:text-slate-200'} text-${isDarkMode ? 'white' : 'black'}`}
                     >
                         <div className="flex items-center">
-                            <p>Tools</p>
-                            <span className={`ml-2 px-2 py-1 text-xs rounded ${isDarkMode ? 'bg-emerald-600 text-white' : 'bg-emerald-400 text-white'}`}>Demo</span>
+                            <p>Dashboard</p>
                         </div>
                     </Link>
                     <Link 
@@ -133,14 +131,6 @@ export default function Header() {
                     >
                         <p>Account</p>
                     </Link>
-                    <button 
-                        onClick={logout} 
-                        className={`border border-solid duration-200 border-transparent px-4 grid place-items-center rounded
-                        ${isDarkMode ? 'hover:text-slate-500' : 'hover:text-slate-200'} text-${isDarkMode ? 'white' : 'black'}`}
-                    >
-                        <p>Logout</p>
-                    </button>
-                    {shareBtn}
                 </div>
             </>
         );
@@ -152,8 +142,7 @@ export default function Header() {
                     ${isDarkMode ? 'hover:text-slate-500 hover:bg-blue-950 text-white' : 'hover:text-slate-500 hover:bg-blue-950 text-black'}`}
                 >
                     <div className="flex items-center">
-                        <p>Tools</p>
-                        <span className={`ml-2 px-2 py-1 text-xs rounded ${isDarkMode ? 'bg-emerald-600 text-white' : 'bg-emerald-400 text-white'}`}>Demo</span>
+                        <p>Dashboard</p>
                     </div>
                 </Link>
                 <Link 
@@ -163,14 +152,6 @@ export default function Header() {
                 >
                     <p>Account</p>
                 </Link>
-                <button 
-                    className={`p-2 text-left rounded border-solid border duration-200 text-lg border-blue-950 border-x-4 border-y-4
-                    ${isDarkMode ? 'hover:text-slate-500 hover:bg-blue-950 text-white' : 'hover:text-slate-500 hover:bg-blue-950 text-black'}`} 
-                    onClick={logout}
-                >
-                    <p>Logout</p>
-                </button>
-                {shareBtn}
             </nav>
         );
     }
@@ -189,8 +170,9 @@ export default function Header() {
                             unoptimized={true}
                         />
                         <h1 className={`text-xl sm:text-2xl goldGradient font-medium ${poppins.className}`}>
-                            CadexLaw // Demo
+                            CadexLaw
                         </h1>
+                        <span className={`ml-2 px-2 py-1 text-xs rounded ${isDarkMode ? 'bg-emerald-600 text-white' : 'bg-emerald-400 text-white'}`}>Demo Build</span>
                     </div>
                 </Link>
                 {navActions}

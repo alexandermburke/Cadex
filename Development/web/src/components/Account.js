@@ -311,14 +311,8 @@ export default function Account() {
                             onChange={handleEmailNotificationsToggle}
                             className="toggle-checkbox absolute h-0 w-0 opacity-0"
                         />
-                        <label
-                            htmlFor="emailNotificationsToggle"
-                            className="toggle-label block overflow-hidden h-8 rounded-full bg-gray-300 cursor-pointer"
-                        ></label>
+                       
                     </div>
-                    <label htmlFor="emailNotificationsToggle" className="cursor-pointer">
-                        Enable Email Notifications
-                    </label>
                 </div>
             </ActionCard>
 

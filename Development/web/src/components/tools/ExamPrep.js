@@ -42,6 +42,7 @@ export default function ExamPrep() {
       setIsDarkMode(userDataObj?.darkMode || false);
     }
   }, [isDemoUser, userDataObj?.darkMode]);
+  
 
   // Only one declaration of inputText:
   const [inputText, setInputText] = useState('');
@@ -245,7 +246,7 @@ export default function ExamPrep() {
     setAnswerResult('');
 
     try {
-      const response = await fetch('/api/submit-exam-answer', {
+      const response = await fetch('/api/examprep/submit-exam-answer', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -472,7 +473,7 @@ export default function ExamPrep() {
   return (
     <div
       className={`flex h-screen ${
-        isDarkMode ? 'bg-slate-800' : 'bg-white'
+        isDarkMode ? 'bg-slate-900' : 'bg-white'
       } rounded shadow-md`}
     >
       <AnimatePresence>

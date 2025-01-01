@@ -233,7 +233,7 @@ export default function AIExamFlashCard() {
     return (
       <div
         className={`flex items-center justify-center h-screen ${
-          isDarkMode ? 'bg-slate-800 text-white' : 'bg-gray-100 text-gray-800'
+          isDarkMode ? 'bg-slate-900 text-white' : 'bg-gray-100 text-gray-800'
         }`}
       >
         <div className="p-6 rounded shadow-md text-center">
@@ -442,7 +442,7 @@ export default function AIExamFlashCard() {
   const closeFinalFeedbackModal = () => setIsFinalFeedbackModalOpen(false);
 
   return (
-    <div className={`flex h-screen ${isDarkMode ? 'bg-slate-800' : 'bg-white'} rounded shadow-md`}>
+    <div className={`flex h-screen ${isDarkMode ? 'bg-slate-900' : 'bg-white'} rounded shadow-md`}>
       {/* Sidebar */}
       <AnimatePresence>
         {isSidebarVisible && (
@@ -500,9 +500,9 @@ export default function AIExamFlashCard() {
           </button>
 
           {/* Timer display */}
-          <div className="text-lg font-semibold">
-            {timeLeft > 0 ? `Time Left: ${formatTime()}` : ''}
-          </div>
+          <div className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-black'}`}>
+              {timeLeft > 0 ? `Time Left: ${formatTime()}` : ''}
+            </div>
 
           {/* Buttons: Save, Load, Configure */}
           <div className="inline-flex flex-row flex-nowrap items-center gap-2 sm:gap-4">
@@ -520,7 +520,7 @@ export default function AIExamFlashCard() {
               className={`group relative h-10 sm:h-12 w-28 sm:w-40 overflow-hidden rounded ${
                 isDarkMode ? 'bg-blue-700' : 'bg-blue-950'
               } text-white duration-200 before:absolute before:right-0 before:top-0 before:h-full before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-56 text-sm sm:text-base shadow-md`}
-              aria-label="Configure Exam Prep"
+              aria-label="Configure Flashcards"
             >
               Configure
             </button>
@@ -964,28 +964,34 @@ export default function AIExamFlashCard() {
               </div>
 
               {/* Action Buttons */}
-              <div className="text-right">
-                <button
-                  onClick={handleGenerateFlashcards}
-                  className={`mr-4 px-4 py-2 rounded ${
-                    isDarkMode
-                      ? 'bg-blue-700 hover:bg-blue-600 text-white'
-                      : 'bg-blue-600 hover:bg-blue-700 text-white'
-                  }`}
-                  disabled={isLoading}
-                >
-                  {isLoading ? 'Generating...' : 'Generate'}
-                </button>
-                <button
-                  onClick={closeConfigModal}
-                  className={`px-4 py-2 rounded ${
-                    isDarkMode
-                      ? 'bg-gray-700 hover:bg-gray-600 text-white'
-                      : 'bg-gray-300 hover:bg-gray-400 text-gray-800'
-                  }`}
-                >
-                  Cancel
-                </button>
+              <div className="flex justify-end space-x-4">
+                 <button
+                                    type="button"
+                                    onClick={handleGenerateFlashcards}
+                                    className="relative h-12 w-full sm:w-56 overflow-hidden rounded bg-blue-950 text-white shadow-lg transition-colors duration-200 before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-56"
+                                    aria-label="Start Session"
+                                  >
+                                    Start Session
+                                    <motion.span
+                                      className="absolute right-4 top-3"
+                                      initial={{ x: -10, opacity: 0 }}
+                                      animate={{ x: 0, opacity: 1 }}
+                                      transition={{ delay: 0.3, duration: 0.3 }}
+                                    >
+                                      <i className="fa-solid fa-arrow-right"></i>
+                                    </motion.span>
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={closeConfigModal}
+                                    className={`h-10 sm:h-12 px-6 py-2 rounded ${
+                                      isDarkMode
+                                        ? 'bg-gray-600 text-gray-300 hover:bg-gray-500'
+                                        : 'bg-gray-300 text-gray-700 hover:bg-gray-400'
+                                    } transition-colors duration-200 text-sm sm:text-base`}
+                                  >
+                                    Cancel
+                                  </button>
               </div>
             </motion.div>
           </motion.div>

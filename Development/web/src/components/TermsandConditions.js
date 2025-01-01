@@ -1,5 +1,5 @@
 'use client';
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Image from 'next/image'; // Import Image from next/image
 import { Poppins } from 'next/font/google';
 import { useAuth } from '@/context/AuthContext'; // Import useAuth
@@ -11,8 +11,24 @@ const poppins = Poppins({
 
 export default function Legal() {
   const { currentUser, userDataObj } = useAuth();
-  const isDarkMode = userDataObj?.darkMode || false;
-
+ const isDemoUser = currentUser?.uid === 'demo-user-uid';
+   const [isDarkMode, setIsDarkMode] = useState(false);
+    
+      useEffect(() => {
+        if (isDemoUser) {
+          const storedDarkMode = localStorage.getItem('demoDarkMode');
+          setIsDarkMode(storedDarkMode === 'true');
+        } else {
+          setIsDarkMode(userDataObj?.darkMode || false);
+        }
+      }, [isDemoUser, userDataObj?.darkMode]);
+      useEffect(() => {
+        if (isDarkMode) {
+          document.documentElement.classList.add('dark');
+        } else {
+          document.documentElement.classList.remove('dark');
+        }
+      }, [isDarkMode]);
   return (
     <div className={`flex flex-col gap-6 p-6 ${poppins.className}`}>
       {/* Add the header image */}
@@ -22,6 +38,7 @@ export default function Legal() {
         width={100}
         height={100}
         className="mx-auto"
+        unoptimized={true}
       />
 
       {/* Update the title */}

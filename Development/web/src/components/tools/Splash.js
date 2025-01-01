@@ -108,13 +108,13 @@ export default function Splash() {
             variants={headlineVariants}
           >
             Welcome to Your Dashboard,{' '}
-            <span>{'Demo'}</span>
+            <span>{'User'}</span>
           </motion.h1>
           <motion.p
             className="text-lg sm:text-xl text-gray-100 mb-8"
             variants={paragraphVariants}
           >
-            Explore a variety of AI-powered law study aids and resources to help you succeed.
+            Explore a variety of LLM powered law study aids and resources to help you succeed.
             Pick from the options in the sidebar to start your journey.
           </motion.p>
         </motion.div>

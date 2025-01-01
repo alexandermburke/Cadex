@@ -33,6 +33,9 @@ export default function Sidebar({
   // 3) "Exam Preparation" => "Pro" OR "Demo"
   const hasExamPrepAccess = plan === 'pro' || plan === 'demo';
 
+  // 4) "Exam Insights" => Only "Pro"
+  const hasExamInsightsAccess = plan === 'pro';
+
   // ---------------------------------------
   // For locked links, we keep the original icon + a lock
   // ---------------------------------------
@@ -87,7 +90,7 @@ export default function Sidebar({
     </li>
   );
 
-  const colorfulrenderNavLink = (href, iconClass, label) => (
+  const colorfulRenderNavLink = (href, iconClass, label) => (
     <li>
       <Link
         href={href}
@@ -97,7 +100,9 @@ export default function Sidebar({
             : 'bg-transparent hover:bg-blue-800 hover:bg-opacity-75'
         }`}
       >
-        <i className={`${iconClass} bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 bg-clip-text text-transparent`}></i>
+        <i
+          className={`${iconClass} bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 bg-clip-text text-transparent`}
+        ></i>
         <span className="text-white">{label}</span>
       </Link>
     </li>
@@ -133,15 +138,39 @@ export default function Sidebar({
           <ul className="space-y-2">
             {hasStudyAccess ? (
               <>
-                {renderNavLink('/lawtools/dictionary', 'fa-solid fa-book', 'Legal Dictionary')}
-                {renderNavLink('/lawtools/briefeditor', 'fa-solid fa-file-pen', 'Brief Editor')}
-                {renderNavLink('/lawtools/lecturesummaries', 'fa-solid fa-chalkboard-user', 'Lecture Summaries')}
+                {renderNavLink(
+                  '/lawtools/dictionary',
+                  'fa-solid fa-book',
+                  'Legal Dictionary'
+                )}
+                {renderNavLink(
+                  '/lawtools/briefeditor',
+                  'fa-solid fa-file-pen',
+                  'Brief Editor'
+                )}
+                {renderNavLink(
+                  '/lawtools/lecturesummaries',
+                  'fa-solid fa-chalkboard-user',
+                  'Lecture Summaries'
+                )}
               </>
             ) : (
               <>
-                {renderLockedNavLink('/lawtools/dictionary', 'fa-solid fa-book', 'Legal Dictionary')}
-                {renderLockedNavLink('/lawtools/briefeditor', 'fa-solid fa-file-pen', 'Brief Editor')}
-                {renderLockedNavLink('/lawtools/lecturesummaries', 'fa-solid fa-chalkboard-user', 'Lecture Summaries')}
+                {renderLockedNavLink(
+                  '/lawtools/dictionary',
+                  'fa-solid fa-book',
+                  'Legal Dictionary'
+                )}
+                {renderLockedNavLink(
+                  '/lawtools/briefeditor',
+                  'fa-solid fa-file-pen',
+                  'Brief Editor'
+                )}
+                {renderLockedNavLink(
+                  '/lawtools/lecturesummaries',
+                  'fa-solid fa-chalkboard-user',
+                  'Lecture Summaries'
+                )}
               </>
             )}
           </ul>
@@ -153,15 +182,49 @@ export default function Sidebar({
           <ul className="space-y-2">
             {hasAiAccess ? (
               <>
-                {renderNavLink('/ailawtools/flashcards', 'fa-solid fa-lightbulb', 'Generative Flashcards')}
-                {colorfulrenderNavLink('/ailawtools/lexapi', 'fa-solid fa-brain', 'LExAPI Tutor')}
-                {renderNavLink('/ailawtools/insights', 'fa-solid fa-chart-line', 'Exam Insights')}
+                {renderNavLink(
+                  '/ailawtools/flashcards',
+                  'fa-solid fa-lightbulb',
+                  'Generative Flashcards'
+                )}
+                {colorfulRenderNavLink(
+                  '/ailawtools/lexapi',
+                  'fa-solid fa-brain',
+                  'LExAPI Tutor'
+                )}
+                {/* Exam Insights - Only Pro */}
+                {hasExamInsightsAccess ? (
+                  renderNavLink(
+                    '/ailawtools/insights',
+                    'fa-solid fa-chart-line',
+                    'Exam Insights'
+                  )
+                ) : (
+                  renderLockedNavLink(
+                    '/ailawtools/insights',
+                    'fa-solid fa-chart-line',
+                    'Exam Insights'
+                  )
+                )}
               </>
             ) : (
               <>
-                {renderLockedNavLink('/ailawtools/flashcards', 'fa-solid fa-lightbulb', 'Generative Flashcards')}
-                {renderLockedNavLink('/ailawtools/lexapi', 'fa-solid fa-brain', 'LExAPI Tutor')}
-                {renderLockedNavLink('/ailawtools/insights', 'fa-solid fa-chart-line', 'Exam Insights')}
+                {renderLockedNavLink(
+                  '/ailawtools/flashcards',
+                  'fa-solid fa-lightbulb',
+                  'Generative Flashcards'
+                )}
+                {renderLockedNavLink(
+                  '/ailawtools/lexapi',
+                  'fa-solid fa-brain',
+                  'LExAPI Tutor'
+                )}
+                {/* Exam Insights - Only Pro */}
+                {renderLockedNavLink(
+                  '/ailawtools/insights',
+                  'fa-solid fa-chart-line',
+                  'Exam Insights'
+                )}
               </>
             )}
           </ul>
@@ -173,17 +236,27 @@ export default function Sidebar({
           <ul className="space-y-2">
             {hasExamPrepAccess ? (
               <>
-                {renderNavLink('/ailawtools/examprep', 'fa-solid fa-flask', 'LSAT/BAR Prep')}
+                {renderNavLink(
+                  '/ailawtools/examprep',
+                  'fa-solid fa-flask',
+                  'LSAT/BAR Prep'
+                )}
               </>
             ) : (
               <>
-                {renderLockedNavLink('/ailawtools/examprep', 'fa-solid fa-flask', 'LSAT/BAR Prep')}
+                {renderLockedNavLink(
+                  '/ailawtools/examprep',
+                  'fa-solid fa-flask',
+                  'LSAT/BAR Prep'
+                )}
               </>
             )}
             <li>
               <Link
                 href="https://discord.gg/wKgH9ussWc"
                 className="flex items-center gap-3 p-3 rounded transition-colors duration-200 hover:bg-blue-800 hover:bg-opacity-75"
+                target="_blank"
+                rel="noopener noreferrer"
               >
                 <i className="fa-solid fa-comment"></i>
                 <span>Requests/Suggestions</span>

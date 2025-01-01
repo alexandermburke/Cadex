@@ -25,7 +25,7 @@ export default function Footer() {
               </h1>
             </Link>
           </div>
-          <p className="mx-auto text-xs">© 2024 Alexander Burke</p>
+          <p className="mx-auto text-xs">© 2025 Alexander Burke</p>
           {/* Version Number and Development Build */}
           <p className="mx-auto text-xs font-semibold">
             Version {versionNumber} - Development Build
@@ -51,7 +51,7 @@ export default function Footer() {
               </div>
               <div className="flex items-center gap-2 relative w-fit overflow-hidden">
                 <i className="fa-solid fa-house"></i>
-                <p>2001 N Scottsdale Road Scottsdale 85257</p>
+                <p>Scottsdale, Arizona</p>
               </div>
             </div>
           </div>
