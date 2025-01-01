@@ -623,7 +623,7 @@ export default function ExamPrep() {
                 isDarkMode ? 'text-white' : 'text-black'
               }`}
             >
-              LExAPI Version: 0.3.4
+              LExAPI Version: 0.3.6
             </h3>
             <p className={`mb-4 ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>
               {questionStem}
