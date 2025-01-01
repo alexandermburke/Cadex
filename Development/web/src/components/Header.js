@@ -97,9 +97,7 @@ export default function Header() {
     ) {
         navActions = (
             <>
-                <p className={`capitalize flex-1 ${poppins.className} ${isDarkMode ? 'text-white' : 'text-black'}`}>
-                    Welcome <span>{currentUser.displayName}</span>
-                </p>
+              
                 <div className='hidden items-stretch md:flex'>
                     <Link 
                         href={'/admin'} 
