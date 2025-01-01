@@ -1,4 +1,4 @@
-// /app/api/get-exam-question/route.js
+// /app/api/examprep/get-exam-question/route.js
 
 import { NextResponse } from 'next/server';
 import OpenAI from 'openai';
@@ -20,19 +20,23 @@ export async function POST(request) {
     // Mapping difficulty levels to detailed descriptions
     const difficultyDetails = {
       // LSAT difficulty mapping
-      'Below 150': 'basic understanding with straightforward scenarios, purpose is to generate a below 150 LSAT equivalent score',
-      '150-160': 'intermediate understanding with moderate complexity, purpose is to generate a 150 to 160 LSAT equivalent score',
-      '160-170': 'advanced understanding with complex and nuanced scenarios, purpose is to generate a 160 to 170 LSAT equivalent score',
-      '175+': 'expert-level understanding with extremely complex and nuanced scenarios, purpose is to generate a 175 or higher LSAT equivalent score',
+      'Below 150':
+        'basic understanding with straightforward scenarios, purpose is to generate a below 150 LSAT equivalent score',
+      '150-160':
+        'intermediate understanding with moderate complexity, purpose is to generate a 150 to 160 LSAT equivalent score',
+      '160-170':
+        'advanced understanding with complex and nuanced scenarios, purpose is to generate a 160 to 170 LSAT equivalent score',
+      '175+':
+        'expert-level understanding with extremely complex and nuanced scenarios, purpose is to generate a 175 or higher LSAT equivalent score',
       // BAR difficulty mapping
       'Below Average': 'basic proficiency with fundamental concepts',
-      'Average': 'solid proficiency with moderately challenging concepts',
+      Average: 'solid proficiency with moderately challenging concepts',
       'Above Average': 'high proficiency with complex and challenging concepts',
-      'Expert': 'very high proficiency with complex and extremely challenging concepts',
+      Expert: 'very high proficiency with complex and extremely challenging concepts',
       // MPRE difficulty mapping
-      'Basic': 'basic ethical understanding with simple scenarios',
-      'Intermediate': 'intermediate ethical understanding with moderate complexity',
-      'Advanced': 'advanced ethical understanding with complex and nuanced scenarios',
+      Basic: 'basic ethical understanding with simple scenarios',
+      Intermediate: 'intermediate ethical understanding with moderate complexity',
+      Advanced: 'advanced ethical understanding with complex and nuanced scenarios',
     };
 
     const difficultyDescription = difficultyDetails[difficulty] || difficulty;
@@ -119,9 +123,9 @@ ${questionTypesDescription ? questionTypesDescription : ''}
       apiKey: process.env.OPENAI_API_KEY, // Ensure this is set in your environment variables
     });
 
-    // Make the API request to OpenAI
+    // Make the API request to OpenAI, now with GPT-4
     const response = await openai.chat.completions.create({
-      model: 'gpt-3.5-turbo', // or 'gpt-4'
+      model: 'gpt-3.5-turbo',  // <---- UPDATED TO GPT-4
       messages: [{ role: 'user', content: prompt }],
       max_tokens: 700, // Adjust as needed
       temperature: 0.7, // Adjust as needed
