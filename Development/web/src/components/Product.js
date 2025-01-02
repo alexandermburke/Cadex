@@ -22,12 +22,12 @@ export default function Product() {
       {/* Header Container */}
       <div className="text-center mb-4 my-6">
         <h3 className="text-6xl sm:text-6xl font-semibold text-white mb-10">
-          Preview our Demo.
+          Try our Demo for free
         </h3>
       </div>
 
       {/* Outer container */}
-      <div className="flex flex-col dropShadow overflow-hidden rounded-lg mx-auto bg-transparent w-11/12 sm:w-3/4 max-w-full drop-shadow-lg">
+      <div className="flex flex-col dropShadow overflow-hidden rounded-lg mx-auto bg-transparent w-11/12 sm:w-3/4 max-w-full">
         {/* Header / Toolbar area */}
         <div className="rounded-t-xl p-4 bg-white h-full opacity-60 flex items-center gap-2 my-0">
           {[1, 2, 3].map((val, i) => (
