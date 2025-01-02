@@ -1,6 +1,6 @@
 'use client';
 import React, { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation'; // Import the hook
+import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Button from './Button';
 import { Poppins } from 'next/font/google';
@@ -15,7 +15,6 @@ const poppins = Poppins({
 
 export default function Login() {
   const router = useRouter();
-  const [code, setCode] = useState('');
   const [authenticating, setAuthenticating] = useState(false);
   const [error, setError] = useState(null);
 
@@ -41,13 +40,14 @@ export default function Login() {
   // ---------------------------------------
   // Handle Demo Login Submission
   // ---------------------------------------
-  async function handleSubmit() {
+  async function handleBegin() {
     if (authenticating) return;
     setError(null);
     setAuthenticating(true);
 
     try {
-      await demoLogin(code);
+      // No code required. Demo login defaults to demo rank and default@default.com
+      await demoLogin();
       router.push('/ailawtools/splash'); // Redirect after successful login
     } catch (err) {
       console.error(err.message);
@@ -111,30 +111,21 @@ export default function Login() {
           </h2>
         </div>
       </div>
-      <div className="flex flex-col gap-2 items-center sm:flex-row sm:justify-center sm:items-center">
-        <p>Enter your demo code!</p>
-      </div>
       <div className="flex flex-col gap-4 text-base sm:text-lg">
         {error && <AuthError errMessage={error} />}
-        <input
-          value={code}
-          onChange={(e) => setCode(e.target.value)}
-          className="flex-1 bg-white dark:bg-gray-700 dark:text-white rounded max-w-[600px] mx-auto w-full outline-none border border-solid border-white dark:border-gray-600 p-4"
-          placeholder="Demo Code (e.g. 1234)"
-        />
         <div
           className={
-            'flex items-stretch gap-4 max-w-[600px] mx-auto w-full duration-200 ' +
+            'flex items-stretch gap-4 max-w-[400px] mx-auto w-full duration-200 ' +
             (authenticating ? ' cursor-not-allowed opacity-60 ' : ' ')
           }
         >
           <Button
-            text={'Submit'}
-            saving={authenticating ? 'Submitting' : ''}
-            clickHandler={handleSubmit}
+            text={'Start Demo'}
+            saving={authenticating ? 'Starting...' : ''}
+            clickHandler={handleBegin}
           />
         </div>
-        <p className="mx-auto text-sm sm:text-base">
+        <p className="mx-auto text-sm sm:text-base my-4">
           Prefer the real app?{' '}
           <a
             className="goldGradient pl-2"

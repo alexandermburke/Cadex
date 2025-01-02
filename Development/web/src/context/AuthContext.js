@@ -1,5 +1,3 @@
-// context/AuthContext.js
-
 'use client';
 import React, { useContext, useState, useEffect } from 'react';
 import {
@@ -80,13 +78,8 @@ export function AuthProvider({ children }) {
         }
     };
 
-    // 6) Demo login function
-    function demoLogin(code) {
-        // Optional: require a specific code
-        if (code !== '1234') {
-            throw new Error('Invalid demo code');
-        }
-
+    // 6) Demo login function (no code required)
+    function demoLogin() {
         // Create a fake user object
         const demoUser = {
             uid: 'demo-user-uid',
