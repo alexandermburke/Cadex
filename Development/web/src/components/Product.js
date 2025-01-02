@@ -21,7 +21,7 @@ export default function Product() {
     <div className="relative w-full min-h-screen bg-blue-950 drop-shadow-lg overflow-hidden">
       {/* Header Container */}
       <div className="text-center mb-4 my-6">
-        <h3 className="text-6xl sm:text-6xl font-semibold text-white mb-10 my-8">
+        <h3 className="text-6xl sm:text-6xl font-semibold text-white mb-8 my-6">
           Try our Demo for <span className='goldGradient font-bold'>free</span> 
         </h3>
       </div>
@@ -29,7 +29,7 @@ export default function Product() {
       {/* Outer container */}
       <div className="flex flex-col dropShadow overflow-hidden rounded-lg mx-auto bg-transparent w-11/12 sm:w-3/4 max-w-full">
         {/* Header / Toolbar area */}
-        <div className="rounded-t-xl p-4 bg-white h-full opacity-60 flex items-center gap-2 my-0">
+        <div className="rounded-t-xl p-4 bg-white h-12 opacity-60 flex items-center gap-2 my-0">
           {[1, 2, 3].map((val, i) => (
             <div
               key={i}
