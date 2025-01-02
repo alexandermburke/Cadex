@@ -69,6 +69,11 @@ html {
   box-shadow: 5px 8px 20px rgba(218, 202, 131, 0.5);
 }
 
+.whiteShadow {
+  box-shadow: 0 4px 15px rgba(255, 255, 255, 0.2), 
+              0 10px 30px rgba(255, 255, 255, 0.1);
+}
+
 .dropShadow {
   filter: drop-shadow(-10.8923px 14.523px 35.0973px rgba(0, 0, 0, 0.35));
 }
