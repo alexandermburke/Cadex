@@ -21,8 +21,8 @@ export default function Product() {
     <div className="relative w-full min-h-screen bg-blue-950 drop-shadow-lg overflow-hidden">
       {/* Header Container */}
       <div className="text-center mb-4 my-6">
-        <h3 className="text-6xl sm:text-6xl font-semibold text-white mb-10">
-          Try our Demo for free
+        <h3 className="text-6xl sm:text-6xl font-semibold text-white mb-10 my-8">
+          Try our Demo for <span className='goldGradient font-bold'>free</span> 
         </h3>
       </div>
 
