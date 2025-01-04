@@ -78,7 +78,7 @@ export default function Login() {
             <div className="text-right">
               <button
                 onClick={handleCloseDisclaimer}
-                className="group before:ease relative h-12 w-56 overflow-hidden rounded bg-gradient-to-r from-blue-950 to-slate-700 text-white shadow-2xl transition-all before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-56"
+                className="group before:ease relative h-12 w-56 overflow-hidden rounded bg-blue-950 text-white shadow-2xl transition-all before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-56"
               >
                 <div className="flex items-center justify-center h-full">
                   I Understand
@@ -107,7 +107,7 @@ export default function Login() {
               poppins.className
             }
           >
-            <span className="goldGradient">CadexLaw</span>
+            <span className="goldSolid">CadexLaw</span>
           </h2>
         </div>
       </div>
