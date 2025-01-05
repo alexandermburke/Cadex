@@ -51,7 +51,7 @@ export default function Footer() {
               </div>
               <div className="flex items-center gap-2 relative w-fit overflow-hidden">
                 <i className="fa-solid fa-house"></i>
-                <p>2001 N Scottsdale Road Scottsdale 85257</p>
+                <p>Scottsdale, Arizona</p>
               </div>
             </div>
           </div>
