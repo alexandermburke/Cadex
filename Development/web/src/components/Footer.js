@@ -12,7 +12,7 @@ const poppins = Poppins({
 
 export default function Footer() {
   // You can set your version number here
-  const versionNumber = '0.8.9';
+  const versionNumber = '0.9.0';
 
   return (
     <footer className="flex flex-col bg-gradient-to-r from-blue-950 to-slate-800 text-white py-4">
@@ -25,7 +25,7 @@ export default function Footer() {
               </h1>
             </Link>
           </div>
-          <p className="mx-auto text-xs">© 2024 Alexander Burke</p>
+          <p className="mx-auto text-xs">© 2025 Burke Software</p>
           {/* Version Number and Development Build */}
           <p className="mx-auto text-xs font-semibold">
             Version {versionNumber} - Development Build
