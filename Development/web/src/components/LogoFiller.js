@@ -41,14 +41,18 @@ export default function LogoFiller() {
     >
       <div className="flex flex-col items-center gap-2 font-medium">
         {/* Header Image */}
-        <div className="relative w-10 h-10 sm:w-12 sm:h-12 mx-auto my-auto">
+        <div
+          className="relative mx-auto my-auto"
+          style={{ width: 'min(44px, 25vw)', height: 'min(44px, 25vw)' }}
+        >
           <Image
             src="/header.avif"
             alt="CadexLaw Logo"
-            width={16}
-            height={16}
-            className="w-12 h-12 sm:mr-4 mb-4"
+            layout="fill"
+            objectFit="cover"
+            className="rounded-full"
             unoptimized={true}
+            quality={'100'}
           />
         </div>
         {/* Text Content */}
