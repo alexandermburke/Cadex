@@ -240,7 +240,7 @@ export default function Hero() {
             <h2 className="text-3xl font-semibold mb-4">Important Disclaimer</h2>
             <p className="mb-4 text-gray-700">
               Please note that Cadex is a supplementary tool and not a substitute for professional legal advice or formal exams. Verify all information and refer to our{' '}
-              <Link href="/legal" className="text-blue-600 underline">
+              <Link href="/termsandconditions" className="text-blue-600 underline">
                 Terms and Conditions
               </Link>.
             </p>
@@ -322,7 +322,7 @@ export default function Hero() {
           }`}
         >
           <div className="max-w-7xl w-full">
-            <h3 className={`text-4xl sm:text-5xl font-semibold text-center ${isDarkMode ? 'text-white ' : 'text-blue-950 hover:text-blue-700'}`}>
+            <h3 className={`text-4xl sm:text-5xl font-semibold text-center ${isDarkMode ? 'text-white ' : 'text-blue-950 '}`}>
               Features
             </h3>
             <Swiper
@@ -346,7 +346,7 @@ export default function Hero() {
                 >
                   <div className="w-full h-full flex flex-col items-center justify-center p-4 bg-transparent rounded shadow-lg hover:shadow-xl transition-shadow">
                     {feature.icon}
-                    <h4 className={`text-lg font-semibold mb-2 text-center ${isDarkMode ? 'text-white ' : 'text-blue-950 hover:text-blue-700'}`}>
+                    <h4 className={`text-lg font-semibold mb-2 text-center ${isDarkMode ? 'text-white ' : 'text-blue-950 '}`}>
                       {feature.title}
                     </h4>
                     <p className={`text-sm ${isDarkMode ? 'text-white ' : 'text-gray-700 '}`}>
@@ -369,7 +369,7 @@ export default function Hero() {
           }`}
         >
           <div className="max-w-5xl w-full">
-            <h3 className={`text-4xl sm:text-5xl font-semibold my-6 text-center ${isDarkMode ? 'text-white ' : 'text-blue-950 hover:text-blue-700'}`}>
+            <h3 className={`text-4xl sm:text-5xl font-semibold my-6 text-center ${isDarkMode ? 'text-white ' : 'text-blue-950 '}`}>
               Success Stories
             </h3>
             <Swiper
@@ -398,7 +398,7 @@ export default function Hero() {
                 <SwiperSlide key={index} style={{ width: '320px', height: '320px' }}>
                   <div className="bg-transparent rounded shadow-lg p-6 h-full flex flex-col justify-between hover:shadow-xl transition-shadow">
                     <div>
-                      <h4 className={`text-xl font-semibold mb-2 ${isDarkMode ? 'text-white ' : 'text-blue-950 hover:text-blue-700'}`}>
+                      <h4 className={`text-xl font-semibold mb-2 ${isDarkMode ? 'text-white ' : 'text-blue-950 '}`}>
                         {story.name}
                       </h4>
                       <p className={`text-base italic mb-4 ${isDarkMode ? 'text-white ' : 'text-gray-700 '}`}>

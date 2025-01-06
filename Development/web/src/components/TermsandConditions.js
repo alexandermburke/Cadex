@@ -22,6 +22,7 @@ export default function Legal() {
         width={100}
         height={100}
         className="mx-auto"
+        unoptimized={true}
       />
 
       {/* Update the title */}
