@@ -22,11 +22,9 @@ const plans = [
     promotion: 'First 7 days free',
     features: [
       'Comprehensive access to case simulation tools',
-      'Unlimited question explanations powered by advanced AI',
+      'Infinite question explanations powered by advanced AI',
       'Access to streamlined LSAT and Bar exam preparation resources',
-      'Flexible subscription with no long-term commitment',
       'Ad-free user experience',
-      'Engage in open discussions on public cases',
       'Cancel at any time, no questions asked',
     ],
     recommended: false,
@@ -39,7 +37,7 @@ const plans = [
     features: [
       'Includes all features from the Basic plan',
       'Full access to Pro+ Mode Exam Prep',
-      'Exclusive access to AI-driven legal assistance tools',
+      'Exclusive access to AI generated Exam Insights',
       'Comprehensive suite of professional legal resources',
       'Priority customer support and expedited feature requests',
     ],

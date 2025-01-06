@@ -37,7 +37,6 @@ export default function Header() {
 
     let shareBtn = (
         <div className='flex flex-col relative'>
-            {/* Add share-related UI here if needed */}
         </div>
     );
 
@@ -184,6 +183,7 @@ export default function Header() {
                             height={44} 
                             className={`${logoLoaded ? 'logo-animation' : 'w-12 h-12'}`} 
                             unoptimized={true}
+                            quality={'100'}
                         />
                         <h1 className={`text-xl sm:text-2xl goldGradient font-medium ${poppins.className}`}>
                             CadexLaw

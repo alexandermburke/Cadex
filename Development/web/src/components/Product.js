@@ -45,7 +45,7 @@ export default function Product() {
         
         <div className="flex-col bg-transparent flex justify-center items-start p-4 lg:p-6">
           <h3 className="text-3xl sm:text-4xl lg:text-5xl font-semibold text-white mb-4">
-            Experience Cadex <span className="goldGradient">free</span>
+            Experience Cadex <span className="goldSolid">free</span>
           </h3>
           <p className="text-lg sm:text-xl lg:text-2xl text-gray-200 mb-6 leading-relaxed max-w-md">
             Cadex is your ultimate tool for legal education. From interactive simulations to powerful exam prep, discover how Cadex can enhance your journey.

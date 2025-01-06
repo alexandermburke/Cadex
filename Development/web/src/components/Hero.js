@@ -20,7 +20,7 @@ import {
 
 import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css';
-import { Autoplay } from 'swiper/modules';
+import { Autoplay, FreeMode } from 'swiper/modules';
 import { useInView } from 'react-intersection-observer';
 import { useAuth } from '@/context/AuthContext';
 
@@ -145,6 +145,9 @@ export default function Hero() {
     },
   ];
 
+  // Duplicate features array to allow seamless scrolling
+  const duplicatedFeatures = [...features, ...features];
+
   const successStories = [
     {
       name: "Jane Doe",
@@ -218,6 +221,9 @@ export default function Hero() {
     },
   ];
 
+  // Duplicate successStories array for seamless scrolling
+  const duplicatedSuccessStories = [...successStories, ...successStories];
+
   const VerticalDivider = () => (
     <div
       className={`mx-auto w-[2px] my-0 ${
@@ -233,8 +239,8 @@ export default function Hero() {
 
   return (
     <section className="w-full bg-transparent">
-        {/* Disclaimer Popup */}
-        {showDisclaimer && (
+      {/* Disclaimer Popup */}
+      {showDisclaimer && (
         <div className="fixed inset-0 z-[151] flex items-center justify-center bg-black bg-opacity-50">
           <div className="bg-white rounded-lg p-6 max-w-lg mx-auto">
             <h2 className="text-3xl font-semibold mb-4">Important Disclaimer</h2>
@@ -295,12 +301,11 @@ export default function Hero() {
           </h2>
 
           <p className={`text-center text-2xl sm:text-2xl md:text-2xl ${isDarkMode ? 'text-white' : 'text-black'} max-w-2xl my-6`}>
-  By law students, for law students. CadexLaw uses AI to deliver high quality prep at up to <span className='goldGradient font-bold'>85%</span> lower costs than traditional competitors.
-</p>
-
+            By law students, for law students. CadexLaw uses AI to deliver high quality prep at up to <span className='goldSolid font-bold'>85%</span> lower costs than traditional competitors.
+          </p>
 
           <div className="flex justify-center mt-6 mb-6">
-          <Link
+            <Link
               href="/pricing"
               className={'group before:ease relative h-12 w-56 overflow-hidden rounded bg-blue-950 text-white shadow-2xl transition-all before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-56'}
             >
@@ -326,20 +331,20 @@ export default function Hero() {
               Features
             </h3>
             <Swiper
-              modules={[Autoplay]}
+              modules={[Autoplay, FreeMode]}
               spaceBetween={20}
               slidesPerView="auto"
               autoplay={{
-                delay: 0,
+                delay: 0, // No delay between transitions
                 disableOnInteraction: false,
               }}
-              speed={3000}
+              speed={20000} // Adjust this value to control scrolling speed (20 seconds for a full loop)
               loop={true}
               freeMode={true}
-              freeModeMomentum={false}
+              freeModeVelocityRatio={0.5} // Adjust to control the velocity of scrolling
               className="my-8"
             >
-              {features.map((feature, index) => (
+              {duplicatedFeatures.map((feature, index) => (
                 <SwiperSlide
                   key={index}
                   style={{ width: '220px', height: '250px' }}
@@ -373,17 +378,17 @@ export default function Hero() {
               Success Stories
             </h3>
             <Swiper
-              modules={[Autoplay]}
+              modules={[Autoplay, FreeMode]}
               spaceBetween={20}
               slidesPerView={1}
               autoplay={{
-                delay: 0,
+                delay: 0, // No delay between transitions
                 disableOnInteraction: false,
               }}
-              speed={3000}
+              speed={20000} // Adjust this value to control scrolling speed (20 seconds for a full loop)
               loop={true}
               freeMode={true}
-              freeModeMomentum={false}
+              freeModeVelocityRatio={0.5} // Adjust to control the velocity of scrolling
               className="my-12"
               breakpoints={{
                 640: {
@@ -394,7 +399,7 @@ export default function Hero() {
                 },
               }}
             >
-              {successStories.map((story, index) => (
+              {duplicatedSuccessStories.map((story, index) => (
                 <SwiperSlide key={index} style={{ width: '320px', height: '320px' }}>
                   <div className="bg-transparent rounded shadow-lg p-6 h-full flex flex-col justify-between hover:shadow-xl transition-shadow">
                     <div>

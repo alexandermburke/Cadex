@@ -115,6 +115,12 @@ html {
   -webkit-text-fill-color: transparent;
 }
 
+.goldSolid {
+  background: -webkit-linear-gradient(30deg, #D4B44A, #e8d28a, #e8d28a);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
 .goldBackground {
   background: linear-gradient(30deg, #D4B44A, #ecddaa);
 }

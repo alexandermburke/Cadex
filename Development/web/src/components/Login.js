@@ -41,9 +41,10 @@ export default function Login() {
       <Image
                         src="/header.avif" 
                         alt="CadexLaw Logo"
-                        width={144} 
-                        height={144} 
+                        width={520} 
+                        height={520} 
                         className='w-24 h-24 sm:mr-4 mb-4'
+                        quality={'100'}
                         unoptimized={true}
                     />
         <div className="text-center sm:text-left">
@@ -53,7 +54,7 @@ export default function Login() {
               poppins.className
             }
           >
-            <span className="goldGradient">CadexLaw</span>
+            <span className="goldSolid">CadexLaw</span>
           </h2>
         </div>
       </div>
@@ -65,14 +66,14 @@ export default function Login() {
         <input
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="flex-1 bg-white rounded max-w-[600px] mx-auto w-full outline-none border border-solid border-white p-4"
+          className="flex-1 bg-white max-w-[600px] mx-auto w-full outline-none border border-solid rounded-full border-white p-4"
           placeholder="Email"
         />
         <input
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           type="password"
-          className="flex-1 bg-white rounded max-w-[600px] mx-auto w-full outline-none border border-solid border-white p-4"
+          className="flex-1 bg-white max-w-[600px] mx-auto w-full outline-none border border-solid rounded-full border-white p-4"
           placeholder="Password"
         />
         <div
