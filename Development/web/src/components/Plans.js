@@ -16,7 +16,7 @@ const poppins = Poppins({
 const plans = [
   {
     name: 'Basic',
-    description: 'Tailored for individual legal studies and comprehensive practice.',
+    description: 'Designed for individual legal study and practice.',
     price: '$15 USD',
     interval: 'Per month',
     promotion: 'First 7 days free',
@@ -44,7 +44,6 @@ const plans = [
     recommended: true,
   },
 ];
-
 export default function Plans() {
   const [selectedPlan, setSelectedPlan] = useState(null);
   const { currentUser, userDataObj } = useAuth();

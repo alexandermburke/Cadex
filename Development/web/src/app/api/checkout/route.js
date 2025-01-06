@@ -22,7 +22,7 @@ export async function POST(request) {
     }
 
     try {
-        // Fetch the user from Firestore
+        
         const userDocRef = adminDB.collection('users').doc(userId);
         const userDoc = await userDocRef.get();
 
@@ -32,7 +32,6 @@ export async function POST(request) {
 
         let stripeCustomerId = userDoc.data().billing?.stripeCustomerId;
 
-        // If the user doesn't have a Stripe customer ID, create one
         if (!stripeCustomerId) {
             const customer = await stripe.customers.create({
                 email,
@@ -42,7 +41,6 @@ export async function POST(request) {
             });
             stripeCustomerId = customer.id;
 
-            // Update Firestore with the new Stripe customer ID
             await userDocRef.set({
                 billing: {
                     stripeCustomerId: stripeCustomerId,
@@ -50,16 +48,16 @@ export async function POST(request) {
             }, { merge: true });
         }
 
-        // Validate the selected plan
+       
         if (!priceIds[plan]) {
             throw new Error('Invalid plan selected.');
         }
 
-        // Create the Stripe Checkout Session with a 7-day trial
+     
         const session = await stripe.checkout.sessions.create({
             payment_method_types: ['card'],
             mode: 'subscription',
-            customer: stripeCustomerId, // Reuse existing customer ID
+            customer: stripeCustomerId, 
             line_items: [
                 {
                     price: priceIds[plan],
@@ -70,8 +68,8 @@ export async function POST(request) {
                 trial_period_days: 7,
             },
             success_url: `https://www.cadexlaw.com/admin/success?session_id={CHECKOUT_SESSION_ID}`,
-            cancel_url: `https://www.cadexlaw.com/admin`,
-            metadata: { userId }, // Pass userId for webhook linkage
+            cancel_url: `https://www.cadexlaw.com/admin/account`,
+            metadata: { userId }, 
         });
 
         return NextResponse.json({ url: session.url }, { status: 201 });

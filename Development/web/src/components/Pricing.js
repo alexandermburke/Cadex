@@ -173,7 +173,8 @@ export default function Plans() {
         <p
           className={`text-center ${isDarkMode ? 'text-white' : 'text-black'} ` + poppins.className}
         >
-          Stripe is currently disabled as this is not a finished product, please use the demo!
+        
+        All transactions are handled by Stripe
         </p>
 
           
