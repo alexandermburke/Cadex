@@ -148,8 +148,10 @@ export default function Account() {
                     </Link>
                 )}
                 {(plan === 'Pro' || plan === 'Basic' || plan === 'Developer') && (
-                    <Link
-                        href="/admin/billing/cancel_subscription"
+                    <a
+                        href="https://billing.stripe.com/p/login/4gwaH17kt3TRbZu5kk"
+                        target="_blank"
+                        rel="noopener noreferrer"
                         className={`group relative h-12 w-56 overflow-hidden rounded bg-transparent transition-all 
                             before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 
                             before:rotate-6 before:bg-transparent before:opacity-20 before:duration-700 
@@ -161,7 +163,7 @@ export default function Account() {
                             Cancel Subscription
                             <i className="ml-8 fa-solid fa-arrow-right opacity-0 group-hover:opacity-100 transition-opacity duration-200"></i>
                         </div>
-                    </Link>
+                    </a>
                 )}
             </div>
         ),
