@@ -38,7 +38,7 @@ const plans = [
     features: [
       'Includes all features from the Basic plan',
       'Full access to Pro+ Mode Exam Prep',
-      'Exclusive access to AI-driven legal assistance tools',
+      'Exclusive access to AI generated Exam Insights',
       'Comprehensive suite of professional legal resources',
       'Priority customer support and expedited feature requests',
     ],
