@@ -49,7 +49,6 @@ export default function Header() {
             >
                 <div className="flex items-center">
                     <p>Dashboard</p>
-                    <span className={`ml-2 px-2 py-1 text-xs rounded ${isDarkMode ? 'bg-emerald-600 text-white' : 'bg-emerald-400 text-white'}`}>New</span>
                 </div>
             </Link>
             <Link 

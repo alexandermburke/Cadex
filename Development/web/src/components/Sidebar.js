@@ -15,10 +15,9 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, i
   const plan = userDataObj?.billing?.plan?.toLowerCase() || 'free'; 
   const isDarkMode = userDataObj?.darkMode || false;
 
-  const hasAccess = plan === 'free' || plan === 'developer'; 
-  const hasSimulationAccess = plan === 'free' || plan === 'basic'; //change 'free' to 'Pro' when ready to launch
+  const hasAccess = plan === 'pro'; 
+  const hasSimulationAccess = plan === 'pro' || plan === 'basic'; //change 'free' to 'Pro' when ready to launch
 
-  // For locked links, keep original icon on the left + smaller lock on the right
   const renderLockedNavLink = (href, iconClass, label) => (
     <li>
       <div className="flex items-center justify-between gap-2 p-3 text-gray-400 cursor-not-allowed">
