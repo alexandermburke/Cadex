@@ -12,18 +12,18 @@ import { Poppins } from 'next/font/google'
 const poppins = Poppins({
     subsets: ["latin"],
     weight: ['400', '100', '200', '300', '500', '600', '700']
-});
+})
 
 export default function SuccessfulCheckoutPage() {
-    const { setUserDataObj, currentUser } = useAuth()
+    const { setUserDataObj, currentUser, userDataObj } = useAuth()
     const router = useRouter()
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState(null)
+    const currentPlan = userDataObj?.billing?.plan
 
     useEffect(() => {
         if (!currentUser?.uid) {
-            // Redirect unauthenticated users to login
-            router.push('/login') // Adjust the path as needed
+            router.push('/login')
             return
         }
 
@@ -37,7 +37,6 @@ export default function SuccessfulCheckoutPage() {
                     console.log('Found user data')
                     const firebaseData = docSnap.data()
                     setUserDataObj(firebaseData)
-                    // Optionally, cache data in local storage
                     localStorage.setItem('hyr', JSON.stringify(firebaseData))
                 } else {
                     console.log('No user data found')
@@ -81,7 +80,10 @@ export default function SuccessfulCheckoutPage() {
             <h2 className={'text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-semibold text-center ' + poppins.className}>
                 <span className='text-blue-950'>Congratulations</span>
             </h2>
-            <p className='text-center text-slate-600'>Your account was successfully upgraded to <b>Pro</b>!</p>
+            {/* Embed currentPlan using curly braces */}
+            <p className='text-center text-slate-600'>
+                Your account was successfully upgraded to <b>{currentPlan}</b>!
+            </p>
             <div className='flex flex-col items-center justify-center mt-4'>
                 <Button text="Back to dashboard" clickHandler={() => { router.push('/admin/account') }} />
             </div>
