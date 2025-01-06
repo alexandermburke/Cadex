@@ -69,8 +69,8 @@ export async function POST(request) {
             subscription_data: {
                 trial_period_days: 7,
             },
-            success_url: `${process.env.NEXT_PUBLIC_YOUR_DOMAIN}/admin/success?session_id={CHECKOUT_SESSION_ID}`,
-            cancel_url: `${process.env.NEXT_PUBLIC_YOUR_DOMAIN}/admin`,
+            success_url: `https://www.cadexlaw.com/admin/success?session_id={CHECKOUT_SESSION_ID}`,
+            cancel_url: `https://www.cadexlaw.com/admin`,
             metadata: { userId }, // Pass userId for webhook linkage
         });
 
