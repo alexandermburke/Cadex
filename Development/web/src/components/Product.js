@@ -15,7 +15,7 @@ export default function Product() {
   }, []);
 
   return (
-    <div className="relative w-full min-h-[80vh] bg-blue-950 drop-shadow-lg overflow-hidden flex items-center justify-center p-4">
+    <div className="relative w-full min-h-[60vh] bg-blue-950 drop-shadow-lg overflow-hidden flex items-center justify-center p-4">
       <div className="flex flex-col md:flex-row w-full max-w-6xl bg-transparent rounded-lg">
         {/* Image Section */}
         <div className="flex flex-col overflow-hidden rounded-lg bg-transparent w-full md:w-2/3 max-w-full">
