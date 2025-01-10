@@ -228,7 +228,7 @@ export default function ExamPrep() {
     setAnswerResult('');
 
     try {
-      const response = await fetch('/api/submit-exam-answer', {
+      const response = await fetch('/api/examprep/submit-exam-answer', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

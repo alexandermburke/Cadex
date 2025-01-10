@@ -15,7 +15,7 @@ export default function Footer() {
   const versionNumber = '0.9.1';
 
   return (
-    <footer className="flex flex-col bg-gradient-to-r from-blue-950 to-slate-800 text-white py-4">
+    <footer className="flex flex-col bg-gradient-to-r from-blue-950 to-slate-950 text-white py-4">
       <div className="flex flex-col sm:flex-row items-center justify-center flex-wrap gap-6 sm:gap-8 md:gap-10 mx-auto py-4 px-8 text-sm">
         <div className="flex flex-col w-fit shrink-0 gap-2 whitespace-nowrap text-center">
           <div className="flex flex-col mx-auto w-fit">
