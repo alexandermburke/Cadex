@@ -144,8 +144,8 @@ export default function Splash() {
             className="text-lg sm:text-xl text-gray-100 mb-8"
             variants={paragraphVariants}
           >
-            Explore a variety of LLM-powered law study aids and resources to help you
-            succeed. Pick from the options in the sidebar to start your journey.
+            Explore a variety of LLM powered law study aids and resources to help you
+            succeed. Pick from the options in the sidebar to start your work.
           </motion.p>
         </motion.div>
       </main>

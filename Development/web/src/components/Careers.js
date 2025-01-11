@@ -30,10 +30,11 @@ export default function Careers() {
                     <Image
                         src="/header.avif" 
                         alt="CadexLaw Logo"
-                        width={144} 
-                        height={144} 
+                        width={288} 
+                        height={288} 
                         className='w-24 h-24 sm:mr-4 mb-4'
                         unoptimized={true}
+                        quality={'100'}
                     />
                     <h2 className={`text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-semibold ${isDarkMode ? 'text-white' : 'text-gray-700'} ${poppins.className}`}>
                         <span className={`goldGradient ${isDarkMode ? 'text-white' : 'text-blue-950'}`}>Join Our Team</span> and Shape the Future of Legal Practice
