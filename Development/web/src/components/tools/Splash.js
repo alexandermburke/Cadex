@@ -7,6 +7,26 @@ import { useRouter } from 'next/navigation';
 import Sidebar from '../Sidebar';
 import { FaTimes, FaBars } from 'react-icons/fa';
 
+/* Generate snowflake metadata */
+const generateSnowflakes = (count) => {
+  const snowflakes = [];
+  for (let i = 0; i < count; i++) {
+    const size = Math.random() * 10 + 5; // 5px - 15px
+    snowflakes.push({
+      id: i,
+      left: Math.random() * 100,  // left position (%)
+      delay: Math.random() * 5,   // random delay
+      duration: Math.random() * 5 + 5, // 5s - 10s
+      size,
+      opacity: Math.random() * 0.5 + 0.4, // 0.4 - 0.9
+      blur: Math.random() * 2 + 1, // 1px - 3px blur
+    });
+  }
+  return snowflakes;
+};
+
+const snowflakeData = generateSnowflakes(50);
+
 export default function Splash() {
   const { currentUser } = useAuth();
   const router = useRouter();
@@ -15,7 +35,7 @@ export default function Splash() {
   const [isSidebarVisible, setIsSidebarVisible] = useState(true);
   const toggleSidebar = () => setIsSidebarVisible(!isSidebarVisible);
 
-  // If user is not logged in, show a login prompt
+  // If user not logged in, show login prompt
   if (!currentUser) {
     return (
       <div className="flex items-center justify-center h-screen bg-white text-gray-700">
@@ -38,7 +58,7 @@ export default function Splash() {
     );
   }
 
-  // Animations for splash content
+  // Framer Motion variants for hero text
   const headlineVariants = {
     hidden: { opacity: 0, y: 30 },
     visible: { opacity: 1, y: 0, transition: { duration: 0.8 } },
@@ -50,90 +70,85 @@ export default function Splash() {
   };
 
   return (
-    <>
-      {/* Keyframes and class for the animated gradient */}
-      <style jsx>{`
-        @keyframes gradientAnimation {
-          0% {
-            background-position: 0% 50%;
-          }
-          50% {
-            background-position: 100% 50%;
-          }
-          100% {
-            background-position: 0% 50%;
-          }
-        }
-        .animated-gradient {
-          background: linear-gradient(
-            120deg,
-            #7e22ce,
-            #8b5cf6,
-            #1e3a8a
-          );
-          background-size: 300% 300%;
-          animation: gradientAnimation 10s ease infinite;
-        }
-      `}</style>
+    <div className="relative flex h-screen text-white">
+      {/* Swirling AI-like background layer */}
+      <div className="animatedBackground" />
 
-      <div className="flex h-screen animated-gradient rounded shadow-md z-[150] text-white">
-        {/* Sidebar */}
-        <AnimatePresence>
-          {isSidebarVisible && (
-            <>
-              <Sidebar
-                activeLink=""
-                isSidebarVisible={isSidebarVisible}
-                toggleSidebar={toggleSidebar}
-                isAiTutor={false} // or true if needed
-              />
-              {/* Overlay for mobile */}
-              <motion.div
-                className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 0.5 }}
-                exit={{ opacity: 0 }}
-                onClick={toggleSidebar}
-              />
-            </>
-          )}
-        </AnimatePresence>
-
-        {/* Main content area */}
-        <main className="flex-1 flex flex-col items-center justify-center p-4 sm:p-6 overflow-auto relative">
-          {/* Mobile toggle (small screens) */}
-          <div className="absolute top-4 left-4 md:hidden">
-            <button
-              onClick={toggleSidebar}
-              className="text-white hover:text-gray-300 focus:outline-none"
-            >
-              {isSidebarVisible ? <FaTimes size={24} /> : <FaBars size={24} />}
-            </button>
-          </div>
-
-          {/* Splash hero content */}
-          <motion.div
-            className="max-w-4xl text-center"
-            initial="hidden"
-            animate="visible"
-            variants={{ visible: { transition: { staggerChildren: 0.2 } } }}
+      {/* Snowflake particle layer */}
+      <div className="snowflake-container">
+        {snowflakeData.map((flake) => (
+          <span
+            key={flake.id}
+            className="snowflake"
+            style={{
+              left: `${flake.left}%`,
+              fontSize: `${flake.size}px`,
+              animation: `snowfall ${flake.duration}s linear ${flake.delay}s infinite`,
+              opacity: flake.opacity,
+              filter: `blur(${flake.blur}px)`,
+            }}
           >
-            <motion.h1
-              className="text-4xl sm:text-5xl font-bold mb-6 drop-shadow-lg"
-              variants={headlineVariants}
-            >
-              Welcome to Your Dashboard, <span>User</span>
-            </motion.h1>
-            <motion.p
-              className="text-lg sm:text-xl text-gray-100 mb-8"
-              variants={paragraphVariants}
-            >
-              Explore a variety of LLM-powered law study aids and resources to help you
-              succeed. Pick from the options in the sidebar to start your journey.
-            </motion.p>
-          </motion.div>
-        </main>
+            ❄
+          </span>
+        ))}
       </div>
-    </>
+
+      {/* Sidebar */}
+      <AnimatePresence>
+        {isSidebarVisible && (
+          <>
+            <Sidebar
+              activeLink=""
+              isSidebarVisible={isSidebarVisible}
+              toggleSidebar={toggleSidebar}
+              isAiTutor={false} // or true if needed
+            />
+            {/* Overlay for mobile */}
+            <motion.div
+              className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 0.5 }}
+              exit={{ opacity: 0 }}
+              onClick={toggleSidebar}
+            />
+          </>
+        )}
+      </AnimatePresence>
+
+      {/* Main content area */}
+      <main className="flex-1 flex flex-col items-center justify-center p-4 sm:p-6 overflow-auto relative z-50">
+        {/* Mobile toggle (small screens) */}
+        <div className="absolute top-4 left-4 md:hidden">
+          <button
+            onClick={toggleSidebar}
+            className="text-white hover:text-gray-300 focus:outline-none"
+          >
+            {isSidebarVisible ? <FaTimes size={24} /> : <FaBars size={24} />}
+          </button>
+        </div>
+
+        {/* Hero / splash content */}
+        <motion.div
+          className="max-w-4xl text-center"
+          initial="hidden"
+          animate="visible"
+          variants={{ visible: { transition: { staggerChildren: 0.2 } } }}
+        >
+          <motion.h1
+            className="text-4xl sm:text-5xl font-bold mb-6 drop-shadow-lg"
+            variants={headlineVariants}
+          >
+            Welcome to Your Dashboard, <span>User</span>
+          </motion.h1>
+          <motion.p
+            className="text-lg sm:text-xl text-gray-100 mb-8"
+            variants={paragraphVariants}
+          >
+            Explore a variety of LLM-powered law study aids and resources to help you
+            succeed. Pick from the options in the sidebar to start your journey.
+          </motion.p>
+        </motion.div>
+      </main>
+    </div>
   );
 }

@@ -5,6 +5,11 @@
 /* ------------------------------
    Your global custom CSS starts 
    ------------------------------ */
+
+/* ------------------------------
+   Existing animations & classes
+   ------------------------------ */
+
 @keyframes fadeInSlide {
     0% {
         opacity: 0;
@@ -243,4 +248,70 @@ html {
 
 .toggle-checkbox:checked + .toggle-label::after {
   transform: translate(1.6rem, -50%);
+}
+
+/* ------------------------------
+   NEW: Swirling AI-like background animation 
+   and snowflake effect 
+   ------------------------------ */
+
+/* Keyframe for the swirling color animation */
+@keyframes windBlow {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+/* Animated swirl background */
+.animatedBackground {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    70deg,
+    /* AI-inspired bright colors */
+    #f43f5e,
+    #ec4899,
+    #6366f1,
+    #10b981,
+    #0ea5e9
+  );
+  background-size: 500% 500%;
+  animation: windBlow 12s ease-in-out infinite;
+  z-index: 0;
+}
+
+/* Keyframe for snowflake fall */
+@keyframes snowfall {
+  0% {
+    transform: translateY(-10%) rotate(0deg);
+  }
+  100% {
+    transform: translateY(110%) rotate(360deg);
+  }
+}
+
+/* Snowflake container sits on top of background, behind main content */
+.snowflake-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 10;
+}
+
+/* Each snowflake element */
+.snowflake {
+  position: absolute;
+  top: -5%;
+  color: #ffffff;
+  will-change: transform;
 }
