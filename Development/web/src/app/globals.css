@@ -130,6 +130,10 @@ html {
   background: linear-gradient(30deg, #D4B44A, #ecddaa);
 }
 
+.goldBackgroundAlt {
+  background: linear-gradient(30deg, #e8d28a, #e8d28a);
+}
+
 .unstyled {
   border: none;
   outline: none;
