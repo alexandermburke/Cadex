@@ -164,7 +164,7 @@ export default function Plans() {
         userId: currentUser.uid,
         email: currentUser.email,
         plan: selectedPlan,
-        billingCycle, // Pass billing cycle to backend
+        billingCycle,
       }),
     };
 
