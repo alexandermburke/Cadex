@@ -1,4 +1,5 @@
 'use client';
+
 import React, { useState, useEffect } from 'react';
 import { Poppins } from 'next/font/google';
 import Link from 'next/link';
@@ -13,9 +14,6 @@ import {
   FaChartLine,
   FaFileContract,
   FaBalanceScale,
-  FaThumbsUp,
-  FaUsers,
-  FaGraduationCap,
 } from 'react-icons/fa';
 
 import { Swiper, SwiperSlide } from 'swiper/react';
@@ -46,6 +44,7 @@ export default function Hero() {
     statsProvided: 0,
   });
 
+  // Animate stats counters
   const animateStats = (start, end, setter) => {
     let startTime;
     const duration = 7500;
@@ -65,6 +64,7 @@ export default function Hero() {
   const [animationTrigger, setAnimationTrigger] = useState(0);
   const animationInterval = 12;
 
+  // Disclaimer Popup
   const [showDisclaimer, setShowDisclaimer] = useState(false);
 
   useEffect(() => {
@@ -97,8 +97,9 @@ export default function Hero() {
     localStorage.setItem('hasSeenDisclaimer', 'true');
   };
 
-  const animatedWord = 'Dream';
+  const animatedWord = 'Experience';
 
+  // Features (focusing on law school)
   const features = [
     {
       icon: <FaGavel className={`${isDarkMode ? 'text-white' : 'text-blue-950'} text-4xl mb-4`} />,
@@ -110,7 +111,7 @@ export default function Hero() {
       icon: <FaSearch className={`${isDarkMode ? 'text-white' : 'text-blue-950'} text-4xl mb-4`} />,
       title: 'Personalized Study Materials',
       description:
-        'Access study materials tailored to your strengths and weaknesses.',
+        'Access materials tailored to your strengths and weaknesses.',
     },
     {
       icon: <FaTasks className={`${isDarkMode ? 'text-white' : 'text-blue-950'} text-4xl mb-4`} />,
@@ -131,93 +132,94 @@ export default function Hero() {
       icon: <FaChartLine className={`${isDarkMode ? 'text-white' : 'text-blue-950'} text-4xl mb-4`} />,
       title: 'Adaptive Learning',
       description:
-        'Material adapts to your learning style.',
+        'Material adapts to your learning style for maximum efficiency.',
     },
     {
       icon: <FaFileContract className={`${isDarkMode ? 'text-white' : 'text-blue-950'} text-4xl mb-4`} />,
       title: 'Exam Strategies',
-      description: 'Effective methods for complex questions.',
+      description: 'Effective methods for tackling tough law school questions.',
     },
     {
       icon: <FaBalanceScale className={`${isDarkMode ? 'text-white' : 'text-blue-950'} text-4xl mb-4`} />,
       title: 'Question Bank',
-      description: 'Thousands of questions across topics.',
+      description: 'Thousands of practice questions across legal topics.',
     },
   ];
 
   // Duplicate features array to allow seamless scrolling
   const duplicatedFeatures = [...features, ...features];
 
+  // Success Stories (now law-school oriented)
   const successStories = [
     {
       name: "Jane Doe",
-      initialScore: 154,
-      newScore: 158,
-      difference: 4,
+      initialGrade: "B-",
+      newGrade: "B+",
+      difference: 1,
       quote: "Cadex gave me confidence!",
     },
     {
       name: "John Smith",
-      initialScore: 148,
-      newScore: 155,
-      difference: 7,
+      initialGrade: "C",
+      newGrade: "B",
+      difference: 1,
       quote: "Personalized feedback made the difference.",
     },
     {
       name: "Ayesha Khan",
-      initialScore: 160,
-      newScore: 165,
-      difference: 5,
+      initialGrade: "B+",
+      newGrade: "A-",
+      difference: 1,
       quote: "I finally understood the material.",
     },
     {
       name: "Carlos Mendes",
-      initialScore: 150,
-      newScore: 157,
-      difference: 7,
+      initialGrade: "C+",
+      newGrade: "B+",
+      difference: 1,
       quote: "Smarter study beats expensive methods.",
     },
     {
       name: "Linda Green",
-      initialScore: 152,
-      newScore: 160,
-      difference: 8,
-      quote: "Structure and resources boosted my score!",
+      initialGrade: "C",
+      newGrade: "A-",
+      difference: 2,
+      quote: "Structure and resources boosted my grade!",
     },
     {
       name: "Mark Thompson",
-      initialScore: 149,
-      newScore: 156,
-      difference: 7,
-      quote: "7 points in two months!",
+      initialGrade: "C-",
+      newGrade: "B+",
+      difference: 2,
+      quote: "Two letters up in two months!",
     },
     {
       name: "Sophia Ramirez",
-      initialScore: 155,
-      newScore: 163,
-      difference: 8,
+      initialGrade: "B-",
+      newGrade: "A-",
+      difference: 1,
       quote: "Instant feedback = huge jump!",
     },
     {
       name: "David Lee",
-      initialScore: 151,
-      newScore: 158,
-      difference: 7,
+      initialGrade: "C+",
+      newGrade: "B+",
+      difference: 1,
       quote: "Felt more prepared than ever.",
     },
     {
       name: "Emma Wilson",
-      initialScore: 153,
-      newScore: 161,
-      difference: 8,
+      initialGrade: "B-",
+      newGrade: "A",
+      difference: 2,
       quote: "AI tutoring made learning easy.",
     },
     {
       name: "James Brown",
-      initialScore: 147,
-      newScore: 154,
-      difference: 7,
-      quote: "Tailored study materials helped me pass.",
+      initialGrade: "C+",
+      newGrade: "B+",
+      difference: 1,
+      quote: "Tailored study materials helped me excel.",
     },
   ];
 
@@ -234,6 +236,7 @@ export default function Hero() {
     />
   );
 
+  // Intersection Observers
   const [featuresRef, featuresInView] = useInView({ threshold: 0.1, triggerOnce: true });
   const [storiesRef, storiesInView] = useInView({ threshold: 0.1, triggerOnce: true });
 
@@ -243,9 +246,9 @@ export default function Hero() {
       {showDisclaimer && (
         <div className="fixed inset-0 z-[151] flex items-center justify-center bg-black bg-opacity-50">
           <div className="bg-white rounded-lg p-6 max-w-lg mx-auto">
-            <h2 className="text-3xl font-semibold mb-4">Important Disclaimer</h2>
+            <h2 className="text-3xl font-semibold mb-4">Disclaimer</h2>
             <p className="mb-4 text-gray-700">
-              Please note that Cadex is a supplementary tool and not a substitute for professional legal advice or formal exams. Verify all information and refer to our{' '}
+              Cadexlaw&apos;s resources are for educational purposes only and don&apos;t constitute legal advice or establish an attorney-client relationship. We&apos;re not experts in education or law. Please research and consult a licensed attorney or educator for legal matters or educational decisions. For more details, see our{' '}
               <Link href="/termsandconditions" className="text-blue-600 underline">
                 Terms and Conditions
               </Link>.
@@ -273,10 +276,12 @@ export default function Hero() {
           }`}
         >
           <h2
-            className={`text-4xl sm:text-6xl font-semibold py-2 mb-0 ${isDarkMode ? 'text-white' : 'text-blue-950'} ` + poppins.className}
+            className={`text-4xl sm:text-6xl font-semibold py-2 mb-0 ${
+              isDarkMode ? 'text-white' : 'text-blue-950'
+            } ` + poppins.className}
           >
             <span className="block mb-4">
-              Your{' '}
+              Your Dream School{' '}
               <span className="relative inline-block" key={animationTrigger} aria-hidden="true">
                 {animatedWord.split('').map((letter, letterIndex) => {
                   if (letter === ' ') {
@@ -295,23 +300,31 @@ export default function Hero() {
                   );
                 })}
               </span>{' '}
-              School Awaits.
+              Awaits.
             </span>
-            <span className="sr-only">Your Dream School Awaits.</span>
+            <span className="sr-only">Your Dream School Experience Awaits.</span>
           </h2>
 
-          <p className={`text-center text-2xl sm:text-2xl md:text-2xl ${isDarkMode ? 'text-white' : 'text-black'} max-w-2xl my-6`}>
-            By law students, for law students. CadexLaw uses AI to deliver high quality prep at up to <span className='goldSolid font-bold'>85%</span> lower costs than traditional competitors.
+          <p
+            className={`text-center text-2xl sm:text-2xl md:text-2xl ${
+              isDarkMode ? 'text-white' : 'text-black'
+            } max-w-2xl my-6`}
+          >
+            By law students, for law students. CadexLaw uses AI to deliver high quality preparation
+            at up to <span className="goldSolid font-bold">85%</span> lower costs than
+            traditional competitors.
           </p>
 
           <div className="flex justify-center mt-6 mb-6">
             <Link
               href="/pricing"
-              className={'group before:ease relative h-12 w-56 overflow-hidden rounded bg-blue-950 text-white shadow-2xl transition-all before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-56'}
+              className={
+                'group before:ease relative h-12 w-56 overflow-hidden rounded bg-blue-950 text-white shadow-2xl transition-all before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-56'
+              }
             >
               <div className="flex items-center justify-center h-full">
                 Explore Our Plans
-                <i className="ml-8 fa-solid fa-arrow-right opacity-0 group-hover:opacity-100 transition-opacity duration-200"></i>
+                <i className="ml-8 fa-solid fa-arrow-right transition-opacity duration-200"></i>
               </div>
             </Link>
           </div>
@@ -327,7 +340,11 @@ export default function Hero() {
           }`}
         >
           <div className="max-w-7xl w-full">
-            <h3 className={`text-4xl sm:text-5xl font-semibold text-center ${isDarkMode ? 'text-white ' : 'text-blue-950 '}`}>
+            <h3
+              className={`text-4xl sm:text-5xl font-semibold text-center ${
+                isDarkMode ? 'text-white ' : 'text-blue-950 '
+              }`}
+            >
               Features
             </h3>
             <Swiper
@@ -338,23 +355,28 @@ export default function Hero() {
                 delay: 0, // No delay between transitions
                 disableOnInteraction: false,
               }}
-              speed={20000} // Adjust this value to control scrolling speed (20 seconds for a full loop)
+              speed={20000} // Adjust to control scrolling speed (20 seconds for a full loop)
               loop={true}
               freeMode={true}
-              freeModeVelocityRatio={0.5} // Adjust to control the velocity of scrolling
+              freeModeVelocityRatio={0.5}
               className="my-8"
             >
               {duplicatedFeatures.map((feature, index) => (
-                <SwiperSlide
-                  key={index}
-                  style={{ width: '220px', height: '250px' }}
-                >
+                <SwiperSlide key={index} style={{ width: '220px', height: '250px' }}>
                   <div className="w-full h-full flex flex-col items-center justify-center p-4 bg-transparent rounded shadow-lg hover:shadow-xl transition-shadow">
                     {feature.icon}
-                    <h4 className={`text-lg font-semibold mb-2 text-center ${isDarkMode ? 'text-white ' : 'text-blue-950 '}`}>
+                    <h4
+                      className={`text-lg font-semibold mb-2 text-center ${
+                        isDarkMode ? 'text-white ' : 'text-blue-950 '
+                      }`}
+                    >
                       {feature.title}
                     </h4>
-                    <p className={`text-sm ${isDarkMode ? 'text-white ' : 'text-gray-700 '}`}>
+                    <p
+                      className={`text-sm ${
+                        isDarkMode ? 'text-white ' : 'text-gray-700 '
+                      }`}
+                    >
                       {feature.description}
                     </p>
                   </div>
@@ -366,7 +388,7 @@ export default function Hero() {
 
         <VerticalDivider />
 
-        {/* Success Stories Section - Carousel */}
+        {/* Success Stories Section */}
         <div
           ref={storiesRef}
           className={`flex flex-col items-center px-4 md:px-8 lg:px-16 transition-all duration-1000 ${
@@ -374,7 +396,11 @@ export default function Hero() {
           }`}
         >
           <div className="max-w-5xl w-full">
-            <h3 className={`text-4xl sm:text-5xl font-semibold my-6 text-center ${isDarkMode ? 'text-white ' : 'text-blue-950 '}`}>
+            <h3
+              className={`text-4xl sm:text-5xl font-semibold my-6 text-center ${
+                isDarkMode ? 'text-white ' : 'text-blue-950 '
+              }`}
+            >
               Success Stories
             </h3>
             <Swiper
@@ -382,13 +408,13 @@ export default function Hero() {
               spaceBetween={20}
               slidesPerView={1}
               autoplay={{
-                delay: 0, // No delay between transitions
+                delay: 0,
                 disableOnInteraction: false,
               }}
-              speed={20000} // Adjust this value to control scrolling speed (20 seconds for a full loop)
+              speed={20000}
               loop={true}
               freeMode={true}
-              freeModeVelocityRatio={0.5} // Adjust to control the velocity of scrolling
+              freeModeVelocityRatio={0.5}
               className="my-12"
               breakpoints={{
                 640: {
@@ -403,17 +429,34 @@ export default function Hero() {
                 <SwiperSlide key={index} style={{ width: '320px', height: '320px' }}>
                   <div className="bg-transparent rounded shadow-lg p-6 h-full flex flex-col justify-between hover:shadow-xl transition-shadow">
                     <div>
-                      <h4 className={`text-xl font-semibold mb-2 ${isDarkMode ? 'text-white ' : 'text-blue-950 '}`}>
+                      <h4
+                        className={`text-xl font-semibold mb-2 ${
+                          isDarkMode ? 'text-white ' : 'text-blue-950 '
+                        }`}
+                      >
                         {story.name}
                       </h4>
-                      <p className={`text-base italic mb-4 ${isDarkMode ? 'text-white ' : 'text-gray-700 '}`}>
+                      <p
+                        className={`text-base italic mb-4 ${
+                          isDarkMode ? 'text-white ' : 'text-gray-700 '
+                        }`}
+                      >
                         &ldquo;{story.quote}&rdquo;
                       </p>
                     </div>
-                    <div className={`flex items-center justify-start gap-4 ${isDarkMode ? 'text-white ' : 'text-gray-700 '} mt-auto`}>
+                    <div
+                      className={`flex items-center justify-start gap-4 ${
+                        isDarkMode ? 'text-white ' : 'text-gray-700 '
+                      } mt-auto`}
+                    >
                       <span className="text-sm">
-                        {story.initialScore} → {story.newScore} (
-                        <span className="font-bold text-emerald-500">+{story.difference}</span>)
+                        {story.initialGrade} → {story.newGrade} (
+                        <span className="font-bold text-emerald-500">
+                          {story.difference === 1
+                            ? `+${story.difference} letter`
+                            : `+${story.difference} letters`}
+                        </span>
+                        )
                       </span>
                     </div>
                   </div>

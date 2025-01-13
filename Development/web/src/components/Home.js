@@ -6,22 +6,11 @@ import CarouselComponent from './Carousel';
 import Image from 'next/image';
 import {
   FaGavel,
-  FaSearch,
-  FaTasks,
-  FaFileAlt,
-  FaRobot,
-  FaChartLine,
-  FaFileContract,
-  FaBalanceScale,
-  FaThumbsUp,
-  FaUsers,
   FaGraduationCap,
-} from 'react-icons/fa';
-
+} from 'react-icons/fa'; // (You can import other icons if needed)
 import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css';
 import { Autoplay } from 'swiper/modules';
-
 import { useInView } from 'react-intersection-observer';
 import { useAuth } from '@/context/AuthContext';
 
@@ -47,6 +36,7 @@ export default function Home() {
     statsProvided: 0,
   });
 
+  // Animate stats function
   const animateStats = (start, end, setter) => {
     let startTime;
     const duration = 7500;
@@ -66,13 +56,10 @@ export default function Home() {
   const [animationTrigger, setAnimationTrigger] = useState(0);
   const animationInterval = 12;
 
-  // Removed the disclaimer state and related logic
-
   useEffect(() => {
-    // Removed the disclaimer logic
-
     setLoaded(true);
 
+    // Trigger the stat counters
     animateStats(0, targetStats.cases, (value) =>
       setStats((prevStats) => ({ ...prevStats, cases: value }))
     );
@@ -83,6 +70,7 @@ export default function Home() {
       setStats((prevStats) => ({ ...prevStats, statsProvided: value }))
     );
 
+    // Simple interval to re-run any animations or text transformations
     const interval = setInterval(() => {
       setAnimationTrigger((prev) => prev + 1);
     }, animationInterval * 1000);
@@ -90,8 +78,7 @@ export default function Home() {
     return () => clearInterval(interval);
   }, []);
 
-  // Removed the handleCloseDisclaimer function
-
+  // Just a cosmetic divider for transitions
   const VerticalDivider = () => (
     <div
       className={`mx-auto w-[2px] my-0 ${
@@ -104,6 +91,7 @@ export default function Home() {
     />
   );
 
+  // Intersection Observers for fade-in effects
   const [featuresRef, featuresInView] = useInView({ threshold: 0.1, triggerOnce: true });
   const [whoRef, whoInView] = useInView({ threshold: 0.1, triggerOnce: true });
   const [costRef, costInView] = useInView({ threshold: 0.1, triggerOnce: true });
@@ -114,10 +102,7 @@ export default function Home() {
 
   return (
     <section className="w-full bg-transparent">
-      {/* Removed Disclaimer Popup */}
-
       <div className="max-w-7xl mx-auto px-4 py-0">
-
         {/* Who Can Benefit Section */}
         <div
           ref={whoRef}
@@ -126,11 +111,19 @@ export default function Home() {
           }`}
         >
           <div className="max-w-7xl w-full">
-            <h3 className={`text-4xl sm:text-5xl font-semibold text-center ${isDarkMode ? 'text-white' : 'text-blue-950'} my-8`}>
+            <h3
+              className={`text-4xl sm:text-5xl font-semibold text-center ${
+                isDarkMode ? 'text-white' : 'text-blue-950'
+              } my-8`}
+            >
               Who Benefits
             </h3>
-            <p className={`text-center sm:text-lg md:text-xl ${isDarkMode ? 'text-white' : 'text-black'} max-w-3xl mx-auto my-4`}>
-              From high schoolers to law professionals.
+            <p
+              className={`text-center sm:text-lg md:text-xl ${
+                isDarkMode ? 'text-white' : 'text-black'
+              } max-w-3xl mx-auto my-4`}
+            >
+              From aspiring learners to seasoned legal professionals.
             </p>
             <Swiper
               modules={[Autoplay]}
@@ -154,36 +147,71 @@ export default function Home() {
               }}
               className="my-4"
             >
+              {/* Slide 1 */}
               <SwiperSlide style={{ width: '220px', height: '250px' }}>
                 <div className="w-full h-full flex flex-col items-center justify-center p-4 bg-transparent rounded shadow-lg hover:shadow-xl transition-shadow">
-                  <FaGraduationCap className={`${isDarkMode ? 'text-white' : 'text-blue-950'} text-4xl mb-4`} />
-                  <h4 className={`text-xl font-semibold mb-2 text-center ${isDarkMode ? 'text-white' : 'text-blue-950'}`}>
-                    Students
+                  <FaGraduationCap
+                    className={`${isDarkMode ? 'text-white' : 'text-blue-950'} text-4xl mb-4`}
+                  />
+                  <h4
+                    className={`text-xl font-semibold mb-2 text-center ${
+                      isDarkMode ? 'text-white' : 'text-blue-950'
+                    }`}
+                  >
+                    Aspiring Undergraduates / High School
                   </h4>
-                  <p className={`text-base text-center ${isDarkMode ? 'text-white' : 'text-gray-700'}`}>
-                    Start strong and explore law early
+                  <p
+                    className={`text-base text-center ${
+                      isDarkMode ? 'text-white' : 'text-gray-700'
+                    }`}
+                  >
+                    Get a head start, explore legal concepts, and prepare for law school
                   </p>
                 </div>
               </SwiperSlide>
+
+              {/* Slide 2 */}
               <SwiperSlide style={{ width: '220px', height: '250px' }}>
                 <div className="w-full h-full flex flex-col items-center justify-center p-4 bg-transparent rounded shadow-lg hover:shadow-xl transition-shadow">
-                  <FaGraduationCap className={`${isDarkMode ? 'text-white' : 'text-blue-950'} text-4xl mb-4`} />
-                  <h4 className={`text-xl font-semibold mb-2 text-center ${isDarkMode ? 'text-white' : 'text-blue-950'}`}>
-                    Undergrads
+                  <FaGraduationCap
+                    className={`${isDarkMode ? 'text-white' : 'text-blue-950'} text-4xl mb-4`}
+                  />
+                  <h4
+                    className={`text-xl font-semibold mb-2 text-center ${
+                      isDarkMode ? 'text-white' : 'text-blue-950'
+                    }`}
+                  >
+                    1L, 2L & 3L Students
                   </h4>
-                  <p className={`text-base text-center ${isDarkMode ? 'text-white' : 'text-gray-700'}`}>
-                    Prep for law school success
+                  <p
+                    className={`text-base text-center ${
+                      isDarkMode ? 'text-white' : 'text-gray-700'
+                    }`}
+                  >
+                    Build on your foundation, excel in exams, and tackle advanced coursework
                   </p>
                 </div>
               </SwiperSlide>
+
+              {/* Slide 3 */}
               <SwiperSlide style={{ width: '220px', height: '250px' }}>
                 <div className="w-full h-full flex flex-col items-center justify-center p-4 bg-transparent rounded shadow-lg hover:shadow-xl transition-shadow">
-                  <FaGavel className={`${isDarkMode ? 'text-white' : 'text-blue-950'} text-4xl mb-4`} />
-                  <h4 className={`text-xl font-semibold mb-2 text-center ${isDarkMode ? 'text-white' : 'text-blue-950'}`}>
-                    Professionals
+                  <FaGavel
+                    className={`${isDarkMode ? 'text-white' : 'text-blue-950'} text-4xl mb-4`}
+                  />
+                  <h4
+                    className={`text-xl font-semibold mb-2 text-center ${
+                      isDarkMode ? 'text-white' : 'text-blue-950'
+                    }`}
+                  >
+                    Sharpen Skills
                   </h4>
-                  <p className={`text-base text-center ${isDarkMode ? 'text-white' : 'text-gray-700'}`}>
-                    Enhance knowledge and skills
+                  <p
+                    className={`text-base text-center ${
+                      isDarkMode ? 'text-white' : 'text-gray-700'
+                    }`}
+                  >
+                    Enhance expertise for final year and bar exam readiness
                   </p>
                 </div>
               </SwiperSlide>
@@ -202,15 +230,26 @@ export default function Home() {
             }`}
           >
             <div className="max-w-5xl w-full">
-              <h3 className={`text-4xl sm:text-5xl font-semibold my-8 text-center ${isDarkMode ? 'text-white' : 'text-blue-950'}`}>
+              <h3
+                className={`text-4xl sm:text-5xl font-semibold my-8 text-center ${
+                  isDarkMode ? 'text-white' : 'text-blue-950'
+                }`}
+              >
                 Universities We Partner With
               </h3>
               <CarouselComponent />
 
-              {/* Added Text Below the Carousel */}
-              <p className={`mt-4 text-center text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                Are you associated with a university and interested in partnering with CadexLaw? Please email us at{' '}
-                <a href="mailto:businessinquires@cadexlaw.com" className="text-blue-500 hover:underline">
+              <p
+                className={`mt-4 text-center text-sm ${
+                  isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                }`}
+              >
+                Are you associated with a university and interested in partnering with CadexLaw?
+                Please email us at{' '}
+                <a
+                  href="mailto:businessinquires@cadexlaw.com"
+                  className="text-blue-500 hover:underline"
+                >
                   businessinquires@cadexlaw.com
                 </a>
                 .
@@ -218,7 +257,6 @@ export default function Home() {
             </div>
           </div>
         </section>
-
       </div>
     </section>
   );

@@ -2,27 +2,10 @@
 
 import React, { useState, useEffect } from 'react';
 import Sidebar from '../Sidebar';
-import { FaBars, FaTimes } from 'react-icons/fa';
 import { motion, AnimatePresence } from 'framer-motion';
-import Slider from 'react-slick';
-import 'slick-carousel/slick/slick.css';
-import 'slick-carousel/slick/slick-theme.css';
-
-import { Pie, Bar as ChartBar, Line } from 'react-chartjs-2';
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  BarElement,
-  ArcElement,
-  Title as ChartTitle,
-  Tooltip,
-  Legend,
-} from 'chart.js';
-
+import { FaBars, FaTimes } from 'react-icons/fa';
 import { useAuth } from '@/context/AuthContext';
+import { db } from '@/firebase';
 import {
   doc,
   collection,
@@ -31,19 +14,12 @@ import {
   query,
   where,
 } from 'firebase/firestore';
-import { db } from '@/firebase';
 
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  BarElement,
-  ArcElement,
-  ChartTitle,
-  Tooltip,
-  Legend
-);
+import {
+  CircularProgressbar,
+  buildStyles
+} from 'react-circular-progressbar';
+import 'react-circular-progressbar/dist/styles.css';
 
 export default function ExamInsight() {
   const { currentUser, userDataObj } = useAuth();
@@ -52,355 +28,150 @@ export default function ExamInsight() {
   const [isSidebarVisible, setIsSidebarVisible] = useState(true);
   const [isLoadProgressModalOpen, setIsLoadProgressModalOpen] = useState(false);
   const [savedProgresses, setSavedProgresses] = useState([]);
-  const [selectedProgresses, setSelectedProgresses] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
-  // Track how many correct/incorrect answers for each progress
-  const [correctAnswersCount, setCorrectAnswersCount] = useState({});
-  const [incorrectAnswersCount, setIncorrectAnswersCount] = useState({});
-  // Track question type distribution for each progress
-  const [questionTypeDistribution, setQuestionTypeDistribution] = useState({});
-  // Track performance over time for each progress
-  const [performanceOverTime, setPerformanceOverTime] = useState({});
-  // Track recommended schools for each progress
-  const [recommendedUniversities, setRecommendedUniversities] = useState({});
-  const [isRecommending, setIsRecommending] = useState(false);
+  const [subjectScoresByProgress, setSubjectScoresByProgress] = useState({});
 
-  // We'll store the last opened progress ID in local storage
+  const lawSubjects = [
+    'Contracts',
+    'Torts',
+    'CriminalLaw',
+    'Property',
+    'Evidence',
+    'ConstitutionalLaw',
+    'CivilProcedure',
+    'BusinessAssociations',
+  ];
+
   useEffect(() => {
-    const lastProgressId = localStorage.getItem('lastProgressId');
-    if (lastProgressId) {
-      fetchSavedProgresses(true, lastProgressId);
-    } else {
-      fetchSavedProgresses(false);
-    }
+    fetchSavedProgresses();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentUser]);
 
+  // Toggle Sidebar
   const toggleSidebar = () => {
     setIsSidebarVisible(!isSidebarVisible);
   };
 
-  const openLoadProgressModal = () => {
-    setIsLoadProgressModalOpen(true);
-  };
+  // Open/Close Modal
+  const openLoadProgressModal = () => setIsLoadProgressModalOpen(true);
+  const closeLoadProgressModal = () => setIsLoadProgressModalOpen(false);
 
-  const closeLoadProgressModal = () => {
-    setIsLoadProgressModalOpen(false);
-  };
-
-  const fetchSavedProgresses = async (autoLoadLast = false, lastProgressId = '') => {
-    if (!currentUser) {
-      return;
-    }
+  // Fetch from Firestore
+  const fetchSavedProgresses = async () => {
+    if (!currentUser) return;
     setIsLoading(true);
-
     try {
       const q = query(collection(db, 'examProgress'), where('userId', '==', currentUser.uid));
-      const querySnapshot = await getDocs(q);
+      const snap = await getDocs(q);
 
       const progresses = [];
-      querySnapshot.forEach((doc) => {
-        progresses.push({ id: doc.id, ...doc.data() });
+      snap.forEach((docSnapshot) => {
+        progresses.push({ id: docSnapshot.id, ...docSnapshot.data() });
       });
+
+      // Sort progresses by timestamp ascending (oldest first)
+      progresses.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
 
       setSavedProgresses(progresses);
 
-      if (autoLoadLast && lastProgressId) {
-        const matching = progresses.find((p) => p.id === lastProgressId);
-        if (matching) {
-          if (!selectedProgresses.find((sp) => sp.id === lastProgressId)) {
-            setSelectedProgresses([matching]);
-            analyzeProgress(matching);
-          }
-        }
-      }
+      // Compute scores for all fetched progresses
+      progresses.forEach((progress) => {
+        computeSubjectScores(progress);
+      });
+
     } catch (error) {
-      console.error('Error fetching saved progresses:', error);
+      console.error('Error fetching progress docs:', error);
+      alert('Error fetching progress data.');
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleLoadProgress = (progress) => {
-    const alreadySelected = selectedProgresses.find((p) => p.id === progress.id);
-    if (!alreadySelected) {
-      setSelectedProgresses((prev) => [...prev, progress]);
-    }
-    localStorage.setItem('lastProgressId', progress.id);
-  };
-
   const handleDeleteProgress = async (id) => {
     if (!currentUser) {
-      alert('You need to be logged in to delete your progress.');
+      alert('You must be logged in to delete progress.');
       return;
     }
-
     try {
       await deleteDoc(doc(db, 'examProgress', id));
-      fetchSavedProgresses();
-      setSelectedProgresses((prev) => prev.filter((p) => p.id !== id));
-
-      const lastProgressId = localStorage.getItem('lastProgressId');
-      if (lastProgressId === id) {
-        localStorage.removeItem('lastProgressId');
-      }
+      fetchSavedProgresses(); // Refresh
     } catch (error) {
       console.error('Error deleting progress:', error);
-      alert('An error occurred while deleting the progress.');
+      alert('Error deleting progress.');
     }
   };
 
-  useEffect(() => {
-    selectedProgresses.forEach((progress) => {
-      analyzeProgress(progress);
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedProgresses]);
-
-  const analyzeProgress = (progress) => {
-    const answered = progress.answeredQuestions || [];
-    let correct = 0;
-    let incorrect = 0;
-    const typeDistribution = {};
-    const performanceTimeline = [];
-
-    answered.forEach((q) => {
-      if (q.correct) correct++;
-      else incorrect++;
-
-      const qType = q.questionType || 'Unknown';
-      if (!typeDistribution[qType]) {
-        typeDistribution[qType] = 1;
-      } else {
-        typeDistribution[qType]++;
-      }
-
-      const timestamp = new Date(q.timestamp || progress.timestamp);
-      const date = `${timestamp.getMonth() + 1}/${timestamp.getDate()}`;
-      performanceTimeline.push({ date, correct: q.correct ? 1 : 0 });
-    });
-
-    const progressId = progress.id;
-    setCorrectAnswersCount((prev) => ({ ...prev, [progressId]: correct }));
-    setIncorrectAnswersCount((prev) => ({ ...prev, [progressId]: incorrect }));
-
-    // Build performance map
-    const perfMap = {};
-    performanceTimeline.forEach((entry) => {
-      if (!perfMap[entry.date]) {
-        perfMap[entry.date] = { total: 0, correct: 0 };
-      }
-      perfMap[entry.date].total++;
-      perfMap[entry.date].correct += entry.correct;
-    });
-
-    const sortedDates = Object.keys(perfMap).sort((a, b) => new Date(a) - new Date(b));
-    const perfData = sortedDates.map((date) => ({
-      date,
-      accuracy: Number(((perfMap[date].correct / perfMap[date].total) * 100).toFixed(2)),
-    }));
-
-    setPerformanceOverTime((prev) => ({ ...prev, [progressId]: perfData }));
-    setQuestionTypeDistribution((prev) => ({ ...prev, [progressId]: typeDistribution }));
-
-    const totalAnswers = correct + incorrect;
-    const accuracy = totalAnswers ? (correct / totalAnswers) * 100 : 0;
-    recommendLawSchools(progressId, accuracy);
+  // Functionality to handle loading a saved progress
+  const handleLoadProgress = (progress) => {
+    console.log('Loading progress:', progress);
+    closeLoadProgressModal();
+    // Add your loading logic or routing here
   };
 
-  const recommendLawSchools = async (progressId, accuracy) => {
-    setIsRecommending(true);
+  // Example of additional functionality: Export progress to CSV (simple approach)
+  const handleExportCSV = (progress) => {
     try {
-      const response = await fetch('/api/recommend-law-schools', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ accuracy }),
-      });
+      const rows = [];
+      rows.push(['Exam Type', 'Subject', 'Difficulty', 'Question Limit', 'Current Question Count', 'Timestamp']);
+      rows.push([
+        progress.examConfig?.examType || 'Practice Exam',
+        progress.examConfig?.lawSubject || 'Contracts',
+        progress.examConfig?.difficulty || 'Basic',
+        progress.examConfig?.questionLimit || 5,
+        progress.currentQuestionCount,
+        new Date(progress.timestamp).toLocaleString(),
+      ]);
 
-      if (!response.ok) {
-        throw new Error('Failed to get recommendations.');
-      }
+      // Convert to CSV format
+      const csvContent =
+        'data:text/csv;charset=utf-8,' +
+        rows.map((e) => e.join(',')).join('\n');
 
-      const data = await response.json();
-      setRecommendedUniversities((prev) => ({ ...prev, [progressId]: data }));
+      // Create download link
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement('a');
+      link.setAttribute('href', encodedUri);
+      link.setAttribute('download', 'exam_progress.csv');
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
     } catch (error) {
-      console.error('Error recommending law schools:', error);
-      setRecommendedUniversities((prev) => ({ ...prev, [progressId]: [] }));
-    } finally {
-      setIsRecommending(false);
+      console.error('Error exporting to CSV:', error);
+      alert('Error exporting to CSV.');
     }
   };
 
-  // Chart Colors
-  const chartColors = {
-    pie: {
-      correct: isDarkMode ? '#6EE7B7' : '#4CAF50',
-      incorrect: isDarkMode ? '#FCA5A5' : '#F44336',
-    },
-    bar: {
-      background: isDarkMode ? '#A5B4FC' : '#3F51B5',
-    },
-    line: {
-      background: isDarkMode ? '#f9a8d4' : '#E91E63',
-    },
-    axisColor: isDarkMode ? '#FFFFFF' : '#000000',
-    gridColor: isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)',
-  };
+  function computeSubjectScores(progress) {
+    // Overall
+    const overallCorrect = progress.overallCorrect || 0;
+    const overallTotal = progress.overallTotal || 0;
+    const overallPct = overallTotal ? Math.round((overallCorrect / overallTotal) * 100) : 0;
 
-  // Pie Chart
-  const getPieData = (pid) => {
-    const correct = correctAnswersCount[pid] || 0;
-    const incorrect = incorrectAnswersCount[pid] || 0;
-    return {
-      labels: ['Correct', 'Incorrect'],
-      datasets: [
-        {
-          data: [correct, incorrect],
-          backgroundColor: [chartColors.pie.correct, chartColors.pie.incorrect],
-          borderWidth: 1,
-          borderColor: isDarkMode ? '#222' : '#ccc',
-        },
-      ],
-    };
-  };
-  const pieOptions = {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: {
-      legend: {
-        position: 'bottom',
-        labels: {
-          color: chartColors.axisColor,
-        },
-      },
-      tooltip: {
-        backgroundColor: isDarkMode ? '#333' : '#fff',
-        titleColor: isDarkMode ? '#fff' : '#000',
-        bodyColor: isDarkMode ? '#fff' : '#000',
-      },
-    },
-  };
+    // Categories
+    const cat = progress.categories || {};
+    const result = [];
+    lawSubjects.forEach((subj) => {
+      if (cat[subj]) {
+        const correct = cat[subj].correct || 0;
+        const total = cat[subj].total || 0;
+        const pct = total > 0 ? Math.round((correct / total) * 100) : 0;
+        result.push({ subjectName: subj, percentage: pct });
+      } else {
+        result.push({ subjectName: subj, percentage: 0 });
+      }
+    });
 
-  // Bar Chart
-  const getBarData = (pid) => {
-    const distribution = questionTypeDistribution[pid] || {};
-    return {
-      labels: Object.keys(distribution),
-      datasets: [
-        {
-          label: 'Questions',
-          data: Object.values(distribution),
-          backgroundColor: chartColors.bar.background,
-        },
-      ],
-    };
-  };
-  const barOptions = {
-    responsive: true,
-    maintainAspectRatio: false,
-    scales: {
-      x: {
-        ticks: {
-          color: chartColors.axisColor,
-        },
-        grid: {
-          color: chartColors.gridColor,
-        },
+    setSubjectScoresByProgress((prev) => ({
+      ...prev,
+      [progress.id]: {
+        overallPct,
+        subjects: result,
       },
-      y: {
-        beginAtZero: true,
-        ticks: {
-          color: chartColors.axisColor,
-          stepSize: 1,
-        },
-        grid: {
-          color: chartColors.gridColor,
-        },
-      },
-    },
-    plugins: {
-      legend: {
-        labels: {
-          color: chartColors.axisColor,
-        },
-      },
-      tooltip: {
-        backgroundColor: isDarkMode ? '#333' : '#fff',
-        titleColor: isDarkMode ? '#fff' : '#000',
-        bodyColor: isDarkMode ? '#fff' : '#000',
-      },
-    },
-  };
+    }));
+  }
 
-  // Line Chart
-  const getLineData = (pid) => {
-    const perf = performanceOverTime[pid] || [];
-    return {
-      labels: perf.map((p) => p.date),
-      datasets: [
-        {
-          label: 'Accuracy (%)',
-          data: perf.map((p) => p.accuracy),
-          borderColor: chartColors.line.background,
-          backgroundColor: 'transparent',
-          pointBackgroundColor: chartColors.line.background,
-          pointHoverRadius: 5,
-          tension: 0.2,
-        },
-      ],
-    };
-  };
-  const lineOptions = {
-    responsive: true,
-    maintainAspectRatio: false,
-    scales: {
-      x: {
-        ticks: {
-          color: chartColors.axisColor,
-        },
-        grid: {
-          color: chartColors.gridColor,
-        },
-      },
-      y: {
-        beginAtZero: true,
-        max: 100,
-        ticks: {
-          color: chartColors.axisColor,
-        },
-        grid: {
-          color: chartColors.gridColor,
-        },
-      },
-    },
-    plugins: {
-      legend: {
-        labels: {
-          color: chartColors.axisColor,
-        },
-      },
-      tooltip: {
-        backgroundColor: isDarkMode ? '#333' : '#fff',
-        titleColor: isDarkMode ? '#fff' : '#000',
-        bodyColor: isDarkMode ? '#fff' : '#000',
-      },
-    },
-  };
-
-  // Slick slider settings
-  const chartSettings = {
-    centerMode: true,
-    infinite: true,
-    centerPadding: '0px',
-    slidesToShow: 1,
-    speed: 500,
-    autoplay: false,
-    dots: true,
-    arrows: false,
-    adaptiveHeight: true,
-  };
-
+  // If user not logged in
   if (!currentUser) {
     return (
       <div
@@ -425,8 +196,34 @@ export default function ExamInsight() {
     );
   }
 
+  // Define styles for the overall progress circle
+  const overallStyles = buildStyles({
+    pathColor: `rgba(255, 0, 135, 0.9)`, // Neon pinkish
+    textColor: 'transparent', // Hide default text
+    trailColor: isDarkMode ? '#4B5563' : '#E5E7EB',
+    strokeLinecap: 'round',
+  });
+
+  // Define styles for subject progress circles based on percentage
+  function subjectStyles(percentage) {
+    const color = percentage >= 70 ? '#4CAF50' : '#F59E0B'; // Green if >=70%, else orange
+    return buildStyles({
+      pathColor: color,
+      textColor: 'transparent', // Hide default text
+      trailColor: isDarkMode ? '#4B5563' : '#E5E7EB',
+      strokeLinecap: 'butt',
+    });
+  }
+
+  // Helper function to calculate change compared to previous progress
+  const calculateChange = (currentPct, previousPct) => {
+    if (previousPct === null) return null;
+    return currentPct - previousPct;
+  };
+
   return (
-    <div className={`flex h-screen ${isDarkMode ? 'bg-slate-900' : 'bg-white'} rounded shadow-md`}>
+    <div className={`flex h-screen ${isDarkMode ? 'bg-slate-900' : 'bg-transparent'}`}>
+      {/* Sidebar */}
       <AnimatePresence>
         {isSidebarVisible && (
           <>
@@ -447,9 +244,10 @@ export default function ExamInsight() {
         )}
       </AnimatePresence>
 
-      <main className="flex-1 flex flex-col items-center p-6 overflow-auto">
-        {/* Top row */}
-        <div className="w-full max-w-5xl flex flex-row flex-wrap items-center justify-between mb-6 gap-2 sm:gap-4">
+      {/* Main content area */}
+      <main className="flex-1 h-full overflow-auto">
+        {/* Top header row */}
+        <div className="flex items-center justify-between p-4 sm:p-6">
           <button
             onClick={toggleSidebar}
             className={`${isDarkMode ? 'text-gray-200' : 'text-gray-600'} hover:text-white`}
@@ -480,168 +278,293 @@ export default function ExamInsight() {
             </AnimatePresence>
           </button>
 
-          {/* Load Progress Button */}
-          <div className="inline-flex flex-row flex-nowrap items-center gap-2 sm:gap-4">
-            <button
-              onClick={openLoadProgressModal}
-              className="relative h-10 sm:h-12 w-28 sm:w-36 overflow-hidden rounded bg-blue-950 text-white shadow-lg transition-colors duration-200 before:absolute before:right-0 before:top-0 before:h-full before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-56 text-sm sm:text-base"
-              aria-label="Load Progress"
-            >
-              Load Progress
-            </button>
-          </div>
+          <button
+            onClick={openLoadProgressModal}
+            className={`relative h-10 sm:h-12 w-28 sm:w-36 overflow-hidden rounded ${
+              isDarkMode ? 'bg-blue-700' : 'bg-blue-950'
+            } text-white shadow-lg transition-colors duration-200
+            before:absolute before:right-0 before:top-0 before:h-full before:w-5 before:translate-x-12 before:rotate-6
+            before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-56 text-sm sm:text-base`}
+            aria-label="Load Progress"
+          >
+            Load Progress
+          </button>
         </div>
 
-        {/* Main content box */}
-        <div
-          className={`w-full max-w-5xl p-6 ${
-            isDarkMode ? 'bg-slate-700' : 'bg-white'
-          } rounded-lg shadow-md`}
-        >
+        {/* Main Container */}
+        <div className={`px-4 pb-6 sm:px-6 lg:px-8 w-full h-auto`}>
           <h2
-            className={`text-2xl font-semibold mb-4 ${
+            className={`text-2xl font-semibold mb-6 ${
               isDarkMode ? 'text-white' : 'text-blue-900'
             }`}
           >
-            Exam Insight & Analysis
+            Exam Insight &amp; Analysis
           </h2>
 
-          {selectedProgresses.length > 0 ? (
-            <div className="space-y-8">
-              {selectedProgresses.map((prog) => {
-                const pid = prog.id;
-
-                return (
-                  <div
-                    key={pid}
-                    className={`p-4 rounded transition-colors duration-300 ${
-                      isDarkMode ? 'bg-gray-700' : 'bg-transparent'
-                    }`}
-                  >
-                    <h3
-                      className={`text-xl font-semibold mb-2 ${
-                        isDarkMode ? 'text-gray-200' : 'text-blue-800'
-                      }`}
-                    >
-                      {prog.examConfig.examType} - {prog.examConfig.lawType}
-                    </h3>
-                    <p className={`${isDarkMode ? 'text-gray-200' : 'text-gray-700'} mb-1`}>
-                      <strong>Difficulty:</strong> {prog.examConfig.difficulty}
-                    </p>
-                    <p className={`${isDarkMode ? 'text-gray-200' : 'text-gray-700'} mb-1`}>
-                      <strong>Questions:</strong>{' '}
-                      {prog.examConfig.flashcardLimit || prog.examConfig.questionLimit}
-                    </p>
-                    <p className={`${isDarkMode ? 'text-gray-200' : 'text-gray-700'} mb-1`}>
-                      <strong>Instant Feedback:</strong>{' '}
-                      {prog.examConfig.instantFeedback ? 'Enabled' : 'Disabled'}
-                    </p>
-                    <p className={`${isDarkMode ? 'text-gray-200' : 'text-gray-700'} mb-4`}>
-                      <strong>Saved on:</strong> {new Date(prog.timestamp).toLocaleString()}
-                    </p>
-
-                    {/* Charts */}
-                    <div style={{ height: '320px' }}>
-                      <Slider {...chartSettings}>
-                        {/* Pie Chart */}
-                        <div
-                          className="p-2"
-                          style={{ background: 'transparent', height: '300px' }}
-                        >
-                          <h4
-                            className={`text-center mb-2 ${
-                              isDarkMode ? 'text-gray-100' : 'text-gray-800'
-                            }`}
-                          >
-                            Performance Overview
-                          </h4>
-                          <div className="h-full relative">
-                            <Pie data={getPieData(pid)} options={pieOptions} />
-                          </div>
-                        </div>
-
-                        {/* Bar Chart */}
-                        <div
-                          className="p-2"
-                          style={{ background: 'transparent', height: '300px' }}
-                        >
-                          <h4
-                            className={`text-center mb-2 ${
-                              isDarkMode ? 'text-gray-100' : 'text-gray-800'
-                            }`}
-                          >
-                            Question Distribution
-                          </h4>
-                          <div className="h-full relative">
-                            <ChartBar data={getBarData(pid)} options={barOptions} />
-                          </div>
-                        </div>
-
-                        {/* Line Chart */}
-                        <div
-                          className="p-2"
-                          style={{ background: 'transparent', height: '300px' }}
-                        >
-                          <h4
-                            className={`text-center mb-2 ${
-                              isDarkMode ? 'text-gray-100' : 'text-gray-800'
-                            }`}
-                          >
-                            Performance Over Time
-                          </h4>
-                          <div className="h-full relative">
-                            <Line data={getLineData(pid)} options={lineOptions} />
-                          </div>
-                        </div>
-                      </Slider>
-                    </div>
-
-                    {/* Recommended Law Schools */}
-                    <div className="mt-6">
-                      <h4
-                        className={`text-lg font-semibold mb-2 ${
-                          isDarkMode ? 'text-gray-200' : 'text-blue-800'
-                        }`}
-                      >
-                        Recommended Law Schools
-                      </h4>
-                      {isRecommending ? (
-                        <p className={`${isDarkMode ? 'text-white' : 'text-gray-800'}`}>
-                          Generating recommendations...
-                        </p>
-                      ) : recommendedUniversities[pid] && recommendedUniversities[pid].length > 0 ? (
-                        <ul className="list-disc list-inside ml-5 space-y-3">
-                          {recommendedUniversities[pid].map((uni, idx) => {
-                            const notesClass = uni.notes.includes('(More Likely)')
-                              ? 'text-emerald-400'
-                              : 'text-red-400';
-                            return (
-                              <li
-                                key={idx}
-                                className={`${isDarkMode ? 'text-gray-100' : 'text-gray-800'}`}
-                              >
-                                <span className="font-semibold">{uni.name}</span>{' '}
-                                <span className={`ml-2 opacity-90 ${notesClass}`}>{uni.notes}</span>
-                                <div className="text-sm mt-1 ml-4 opacity-90">{uni.brief}</div>
-                              </li>
-                            );
-                          })}
-                        </ul>
-                      ) : (
-                        <p className={`${isDarkMode ? 'text-gray-200' : 'text-gray-700'}`}>
-                          No recommendations available.
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                );
-              })}
+          {isLoading ? (
+            <div className="flex justify-center items-center h-64">
+              <p className={`${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>Loading...</p>
             </div>
           ) : (
-            <div className="text-center">
-              <p className={`${isDarkMode ? 'text-gray-300' : 'text-gray-500'}`}>
-                Please load one or more saved progresses to view insights and analysis.
-              </p>
+            <div className="space-y-8">
+              {savedProgresses.length > 0 ? (
+                savedProgresses.map((prog, index) => {
+                  const pid = prog.id;
+                  const data = subjectScoresByProgress[pid] || { overallPct: 0, subjects: [] };
+                  const { overallPct, subjects } = data;
+
+                  // Determine previous progress for change calculation
+                  const previousProg = index > 0 ? savedProgresses[index - 1] : null;
+                  const previousData = previousProg ? subjectScoresByProgress[previousProg.id] : null;
+                  const change = previousData ? overallPct - previousData.overallPct : null;
+
+                  return (
+                    <div
+                      key={pid}
+                      className={`rounded p-4 transition-colors duration-300 ${
+                        isDarkMode ? 'bg-gray-800' : 'bg-transparent'
+                      }`}
+                    >
+                      {/* Top row: Title and optional buttons (Export, etc.) */}
+                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4">
+                        <div>
+                          <h3
+                            className={`text-xl font-semibold mb-1 ${
+                              isDarkMode ? 'text-gray-100' : 'text-blue-800'
+                            }`}
+                          >
+                            {prog.examConfig?.examType || 'Practice Exam'} -{' '}
+                            {prog.examConfig?.lawSubject || 'Contracts'}
+                          </h3>
+                          <p className={`${isDarkMode ? 'text-gray-400' : 'text-gray-600'} text-sm`}>
+                            Difficulty: {prog.examConfig?.difficulty || 'Basic'}
+                          </p>
+                        </div>
+                        <div className="flex flex-row gap-2 mt-2 sm:mt-0">
+                          <button
+                            onClick={() => handleExportCSV(prog)}
+                            className={`h-9 px-3 rounded ${
+                              isDarkMode
+                                ? 'bg-gray-700 text-white hover:bg-gray-600'
+                                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                            } text-sm`}
+                            aria-label="Export to CSV"
+                          >
+                            Export CSV
+                          </button>
+                          <button
+                            onClick={() => handleDeleteProgress(prog.id)}
+                            className={`h-9 px-3 rounded ${
+                              isDarkMode
+                                ? 'bg-red-700 text-white hover:bg-red-600'
+                                : 'bg-red-600 text-white hover:bg-red-500'
+                            } text-sm`}
+                            aria-label="Delete Progress"
+                          >
+                            Delete
+                          </button>
+                        </div>
+                      </div>
+
+                      <p className={`text-sm mb-4 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                        <strong>Saved on:</strong>{' '}
+                        {prog.timestamp ? new Date(prog.timestamp).toLocaleString() : 'Unknown'}
+                      </p>
+
+                      {/* Two-column layout: Left = Overall circle, Right = subject circles */}
+                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        {/* Overall Performance */}
+                        <div className="flex flex-col items-center justify-center">
+                          <div style={{ position: 'relative', width: 240, height: 240 }}>
+                            <CircularProgressbar
+                              value={overallPct}
+                              text={`0%`}
+                              strokeWidth={2}
+                              styles={overallStyles}
+                            />
+                            <div
+                              style={{
+                                position: 'absolute',
+                                top: '50%',
+                                left: '50%',
+                                transform: 'translate(-50%, -50%)',
+                                textAlign: 'center',
+                              }}
+                            >
+                              <span className="block text-base font-semibold">{`${overallPct} out of 100`}</span>
+                                <span
+                                  className={`block text-lg font-semibold ${
+                                    change >= 0 ? 'text-green-400' : 'text-red-400'
+                                  }`}
+                                >
+                                  {`Change: ${change >= 0 ? '+' : ''}${change}`}
+                                </span>
+                              <span className="block text-sm font-medium">{`${overallPct}th percentile`}</span>
+                            </div>
+                          </div>
+                          <p
+                            className={`mt-2 text-sm font-semibold ${
+                              isDarkMode ? 'text-gray-200' : 'text-gray-800'
+                            }`}
+                          >
+                            Overall Performance
+                          </p>
+                        </div>
+
+                        {/* Subject Performance (circular progress for each) */}
+                        <div className="flex flex-wrap justify-center items-center gap-6">
+                          {subjects.map((item) => {
+                            const { subjectName, percentage } = item;
+                            // Determine previous subject percentage
+                            let prevSubjPercentage = null;
+                            if (previousProg && previousProg.categories && previousProg.categories[subjectName]) {
+                              prevSubjPercentage = Math.round(
+                                (previousProg.categories[subjectName].correct /
+                                  previousProg.categories[subjectName].total) *
+                                  100
+                              );
+                            }
+                            const subjChange =
+                              prevSubjPercentage !== null ? percentage - prevSubjPercentage : null;
+
+                            return (
+                              <div
+                                key={subjectName}
+                                className="flex flex-col items-center justify-center"
+                              >
+                                <div style={{ position: 'relative', width: 180, height: 180 }}>
+                                  <CircularProgressbar
+                                    value={percentage}
+                                    text={`0%`}
+                                    strokeWidth={2}
+                                    styles={subjectStyles(percentage)}
+                                  />
+                                  <div
+                                    style={{
+                                      position: 'absolute',
+                                      top: '50%',
+                                      left: '50%',
+                                      transform: 'translate(-50%, -50%)',
+                                      textAlign: 'center',
+                                    }}
+                                  >
+                                    <span className="block text-sm font-semibold">{`${percentage} out of 100`}</span>
+                                      <span
+                                        className={`block text-sm font-semibold ${
+                                          subjChange >= 0 ? 'text-green-400' : 'text-red-400'
+                                        }`}
+                                      >
+                                        {`Change: ${subjChange >= 0 ? '+' : ''}${subjChange}`}
+                                      </span>
+                                    <span className="block text-xs font-medium">{`${percentage}th percentile`}</span>
+                                  </div>
+                                </div>
+                                <p
+                                  className={`mt-2 text-xs font-semibold ${
+                                    isDarkMode ? 'text-gray-200' : 'text-gray-800'
+                                  }`}
+                                >
+                                  {subjectName}
+                                </p>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })
+              ) : (
+                // Display default progress bars with 0% when no progresses are loaded
+                <div className="space-y-8">
+                  <div
+                    className={`p-4 rounded shadow-lg transition-colors duration-300 ${
+                      isDarkMode ? 'bg-gray-800' : 'bg-white'
+                    }`}
+                  >
+                    {/* Top row: Title */}
+                    <div className="flex items-center justify-between mb-4">
+                      <div>
+                        <h3
+                          className={`text-xl font-semibold mb-1 ${
+                            isDarkMode ? 'text-gray-200' : 'text-blue-800'
+                          }`}
+                        >
+                          No Saved Exam Progress
+                        </h3>
+                      </div>
+                    </div>
+
+                    {/* Overall Circle (bigger) */}
+                    <div className="flex flex-col items-center mb-6">
+                      <div style={{ position: 'relative', width: 120, height: 120 }}>
+                        <CircularProgressbar
+                          value={0}
+                          text={`0%`}
+                          strokeWidth={2}
+                          styles={overallStyles}
+                        />
+                        <div
+                          style={{
+                            position: 'absolute',
+                            top: '50%',
+                            left: '50%',
+                            transform: 'translate(-50%, -50%)',
+                            textAlign: 'center',
+                          }}
+                        >
+                          <span className="block text-base font-semibold">{`0 out of 100`}</span>
+                          <span className="block text-lg font-semibold text-green-400">{`Change: N/A`}</span>
+                          <span className="block text-sm font-medium">{`0 percentile`}</span>
+                        </div>
+                      </div>
+                      <p
+                        className={`mt-2 text-sm font-semibold ${
+                          isDarkMode ? 'text-gray-200' : 'text-gray-800'
+                        }`}
+                      >
+                        Overall Performance
+                      </p>
+                    </div>
+
+                    {/* Smaller circles for each subject */}
+                    <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-4 lg:grid-cols-6 gap-4 justify-items-center">
+                      {lawSubjects.map((subjectName) => (
+                        <div key={subjectName} className="flex flex-col items-center">
+                          <div style={{ position: 'relative', width: 70, height: 70 }}>
+                            <CircularProgressbar
+                              value={0}
+                              text={`0%`}
+                              strokeWidth={2}
+                              styles={subjectStyles(0)}
+                            />
+                            <div
+                              style={{
+                                position: 'absolute',
+                                top: '50%',
+                                left: '50%',
+                                transform: 'translate(-50%, -50%)',
+                                textAlign: 'center',
+                              }}
+                            >
+                              <span className="block text-sm font-semibold">{`0 out of 100`}</span>
+                              <span className="block text-md font-semibold text-green-400">{`Change: N/A`}</span>
+                              <span className="block text-xs font-medium">{`0 percentile`}</span>
+                            </div>
+                          </div>
+                          <p
+                            className={`mt-2 text-xs font-semibold ${
+                              isDarkMode ? 'text-gray-200' : 'text-gray-800'
+                            }`}
+                          >
+                            {subjectName}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </div>
@@ -651,7 +574,7 @@ export default function ExamInsight() {
       <AnimatePresence>
         {isLoadProgressModalOpen && (
           <motion.div
-            className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-[180]"
+            className={`fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-[180]`}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -687,37 +610,35 @@ export default function ExamInsight() {
                         isDarkMode ? 'border-gray-700' : 'border-gray-200'
                       } rounded`}
                     >
-                      <div className="flex justify-between items-start">
-                        <div>
+                      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start">
+                        <div className="mb-2 sm:mb-0">
                           <p
                             className={`font-semibold ${
                               isDarkMode ? 'text-cyan-300' : 'text-blue-900'
                             }`}
                           >
-                            Exam Type: {progress.examConfig.examType}
+                            Exam Type: {progress.examConfig?.examType || 'Practice Exam'}
                           </p>
                           <p
                             className={`text-sm ${
                               isDarkMode ? 'text-gray-300' : 'text-gray-600'
                             }`}
                           >
-                            Law Type: {progress.examConfig.lawType}
+                            Law Subject: {progress.examConfig?.lawSubject || 'Contracts'}
                           </p>
                           <p
                             className={`text-sm ${
                               isDarkMode ? 'text-gray-300' : 'text-gray-600'
                             }`}
                           >
-                            Difficulty: {progress.examConfig.difficulty}
+                            Difficulty: {progress.examConfig?.difficulty || 'Basic'}
                           </p>
                           <p
                             className={`text-sm ${
                               isDarkMode ? 'text-gray-300' : 'text-gray-600'
                             }`}
                           >
-                            Number of Questions:{' '}
-                            {progress.examConfig.flashcardLimit ||
-                              progress.examConfig.questionLimit}
+                            Questions: {progress.examConfig?.questionLimit || 5}
                           </p>
                           <p
                             className={`text-sm ${
@@ -734,7 +655,7 @@ export default function ExamInsight() {
                             Saved on: {new Date(progress.timestamp).toLocaleString()}
                           </p>
                         </div>
-                        <div className="flex space-x-2 mt-2 sm:mt-0">
+                        <div className="flex flex-row space-x-2">
                           <button
                             onClick={() => handleLoadProgress(progress)}
                             className="h-10 w-20 sm:w-24 overflow-hidden rounded bg-blue-600 text-white shadow-lg transition-colors duration-200 hover:bg-blue-500 text-sm sm:text-base"
@@ -759,10 +680,10 @@ export default function ExamInsight() {
                 <button
                   type="button"
                   onClick={closeLoadProgressModal}
-                  className={`h-10 sm:h-12 px-4 py-2 rounded ${
+                  className={`h-10 sm:h-12 px-6 py-2 rounded ${
                     isDarkMode
-                      ? 'bg-gray-700 text-gray-200 hover:bg-gray-600'
-                      : 'bg-gray-300 text-gray-700 hover:bg-gray-400'
+                      ? 'bg-gray-600 hover:bg-gray-500 text-gray-300'
+                      : 'bg-gray-300 hover:bg-gray-400 text-gray-700'
                   } transition-colors duration-200 text-sm sm:text-base`}
                   aria-label="Close Load Progress Modal"
                 >

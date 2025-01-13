@@ -1,139 +1,101 @@
-// /app/api/examprep/get-exam-question/route.js
-
 import { NextResponse } from 'next/server';
 import OpenAI from 'openai';
 
 export async function POST(request) {
   try {
-    // Parse the JSON body from the request
-    const { examType, difficulty, lawType, selectedQuestionTypes } = await request.json();
+    // 1. Parse the JSON body
+    const {
+      examType = 'Practice Exam',
+      difficulty = 'Basic',
+      lawSubject = 'General Law',
+      selectedQuestionTypes = [],
+      questionLimit = 5,
+      instantFeedback = false,
+      includeCurveBalls = false,
+      allowMultipleChoice = true,
+      preferEssayStyle = false,
+      // ... any other fields as needed
+    } = await request.json();
 
-    // Validate input parameters
-    if (!examType || !difficulty) {
-      console.warn('Incomplete exam configuration received:', { examType, difficulty });
-      return NextResponse.json(
-        { error: 'Incomplete exam configuration. Please provide examType and difficulty.' },
-        { status: 400 }
-      );
-    }
-
-    // Mapping difficulty levels to detailed descriptions
-    const difficultyDetails = {
-      // LSAT difficulty mapping
-      'Below 150':
-        'basic understanding with straightforward scenarios, purpose is to generate a below 150 LSAT equivalent score',
-      '150-160':
-        'intermediate understanding with moderate complexity, purpose is to generate a 150 to 160 LSAT equivalent score',
-      '160-170':
-        'advanced understanding with complex and nuanced scenarios, purpose is to generate a 160 to 170 LSAT equivalent score',
-      '175+':
-        'expert-level understanding with extremely complex and nuanced scenarios, purpose is to generate a 175 or higher LSAT equivalent score',
-      // BAR difficulty mapping
-      'Below Average': 'basic proficiency with fundamental concepts',
-      Average: 'solid proficiency with moderately challenging concepts',
-      'Above Average': 'high proficiency with complex and challenging concepts',
-      Expert: 'very high proficiency with complex and extremely challenging concepts',
-      // MPRE difficulty mapping
-      Basic: 'basic ethical understanding with simple scenarios',
-      Intermediate: 'intermediate ethical understanding with moderate complexity',
-      Advanced: 'advanced ethical understanding with complex and nuanced scenarios',
+    // 2. Build a difficulty description (example)
+    const lawStudentDifficultyDetails = {
+      Basic:
+        'introductory-level complexity for a law student with basic familiarity of the subject',
+      Intermediate:
+        'moderate complexity requiring some knowledge of underlying legal doctrines',
+      Advanced:
+        'high complexity demanding deeper legal reasoning and nuanced analysis',
+      Expert:
+        'expert-level complexity reflecting mastery with highly sophisticated arguments',
     };
+    const difficultyDescription = lawStudentDifficultyDetails[difficulty] || difficulty;
 
-    const difficultyDescription = difficultyDetails[difficulty] || difficulty;
-
-    // Build the question types description for the prompt
-    let questionTypesDescription = '';
+    // 3. Collect question type info
+    let questionTypesBlock = '';
     if (Array.isArray(selectedQuestionTypes) && selectedQuestionTypes.length > 0) {
-      questionTypesDescription = '- Question Focus: The question should be of the following type(s):\n';
+      questionTypesBlock = 'The question should incorporate the following style/elements:\n';
       selectedQuestionTypes.forEach((type) => {
-        questionTypesDescription += `  - ${type}\n`;
+        questionTypesBlock += `- ${type}\n`;
       });
     }
 
-    // Decide prompt based on LSAT vs. other exams
-    let prompt = '';
+    // 4. Construct the prompt to GPT
+    let prompt = `
+You are an expert exam question writer focusing on law students' practice exams. 
+Create a well-formatted question covering "${lawSubject}" at a "${difficultyDescription}" level. 
+Exam Type/Purpose: ${examType}
 
-    if (examType === 'LSAT') {
-      // 50/50 chance for multiple-choice Logical Reasoning vs. Analytical Reasoning
-      const isMultipleChoice = Math.random() < 0.5;
+Details:
+- questionLimit: ${questionLimit}
+- instantFeedback: ${instantFeedback ? 'enabled' : 'disabled'}
+- includeCurveBalls: ${includeCurveBalls ? 'yes' : 'no'}
+- allowMultipleChoice: ${allowMultipleChoice ? 'yes' : 'no'}
+- preferEssayStyle: ${preferEssayStyle ? 'yes' : 'no'}
 
-      if (isMultipleChoice) {
-        // LSAT Logical Reasoning multiple-choice prompt
-        prompt = `You are an expert question writer for the LSAT. Create a multiple-choice question that matches the style and format of a real LSAT Logical Reasoning question.
+${questionTypesBlock || ''}
 
-- Difficulty Level: ${difficultyDescription}. The question should reflect the difficulty expected for a student aiming for a score of ${difficulty} on the LSAT.
-${questionTypesDescription ? questionTypesDescription : ''}
-- Content Focus: The question should involve logical reasoning, analyzing arguments, identifying assumptions, or drawing conclusions, without any legal content.
-- Style Guidelines:
-  - Include a stimulus (a short passage) followed by a question stem.
-  - Provide five answer choices labeled (A), (B), (C), (D), (E).
-  - Each answer choice must start on a new line and be plausible enough to avoid obvious elimination.
-  - Use clear and precise language appropriate for the LSAT.
-  - Do not include any introductory explanations or answers.
-  - **Ensure that each answer choice is labeled exactly as (A), (B), (C), (D), or (E) followed by a space, with no markdown or asterisks.**
-  - Do not use any asterisks or markdown formatting in the question.
-  - Do not include any introductory phrases or apologies, just return the question text.`;
-      } else {
-        // LSAT Analytical Reasoning (Logic Games) prompt
-        prompt = `You are an expert question writer for the LSAT. Create an Analytical Reasoning (Logic Games) question that matches the style and format of a real LSAT question.
+**Requirements**:
+1. Provide a concise but sufficiently detailed Fact Pattern:
+   - The scenario must be relevant to ${lawSubject}.
+   - Should contain legal or factual nuances typical of a law school exam.
 
-- Difficulty Level: ${difficultyDescription}. The question should reflect the difficulty expected for a student aiming for a score of ${difficulty} on the LSAT.
-${questionTypesDescription ? questionTypesDescription : ''}
-- Content Focus: Present a scenario followed by a set of conditions or rules, then pose a question based on that setup.
-- Style Guidelines:
-  - The scenario and rules should be clear and concise but sufficiently complex.
-  - Provide one question related to the scenario with five answer choices labeled (A), (B), (C), (D), (E).
-  - Each answer choice should start on a new line.
-  - Use standard LSAT formatting and language conventions.
-  - Do not include any introductory explanations or answers.
-  - **Ensure that each answer choice is labeled exactly as (A), (B), (C), (D), or (E) followed by a space, with no markdown or asterisks.**
-  - Do not use any asterisks or markdown formatting in the question.
-  - Do not include any introductory phrases or apologies, just return the question text.`;
-      }
-    } else {
-      // General prompt for other exams (BAR, MPRE, etc.)
-      if (!lawType) {
-        console.warn('Law type is missing for non-LSAT exam.');
-        return NextResponse.json(
-          { error: 'Incomplete exam configuration. Please provide lawType for non-LSAT exams.' },
-          { status: 400 }
-        );
-      }
+2. Provide separate question(s). 
+   - If essay style, separate out the sub-questions with headings like "Question 1:", "Question 2:", etc.
+   - If multiple-choice, label answers exactly as (A), (B), (C), (D), (E), each on a new line.
 
-      prompt = `You are an expert question writer for the ${examType}. Create a ${lawType} question that matches the style and format of a real ${examType} question.
+3. Use clear section headings, for example:
+   "Fact Pattern:" 
+    <some lines of text>
+   
+   "Question 1:" 
+    <the question or sub-question>
+   
+   "Question 2:" 
+    ... etc.
 
-- Difficulty Level: ${difficultyDescription}. The question should reflect the difficulty expected for a student aiming for a score of ${difficulty} on the ${examType}.
-- Question Type: Ensure the question adheres to the types commonly found on the ${examType}, such as essay questions or multiple-choice questions.
-${questionTypesDescription ? questionTypesDescription : ''}
-- Content Focus: Specifically address key concepts and complexities within ${lawType}, including relevant subtopics or typical scenarios.
-- Style Guidelines:
-  - Use clear and precise language appropriate for the ${examType}.
-  - The question should be well-structured and adhere to the exam's standards.
-  - For multiple-choice questions, provide four or five answer choices labeled (A), (B), (C), (D), (E).
-  - Each answer choice should start on a new line.
-  - For essay questions, present a detailed fact pattern that requires analysis.
-  - Do not include any introductory explanations or answers.
-  - **Ensure that each answer choice is labeled exactly as (A), (B), (C), (D), or (E) followed by a space, with no markdown or asterisks.**
-  - Do not use any asterisks or markdown formatting in the question.
-  - Base questions on most recent possible information (specifically LSAT)
-  - Do not include any introductory phrases or apologies, just return the question text.`;
-    }
+4. Do not provide solutions or commentary, only the final text of the question. 
+5. Avoid disclaimers, apologies, or extraneous conversation. 
+6. No markdown formatting, no asterisks, no code fences. 
+7. Output must be easily readable: 
+   - Insert blank lines where appropriate between the Fact Pattern and the questions. 
+   - Avoid huge paragraphs without line breaks.
 
-    // Initialize OpenAI API client
+Return only this question text, nothing else.
+`;
+
+    // 5. Call GPT (here using GPT-4) 
     const openai = new OpenAI({
-      apiKey: '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',
-      organization: 'org-GlmR3M6uGsW47UCXYi5CyZph',
+      apiKey: process.env.OPENAI_API_KEY,
     });
 
-    // Make the API request to OpenAI, now with GPT-4
     const response = await openai.chat.completions.create({
-      model: 'gpt-4',  // <---- UPDATED TO GPT-4
+      model: 'gpt-3.5-turbo',
       messages: [{ role: 'user', content: prompt }],
-      max_tokens: 700, // Adjust as needed
-      temperature: 0.7, // Adjust as needed
+      max_tokens: 1200,
+      temperature: 0.7,
     });
 
-    // Validate the structure of the response
+    // 6. Validate
     if (
       !response ||
       !response.choices ||
@@ -143,23 +105,27 @@ ${questionTypesDescription ? questionTypesDescription : ''}
       !response.choices[0].message.content
     ) {
       console.error('Unexpected response structure from OpenAI:', response);
-      throw new Error('Unexpected response structure from OpenAI.');
+      throw new Error('Unexpected response from OpenAI.');
     }
 
-    const question = response.choices[0].message.content.trim();
+    let question = response.choices[0].message.content.trim();
 
-    // Check if a question was generated
     if (!question) {
-      console.error('OpenAI did not return any question.');
-      throw new Error('No question generated by the AI.');
+      console.error('OpenAI returned no question text.');
+      throw new Error('No question generated by AI.');
     }
 
-    // Return the generated question
+    // 7. Optional Post-processing:
+    // If GPT forgot to add some spacing or headings, let's do some
+    // simple replacements or line breaks. For instance, if we detect
+    // "Fact Pattern:", but there's no blank line after, we can add one:
+    question = question.replace(/Fact Pattern:\s*/gi, 'Fact Pattern:\n\n');
+    question = question.replace(/Question\s+(\d+):\s*/gi, 'Question $1:\n\n');
+
+    // 8. Return
     return NextResponse.json({ question }, { status: 200 });
   } catch (error) {
-    console.error('Error generating exam question:', error);
-
-    // Return an error response
+    console.error('Error generating question:', error);
     return NextResponse.json(
       { error: 'An error occurred while generating the exam question.' },
       { status: 500 }

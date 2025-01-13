@@ -25,7 +25,7 @@ export default function Footer() {
               </h1>
             </Link>
           </div>
-          <p className="mx-auto text-xs">© 2025 Burke Software</p>
+          <p className="mx-auto text-xs">© 2025 Cadex Software</p>
           {/* Version Number and Development Build */}
           <p className="mx-auto text-xs font-semibold">
             Version {versionNumber} - Development Build

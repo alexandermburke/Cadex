@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { FaLock } from 'react-icons/fa';
 import { motion } from 'framer-motion';
-import clsx from 'clsx'; // Ensure clsx is installed: npm install clsx
+import clsx from 'clsx';
 
 export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, isAiTutor }) {
   const router = useRouter();
@@ -15,8 +15,8 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, i
   const plan = userDataObj?.billing?.plan?.toLowerCase() || 'free'; 
   const isDarkMode = userDataObj?.darkMode || false;
 
-  const hasAccess = plan === 'pro'; 
-  const hasSimulationAccess = plan === 'pro' || plan === 'basic'; //change 'free' to 'Pro' when ready to launch
+  const hasAccess = plan === 'basic'; 
+  const hasSimulationAccess = plan === 'pro' || plan === 'basic';
 
   const renderLockedNavLink = (href, iconClass, label) => (
     <li>
@@ -73,13 +73,14 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, i
             : 'bg-transparent hover:bg-blue-800 hover:bg-opacity-75'
         }`}
       >
-        <i className={`${iconClass} bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 bg-clip-text text-transparent`}></i>
+        <i
+          className={`${iconClass} bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 bg-clip-text text-transparent`}
+        ></i>
         <span className="text-white">{label}</span>
       </Link>
     </li>
   );
 
-  // Determine background gradient based on dark mode
   const sidebarBackground = clsx({
     'bg-gradient-to-b from-blue-900 to-slate-900': isDarkMode,
     'bg-gradient-to-b from-blue-950 to-slate-950': !isDarkMode,
@@ -100,38 +101,41 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, i
       </div>
 
       <nav className="flex-1 overflow-y-auto px-6">
-        {/* Replaced "Study & Research" with new items */}
+        {/* Study & Research */}
         <section className="mb-6">
           <h2 className="text-lg font-semibold mb-4">Study & Research</h2>
           <ul className="space-y-2">
             {hasAccess ? (
               <>
                 {renderNavLink('/lawtools/dictionary', 'fa-solid fa-book', 'Legal Dictionary')}
-                {renderNavLink('/lawtools/briefeditor', 'fa-solid fa-file-pen', 'Brief Editor')}
+                {renderNavLink('/lawtools/casesummaries', 'fa-solid fa-gavel', 'Case Summaries')}
                 {renderNavLink('/lawtools/lecturesummaries', 'fa-solid fa-chalkboard-user', 'Lecture Summaries')}
               </>
             ) : (
               <>
                 {renderLockedNavLink('/lawtools/dictionary', 'fa-solid fa-book', 'Legal Dictionary')}
-                {renderLockedNavLink('/lawtools/briefeditor', 'fa-solid fa-file-pen', 'Brief Editor')}
+                {renderLockedNavLink('/lawtools/casesummaries', 'fa-solid fa-gavel', 'Case Summaries')}
                 {renderLockedNavLink('/lawtools/lecturesummaries', 'fa-solid fa-chalkboard-user', 'Lecture Summaries')}
               </>
             )}
           </ul>
         </section>
 
+        {/* AI Study Aids */}
         <section className="mb-6">
-          <h2 className="text-lg font-semibold mb-4">AI Study Aids</h2>
+          <h2 className="text-lg font-semibold mb-4">Advanced Study Tools</h2>
           <ul className="space-y-2">
             {hasAccess ? (
               <>
                 {renderNavLink('/ailawtools/flashcards', 'fa-solid fa-lightbulb', 'Generative Flashcards')}
+                {renderNavLink('/ailawtools/irac', 'fa-solid fa-file-alt', 'One-Click IRAC')}
                 {colorfulrenderNavLink('/ailawtools/lexapi', 'fa-solid fa-brain', 'LExAPI Tutor')}
                 {renderNavLink('/ailawtools/insights', 'fa-solid fa-chart-line', 'Exam Insights')}
               </>
             ) : (
               <>
                 {renderLockedNavLink('/ailawtools/flashcards', 'fa-solid fa-lightbulb', 'Generative Flashcards')}
+                {renderLockedNavLink('/ailawtools/irac', 'fa-solid fa-file-alt', 'One-Click IRAC')}
                 {renderLockedNavLink('/ailawtools/lexapi', 'fa-solid fa-brain', 'LExAPI Tutor')}
                 {renderLockedNavLink('/ailawtools/insights', 'fa-solid fa-chart-line', 'Exam Insights')}
               </>
@@ -139,16 +143,17 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, i
           </ul>
         </section>
 
+        {/* Exam Preparation */}
         <section className="mb-6">
           <h2 className="text-lg font-semibold mb-4">Exam Preparation</h2>
           <ul className="space-y-2">
             {hasSimulationAccess ? (
               <>
-                {renderNavLink('/ailawtools/examprep', 'fa-solid fa-flask', 'LSAT/BAR Prep')}
+                {renderNavLink('/ailawtools/examprep', 'fa-solid fa-pencil-ruler', 'Practice Exams')}
               </>
             ) : (
               <>
-                {renderLockedNavLink('/ailawtools/examprep', 'fa-solid fa-flask', 'LSAT/BAR Prep')}
+                {renderLockedNavLink('/ailawtools/examprep', 'fa-solid fa-pencil-ruler', 'Practice Exams')}
               </>
             )}
             <li>
@@ -167,7 +172,9 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, i
       <footer className="px-6 py-4 bg-transparent">
         <div className="flex items-center gap-4">
           <div className="flex-1 min-w-0">
-            <p className="font-semibold truncate">{currentUser?.displayName || 'User'}</p>
+            <p className="font-semibold truncate">
+              {currentUser?.displayName || 'User'}
+            </p>
             <p className="text-sm text-blue-200 truncate">
               {currentUser?.email || 'user@example.com'}
             </p>

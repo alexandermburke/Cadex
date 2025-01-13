@@ -54,7 +54,8 @@ export default function Product() {
             Experience Cadex <span className="goldSolid">Free</span>
           </h3>
           <p className="text-lg sm:text-xl lg:text-2xl text-gray-200 mb-6 leading-relaxed max-w-md">
-            Cadex is your ultimate tool for legal education. From interactive simulations to powerful exam prep, discover how Cadex can enhance your journey.
+            Cadex is your ultimate tool for legal education. From interactive simulations to powerful
+            exam prep, discover how Cadex can enhance your journey.
           </p>
           <a
             href="https://demo.cadexlaw.com"

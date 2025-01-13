@@ -17,11 +17,121 @@ import { useAuth } from '@/context/AuthContext';
 import { FaBars, FaTimes, FaSave, FaSyncAlt } from 'react-icons/fa';
 import { motion, AnimatePresence } from 'framer-motion';
 
+// ----------------------------------------
+// 1. STUDY MAPPING FOR LAW SCHOOL
+// ----------------------------------------
+/** 
+ * We replace LSAT/Bar/MPRE references with typical law school progressions:
+ * 1L, 2L, 3L, LLM
+ * Each year has various course topics, each with subTopics.
+ */
+const studyMapping = {
+  '1L': {
+    topics: [
+      { value: 'Contracts', label: 'Contracts' },
+      { value: 'Torts', label: 'Torts' },
+      { value: 'Civil Procedure', label: 'Civil Procedure' },
+    ],
+    subTopics: {
+      'Contracts': [
+        { value: 'Formation', label: 'Formation' },
+        { value: 'Performance', label: 'Performance' },
+        { value: 'Remedies', label: 'Remedies' },
+      ],
+      'Torts': [
+        { value: 'Negligence', label: 'Negligence' },
+        { value: 'Intentional Torts', label: 'Intentional Torts' },
+        { value: 'Strict Liability', label: 'Strict Liability' },
+      ],
+      'Civil Procedure': [
+        { value: 'Jurisdiction', label: 'Jurisdiction' },
+        { value: 'Pleadings', label: 'Pleadings' },
+        { value: 'Discovery', label: 'Discovery' },
+      ],
+    },
+  },
+  '2L': {
+    topics: [
+      { value: 'Criminal Law', label: 'Criminal Law' },
+      { value: 'Evidence', label: 'Evidence' },
+      { value: 'Property', label: 'Property' },
+    ],
+    subTopics: {
+      'Criminal Law': [
+        { value: 'Homicide', label: 'Homicide' },
+        { value: 'Inchoate Offenses', label: 'Inchoate Offenses' },
+        { value: 'Defenses', label: 'Defenses' },
+      ],
+      'Evidence': [
+        { value: 'Relevance', label: 'Relevance' },
+        { value: 'Hearsay', label: 'Hearsay' },
+        { value: 'Privileges', label: 'Privileges' },
+      ],
+      'Property': [
+        { value: 'Estates in Land', label: 'Estates in Land' },
+        { value: 'Landlord-Tenant', label: 'Landlord-Tenant' },
+        { value: 'Future Interests', label: 'Future Interests' },
+      ],
+    },
+  },
+  '3L': {
+    topics: [
+      { value: 'Constitutional Law', label: 'Constitutional Law' },
+      { value: 'Family Law', label: 'Family Law' },
+      { value: 'Wills & Trusts', label: 'Wills & Trusts' },
+      { value: 'Business Associations', label: 'Business Associations' },
+    ],
+    subTopics: {
+      'Constitutional Law': [
+        { value: 'Equal Protection', label: 'Equal Protection' },
+        { value: 'Due Process', label: 'Due Process' },
+        { value: 'First Amendment', label: 'First Amendment' },
+      ],
+      'Family Law': [
+        { value: 'Marriage & Divorce', label: 'Marriage & Divorce' },
+        { value: 'Child Custody', label: 'Child Custody' },
+        { value: 'Alimony & Child Support', label: 'Alimony & Child Support' },
+      ],
+      'Wills & Trusts': [
+        { value: 'Intestacy', label: 'Intestacy' },
+        { value: 'Trust Formation', label: 'Trust Formation' },
+        { value: 'Will Formalities', label: 'Will Formalities' },
+      ],
+      'Business Associations': [
+        { value: 'Corporations', label: 'Corporations' },
+        { value: 'Partnerships', label: 'Partnerships' },
+        { value: 'LLCs', label: 'LLCs' },
+      ],
+    },
+  },
+  'LLM': {
+    topics: [
+      { value: 'International Law', label: 'International Law' },
+      { value: 'Tax Law', label: 'Tax Law' },
+    ],
+    subTopics: {
+      'International Law': [
+        { value: 'Treaties', label: 'Treaties' },
+        { value: 'Jurisdiction Issues', label: 'Jurisdiction Issues' },
+        { value: 'International Dispute Resolution', label: 'International Dispute Resolution' },
+      ],
+      'Tax Law': [
+        { value: 'Individual Taxation', label: 'Individual Taxation' },
+        { value: 'Corporate Taxation', label: 'Corporate Taxation' },
+        { value: 'Tax Procedure', label: 'Tax Procedure' },
+      ],
+    },
+  },
+};
+
+// ----------------------------------------
 export default function AiTutor() {
   const { currentUser, userDataObj } = useAuth();
   const router = useRouter();
 
   const isDarkMode = userDataObj?.darkMode || false;
+
+  // User session states
   const [inputText, setInputText] = useState('');
   const [questionText, setQuestionText] = useState('');
   const [questionStem, setQuestionStem] = useState('');
@@ -29,21 +139,25 @@ export default function AiTutor() {
   const [answerResult, setAnswerResult] = useState('');
   const [isSidebarVisible, setIsSidebarVisible] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
+
   const [isConfigModalOpen, setIsConfigModalOpen] = useState(false);
   const [isLoadProgressModalOpen, setIsLoadProgressModalOpen] = useState(false);
   const [isFinalFeedbackModalOpen, setIsFinalFeedbackModalOpen] = useState(false);
-  const [savedProgresses, setSavedProgresses] = useState([]);
 
+  const [savedProgresses, setSavedProgresses] = useState([]);
   const [currentQuestionCount, setCurrentQuestionCount] = useState(0);
   const [answeredQuestions, setAnsweredQuestions] = useState([]);
   const [isSessionActive, setIsSessionActive] = useState(false);
   const [isCommunicating, setIsCommunicating] = useState(false);
 
+  // ----------------------------------------
+  // 2. TUTOR CONFIG FOR LAW SCHOOL
+  // ----------------------------------------
   const [tutorConfig, setTutorConfig] = useState({
-    examType: 'LSAT',
-    topic: 'Logical Reasoning',
-    subTopic: '',
-    complexity: 'Intermediate',
+    studyYear: '1L',              // e.g. '1L', '2L', '3L', 'LLM'
+    course: 'Contracts',          // e.g. 'Contracts', 'Torts'
+    subTopic: 'Formation',        // e.g. 'Formation', 'Performance'
+    complexity: 'Intermediate',   // Basic, Intermediate, Advanced, Expert
     questionLimit: 5,
     userPrompt: '',
     showLegalReferences: true,
@@ -51,8 +165,12 @@ export default function AiTutor() {
     liveMode: false,
     highlightHue: 60,
     highlightOpacity: 0.6,
+    // New checkboxes for law students
+    includeKeyCases: false,
+    includeStatutes: false,
   });
 
+  // Complexity options
   const complexityOptions = [
     { value: 'Basic', label: 'Basic' },
     { value: 'Intermediate', label: 'Intermediate' },
@@ -60,172 +178,17 @@ export default function AiTutor() {
     { value: 'Expert', label: 'Expert' },
   ];
 
-  const examMapping = {
-    LSAT: {
-      topics: [
-        { value: 'Logical Reasoning', label: 'Logical Reasoning' },
-        { value: 'Reading Comprehension', label: 'Reading Comprehension' },
-        { value: 'Analytical Reasoning', label: 'Analytical Reasoning' },
-      ],
-      subTopics: {
-        'Logical Reasoning': [
-          { value: 'Assumption', label: 'Assumption' },
-          { value: 'Strengthen', label: 'Strengthen' },
-          { value: 'Weaken', label: 'Weaken' },
-        ],
-        'Reading Comprehension': [
-          { value: 'Main Idea', label: 'Main Idea' },
-          { value: 'Detail', label: 'Detail' },
-          { value: 'Inference', label: 'Inference' },
-        ],
-        'Analytical Reasoning': [
-          { value: 'Logic Games', label: 'Logic Games' },
-        ],
-      },
-    },
-    Bar: {
-      topics: [
-        { value: 'Criminal Law', label: 'Criminal Law' },
-        { value: 'Civil Procedure', label: 'Civil Procedure' },
-        { value: 'Contracts', label: 'Contracts' },
-      ],
-      subTopics: {
-        'Criminal Law': [
-          { value: 'Homicide', label: 'Homicide' },
-          { value: 'Theft', label: 'Theft' },
-          { value: 'Fraud', label: 'Fraud' },
-        ],
-        'Civil Procedure': [
-          { value: 'Jurisdiction', label: 'Jurisdiction' },
-          { value: 'Pleadings', label: 'Pleadings' },
-          { value: 'Discovery', label: 'Discovery' },
-        ],
-        'Contracts': [
-          { value: 'Formation', label: 'Formation' },
-          { value: 'Performance', label: 'Performance' },
-          { value: 'Breach', label: 'Breach' },
-        ],
-      },
-    },
-    MPRE: {
-      topics: [
-        { value: 'Professional Responsibility', label: 'Professional Responsibility' },
-        { value: 'Ethics', label: 'Ethics' },
-      ],
-      subTopics: {
-        'Professional Responsibility': [
-          { value: 'Confidentiality', label: 'Confidentiality' },
-          { value: 'Conflict of Interest', label: 'Conflict of Interest' },
-        ],
-        'Ethics': [
-          { value: 'Advertising', label: 'Advertising' },
-          { value: 'Fees', label: 'Fees' },
-        ],
-      },
-    },
-  };
-
-  const [topicOptions, setTopicOptions] = useState(examMapping['LSAT'].topics);
+  // Build out dynamic options
+  const [topicOptions, setTopicOptions] = useState(studyMapping['1L'].topics);
   const [subTopicOptions, setSubTopicOptions] = useState(
-    examMapping['LSAT'].subTopics['Logical Reasoning'] || []
+    studyMapping['1L'].subTopics['Contracts'] || []
   );
 
-  useEffect(() => {
-    const selectedExam = tutorConfig.examType;
-    const newTopicOptions = examMapping[selectedExam]?.topics || [];
-    const newSubTopicOptions = examMapping[selectedExam]?.subTopics[tutorConfig.topic] || [];
-
-    setTopicOptions(newTopicOptions);
-    setSubTopicOptions(newSubTopicOptions);
-
-    setTutorConfig((prevConfig) => ({
-      ...prevConfig,
-      topic: newTopicOptions[0]?.value || '',
-      subTopic: newSubTopicOptions[0]?.value || '',
-    }));
-  }, [tutorConfig.examType]);
-
-  useEffect(() => {
-    const selectedExam = tutorConfig.examType;
-    const selectedTopic = tutorConfig.topic;
-    const newSubTopicOptions = examMapping[selectedExam]?.subTopics[selectedTopic] || [];
-    setSubTopicOptions(newSubTopicOptions);
-
-    setTutorConfig((prevConfig) => ({
-      ...prevConfig,
-      subTopic: newSubTopicOptions[0]?.value || '',
-    }));
-  }, [tutorConfig.topic, tutorConfig.examType]);
-
+  // Canvas Particle Visualizer
   const visualizerCanvas = useRef(null);
   const animationFrameId = useRef(null);
 
-  class Particle {
-    constructor(canvasWidth, canvasHeight, config) {
-      this.canvasWidth = canvasWidth;
-      this.canvasHeight = canvasHeight;
-      this.config = config;
-      this.reset();
-    }
-
-    reset() {
-      this.x = Math.random() * this.canvasWidth;
-      this.y = Math.random() * this.canvasHeight;
-      const speed = Math.random() * this.config.maxSpeed;
-      const angle = Math.random() * Math.PI * 2;
-      this.vx = Math.cos(angle) * speed;
-      this.vy = Math.sin(angle) * speed;
-      this.size = Math.random() * this.config.maxSize + 1;
-      this.color = this.config.colors[Math.floor(Math.random() * this.config.colors.length)];
-      this.alpha = Math.random() * 0.5 + 0.5;
-    }
-
-    update() {
-      this.x += this.vx;
-      this.y += this.vy;
-
-      if (this.x <= 0 || this.x >= this.canvasWidth) {
-        this.vx *= -1;
-      }
-      if (this.y <= 0 || this.y >= this.canvasHeight) {
-        this.vy *= -1;
-      }
-
-      if (
-        this.x < -50 ||
-        this.x > this.canvasWidth + 50 ||
-        this.y < -50 ||
-        this.y > this.canvasHeight + 50
-      ) {
-        this.reset();
-      }
-    }
-
-    draw(ctx) {
-      ctx.beginPath();
-      ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-      ctx.fillStyle = `rgba(${hexToRgb(this.color)}, ${this.alpha})`;
-      ctx.shadowColor = this.color;
-      ctx.shadowBlur = 15;
-      ctx.fill();
-    }
-  }
-
-  function hexToRgb(hex) {
-    hex = hex.replace('#', '');
-    if (hex.length === 3) {
-      hex = hex
-        .split('')
-        .map((h) => h + h)
-        .join('');
-    }
-    const bigint = parseInt(hex, 16);
-    const r = (bigint >> 16) & 255;
-    const g = (bigint >> 8) & 255;
-    const b = bigint & 255;
-    return `${r}, ${g}, ${b}`;
-  }
-
+  // 3. Particle config for the background
   const particleConfig = {
     numParticles: 100,
     maxSpeed: 1.0,
@@ -233,39 +196,93 @@ export default function AiTutor() {
     colors: ['#00FFFF', '#7B68EE', '#1E90FF', '#BA55D3', '#00CED1'],
   };
 
+  // -------------------------------
+  // 4. UseEffect: update topic/subTopic on studyYear changes
+  // -------------------------------
+  useEffect(() => {
+    const selectedYear = tutorConfig.studyYear;
+    const newTopicOptions = studyMapping[selectedYear]?.topics || [];
+    const firstTopic = newTopicOptions[0]?.value || '';
+
+    const newSubTopicOptions =
+      studyMapping[selectedYear]?.subTopics[firstTopic] || [];
+
+    setTopicOptions(newTopicOptions);
+    setSubTopicOptions(newSubTopicOptions);
+
+    setTutorConfig((prevConfig) => ({
+      ...prevConfig,
+      course: firstTopic, // e.g. 'Contracts'
+      subTopic: newSubTopicOptions[0]?.value || '',
+    }));
+  }, [tutorConfig.studyYear]);
+
+  useEffect(() => {
+    const selectedYear = tutorConfig.studyYear;
+    const selectedCourse = tutorConfig.course;
+    const newSubTopicOptions =
+      studyMapping[selectedYear]?.subTopics[selectedCourse] || [];
+
+    setSubTopicOptions(newSubTopicOptions);
+
+    setTutorConfig((prevConfig) => ({
+      ...prevConfig,
+      subTopic: newSubTopicOptions[0]?.value || '',
+    }));
+  }, [tutorConfig.course, tutorConfig.studyYear]);
+
+  // -------------------------------
+  // 5. Particle Visualizer
+  // -------------------------------
   useEffect(() => {
     const canvas = visualizerCanvas.current;
     const ctx = canvas.getContext('2d');
     let particles = [];
 
-    const initializeParticles = () => {
-      particles = [];
-      for (let i = 0; i < particleConfig.numParticles; i++) {
-        particles.push(new Particle(canvas.width, canvas.height, particleConfig));
+    class Particle {
+      constructor(canvasWidth, canvasHeight, config) {
+        this.canvasWidth = canvasWidth;
+        this.canvasHeight = canvasHeight;
+        this.config = config;
+        this.reset();
       }
-    };
 
-    const resizeCanvas = () => {
-      canvas.width = canvas.parentElement.clientWidth;
-      canvas.height = canvas.parentElement.clientHeight;
-      initializeParticles();
-    };
+      reset() {
+        this.x = Math.random() * this.canvasWidth;
+        this.y = Math.random() * this.canvasHeight;
+        const speed = Math.random() * this.config.maxSpeed;
+        const angle = Math.random() * Math.PI * 2;
+        this.vx = Math.cos(angle) * speed;
+        this.vy = Math.sin(angle) * speed;
+        this.size = Math.random() * this.config.maxSize + 1;
+        this.color =
+          this.config.colors[Math.floor(Math.random() * this.config.colors.length)];
+        this.alpha = Math.random() * 0.5 + 0.5;
+      }
 
-    const draw = () => {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.globalAlpha = 0.7;
+      update() {
+        this.x += this.vx;
+        this.y += this.vy;
 
-      particles.forEach((particle) => {
-        particle.update();
-        particle.draw(ctx);
-      });
+        if (this.x <= 0 || this.x >= this.canvasWidth) {
+          this.vx *= -1;
+        }
+        if (this.y <= 0 || this.y >= this.canvasHeight) {
+          this.vy *= -1;
+        }
+      }
 
-      connectParticles(ctx, particles, canvas.width, canvas.height);
+      draw(ctx) {
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(${hexToRgb(this.color)}, ${this.alpha})`;
+        ctx.shadowColor = this.color;
+        ctx.shadowBlur = 15;
+        ctx.fill();
+      }
+    }
 
-      animationFrameId.current = requestAnimationFrame(draw);
-    };
-
-    const connectParticles = (ctx, particles, width, height) => {
+    function connectParticles(ctx, particles) {
       const maxDistance = 100;
       ctx.beginPath();
       for (let i = 0; i < particles.length; i++) {
@@ -284,12 +301,52 @@ export default function AiTutor() {
         }
       }
       ctx.stroke();
+    }
+
+    function hexToRgb(hex) {
+      hex = hex.replace('#', '');
+      if (hex.length === 3) {
+        hex = hex
+          .split('')
+          .map((h) => h + h)
+          .join('');
+      }
+      const bigint = parseInt(hex, 16);
+      const r = (bigint >> 16) & 255;
+      const g = (bigint >> 8) & 255;
+      const b = bigint & 255;
+      return `${r}, ${g}, ${b}`;
+    }
+
+    const resizeCanvas = () => {
+      canvas.width = canvas.parentElement.clientWidth;
+      canvas.height = canvas.parentElement.clientHeight;
+      initParticles();
+    };
+
+    const initParticles = () => {
+      particles = [];
+      for (let i = 0; i < particleConfig.numParticles; i++) {
+        particles.push(new Particle(canvas.width, canvas.height, particleConfig));
+      }
+    };
+
+    const animate = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.globalAlpha = 0.7;
+
+      particles.forEach((particle) => {
+        particle.update();
+        particle.draw(ctx);
+      });
+
+      connectParticles(ctx, particles);
+      animationFrameId.current = requestAnimationFrame(animate);
     };
 
     resizeCanvas();
     window.addEventListener('resize', resizeCanvas);
-
-    draw();
+    animate();
 
     return () => {
       window.removeEventListener('resize', resizeCanvas);
@@ -299,10 +356,11 @@ export default function AiTutor() {
     };
   }, []);
 
-  const toggleSidebar = () => {
-    setIsSidebarVisible(!isSidebarVisible);
-  };
+  const toggleSidebar = () => setIsSidebarVisible(!isSidebarVisible);
 
+  // --------------------------------------
+  // 6. Handlers: get question, submit answer, etc.
+  // --------------------------------------
   const handleGetQuestion = async () => {
     setIsLoading(true);
     setIsCommunicating(true);
@@ -313,6 +371,7 @@ export default function AiTutor() {
     setInputText('');
 
     try {
+      // POST to /api/tutor/get-ai-question but now for law students
       const response = await fetch('/api/tutor/get-ai-question', {
         method: 'POST',
         headers: {
@@ -321,19 +380,16 @@ export default function AiTutor() {
         body: JSON.stringify(tutorConfig),
       });
 
-      if (!response.ok) {
-        throw new Error('Failed to get AI question');
-      }
+      if (!response.ok) throw new Error('Failed to get AI question');
 
       const { question, highlightedSections } = await response.json();
       setHighlightedSections(highlightedSections || []);
-
       setQuestionStem(question);
       setQuestionText(question);
       setIsSessionActive(true);
     } catch (error) {
       console.error('Error fetching AI question:', error);
-      setQuestionText('An error occurred while fetching the AI question.');
+      setQuestionText('An error occurred while fetching the question.');
     } finally {
       setIsLoading(false);
       setIsCommunicating(false);
@@ -342,7 +398,6 @@ export default function AiTutor() {
 
   const handleSubmitAnswer = async () => {
     if (!inputText.trim()) return;
-
     setIsLoading(true);
     setIsCommunicating(true);
     setAnswerResult('');
@@ -350,23 +405,21 @@ export default function AiTutor() {
     try {
       const response = await fetch('/api/tutor/submit-ai-answer', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           question: questionText,
           answer: inputText,
-          examType: tutorConfig.examType,
-          topic: tutorConfig.topic,
+          studyYear: tutorConfig.studyYear,
+          course: tutorConfig.course,
           subTopic: tutorConfig.subTopic,
           showLegalReferences: tutorConfig.showLegalReferences,
           provideApproach: tutorConfig.provideApproach,
+          includeKeyCases: tutorConfig.includeKeyCases,
+          includeStatutes: tutorConfig.includeStatutes,
         }),
       });
 
-      if (!response.ok) {
-        throw new Error('Failed to submit answer');
-      }
+      if (!response.ok) throw new Error('Failed to submit answer');
 
       const { feedback, correct, highlightedSections: newHighlights } = await response.json();
 
@@ -379,8 +432,8 @@ export default function AiTutor() {
         setHighlightedSections(newHighlights);
       }
 
-      setAnsweredQuestions((prevQuestions) => [
-        ...prevQuestions,
+      setAnsweredQuestions((prev) => [
+        ...prev,
         {
           question: questionText || 'No question text provided.',
           answer: inputText || 'No answer provided.',
@@ -399,6 +452,7 @@ export default function AiTutor() {
     }
   };
 
+  // If we exceed the questionLimit
   useEffect(() => {
     if (currentQuestionCount >= tutorConfig.questionLimit && questionText !== '') {
       setCurrentQuestionCount(0);
@@ -406,30 +460,20 @@ export default function AiTutor() {
     }
   }, [currentQuestionCount, tutorConfig.questionLimit, questionText]);
 
-  const openConfigModal = () => {
-    setIsConfigModalOpen(true);
-  };
-
-  const closeConfigModal = () => {
-    setIsConfigModalOpen(false);
-  };
+  // --------------------------------------
+  // 7. Configuration & Modal Handling
+  // --------------------------------------
+  const openConfigModal = () => setIsConfigModalOpen(true);
+  const closeConfigModal = () => setIsConfigModalOpen(false);
 
   const openLoadProgressModal = () => {
     fetchSavedProgresses();
     setIsLoadProgressModalOpen(true);
   };
+  const closeLoadProgressModal = () => setIsLoadProgressModalOpen(false);
 
-  const closeLoadProgressModal = () => {
-    setIsLoadProgressModalOpen(false);
-  };
-
-  const openFinalFeedbackModal = () => {
-    setIsFinalFeedbackModalOpen(true);
-  };
-
-  const closeFinalFeedbackModal = () => {
-    setIsFinalFeedbackModalOpen(false);
-  };
+  const openFinalFeedbackModal = () => setIsFinalFeedbackModalOpen(true);
+  const closeFinalFeedbackModal = () => setIsFinalFeedbackModalOpen(false);
 
   const handleConfigChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -444,43 +488,31 @@ export default function AiTutor() {
     handleGetQuestion();
   };
 
+  // --------------------------------------
+  // 8. Saving & Loading Progress
+  // --------------------------------------
   const handleSaveProgress = async () => {
     if (!currentUser) {
       alert('You need to be logged in to save your progress.');
       return;
     }
-
     try {
       const progressData = {
         userId: currentUser.uid,
-        tutorConfig: {
-          examType: tutorConfig.examType || 'LSAT',
-          topic: tutorConfig.topic || 'Logical Reasoning',
-          subTopic: tutorConfig.subTopic || '',
-          complexity: tutorConfig.complexity || 'Intermediate',
-          questionLimit: tutorConfig.questionLimit || 5,
-          userPrompt: tutorConfig.userPrompt || '',
-          showLegalReferences: tutorConfig.showLegalReferences || false,
-          provideApproach: tutorConfig.provideApproach || false,
-          liveMode: tutorConfig.liveMode || false,
-          highlightHue: tutorConfig.highlightHue || 60,
-          highlightOpacity: tutorConfig.highlightOpacity || 0.5,
-        },
+        tutorConfig: { ...tutorConfig },
         questionText: questionText || '',
         inputText: inputText || '',
         answerResult: answerResult || '',
         currentQuestionCount: currentQuestionCount || 0,
         answeredQuestions: answeredQuestions.map((q) => ({
-          question: q.question || 'No question text provided.',
-          answer: q.answer || 'No answer provided.',
-          feedback: q.feedback || 'No feedback provided.',
-          correct: typeof q.correct === 'boolean' ? q.correct : false,
+          question: q.question || '',
+          answer: q.answer || '',
+          feedback: q.feedback || '',
+          correct: q.correct || false,
         })),
         timestamp: new Date().toISOString(),
       };
-
       await addDoc(collection(db, 'tutorProgress'), progressData);
-
       alert('Progress saved successfully!');
     } catch (error) {
       console.error('Error saving progress:', error);
@@ -490,20 +522,17 @@ export default function AiTutor() {
 
   const fetchSavedProgresses = async () => {
     if (!currentUser) {
-      alert('You need to be logged in to load your progress.');
+      alert('You need to be logged in to load progress.');
       return;
     }
-
     try {
       const q = query(collection(db, 'tutorProgress'), where('userId', '==', currentUser.uid));
       const querySnapshot = await getDocs(q);
-
-      const progresses = [];
+      const results = [];
       querySnapshot.forEach((doc) => {
-        progresses.push({ id: doc.id, ...doc.data() });
+        results.push({ id: doc.id, ...doc.data() });
       });
-
-      setSavedProgresses(progresses);
+      setSavedProgresses(results);
     } catch (error) {
       console.error('Error fetching saved progresses:', error);
       alert('An error occurred while fetching saved progresses.');
@@ -520,25 +549,26 @@ export default function AiTutor() {
     setIsSessionActive(true);
     setQuestionStem(progress.questionText);
     setHighlightedSections([]);
-
     closeLoadProgressModal();
   };
 
   const handleDeleteProgress = async (id) => {
     if (!currentUser) {
-      alert('You need to be logged in to delete your progress.');
+      alert('You need to be logged in to delete progress.');
       return;
     }
-
     try {
       await deleteDoc(doc(db, 'tutorProgress', id));
       fetchSavedProgresses();
     } catch (error) {
       console.error('Error deleting progress:', error);
-      alert('An error occurred while deleting the progress.');
+      alert('An error occurred while deleting progress.');
     }
   };
 
+  // --------------------------------------
+  // 9. Access Control
+  // --------------------------------------
   if (!currentUser) {
     return (
       <div className="flex items-center justify-center h-screen bg-gray-100">
@@ -632,18 +662,24 @@ export default function AiTutor() {
             </AnimatePresence>
           </button>
 
-          {/* Load Progress and Configure AI Tutor Buttons */}
+          {/* Load Progress & Configure */}
           <div className="inline-flex flex-row flex-nowrap items-center gap-2 sm:gap-4">
             <button
               onClick={openLoadProgressModal}
-              className="relative h-10 sm:h-12 w-28 sm:w-40 overflow-hidden rounded bg-blue-700 text-white shadow-lg transition-colors duration-200 before:absolute before:right-0 before:top-0 before:h-full before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-56 text-sm sm:text-base"
+              className="relative h-10 sm:h-12 w-28 sm:w-40 overflow-hidden rounded bg-blue-700 text-white shadow-lg transition-colors duration-200 
+                         before:absolute before:right-0 before:top-0 before:h-full before:w-5 
+                         before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 
+                         before:duration-700 hover:before:-translate-x-56 text-sm sm:text-base"
               aria-label="Load Progress"
             >
               Load Progress
             </button>
             <button
               onClick={openConfigModal}
-              className="relative h-10 sm:h-12 w-28 sm:w-40 overflow-hidden rounded bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white shadow-lg transition-colors duration-200 before:absolute before:right-0 before:top-0 before:h-full before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-56 text-sm sm:text-base"
+              className="relative h-10 sm:h-12 w-28 sm:w-40 overflow-hidden rounded bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white shadow-lg transition-colors duration-200 
+                         before:absolute before:right-0 before:top-0 before:h-full before:w-5 
+                         before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 
+                         before:duration-700 hover:before:-translate-x-56 text-sm sm:text-base"
               aria-label="Configure AI Tutor"
             >
               Configure
@@ -667,7 +703,7 @@ export default function AiTutor() {
           </div>
         )}
 
-        {/* Visualizer and Feedback */}
+        {/* Visualizer & Feedback */}
         <div className="w-full max-w-5xl flex flex-col items-center">
           {/* Visualizer Container */}
           <AnimatePresence>
@@ -683,10 +719,10 @@ export default function AiTutor() {
                   ref={visualizerCanvas}
                   className="absolute top-0 left-0 w-full h-full rounded-full"
                 ></canvas>
-
                 <div className="absolute inset-0 flex items-center justify-center">
                   <textarea
-                    className="w-48 sm:w-64 h-24 bg-transparent text-center p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-white font-semibold text-lg"
+                    className="w-48 sm:w-64 h-24 bg-transparent text-center p-2 rounded-md focus:outline-none 
+                               focus:ring-2 focus:ring-blue-500 text-white font-semibold text-lg"
                     value={messageDisplay()}
                     readOnly
                     aria-label="AI Communication Status"
@@ -700,7 +736,8 @@ export default function AiTutor() {
           {/* Feedback Textbox */}
           <div className="w-full max-w-5xl mb-6">
             <textarea
-              className="w-full h-48 p-4 rounded resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-200 text-white bg-transparent"
+              className="w-full h-48 p-4 rounded resize-none focus:outline-none focus:ring-2 
+                         focus:ring-blue-500 transition-colors duration-200 text-white bg-transparent"
               value={answerResult || ''}
               readOnly
               aria-label="AI Feedback"
@@ -713,7 +750,6 @@ export default function AiTutor() {
             <div className="w-full max-w-5xl mb-6 p-6 bg-white bg-opacity-20 backdrop-blur-md rounded-lg shadow-md overflow-y-scroll">
               <h3 className="text-2xl font-semibold text-white mb-2">Law Question</h3>
               <h3 className="text-sm font-medium text-gray-200 mb-6">LExAPI Version: 0.3.6</h3>
-
               <div className="text-gray-100 mb-4 whitespace-pre-wrap">
                 {showHighlights && highlightedSections && highlightedSections.length > 0 ? (
                   highlightedSections.map((section, idx) =>
@@ -741,7 +777,7 @@ export default function AiTutor() {
                 )}
               </div>
 
-              {/* Why These Areas Are Highlighted Section */}
+              {/* Why These Areas Are Highlighted */}
               {showHighlights && highlightedReasons.length > 0 && (
                 <div className="mt-4 p-4 bg-gray-900 bg-opacity-50 rounded">
                   <h4 className="text-lg text-blue-300 font-semibold mb-2">
@@ -765,8 +801,11 @@ export default function AiTutor() {
               {!answerResult && (
                 <textarea
                   className={`w-full p-4 border ${
-                    isDarkMode ? 'border-gray-600 bg-gray-700 text-white' : 'border-gray-300 bg-white text-gray-800'
-                  } rounded resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-200`}
+                    isDarkMode
+                      ? 'border-gray-600 bg-gray-700 text-white'
+                      : 'border-gray-300 bg-white text-gray-800'
+                  } rounded resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 
+                             transition-colors duration-200`}
                   value={inputText}
                   onChange={(e) => setInputText(e.target.value)}
                   placeholder="Enter your answer here..."
@@ -807,10 +846,7 @@ export default function AiTutor() {
                   disabled={!currentUser}
                   aria-label="Save Progress"
                 >
-                  <motion.div
-                    whileHover={{ scale: 1.2, rotate: 360 }}
-                    transition={{ duration: 0.5 }}
-                  >
+                  <motion.div whileHover={{ scale: 1.2, rotate: 360 }} transition={{ duration: 0.5 }}>
                     <FaSave size={24} />
                   </motion.div>
                 </button>
@@ -820,10 +856,7 @@ export default function AiTutor() {
                   disabled={isLoading}
                   aria-label="Generate New Question"
                 >
-                  <motion.div
-                    whileHover={{ scale: 1.2, rotate: -360 }}
-                    transition={{ duration: 0.5 }}
-                  >
+                  <motion.div whileHover={{ scale: 1.2, rotate: -360 }} transition={{ duration: 0.5 }}>
                     <FaSyncAlt size={24} />
                   </motion.div>
                 </button>
@@ -831,16 +864,16 @@ export default function AiTutor() {
             </div>
           )}
 
+          {/* Initial welcome area (no question loaded) */}
           {!questionStem && !questionText && (
             <div className="w-full max-w-5xl p-6 bg-white bg-opacity-20 backdrop-blur-md rounded-lg shadow-md text-center">
               <p className="text-gray-200 mb-4">
                 Click <span className="font-semibold">Configure AI Tutor</span> to start.
               </p>
               <p className="text-gray-400 text-sm">
-                <strong>Important Note:</strong> This AI Tutor helps you understand law topics by
-                providing explanations, analyses, and feedback. It’s not a substitute for
-                professional legal advice, but can guide you through reasoning steps, highlight key
-                points, and reference principles to strengthen your legal acumen.
+                <strong>Note:</strong> This AI Tutor helps you practice law school concepts, 
+                offers structured feedback, and references key principles or statutes. 
+                It’s not a substitute for professional legal advice.
               </p>
             </div>
           )}
@@ -862,93 +895,99 @@ export default function AiTutor() {
               >
                 <h2 className="text-2xl font-semibold text-white mb-6">Configure AI Tutor</h2>
                 <form>
-                  {/* Prompt / Custom Input */}
+                  {/* Custom Prompt */}
                   <div className="mb-4">
-                    <label className="block text-gray-300 mb-2">Custom Prompt or Topic (Optional):</label>
+                    <label className="block text-gray-300 mb-2">Custom Prompt / Topic (Optional):</label>
                     <input
                       type="text"
                       name="userPrompt"
                       value={tutorConfig.userPrompt}
                       onChange={handleConfigChange}
-                      placeholder="e.g. 'Tort Law Basics'"
-                      className="w-full p-3 border border-gray-500 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-200 bg-gray-700 text-white"
+                      placeholder="e.g. 'Negligence in Torts' or 'Offer & Acceptance'"
+                      className="w-full p-3 border border-gray-500 rounded focus:outline-none 
+                                 focus:ring-2 focus:ring-blue-500 transition-colors duration-200 
+                                 bg-gray-700 text-white"
                       aria-label="Custom Prompt"
                     />
                   </div>
 
-                  {/* Exam Type Selection */}
+                  {/* Study Year */}
                   <div className="mb-4">
-                    <label className="block text-gray-300 mb-2">Exam Type:</label>
+                    <label className="block text-gray-300 mb-2">Law School Year:</label>
                     <select
-                      name="examType"
-                      value={tutorConfig.examType}
+                      name="studyYear"
+                      value={tutorConfig.studyYear}
                       onChange={handleConfigChange}
-                      className="w-full p-3 border border-gray-500 rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      aria-label="Select Exam Type"
+                      className="w-full p-3 border border-gray-500 rounded bg-gray-700 text-white 
+                                 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      aria-label="Select Law School Year"
                     >
-                      {Object.keys(examMapping).map((exam) => (
-                        <option key={exam} value={exam}>
-                          {exam}
+                      {Object.keys(studyMapping).map((year) => (
+                        <option key={year} value={year}>
+                          {year}
                         </option>
                       ))}
                     </select>
                   </div>
 
-                  {/* Topic Selection */}
+                  {/* Course */}
                   <div className="mb-4">
-                    <label className="block text-gray-300 mb-2">Primary Topic:</label>
+                    <label className="block text-gray-300 mb-2">Course:</label>
                     <select
-                      name="topic"
-                      value={tutorConfig.topic}
+                      name="course"
+                      value={tutorConfig.course}
                       onChange={handleConfigChange}
-                      className="w-full p-3 border border-gray-500 rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      aria-label="Select Primary Topic"
+                      className="w-full p-3 border border-gray-500 rounded bg-gray-700 text-white 
+                                 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      aria-label="Select Course"
                     >
-                      {topicOptions.map((topic, index) => (
-                        <option key={index} value={topic.value}>
-                          {topic.label}
+                      {topicOptions.map((t, idx) => (
+                        <option key={idx} value={t.value}>
+                          {t.label}
                         </option>
                       ))}
                     </select>
                   </div>
 
-                  {/* Sub-Topic Selection */}
+                  {/* Sub-Topic */}
                   <div className="mb-4">
                     <label className="block text-gray-300 mb-2">Sub-Topic:</label>
                     <select
                       name="subTopic"
                       value={tutorConfig.subTopic}
                       onChange={handleConfigChange}
-                      className="w-full p-3 border border-gray-500 rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      aria-label="Select Sub-Topic"
+                      className="w-full p-3 border border-gray-500 rounded bg-gray-700 text-white 
+                                 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      aria-label="Select Sub-topic"
                     >
-                      {subTopicOptions.map((subTopic, index) => (
-                        <option key={index} value={subTopic.value}>
-                          {subTopic.label}
+                      {subTopicOptions.map((sub, idx) => (
+                        <option key={idx} value={sub.value}>
+                          {sub.label}
                         </option>
                       ))}
                     </select>
                   </div>
 
-                  {/* Complexity Level */}
+                  {/* Complexity */}
                   <div className="mb-4">
                     <label className="block text-gray-300 mb-2">Complexity Level:</label>
                     <select
                       name="complexity"
                       value={tutorConfig.complexity}
                       onChange={handleConfigChange}
-                      className="w-full p-3 border border-gray-500 rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      aria-label="Select Complexity Level"
+                      className="w-full p-3 border border-gray-500 rounded bg-gray-700 text-white 
+                                 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      aria-label="Select Complexity"
                     >
-                      {complexityOptions.map((option) => (
-                        <option key={option.value} value={option.value}>
-                          {option.label}
+                      {complexityOptions.map((opt) => (
+                        <option key={opt.value} value={opt.value}>
+                          {opt.label}
                         </option>
                       ))}
                     </select>
                   </div>
 
-                  {/* Additional Helpful Features */}
+                  {/* Additional Aids */}
                   <div className="mb-4">
                     <label className="block text-gray-300 mb-2 font-semibold">
                       Additional Aids for Law Students:
@@ -981,7 +1020,35 @@ export default function AiTutor() {
                       </label>
                     </div>
 
-                    {/* Live Mode Checkbox */}
+                    <div className="flex items-center mb-2">
+                      <input
+                        type="checkbox"
+                        id="includeKeyCases"
+                        name="includeKeyCases"
+                        checked={tutorConfig.includeKeyCases}
+                        onChange={handleConfigChange}
+                        className="h-5 w-5 text-blue-500 focus:ring-blue-500 border-gray-300 rounded"
+                      />
+                      <label htmlFor="includeKeyCases" className="ml-3 text-gray-300">
+                        Include references to key cases
+                      </label>
+                    </div>
+
+                    <div className="flex items-center mb-2">
+                      <input
+                        type="checkbox"
+                        id="includeStatutes"
+                        name="includeStatutes"
+                        checked={tutorConfig.includeStatutes}
+                        onChange={handleConfigChange}
+                        className="h-5 w-5 text-blue-500 focus:ring-blue-500 border-gray-300 rounded"
+                      />
+                      <label htmlFor="includeStatutes" className="ml-3 text-gray-300">
+                        Include relevant statutes or code sections
+                      </label>
+                    </div>
+
+                    {/* Live Mode */}
                     <div className="flex items-center mb-2">
                       <input
                         type="checkbox"
@@ -1007,8 +1074,8 @@ export default function AiTutor() {
                         max="360"
                         value={tutorConfig.highlightHue}
                         onChange={(e) =>
-                          setTutorConfig((prevConfig) => ({
-                            ...prevConfig,
+                          setTutorConfig((prev) => ({
+                            ...prev,
                             highlightHue: parseInt(e.target.value, 10),
                           }))
                         }
@@ -1016,11 +1083,13 @@ export default function AiTutor() {
                       />
                       <div
                         className="w-10 h-10 rounded"
-                        style={{ backgroundColor: `hsl(${tutorConfig.highlightHue}, 100%, 50%)` }}
+                        style={{
+                          backgroundColor: `hsl(${tutorConfig.highlightHue}, 100%, 50%)`,
+                        }}
                       ></div>
                     </div>
                     <p className="text-sm mt-2 text-gray-300">
-                      Adjust the hue to change the highlight color. Default is neon yellow.
+                      Adjust the hue to change the highlight color (default is neon yellow).
                     </p>
                   </div>
 
@@ -1036,13 +1105,12 @@ export default function AiTutor() {
                         max="20"
                         value={tutorConfig.questionLimit}
                         onChange={(e) =>
-                          setTutorConfig((prevConfig) => ({
-                            ...prevConfig,
+                          setTutorConfig((prev) => ({
+                            ...prev,
                             questionLimit: parseInt(e.target.value, 10),
                           }))
                         }
                         className="w-full h-2 bg-blue-400 rounded-lg appearance-none cursor-pointer"
-                        id="questionLimit"
                         aria-label="Set Number of Questions"
                       />
                       <span className="ml-4 text-gray-300">{tutorConfig.questionLimit}</span>
@@ -1054,7 +1122,10 @@ export default function AiTutor() {
                     <button
                       type="button"
                       onClick={handleStartTutoringSession}
-                      className="relative h-12 w-full sm:w-56 overflow-hidden rounded bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white shadow-lg transition-colors duration-200 before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-56"
+                      className="relative h-12 w-full sm:w-56 overflow-hidden rounded bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white shadow-lg transition-colors duration-200 
+                                 before:absolute before:right-0 before:top-0 before:h-12 before:w-5 
+                                 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 
+                                 before:duration-700 hover:before:-translate-x-56"
                       aria-label="Start Tutoring Session"
                     >
                       Start Tutoring
@@ -1100,9 +1171,7 @@ export default function AiTutor() {
                 <ul className="space-y-4">
                   {answeredQuestions.map((item, index) => (
                     <li key={index} className="p-4 border border-gray-700 rounded">
-                      <p className="font-semibold text-blue-300 mb-2">
-                        Question {index + 1}:
-                      </p>
+                      <p className="font-semibold text-blue-300">Question {index + 1}:</p>
                       <p className="text-gray-200 mb-2">{item.question}</p>
                       <p className="text-gray-200 mb-1">
                         <span className="font-semibold">Your Answer:</span> {item.answer}
@@ -1151,7 +1220,7 @@ export default function AiTutor() {
               >
                 <h2 className="text-2xl font-semibold text-white mb-6">Load Saved Progress</h2>
                 {savedProgresses.length === 0 ? (
-                  <p className="text-gray-200">No saved progresses found.</p>
+                  <p className="text-gray-200">No saved progress found.</p>
                 ) : (
                   <ul className="space-y-4">
                     {savedProgresses.map((progress) => (
@@ -1159,19 +1228,19 @@ export default function AiTutor() {
                         <div className="flex flex-col sm:flex-row sm:justify-between items-start sm:items-center">
                           <div>
                             <p className="font-semibold text-blue-300">
-                              Exam Type: {progress.tutorConfig.examType}
+                              Law Year: {progress.tutorConfig?.studyYear}
                             </p>
                             <p className="text-sm text-gray-400">
-                              Primary Topic: {progress.tutorConfig.topic}
+                              Course: {progress.tutorConfig?.course}
                             </p>
                             <p className="text-sm text-gray-400">
-                              Sub-Topic: {progress.tutorConfig.subTopic}
+                              Sub-Topic: {progress.tutorConfig?.subTopic}
                             </p>
                             <p className="text-sm text-gray-400">
-                              Complexity: {progress.tutorConfig.complexity}
+                              Complexity: {progress.tutorConfig?.complexity}
                             </p>
                             <p className="text-sm text-gray-400">
-                              Questions Set: {progress.tutorConfig.questionLimit}
+                              Questions: {progress.tutorConfig?.questionLimit}
                             </p>
                             <p className="text-sm text-gray-400">
                               Current Question: {progress.currentQuestionCount}

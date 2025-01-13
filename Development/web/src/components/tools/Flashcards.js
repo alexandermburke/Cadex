@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import Sidebar from '../Sidebar';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/navigation';
-import { FaBars, FaTimes, FaSave, FaSyncAlt } from 'react-icons/fa';
+import { FaBars, FaTimes } from 'react-icons/fa';
 
 // Firebase
 import { db } from '@/firebase';
@@ -47,78 +47,33 @@ ChartJS.register(
   Legend
 );
 
-// Difficulty & law type mappings
-const difficultyMapping = {
-  LSAT: [
-    { value: 'Below 150', label: 'Below 150' },
-    { value: '150-160', label: '150-160' },
-    { value: '160-170', label: '160-170' },
-    { value: '175+', label: '175+' },
-  ],
-  BAR: [
-    { value: 'Below Average', label: 'Below Average' },
-    { value: 'Average', label: 'Average' },
-    { value: 'Above Average', label: 'Above Average' },
-    { value: 'Expert', label: 'Expert' },
-  ],
-  MPRE: [
-    { value: 'Basic', label: 'Basic' },
-    { value: 'Intermediate', label: 'Intermediate' },
-    { value: 'Advanced', label: 'Advanced' },
-  ],
-};
-
-const lawTypeMapping = {
-  LSAT: ['General Law'],
-  BAR: [
-    'Criminal Law',
-    'Civil Law',
-    'Contracts',
-    'Torts',
-    'Constitutional Law',
-    'Evidence',
-    'Real Property',
-    'Civil Procedure',
-    'Business Associations (Corporations)',
-    'Family Law',
-    'Trusts and Estates',
-    'Secured Transactions',
-    'Negotiable Instruments',
-    'Intellectual Property',
-    'Professional Responsibility',
-  ],
-  MPRE: [
-    'Professional Responsibility',
-    'Ethics and Legal Responsibilities',
-    'Disciplinary Actions',
-    'Conflict of Interest',
-    'Confidentiality',
-    'Client Communication',
-    'Fees and Trust Accounts',
-    'Advertising and Solicitation',
-    'Other Professional Conduct',
-  ],
-};
-
-// LSAT-specific
-const logicalReasoningQuestionTypes = [
-  'Assumption Questions',
-  'Strengthen/Weaken Questions',
-  'Flaw Questions',
-  'Inference Questions',
-  'Argument Method Questions',
-  'Paradox Questions',
-  'Parallel Reasoning Questions',
-  'Point-at-Issue Questions',
-  'Principle Questions',
-  'Role Questions',
+// Define possible selections for current law students
+const studyYearMapping = [
+  { value: '1L', label: '1L (Core Subjects)' },
+  { value: '2L', label: '2L (Intermediate Subjects)' },
+  { value: '3L', label: '3L (Advanced/Electives)' },
+  { value: 'LLM', label: 'LLM (Postgrad)' },
 ];
-const readingComprehensionQuestionTypes = [
-  'Main Idea/Primary Purpose Questions',
-  'Method and Structure Questions',
-  'Specific Passage Recall/Detail Questions',
-  'Function Questions',
-  'Inference Questions',
+
+const proficiencyMapping = [
+  { value: 'Basic', label: 'Basic' },
+  { value: 'Intermediate', label: 'Intermediate' },
+  { value: 'Advanced', label: 'Advanced' },
+];
+
+const courseNameMapping = [
+  'Contracts',
+  'Torts',
+  'Civil Procedure',
+  'Criminal Law',
+  'Property',
+  'Constitutional Law',
+  'Evidence',
+  'Family Law',
+  'Business Associations',
+  'Wills & Trusts',
+  'Professional Responsibility',
+  // Add or remove as needed for your curriculum
 ];
 
 export default function AIExamFlashCard() {
@@ -141,13 +96,12 @@ export default function AIExamFlashCard() {
   const [timeLeft, setTimeLeft] = useState(0); // in seconds
   const timerRef = useRef(null);
 
-  // Configuration
-  const [examConfig, setExamConfig] = useState({
-    examType: 'LSAT',
-    difficulty: '',
-    lawType: 'General Law',
+  // Configuration (repurposed for law students)
+  const [studyConfig, setStudyConfig] = useState({
+    studyYear: '1L',
+    proficiency: 'Basic',
+    courseName: 'Contracts',
     questionLimit: 5,
-    selectedQuestionTypes: [],
     timerMinutes: 2,
     resetTimerEveryQuestion: true,
     instantFeedback: false,
@@ -159,26 +113,6 @@ export default function AIExamFlashCard() {
   const [isFinalFeedbackModalOpen, setIsFinalFeedbackModalOpen] = useState(false);
   const [savedProgresses, setSavedProgresses] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-
-  // Difficulty + Law type options
-  const [difficultyOptions, setDifficultyOptions] = useState(difficultyMapping['LSAT']);
-  const [lawTypeOptions, setLawTypeOptions] = useState(lawTypeMapping['LSAT']);
-
-  // Update difficulty & law type dropdowns when examType changes
-  useEffect(() => {
-    const newDiffOptions = difficultyMapping[examConfig.examType] || [];
-    const newLawTypeOptions = lawTypeMapping[examConfig.examType] || ['General Law'];
-
-    setDifficultyOptions(newDiffOptions);
-    setLawTypeOptions(newLawTypeOptions);
-
-    setExamConfig((prev) => ({
-      ...prev,
-      difficulty: newDiffOptions[0]?.value || '',
-      lawType: newLawTypeOptions[0] || 'General Law',
-      selectedQuestionTypes: [],
-    }));
-  }, [examConfig.examType]);
 
   // Clear timer on unmount
   useEffect(() => {
@@ -253,7 +187,7 @@ export default function AIExamFlashCard() {
     try {
       const progressData = {
         userId: currentUser.uid,
-        examConfig,
+        studyConfig,
         flashcards,
         answeredFlashcards,
         currentFlashcardIndex,
@@ -290,7 +224,7 @@ export default function AIExamFlashCard() {
   };
 
   const handleLoadProgress = (progress) => {
-    setExamConfig(progress.examConfig);
+    setStudyConfig(progress.studyConfig);
     setFlashcards(progress.flashcards);
     setAnsweredFlashcards(progress.answeredFlashcards || []);
     setCurrentFlashcardIndex(progress.currentFlashcardIndex || 0);
@@ -321,21 +255,10 @@ export default function AIExamFlashCard() {
   // Handle config form changes
   const handleConfigChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setExamConfig((prev) => ({
+    setStudyConfig((prev) => ({
       ...prev,
       [name]: type === 'checkbox' ? checked : value,
     }));
-  };
-
-  // LSAT question type toggles
-  const handleQuestionTypeChange = (e, type) => {
-    const { checked } = e.target;
-    setExamConfig((prev) => {
-      let updated = [...prev.selectedQuestionTypes];
-      if (checked) updated.push(type);
-      else updated = updated.filter((t) => t !== type);
-      return { ...prev, selectedQuestionTypes: updated };
-    });
   };
 
   // Generate flashcards (calls your /api/generate-flashcards route)
@@ -351,16 +274,16 @@ export default function AIExamFlashCard() {
       const response = await fetch('/api/generate-flashcards', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ config: examConfig }),
+        body: JSON.stringify({ config: studyConfig }), // changed from examConfig to studyConfig
       });
       if (!response.ok) throw new Error('Failed generating');
       const { flashcards: newFCs } = await response.json();
       setFlashcards(newFCs);
 
       // Start timer if set
-      setTimerDuration(examConfig.timerMinutes || 0);
-      if (examConfig.timerMinutes > 0) {
-        startTimer(examConfig.timerMinutes);
+      setTimerDuration(studyConfig.timerMinutes || 0);
+      if (studyConfig.timerMinutes > 0) {
+        startTimer(studyConfig.timerMinutes);
       }
     } catch (err) {
       console.error('Error generating flashcards:', err);
@@ -400,10 +323,9 @@ export default function AIExamFlashCard() {
     ]);
 
     // If instant feedback is toggled on, reveal the answer right away:
-    if (examConfig.instantFeedback) {
+    if (studyConfig.instantFeedback) {
       setIsAnswerRevealed(true);
     } else {
-      // If not instant feedback, jump to next
       nextFlashcard();
     }
   };
@@ -412,8 +334,8 @@ export default function AIExamFlashCard() {
   const nextFlashcard = () => {
     setIsAnswerRevealed(false);
     // Reset timer if needed
-    if (examConfig.resetTimerEveryQuestion && examConfig.timerMinutes > 0) {
-      startTimer(examConfig.timerMinutes);
+    if (studyConfig.resetTimerEveryQuestion && studyConfig.timerMinutes > 0) {
+      startTimer(studyConfig.timerMinutes);
     }
     if (currentFlashcardIndex === flashcards.length - 1) {
       setIsFinalFeedbackModalOpen(true);
@@ -426,13 +348,13 @@ export default function AIExamFlashCard() {
   const closeFinalFeedbackModal = () => setIsFinalFeedbackModalOpen(false);
 
   return (
-    <div className={`flex h-screen ${isDarkMode ? 'bg-slate-800' : 'bg-white'} rounded shadow-md`}>
+    <div className={`flex h-screen ${isDarkMode ? 'bg-slate-800' : 'bg-transparent'} rounded shadow-md`}>
       {/* Sidebar */}
       <AnimatePresence>
         {isSidebarVisible && (
           <>
             <Sidebar
-              activeLink="/ailawtools/flashcards"
+              activeLink="/ailawtools/flashcards" // Adjust as needed
               isSidebarVisible={isSidebarVisible}
               toggleSidebar={toggleSidebar}
               isDarkMode={isDarkMode}
@@ -450,39 +372,36 @@ export default function AIExamFlashCard() {
 
       <main className="flex-1 flex flex-col p-4 overflow-auto">
         {/* Top Bar */}
-        <div className="w-full max-w-5xl mx-auto flex flex-row flex-wrap items-center justify-between mb-4 gap-2 sm:gap-4">
-          {/* Sidebar toggle button */}
-          <button
-            onClick={toggleSidebar}
-            className={`text-gray-600 hover:text-gray-800 ${
-              isDarkMode ? 'text-gray-200 hover:text-white' : ''
-            }`}
-          >
-            <AnimatePresence mode="wait" initial={false}>
-              {isSidebarVisible ? (
-                <motion.div
-                  key="close-icon"
-                  initial={{ rotate: 90, opacity: 0 }}
-                  animate={{ rotate: 0, opacity: 1 }}
-                  exit={{ rotate: -90, opacity: 0 }}
-                  transition={{ duration: 0.3 }}
+       <div className="flex items-center justify-between mb-6">
+                <button
+                  onClick={toggleSidebar}
+                  className={`text-gray-600 hover:text-gray-400`}
+                  aria-label={isSidebarVisible ? 'Hide Sidebar' : 'Show Sidebar'}
                 >
-                  <FaTimes size={24} />
-                </motion.div>
-              ) : (
-                <motion.div
-                  key="menu-icon"
-                  initial={{ rotate: -90, opacity: 0 }}
-                  animate={{ rotate: 0, opacity: 1 }}
-                  exit={{ rotate: 90, opacity: 0 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  <FaBars size={24} />
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </button>
-
+                  <AnimatePresence mode="wait" initial={false}>
+                    {isSidebarVisible ? (
+                      <motion.div
+                        key="close-icon"
+                        initial={{ rotate: 90, opacity: 0 }}
+                        animate={{ rotate: 0, opacity: 1 }}
+                        exit={{ rotate: -90, opacity: 0 }}
+                        transition={{ duration: 0.3 }}
+                      >
+                        <FaTimes size={24} />
+                      </motion.div>
+                    ) : (
+                      <motion.div
+                        key="menu-icon"
+                        initial={{ rotate: -90, opacity: 0 }}
+                        animate={{ rotate: 0, opacity: 1 }}
+                        exit={{ rotate: 90, opacity: 0 }}
+                        transition={{ duration: 0.3 }}
+                      >
+                        <FaBars size={24} />
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </button>
           {/* Timer display */}
           <div className="text-lg font-semibold">
             {timeLeft > 0 ? `Time Left: ${formatTime()}` : ''}
@@ -504,7 +423,7 @@ export default function AIExamFlashCard() {
               className={`group relative h-10 sm:h-12 w-28 sm:w-40 overflow-hidden rounded ${
                 isDarkMode ? 'bg-blue-700' : 'bg-blue-950'
               } text-white duration-200 before:absolute before:right-0 before:top-0 before:h-full before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-56 text-sm sm:text-base shadow-md`}
-              aria-label="Configure Exam Prep"
+              aria-label="Configure Flashcards"
             >
               Configure
             </button>
@@ -527,12 +446,8 @@ export default function AIExamFlashCard() {
               >
                 No flashcards generated yet.
               </h2>
-              <p
-                className={`${
-                  isDarkMode ? 'text-gray-300' : 'text-gray-500'
-                }`}
-              >
-                Click <strong>Configure</strong> to set up your exam and generate flashcards.
+              <p className={`${isDarkMode ? 'text-gray-300' : 'text-gray-500'}`}>
+                Click <strong>Configure</strong> to set up your flashcards.
               </p>
             </div>
           )}
@@ -552,7 +467,6 @@ export default function AIExamFlashCard() {
               initial={{ opacity: 0, y: 50 }}
               animate={{ opacity: 1, y: 0 }}
             >
-              <div className="absolute top-2 right-2 text-sm text-gray-500"></div>
               <h2 className="text-xl font-semibold mb-2">Question:</h2>
               <p className="mb-4">{currentFlashcard.question}</p>
 
@@ -598,7 +512,7 @@ export default function AIExamFlashCard() {
           {flashcards.length > 0 && (
             <div className="mt-2 text-sm text-gray-400">
               <p>
-                Questions Answered: {answeredFlashcards.length} / {examConfig.questionLimit}
+                Questions Answered: {answeredFlashcards.length} / {studyConfig.questionLimit}
               </p>
             </div>
           )}
@@ -638,18 +552,21 @@ export default function AIExamFlashCard() {
                       <div className="flex justify-between items-start">
                         <div>
                           <p className="font-semibold text-blue-400 mb-1">
-                            Exam Type: {prog.examConfig.examType}
+                            Study Year: {prog.studyConfig?.studyYear}
                           </p>
-                          <p className="text-sm">Difficulty: {prog.examConfig.difficulty}</p>
-                          <p className="text-sm">Questions: {prog.examConfig.questionLimit}</p>
-                          <p className="text-sm">Timer: {prog.examConfig.timerMinutes || 0} min</p>
+                          <p className="text-sm">Proficiency: {prog.studyConfig?.proficiency}</p>
+                          <p className="text-sm">Course: {prog.studyConfig?.courseName}</p>
+                          <p className="text-sm">Questions: {prog.studyConfig?.questionLimit}</p>
+                          <p className="text-sm">
+                            Timer: {prog.studyConfig?.timerMinutes || 0} min
+                          </p>
                           <p className="text-sm">
                             Reset Timer:{' '}
-                            {prog.examConfig.resetTimerEveryQuestion ? 'Yes' : 'No'}
+                            {prog.studyConfig?.resetTimerEveryQuestion ? 'Yes' : 'No'}
                           </p>
                           <p className="text-sm">
                             Instant Feedback:{' '}
-                            {prog.examConfig.instantFeedback ? 'Yes' : 'No'}
+                            {prog.studyConfig?.instantFeedback ? 'Yes' : 'No'}
                           </p>
                           <p className="text-sm">
                             Saved on: {new Date(prog.timestamp).toLocaleString()}
@@ -784,35 +701,37 @@ export default function AIExamFlashCard() {
                 </button>
               </div>
 
-              {/* Exam Type */}
+              {/* Study Year */}
               <div className="mb-4">
-                <label className="block font-semibold mb-1">Exam Type:</label>
+                <label className="block font-semibold mb-1">Year/Level:</label>
                 <select
-                  name="examType"
-                  value={examConfig.examType}
+                  name="studyYear"
+                  value={studyConfig.studyYear}
                   onChange={handleConfigChange}
                   className={`w-full p-3 border rounded ${
                     isDarkMode ? 'bg-gray-700 border-gray-600' : 'bg-gray-100 border-gray-300'
                   }`}
                 >
-                  <option value="LSAT">LSAT</option>
-                  <option value="BAR">BAR</option>
-                  <option value="MPRE">MPRE</option>
+                  {studyYearMapping.map((item) => (
+                    <option key={item.value} value={item.value}>
+                      {item.label}
+                    </option>
+                  ))}
                 </select>
               </div>
 
-              {/* Difficulty */}
+              {/* Proficiency (difficulty) */}
               <div className="mb-4">
-                <label className="block font-semibold mb-1">Score Range / Difficulty:</label>
+                <label className="block font-semibold mb-1">Proficiency:</label>
                 <select
-                  name="difficulty"
-                  value={examConfig.difficulty}
+                  name="proficiency"
+                  value={studyConfig.proficiency}
                   onChange={handleConfigChange}
                   className={`w-full p-3 border rounded ${
                     isDarkMode ? 'bg-gray-700 border-gray-600' : 'bg-gray-100 border-gray-300'
                   }`}
                 >
-                  {difficultyOptions.map((opt) => (
+                  {proficiencyMapping.map((opt) => (
                     <option key={opt.value} value={opt.value}>
                       {opt.label}
                     </option>
@@ -820,59 +739,24 @@ export default function AIExamFlashCard() {
                 </select>
               </div>
 
-              {/* Law Type */}
+              {/* Course Name */}
               <div className="mb-4">
-                <label className="block font-semibold mb-1">Law Type:</label>
+                <label className="block font-semibold mb-1">Course/Subject:</label>
                 <select
-                  name="lawType"
-                  value={examConfig.lawType}
+                  name="courseName"
+                  value={studyConfig.courseName}
                   onChange={handleConfigChange}
                   className={`w-full p-3 border rounded ${
                     isDarkMode ? 'bg-gray-700 border-gray-600' : 'bg-gray-100 border-gray-300'
                   }`}
                 >
-                  {lawTypeOptions.map((lt, idx) => (
-                    <option key={idx} value={lt}>
-                      {lt}
+                  {courseNameMapping.map((course, idx) => (
+                    <option key={idx} value={course}>
+                      {course}
                     </option>
                   ))}
                 </select>
               </div>
-
-              {/* LSAT question types */}
-              {examConfig.examType === 'LSAT' && (
-                <div className="mb-4">
-                  <p className="font-semibold text-sm text-gray-400">
-                    Logical Reasoning Question Types:
-                  </p>
-                  {logicalReasoningQuestionTypes.map((type) => (
-                    <label key={type} className="flex items-center">
-                      <input
-                        type="checkbox"
-                        className="mr-2"
-                        checked={examConfig.selectedQuestionTypes.includes(type)}
-                        onChange={(e) => handleQuestionTypeChange(e, type)}
-                      />
-                      {type}
-                    </label>
-                  ))}
-
-                  <p className="font-semibold text-sm text-gray-400 mt-2">
-                    Reading Comprehension Types:
-                  </p>
-                  {readingComprehensionQuestionTypes.map((type) => (
-                    <label key={type} className="flex items-center">
-                      <input
-                        type="checkbox"
-                        className="mr-2"
-                        checked={examConfig.selectedQuestionTypes.includes(type)}
-                        onChange={(e) => handleQuestionTypeChange(e, type)}
-                      />
-                      {type}
-                    </label>
-                  ))}
-                </div>
-              )}
 
               {/* Number of flashcards */}
               <div className="mb-4">
@@ -882,11 +766,11 @@ export default function AIExamFlashCard() {
                   min="1"
                   max="20"
                   name="questionLimit"
-                  value={examConfig.questionLimit}
+                  value={studyConfig.questionLimit}
                   onChange={handleConfigChange}
                   className="w-full"
                 />
-                <p className="text-right">Selected: {examConfig.questionLimit}</p>
+                <p className="text-right">Selected: {studyConfig.questionLimit}</p>
               </div>
 
               {/* Timer field (in minutes) */}
@@ -897,7 +781,7 @@ export default function AIExamFlashCard() {
                   min="0"
                   max="180"
                   name="timerMinutes"
-                  value={examConfig.timerMinutes}
+                  value={studyConfig.timerMinutes}
                   onChange={handleConfigChange}
                   className={`w-full p-2 rounded ${
                     isDarkMode ? 'bg-gray-700 border-gray-600' : 'bg-gray-100 border-gray-300'
@@ -914,7 +798,7 @@ export default function AIExamFlashCard() {
                 <input
                   type="checkbox"
                   name="resetTimerEveryQuestion"
-                  checked={examConfig.resetTimerEveryQuestion}
+                  checked={studyConfig.resetTimerEveryQuestion}
                   onChange={handleConfigChange}
                   className="mr-2"
                 />
@@ -926,21 +810,21 @@ export default function AIExamFlashCard() {
                 <input
                   type="checkbox"
                   name="instantFeedback"
-                  checked={examConfig.instantFeedback}
+                  checked={studyConfig.instantFeedback}
                   onChange={handleConfigChange}
                   className="mr-2"
                 />
                 <label className="font-semibold text-sm">
-                  Instant Feedback (Reveal answer immediately upon marking correct/wrong)
+                  Instant Feedback (reveal answer immediately upon marking correct/wrong)
                 </label>
               </div>
 
-              {/* Include Explanations (if you wish to expand your logic/route) */}
+              {/* Include Explanations */}
               <div className="flex items-center mb-4">
                 <input
                   type="checkbox"
                   name="includeExplanations"
-                  checked={examConfig.includeExplanations}
+                  checked={studyConfig.includeExplanations}
                   onChange={handleConfigChange}
                   className="mr-2"
                 />
@@ -948,28 +832,34 @@ export default function AIExamFlashCard() {
               </div>
 
               {/* Action Buttons */}
-              <div className="text-right">
-                <button
-                  onClick={handleGenerateFlashcards}
-                  className={`mr-4 px-4 py-2 rounded ${
-                    isDarkMode
-                      ? 'bg-blue-700 hover:bg-blue-600 text-white'
-                      : 'bg-blue-600 hover:bg-blue-700 text-white'
-                  }`}
-                  disabled={isLoading}
-                >
-                  {isLoading ? 'Generating...' : 'Generate'}
-                </button>
-                <button
-                  onClick={closeConfigModal}
-                  className={`px-4 py-2 rounded ${
-                    isDarkMode
-                      ? 'bg-gray-700 hover:bg-gray-600 text-white'
-                      : 'bg-gray-300 hover:bg-gray-400 text-gray-800'
-                  }`}
-                >
-                  Cancel
-                </button>
+              <div className="flex justify-end space-x-4">
+                 <button
+       type="button"
+      onClick={handleGenerateFlashcards}
+     className="relative h-12 w-full sm:w-56 overflow-hidden rounded bg-blue-950 text-white shadow-lg transition-colors duration-200 before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-56"
+     aria-label="Start Tutoring Session"
+ >
+  Start Flashcards
+         <motion.span
+     className="absolute right-4 top-3"
+             initial={{ x: -10, opacity: 0 }}
+                                 animate={{ x: 0, opacity: 1 }}
+                        transition={{ delay: 0.3, duration: 0.3 }}
+                              >
+             <i className="fa-solid fa-arrow-right"></i>
+               </motion.span>
+                       </button>
+                 <button
+                    type="button"
+                    onClick={closeConfigModal}
+                    className={`h-10 sm:h-12 px-6 py-2 rounded ${
+                      isDarkMode
+                        ? 'bg-gray-600 text-gray-300 hover:bg-gray-500'
+                        : 'bg-gray-300 text-gray-700 hover:bg-gray-400'
+                    } transition-colors duration-200 text-sm sm:text-base`}
+                  >
+                    Cancel
+                  </button>
               </div>
             </motion.div>
           </motion.div>
