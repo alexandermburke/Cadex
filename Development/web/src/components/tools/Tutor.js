@@ -191,7 +191,7 @@ export default function AiTutor() {
 
   // Refs for Central Exclusion Area
   const centerRef = useRef({ x: 0, y: 0 });
-  const radiusRef = useRef(200);
+  const radiusRef = useRef(200); // Increased radius
 
   // -------------------------------
   // 3. UseEffect: Update topic/subTopic on studyYear changes
@@ -265,7 +265,7 @@ export default function AiTutor() {
         this.path = [];
         this.pathLength = 0;
         this.angle = 0;
-        this.speed = random(0.5, 2);
+        this.speed = random(0.5, 2); // Reduced speed
         this.target = { x: x + 0.1, y: y + 0.1 };
         this.thickness = Math.round(random(0.5, 3));
         this.maxLength = Math.round(random(100, 350));
@@ -402,7 +402,7 @@ export default function AiTutor() {
 
       // Update center and radius
       centerRef.current = { x: width / 2, y: height / 2 };
-      radiusRef.current = 250; // Adjust as needed
+      radiusRef.current = 165; // Increased radius as per user request
 
       // Create gradient
       gradientRef.current = ctx.createLinearGradient(width * 0.25, 0, width * 0.75, 0);
@@ -428,7 +428,7 @@ export default function AiTutor() {
       });
 
       // Add New Lines at Intervals
-      if (frameRef.current % 12 === 0) {
+      if (frameRef.current % 24 === 0) { // Increased interval to slow down animation
         const center = centerRef.current;
         const radius = radiusRef.current;
         const xRange = { min: 0, max: canvas.width };
@@ -716,7 +716,7 @@ export default function AiTutor() {
 
   function messageDisplay() {
     if (isCommunicating) return 'AI is communicating...';
-    return 'LExAPI Version 3.6';
+    return 'LExAPI';
   }
 
   const highlightedReasons = highlightedSections
@@ -840,15 +840,16 @@ export default function AiTutor() {
                   className="absolute top-0 left-0 w-full h-full rounded"
                   aria-label="Background Animation Canvas"
                 ></canvas>
-                <div className="absolute inset-0 flex items-center justify-center">
+                <div className="absolute inset-0 flex flex-col items-center justify-center">
                   <textarea
-                    className="w-48 sm:w-64 h-24 bg-transparent text-center p-2 rounded-md focus:outline-none 
-                               focus:ring-2 focus:ring-blue-500 text-white font-semibold text-2xl"
+                    className="w-48 sm:w-64 h-14 bg-transparent text-center p-2 rounded-md focus:outline-none 
+                               focus:ring-2 focus:ring-blue-500 text-white font-semibold text-4xl"
                     value={messageDisplay()}
                     readOnly
                     aria-label="AI Communication Status"
                     style={{ resize: 'none' }}
                   ></textarea>
+                  <small className="text-gray-300 italic">Version 3.0</small>
                 </div>
               </motion.div>
             )}
@@ -870,7 +871,8 @@ export default function AiTutor() {
           {questionStem && (
             <div className="w-full max-w-5xl mb-6 p-6 bg-white bg-opacity-20 backdrop-blur-md rounded-lg shadow-md overflow-y-scroll">
               <h3 className="text-2xl font-semibold text-white mb-2">Law Question</h3>
-              <h3 className="text-sm font-medium text-gray-200 mb-6">LExAPI Version: 0.3.6</h3>
+              <h3 className="text-sm font-medium text-gray-200 mb-1">LExAPI</h3>
+              <small className="text-gray-300 italic">Version 3.0</small>
               <div className="text-gray-100 mb-4 whitespace-pre-wrap">
                 {showHighlights && highlightedSections && highlightedSections.length > 0 ? (
                   highlightedSections.map((section, idx) =>
