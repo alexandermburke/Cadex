@@ -20,11 +20,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 // ----------------------------------------
 // 1. STUDY MAPPING FOR LAW SCHOOL
 // ----------------------------------------
-/** 
- * We replace LSAT/Bar/MPRE references with typical law school progressions:
- * 1L, 2L, 3L, LLM
- * Each year has various course topics, each with subTopics.
- */
 const studyMapping = {
   '1L': {
     topics: [
@@ -184,28 +179,42 @@ export default function AiTutor() {
     studyMapping['1L'].subTopics['Contracts'] || []
   );
 
-  // Canvas Particle Visualizer
+  // Canvas Visualizer Ref
   const visualizerCanvas = useRef(null);
   const animationFrameId = useRef(null);
 
-  // 3. Particle config for the background
-  const particleConfig = {
-    numParticles: 100,
-    maxSpeed: 1.0,
-    maxSize: 4,
-    colors: ['#00FFFF', '#7B68EE', '#1E90FF', '#BA55D3', '#00CED1'],
-  };
+  // Refs for Line Animation
+  const linesRef = useRef([]);
+  const frameRef = useRef(0);
+  const gradientRef = useRef(null);
+  const resizeObserverRef = useRef(null);
+
+  // Refs for Central Exclusion Area
+  const centerRef = useRef({ x: 0, y: 0 });
+  const radiusRef = useRef(200);
 
   // -------------------------------
-  // 4. UseEffect: update topic/subTopic on studyYear changes
+  // 3. UseEffect: Update topic/subTopic on studyYear changes
   // -------------------------------
   useEffect(() => {
     const selectedYear = tutorConfig.studyYear;
-    const newTopicOptions = studyMapping[selectedYear]?.topics || [];
+    const yearMapping = studyMapping[selectedYear];
+
+    if (!yearMapping) {
+      console.error(`Invalid studyYear: ${selectedYear}`);
+      // Optionally, reset to default
+      setTutorConfig((prevConfig) => ({
+        ...prevConfig,
+        studyYear: '1L',
+      }));
+      return;
+    }
+
+    const newTopicOptions = yearMapping.topics || [];
     const firstTopic = newTopicOptions[0]?.value || '';
 
     const newSubTopicOptions =
-      studyMapping[selectedYear]?.subTopics[firstTopic] || [];
+      yearMapping.subTopics[firstTopic] || [];
 
     setTopicOptions(newTopicOptions);
     setSubTopicOptions(newSubTopicOptions);
@@ -219,9 +228,16 @@ export default function AiTutor() {
 
   useEffect(() => {
     const selectedYear = tutorConfig.studyYear;
+    const yearMapping = studyMapping[selectedYear];
+
+    if (!yearMapping) {
+      console.error(`Invalid studyYear: ${selectedYear}`);
+      return;
+    }
+
     const selectedCourse = tutorConfig.course;
     const newSubTopicOptions =
-      studyMapping[selectedYear]?.subTopics[selectedCourse] || [];
+      yearMapping.subTopics[selectedCourse] || [];
 
     setSubTopicOptions(newSubTopicOptions);
 
@@ -232,134 +248,222 @@ export default function AiTutor() {
   }, [tutorConfig.course, tutorConfig.studyYear]);
 
   // -------------------------------
-  // 5. Particle Visualizer
+  // 4. Line Animation Visualizer
   // -------------------------------
   useEffect(() => {
     const canvas = visualizerCanvas.current;
+    if (!canvas) return;
+
     const ctx = canvas.getContext('2d');
-    let particles = [];
+    const scale = window.devicePixelRatio || 1;
 
-    class Particle {
-      constructor(canvasWidth, canvasHeight, config) {
-        this.canvasWidth = canvasWidth;
-        this.canvasHeight = canvasHeight;
-        this.config = config;
-        this.reset();
+    // Line Class Definition
+    class Line {
+      constructor(x, y) {
+        this.x = x;
+        this.y = y;
+        this.path = [];
+        this.pathLength = 0;
+        this.angle = 0;
+        this.speed = random(0.5, 2);
+        this.target = { x: x + 0.1, y: y + 0.1 };
+        this.thickness = Math.round(random(0.5, 3));
+        this.maxLength = Math.round(random(100, 350));
+        this.hasShadow = this.thickness > 2;
+        this.decay = random(0.0075, 0.05);
+        this.alpha = 1;
       }
 
-      reset() {
-        this.x = Math.random() * this.canvasWidth;
-        this.y = Math.random() * this.canvasHeight;
-        const speed = Math.random() * this.config.maxSpeed;
-        const angle = Math.random() * Math.PI * 2;
-        this.vx = Math.cos(angle) * speed;
-        this.vy = Math.sin(angle) * speed;
-        this.size = Math.random() * this.config.maxSize + 1;
-        this.color =
-          this.config.colors[Math.floor(Math.random() * this.config.colors.length)];
-        this.alpha = Math.random() * 0.5 + 0.5;
-      }
-
-      update() {
-        this.x += this.vx;
-        this.y += this.vy;
-
-        if (this.x <= 0 || this.x >= this.canvasWidth) {
-          this.vx *= -1;
+      step() {
+        if (this.pathLength >= this.maxLength) {
+          this.alpha -= this.decay;
+          return;
         }
-        if (this.y <= 0 || this.y >= this.canvasHeight) {
-          this.vy *= -1;
+
+        this.x += Math.cos(this.angle) * this.speed;
+        this.y += Math.sin(this.angle) * this.speed;
+
+        let isAnchor = false;
+        const target = this.target;
+        const dx = target.x - this.x;
+        const dy = target.y - this.y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+
+        if (distance < this.speed) {
+          isAnchor = true;
+          this.x = target.x;
+          this.y = target.y;
+          this.steer();
         }
+
+        this.path.push({
+          x: this.x,
+          y: this.y,
+          isAnchor: isAnchor,
+        });
+
+        this.pathLength++;
       }
 
-      draw(ctx) {
+      draw() {
+        ctx.save();
+        ctx.globalAlpha = this.alpha;
+        ctx.lineWidth = this.thickness;
+
         ctx.beginPath();
-        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(${hexToRgb(this.color)}, ${this.alpha})`;
-        ctx.shadowColor = this.color;
-        ctx.shadowBlur = 15;
-        ctx.fill();
-      }
-    }
 
-    function connectParticles(ctx, particles) {
-      const maxDistance = 100;
-      ctx.beginPath();
-      for (let i = 0; i < particles.length; i++) {
-        for (let j = i + 1; j < particles.length; j++) {
-          const dx = particles[i].x - particles[j].x;
-          const dy = particles[i].y - particles[j].y;
-          const distance = Math.sqrt(dx * dx + dy * dy);
-          if (distance < maxDistance) {
-            ctx.strokeStyle = `rgba(${hexToRgb(particles[i].color)}, ${
-              (1 - distance / maxDistance) * 0.2
-            })`;
-            ctx.lineWidth = 1;
-            ctx.moveTo(particles[i].x, particles[i].y);
-            ctx.lineTo(particles[j].x, particles[j].y);
-          }
+        if (this.hasShadow) {
+          ctx.shadowOffsetX = 10;
+          ctx.shadowOffsetY = 20;
+          ctx.shadowBlur = 12;
+          ctx.shadowColor = 'rgba(0,0,0,0.09)';
         }
+
+        this.path.forEach(function (point, i) {
+          ctx[i === 0 ? 'moveTo' : 'lineTo'](point.x, point.y);
+        });
+
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.arc(this.path[0].x, this.path[0].y, 4, 0, TWO_PI);
+        ctx.fill();
+        ctx.stroke();
+        ctx.restore();
       }
-      ctx.stroke();
+
+      steer() {
+        const distance = random(50, 200);
+        const angleOptions = [-HALF_PI, 0, HALF_PI, -Math.PI];
+        const angle = random(angleOptions);
+
+        // Squash all non-anchor points to squeeze out some extra performance
+        this.path = this.path.filter(function (point) {
+          return point.isAnchor === true;
+        });
+
+        this.target.x = this.x + Math.cos(angle) * distance;
+        this.target.y = this.y + Math.sin(angle) * distance;
+        this.angle = angle;
+      }
     }
 
-    function hexToRgb(hex) {
-      hex = hex.replace('#', '');
-      if (hex.length === 3) {
-        hex = hex
-          .split('')
-          .map((h) => h + h)
-          .join('');
+    // Helper Functions
+    function random(min, max) {
+      if (arguments.length === 0) return Math.random();
+      if (Array.isArray(min)) return min[Math.floor(Math.random() * min.length)];
+      if (typeof min === 'undefined') min = 1;
+      if (typeof max === 'undefined') {
+        max = min || 1;
+        min = 0;
       }
-      const bigint = parseInt(hex, 16);
-      const r = (bigint >> 16) & 255;
-      const g = (bigint >> 8) & 255;
-      const b = bigint & 255;
-      return `${r}, ${g}, ${b}`;
+      return min + Math.random() * (max - min);
     }
 
-    const resizeCanvas = () => {
-      canvas.width = canvas.parentElement.clientWidth;
-      canvas.height = canvas.parentElement.clientHeight;
-      initParticles();
-    };
+    function getRandomPointOutsideCircle(center, radius, xRange, yRange) {
+      let x, y, dx, dy, distanceSquared;
+      let attempts = 0;
+      const maxAttempts = 100;
 
-    const initParticles = () => {
-      particles = [];
-      for (let i = 0; i < particleConfig.numParticles; i++) {
-        particles.push(new Particle(canvas.width, canvas.height, particleConfig));
-      }
-    };
+      do {
+        x = random(xRange.min, xRange.max);
+        y = random(yRange.min, yRange.max);
+        dx = x - center.x;
+        dy = y - center.y;
+        distanceSquared = dx * dx + dy * dy;
+        attempts++;
 
-    const animate = () => {
+        if (attempts > maxAttempts) {
+          // Fallback to a point on the perimeter
+          const angle = random(0, TWO_PI);
+          x = center.x + radius * Math.cos(angle);
+          y = center.y + radius * Math.sin(angle);
+          break;
+        }
+      } while (distanceSquared < radius * radius);
+
+      return { x, y };
+    }
+
+    const TWO_PI = Math.PI * 2;
+    const HALF_PI = Math.PI / 2;
+
+    // Initialize Canvas
+    function resizeCanvas() {
+      const parent = canvas.parentElement;
+      if (!parent) return;
+
+      const width = parent.clientWidth;
+      const height = parent.clientHeight;
+
+      canvas.width = width * scale;
+      canvas.height = height * scale;
+      ctx.scale(scale, scale);
+
+      // Update center and radius
+      centerRef.current = { x: width / 2, y: height / 2 };
+      radiusRef.current = 250; // Adjust as needed
+
+      // Create gradient
+      gradientRef.current = ctx.createLinearGradient(width * 0.25, 0, width * 0.75, 0);
+      gradientRef.current.addColorStop(0, '#ffffff'); // Start color
+      gradientRef.current.addColorStop(1, '#ffffff'); // End color
+    }
+
+    // Animation Loop
+    function drawFrame() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.globalAlpha = 0.7;
+      ctx.lineCap = 'round';
+      ctx.strokeStyle = gradientRef.current;
+      ctx.fillStyle = '#F7FAFB';
 
-      particles.forEach((particle) => {
-        particle.update();
-        particle.draw(ctx);
+      // Update and Draw Lines
+      linesRef.current = linesRef.current.filter(function (line) {
+        line.step();
+        return line.alpha > 0.01;
       });
 
-      connectParticles(ctx, particles);
-      animationFrameId.current = requestAnimationFrame(animate);
-    };
+      linesRef.current.forEach(function (line) {
+        line.draw();
+      });
 
-    resizeCanvas();
-    window.addEventListener('resize', resizeCanvas);
-    animate();
+      // Add New Lines at Intervals
+      if (frameRef.current % 12 === 0) {
+        const center = centerRef.current;
+        const radius = radiusRef.current;
+        const xRange = { min: 0, max: canvas.width };
+        const yRange = { min: 0, max: canvas.height };
 
-    return () => {
-      window.removeEventListener('resize', resizeCanvas);
-      if (animationFrameId.current) {
-        cancelAnimationFrame(animationFrameId.current);
+        const { x, y } = getRandomPointOutsideCircle(center, radius, xRange, yRange);
+        linesRef.current.push(new Line(x, y));
       }
+
+      frameRef.current++;
+      animationFrameId.current = requestAnimationFrame(drawFrame);
+    }
+
+    // Initialize
+    resizeCanvas();
+    drawFrame();
+
+    // Handle Resize
+    const handleResize = () => {
+      resizeCanvas();
     };
-  }, []);
+
+    window.addEventListener('resize', handleResize);
+
+    // Cleanup on Unmount
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      cancelAnimationFrame(animationFrameId.current);
+    };
+  }, []); // Empty dependency array ensures this runs once on mount
 
   const toggleSidebar = () => setIsSidebarVisible(!isSidebarVisible);
 
   // --------------------------------------
-  // 6. Handlers: get question, submit answer, etc.
+  // 5. Handlers: get question, submit answer, etc.
   // --------------------------------------
   const handleGetQuestion = async () => {
     setIsLoading(true);
@@ -383,6 +487,11 @@ export default function AiTutor() {
       if (!response.ok) throw new Error('Failed to get AI question');
 
       const { question, highlightedSections } = await response.json();
+
+      if (!question) {
+        throw new Error('No question received from AI.');
+      }
+
       setHighlightedSections(highlightedSections || []);
       setQuestionStem(question);
       setQuestionText(question);
@@ -461,7 +570,7 @@ export default function AiTutor() {
   }, [currentQuestionCount, tutorConfig.questionLimit, questionText]);
 
   // --------------------------------------
-  // 7. Configuration & Modal Handling
+  // 6. Configuration & Modal Handling
   // --------------------------------------
   const openConfigModal = () => setIsConfigModalOpen(true);
   const closeConfigModal = () => setIsConfigModalOpen(false);
@@ -489,7 +598,7 @@ export default function AiTutor() {
   };
 
   // --------------------------------------
-  // 8. Saving & Loading Progress
+  // 7. Saving & Loading Progress
   // --------------------------------------
   const handleSaveProgress = async () => {
     if (!currentUser) {
@@ -526,8 +635,8 @@ export default function AiTutor() {
       return;
     }
     try {
-      const q = query(collection(db, 'tutorProgress'), where('userId', '==', currentUser.uid));
-      const querySnapshot = await getDocs(q);
+      const qQuery = query(collection(db, 'tutorProgress'), where('userId', '==', currentUser.uid));
+      const querySnapshot = await getDocs(qQuery);
       const results = [];
       querySnapshot.forEach((doc) => {
         results.push({ id: doc.id, ...doc.data() });
@@ -540,6 +649,17 @@ export default function AiTutor() {
   };
 
   const handleLoadProgress = (progress) => {
+    // Validate studyYear before loading
+    if (!studyMapping[progress.tutorConfig.studyYear]) {
+      alert(`Invalid studyYear "${progress.tutorConfig.studyYear}" in saved progress. Resetting to default.`);
+      setTutorConfig((prevConfig) => ({
+        ...prevConfig,
+        studyYear: '1L',
+      }));
+      closeLoadProgressModal();
+      return;
+    }
+
     setTutorConfig(progress.tutorConfig);
     setQuestionText(progress.questionText);
     setInputText(progress.inputText);
@@ -567,7 +687,7 @@ export default function AiTutor() {
   };
 
   // --------------------------------------
-  // 9. Access Control
+  // 8. Access Control
   // --------------------------------------
   if (!currentUser) {
     return (
@@ -596,7 +716,7 @@ export default function AiTutor() {
 
   function messageDisplay() {
     if (isCommunicating) return 'AI is communicating...';
-    return 'LExAPI v0.3.6 is ready';
+    return 'LExAPI Version 3.6';
   }
 
   const highlightedReasons = highlightedSections
@@ -709,7 +829,7 @@ export default function AiTutor() {
           <AnimatePresence>
             {!isSessionActive && (
               <motion.div
-                className="relative w-64 h-64 sm:w-80 sm:h-80 md:w-96 md:h-96 mb-6"
+                className="relative w-full h-64 sm:h-80 md:h-96 mb-6"
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.5 }}
@@ -717,12 +837,13 @@ export default function AiTutor() {
               >
                 <canvas
                   ref={visualizerCanvas}
-                  className="absolute top-0 left-0 w-full h-full rounded-full"
+                  className="absolute top-0 left-0 w-full h-full rounded"
+                  aria-label="Background Animation Canvas"
                 ></canvas>
                 <div className="absolute inset-0 flex items-center justify-center">
                   <textarea
                     className="w-48 sm:w-64 h-24 bg-transparent text-center p-2 rounded-md focus:outline-none 
-                               focus:ring-2 focus:ring-blue-500 text-white font-semibold text-lg"
+                               focus:ring-2 focus:ring-blue-500 text-white font-semibold text-2xl"
                     value={messageDisplay()}
                     readOnly
                     aria-label="AI Communication Status"

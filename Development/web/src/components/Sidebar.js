@@ -15,7 +15,7 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, i
   const plan = userDataObj?.billing?.plan?.toLowerCase() || 'free'; 
   const isDarkMode = userDataObj?.darkMode || false;
 
-  const hasAccess = plan === 'basic'; 
+  const hasAccess = plan === 'free'; 
   const hasSimulationAccess = plan === 'pro' || plan === 'basic';
 
   const renderLockedNavLink = (href, iconClass, label) => (
