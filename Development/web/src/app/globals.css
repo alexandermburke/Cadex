@@ -22,7 +22,9 @@
 }
 
 .logo-animation {
-    animation: fadeInSlide 1s ease-out forwards;
+  animation: fadeInSlide 1s ease-out forwards;
+  width: 64px;
+  height: 64px;
 }
 
 html {

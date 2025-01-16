@@ -23,7 +23,7 @@ export default function PrivacyPolicy() {
         alt="Header"
         width={100}
         height={100}
-        className="mx-auto"
+        className="mx-auto w-32 h-32"
         unoptimized={true}
       />
 

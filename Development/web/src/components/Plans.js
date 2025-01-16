@@ -329,61 +329,6 @@ export default function Plans() {
         </div>
       )}
 
-      {/* Features Section */}
-      <section className="w-full p-6 rounded-lg transition-colors duration-300 flex flex-col items-center gap-4 my-12">
-        <h2 className={`text-4xl font-bold ${isDarkMode ? 'text-white' : 'text-blue-950'} ${poppins.className}`}>
-          Features
-        </h2>
-        <div className="w-full max-w-4xl overflow-x-auto">
-          <table className={`min-w-full table-auto border-collapse ${isDarkMode ? 'bg-slate-800' : 'bg-transparent'}`}>
-            <thead>
-              <tr>
-                <th className="px-4 py-2 text-left text-xl font-semibold text-blue-500">Feature</th>
-                <th className="px-4 py-2 text-left text-xl font-semibold text-blue-500">Description</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr className="border-t">
-                <td className="px-4 py-2 flex items-center gap-2">
-                  <FaInfoCircle className="text-blue-500" />
-                  <span className="font-semibold">Comprehensive Study Tools</span>
-                </td>
-                <td className={`px-4 py-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
-                  Access a wide range of tools designed to enhance your legal studies and practice.
-                </td>
-              </tr>
-              <tr className="border-t">
-                <td className="px-4 py-2 flex items-center gap-2">
-                  <FaInfoCircle className="text-blue-500" />
-                  <span className="font-semibold">Personalized Insights</span>
-                </td>
-                <td className={`px-4 py-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
-                  Receive tailored insights and analytics to track your progress and identify areas for improvement.
-                </td>
-              </tr>
-              <tr className="border-t">
-                <td className="px-4 py-2 flex items-center gap-2">
-                  <FaInfoCircle className="text-blue-500" />
-                  <span className="font-semibold">Expert Support</span>
-                </td>
-                <td className={`px-4 py-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
-                  Get priority support and access to legal experts to assist you with any questions or issues.
-                </td>
-              </tr>
-              <tr className="border-t">
-                <td className="px-4 py-2 flex items-center gap-2">
-                  <FaInfoCircle className="text-blue-500" />
-                  <span className="font-semibold">Secure and Reliable</span>
-                </td>
-                <td className={`px-4 py-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
-                  Your data is protected with industry-standard security measures, ensuring reliability and peace of mind.
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </section>
-
       {/* FAQ Section */}
       <section className="w-full p-6 rounded-lg transition-colors duration-300 flex flex-col items-center gap-4">
         <h2 className={`text-3xl font-bold ${poppins.className} ${isDarkMode ? 'text-white' : 'text-blue-950'}`}>

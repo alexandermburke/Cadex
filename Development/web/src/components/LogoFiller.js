@@ -24,7 +24,7 @@ export default function LogoFiller() {
         {/* Header Image */}
         <div
           className="relative mx-auto my-auto"
-          style={{ width: 'min(44px, 25vw)', height: 'min(44px, 25vw)' }}
+          style={{ width: 'min(65px, 35vw)', height: 'min(65px, 35vw)' }}
         >
           <Image
             src="/header.avif"
