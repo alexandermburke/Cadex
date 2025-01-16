@@ -43,7 +43,7 @@ export default function Login() {
                         alt="CadexLaw Logo"
                         width={520} 
                         height={520} 
-                        className='w-36 h-36'
+                        className='w-24 h-24 sm:mr-4 mb-4'
                         quality={'100'}
                         unoptimized={true}
                     />

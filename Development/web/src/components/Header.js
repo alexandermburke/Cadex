@@ -180,7 +180,7 @@ export default function Header() {
                             alt="CadexLaw Logo" 
                             width={44} 
                             height={44} 
-                            className={`${logoLoaded ? 'logo-animation' : 'w-16 h-16'}`} 
+                            className={`${logoLoaded ? 'logo-animation' : 'w-12 h-12'}`} 
                             unoptimized={true}
                             quality={'100'}
                         />
