@@ -277,7 +277,7 @@ export default function Hero() {
         </div>
       )}
 
-      <div className="max-w-7xl mx-auto px-4 py-0 relative z-10 mt-4">
+      <div className=" mx-auto px-4 py-0 relative z-10 mt-4">
         {/* Hero Section */}
         <div
           className={`flex flex-col items-center text-center mx-auto transform transition-transform duration-700 ${
@@ -348,7 +348,7 @@ export default function Hero() {
             featuresInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
           }`}
         >
-          <div className="max-w-7xl w-full">
+          <div className="w-3/4">
             <h3
               className={`text-4xl sm:text-5xl font-semibold text-center ${
                 isDarkMode ? 'text-white ' : 'text-blue-950 '
@@ -367,7 +367,7 @@ export default function Hero() {
               }}
               speed={15000} // Faster speed: 15 seconds for a full loop
               loop={true}
-              freeMode={true}
+              freeMode={false}
               freeModeVelocityRatio={0.5}
               className="my-8"
             >
@@ -400,13 +400,13 @@ export default function Hero() {
               spaceBetween={20}
               slidesPerView="auto"
               autoplay={{
-                delay: 0, // No delay between transitions
+                delay: 0, 
                 disableOnInteraction: false,
-                reverseDirection: true, // Scroll in opposite direction
+                reverseDirection: true, 
               }}
-              speed={15000} // Faster speed: 15 seconds for a full loop
+              speed={15000} 
               loop={true}
-              freeMode={true}
+              freeMode={false}
               freeModeVelocityRatio={0.5}
               className="my-8"
             >
