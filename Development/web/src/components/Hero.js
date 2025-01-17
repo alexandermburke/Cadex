@@ -3,7 +3,6 @@
 import React, { useState, useEffect } from 'react';
 import { Poppins } from 'next/font/google';
 import Link from 'next/link';
-import CarouselComponent from './Carousel';
 import Image from 'next/image';
 import {
   FaGavel,
@@ -14,6 +13,13 @@ import {
   FaChartLine,
   FaFileContract,
   FaBalanceScale,
+  FaUserPlus,
+  FaCogs,
+  FaGraduationCap,
+  FaComment,
+  FaLightbulb, // Additional icon
+  FaBook,        // Additional icon
+  FaLaptopCode,  // Additional icon
 } from 'react-icons/fa';
 
 import { Swiper, SwiperSlide } from 'swiper/react';
@@ -21,12 +27,10 @@ import 'swiper/css';
 import { Autoplay, FreeMode } from 'swiper/modules';
 import { useInView } from 'react-intersection-observer';
 import { useAuth } from '@/context/AuthContext';
+import { motion } from 'framer-motion';
+import clsx from 'clsx';
 
-const targetStats = {
-  cases: 400,
-  newUsers: 1250,
-  statsProvided: 45,
-};
+import HeroBackground from './HeroBackground'; 
 
 const poppins = Poppins({
   subsets: ['latin'],
@@ -36,18 +40,12 @@ const poppins = Poppins({
 export default function Hero() {
   const { currentUser, userDataObj } = useAuth(); // Ensure useAuth is imported
   const isDarkMode = userDataObj?.darkMode || false;
-
   const [loaded, setLoaded] = useState(false);
-  const [stats, setStats] = useState({
-    cases: 0,
-    newUsers: 0,
-    statsProvided: 0,
-  });
 
   // Animate stats counters
   const animateStats = (start, end, setter) => {
     let startTime;
-    const duration = 7500;
+    const duration = 5000; // Reduced duration for faster animation
 
     const step = (timestamp) => {
       if (!startTime) startTime = timestamp;
@@ -75,13 +73,14 @@ export default function Hero() {
 
     setLoaded(true);
 
-    animateStats(0, targetStats.cases, (value) =>
+    // Animate stats when component mounts
+    animateStats(0, 400, (value) =>
       setStats((prevStats) => ({ ...prevStats, cases: value }))
     );
-    animateStats(0, targetStats.newUsers, (value) =>
+    animateStats(0, 1250, (value) =>
       setStats((prevStats) => ({ ...prevStats, newUsers: value }))
     );
-    animateStats(0, targetStats.statsProvided, (value) =>
+    animateStats(0, 45, (value) =>
       setStats((prevStats) => ({ ...prevStats, statsProvided: value }))
     );
 
@@ -144,87 +143,87 @@ export default function Hero() {
       title: 'Question Bank',
       description: 'Thousands of practice questions across legal topics.',
     },
+    // Additional Features
+    {
+      icon: <FaLightbulb className={`${isDarkMode ? 'text-white' : 'text-blue-950'} text-4xl mb-4`} />,
+      title: 'Smart Flashcards',
+      description: 'Reinforce your knowledge with intelligent flashcards.',
+    },
+    {
+      icon: <FaBook className={`${isDarkMode ? 'text-white' : 'text-blue-950'} text-4xl mb-4`} />,
+      title: 'Comprehensive Guides',
+      description: 'In-depth guides covering all essential legal subjects.',
+    },
+    {
+      icon: <FaLaptopCode className={`${isDarkMode ? 'text-white' : 'text-blue-950'} text-4xl mb-4`} />,
+      title: 'Interactive Coding Modules',
+      description: 'Engage with coding modules tailored for legal studies.',
+    },
+    {
+      icon: <FaComment className={`${isDarkMode ? 'text-white' : 'text-blue-950'} text-4xl mb-4`} />,
+      title: 'Community Support',
+      description: 'Join a community of peers for collaborative learning.',
+    },
   ];
 
   // Duplicate features array to allow seamless scrolling
-  const duplicatedFeatures = [...features, ...features];
+  const duplicatedFeatures = [...features, ...features, ...features];
 
-  // Success Stories (now law-school oriented)
-  const successStories = [
+  // How It Works Steps
+  const howItWorks = [
     {
-      name: "Jane Doe",
-      initialGrade: "B-",
-      newGrade: "B+",
-      difference: 1,
-      quote: "Cadex gave me confidence!",
+      icon: <FaUserPlus className={`${isDarkMode ? 'text-white' : 'text-blue-950'} text-4xl mb-4`} />,
+      title: 'Sign Up & Personalize',
+      description:
+        'Create your account and customize your study preferences to get started.',
     },
     {
-      name: "John Smith",
-      initialGrade: "C",
-      newGrade: "B",
-      difference: 1,
-      quote: "Personalized feedback made the difference.",
+      icon: <FaCogs className={`${isDarkMode ? 'text-white' : 'text-blue-950'} text-4xl mb-4`} />,
+      title: 'Access AI Tools',
+      description:
+        'Utilize our AI-powered tools for practice exams, flashcards, and more.',
     },
     {
-      name: "Ayesha Khan",
-      initialGrade: "B+",
-      newGrade: "A-",
-      difference: 1,
-      quote: "I finally understood the material.",
+      icon: <FaGraduationCap className={`${isDarkMode ? 'text-white' : 'text-blue-950'} text-4xl mb-4`} />,
+      title: 'Track Your Progress',
+      description:
+        'Monitor your performance with detailed analytics and tailored feedback.',
     },
     {
-      name: "Carlos Mendes",
-      initialGrade: "C+",
-      newGrade: "B+",
-      difference: 1,
-      quote: "Smarter study beats expensive methods.",
+      icon: <FaRobot className={`${isDarkMode ? 'text-white' : 'text-blue-950'} text-4xl mb-4`} />,
+      title: 'Achieve Success',
+      description:
+        'Leverage CadexLaw’s resources to excel in your law studies and exams.',
+    },
+    // Additional How It Works steps
+    {
+      icon: <FaChartLine className={`${isDarkMode ? 'text-white' : 'text-blue-950'} text-4xl mb-4`} />,
+      title: 'Advanced Analytics',
+      description:
+        'Gain insights into your study patterns with our advanced analytics tools.',
     },
     {
-      name: "Linda Green",
-      initialGrade: "C",
-      newGrade: "A-",
-      difference: 2,
-      quote: "Structure and resources boosted my grade!",
+      icon: <FaLightbulb className={`${isDarkMode ? 'text-white' : 'text-blue-950'} text-4xl mb-4`} />,
+      title: 'Innovative Learning Methods',
+      description:
+        'Experience cutting-edge learning techniques designed for law students.',
     },
     {
-      name: "Mark Thompson",
-      initialGrade: "C-",
-      newGrade: "B+",
-      difference: 2,
-      quote: "Two letters up in two months!",
+      icon: <FaBook className={`${isDarkMode ? 'text-white' : 'text-blue-950'} text-4xl mb-4`} />,
+      title: 'Extensive Resources',
+      description:
+        'Access a vast library of legal resources to support your studies.',
     },
     {
-      name: "Sophia Ramirez",
-      initialGrade: "B-",
-      newGrade: "A-",
-      difference: 1,
-      quote: "Instant feedback = huge jump!",
-    },
-    {
-      name: "David Lee",
-      initialGrade: "C+",
-      newGrade: "B+",
-      difference: 1,
-      quote: "Felt more prepared than ever.",
-    },
-    {
-      name: "Emma Wilson",
-      initialGrade: "B-",
-      newGrade: "A",
-      difference: 2,
-      quote: "AI tutoring made learning easy.",
-    },
-    {
-      name: "James Brown",
-      initialGrade: "C+",
-      newGrade: "B+",
-      difference: 1,
-      quote: "Tailored study materials helped me excel.",
+      icon: <FaComment className={`${isDarkMode ? 'text-white' : 'text-blue-950'} text-4xl mb-4`} />,
+      title: 'Expert Support',
+      description:
+        'Connect with legal experts for guidance and mentorship.',
     },
   ];
 
-  // Duplicate successStories array for seamless scrolling
-  const duplicatedSuccessStories = [...successStories, ...successStories];
+  // Duplicate howItWorks array for animation purposes
+  const duplicatedHowItWorks = [...howItWorks, ...howItWorks, ...howItWorks];
 
   const VerticalDivider = () => (
     <div
@@ -238,17 +237,27 @@ export default function Hero() {
 
   // Intersection Observers
   const [featuresRef, featuresInView] = useInView({ threshold: 0.1, triggerOnce: true });
-  const [storiesRef, storiesInView] = useInView({ threshold: 0.1, triggerOnce: true });
+  // Removed howItWorksRef since it's now integrated into Features
+  // const [howItWorksRef, howItWorksInView] = useInView({ threshold: 0.1, triggerOnce: true });
+
+  const [stats, setStats] = useState({
+    cases: 0,
+    newUsers: 0,
+    statsProvided: 0,
+  });
 
   return (
-    <section className="w-full bg-transparent">
+    <section className="w-full bg-transparent relative">
+      {/* SVG Background with Blur */}
+      <HeroBackground className="absolute inset-0 w-full h-full filter blur-lg" />
+
       {/* Disclaimer Popup */}
       {showDisclaimer && (
         <div className="fixed inset-0 z-[151] flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white rounded-lg p-6 max-w-lg mx-auto">
-            <h2 className="text-3xl font-semibold mb-4">Disclaimer</h2>
-            <p className="mb-4 text-gray-700">
-              Cadexlaw&apos;s resources are for educational purposes only and don&apos;t constitute legal advice or establish an attorney-client relationship. We&apos;re not experts in education or law. Please research and consult a licensed attorney or educator for legal matters or educational decisions. For more details, see our{' '}
+          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-lg mx-auto">
+            <h2 className="text-3xl font-semibold mb-4 text-gray-900 dark:text-white">Disclaimer</h2>
+            <p className="mb-4 text-gray-700 dark:text-gray-300">
+              CadexLaw&apos;s resources are for educational purposes only and don&apos;t constitute legal advice or establish an attorney-client relationship. We&apos;re not experts in education or law. Please research and consult a licensed attorney or educator for legal matters or educational decisions. For more details, see our{' '}
               <Link href="/termsandconditions" className="text-blue-600 underline">
                 Terms and Conditions
               </Link>.
@@ -256,7 +265,7 @@ export default function Hero() {
             <div className="text-right">
               <button
                 onClick={handleCloseDisclaimer}
-                className="group before:ease relative h-12 w-56 overflow-hidden rounded bg-blue-950 text-white shadow-2xl transition-all before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-56"
+                className="group relative h-12 w-56 overflow-hidden rounded bg-blue-950 text-white shadow-2xl transition-all before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-56 focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <div className="flex items-center justify-center h-full">
                   I Understand
@@ -268,7 +277,7 @@ export default function Hero() {
         </div>
       )}
 
-      <div className="max-w-7xl mx-auto px-4 py-0">
+      <div className="max-w-7xl mx-auto px-4 py-0 relative z-10 mt-4">
         {/* Hero Section */}
         <div
           className={`flex flex-col items-center text-center mx-auto transform transition-transform duration-700 ${
@@ -306,7 +315,7 @@ export default function Hero() {
           </h2>
 
           <p
-            className={`text-center text-2xl sm:text-2xl md:text-2xl ${
+            className={`text-center text-3xl sm:text-3xl md:text-3xl ${
               isDarkMode ? 'text-white' : 'text-black'
             } max-w-2xl my-6`}
           >
@@ -319,7 +328,7 @@ export default function Hero() {
             <Link
               href="/pricing"
               className={
-                'group before:ease relative h-12 w-56 overflow-hidden rounded bg-blue-950 text-white shadow-2xl transition-all before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-56'
+                'group relative h-12 w-56 overflow-hidden rounded bg-blue-950 text-white shadow-2xl transition-all before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-56 focus:outline-none focus:ring-2 focus:ring-blue-500'
               }
             >
               <div className="flex items-center justify-center h-full">
@@ -332,7 +341,7 @@ export default function Hero() {
 
         <VerticalDivider />
 
-        {/* Features Section */}
+        {/* Features Carousel */}
         <div
           ref={featuresRef}
           className={`flex flex-col items-center py-4 px-4 md:px-8 lg:px-16 bg-transparent transition-all duration-1000 ${
@@ -354,8 +363,9 @@ export default function Hero() {
               autoplay={{
                 delay: 0, // No delay between transitions
                 disableOnInteraction: false,
+                reverseDirection: false, // Scroll forward
               }}
-              speed={20000} // Adjust to control scrolling speed (20 seconds for a full loop)
+              speed={15000} // Faster speed: 15 seconds for a full loop
               loop={true}
               freeMode={true}
               freeModeVelocityRatio={0.5}
@@ -383,82 +393,41 @@ export default function Hero() {
                 </SwiperSlide>
               ))}
             </Swiper>
-          </div>
-        </div>
 
-        <VerticalDivider />
-
-        {/* Success Stories Section */}
-        <div
-          ref={storiesRef}
-          className={`flex flex-col items-center px-4 md:px-8 lg:px-16 transition-all duration-1000 ${
-            storiesInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
-          }`}
-        >
-          <div className="max-w-5xl w-full">
-            <h3
-              className={`text-4xl sm:text-5xl font-semibold my-6 text-center ${
-                isDarkMode ? 'text-white ' : 'text-blue-950 '
-              }`}
-            >
-              Success Stories
-            </h3>
+            {/* How It Works Carousel */}
             <Swiper
               modules={[Autoplay, FreeMode]}
               spaceBetween={20}
-              slidesPerView={1}
+              slidesPerView="auto"
               autoplay={{
-                delay: 0,
+                delay: 0, // No delay between transitions
                 disableOnInteraction: false,
+                reverseDirection: true, // Scroll in opposite direction
               }}
-              speed={20000}
+              speed={15000} // Faster speed: 15 seconds for a full loop
               loop={true}
               freeMode={true}
               freeModeVelocityRatio={0.5}
-              className="my-12"
-              breakpoints={{
-                640: {
-                  slidesPerView: 2,
-                },
-                1024: {
-                  slidesPerView: 3,
-                },
-              }}
+              className="my-8"
             >
-              {duplicatedSuccessStories.map((story, index) => (
-                <SwiperSlide key={index} style={{ width: '320px', height: '320px' }}>
-                  <div className="bg-transparent rounded shadow-lg p-6 h-full flex flex-col justify-between hover:shadow-xl transition-shadow">
-                    <div>
-                      <h4
-                        className={`text-xl font-semibold mb-2 ${
-                          isDarkMode ? 'text-white ' : 'text-blue-950 '
-                        }`}
-                      >
-                        {story.name}
-                      </h4>
-                      <p
-                        className={`text-base italic mb-4 ${
-                          isDarkMode ? 'text-white ' : 'text-gray-700 '
-                        }`}
-                      >
-                        &ldquo;{story.quote}&rdquo;
-                      </p>
-                    </div>
-                    <div
-                      className={`flex items-center justify-start gap-4 ${
-                        isDarkMode ? 'text-white ' : 'text-gray-700 '
-                      } mt-auto`}
+              {duplicatedHowItWorks.map((step, index) => (
+                <SwiperSlide key={index} style={{ width: '220px', height: '250px' }}>
+                  <div className="w-full h-full flex flex-col items-center justify-center p-4 bg-transparent rounded shadow-lg hover:shadow-xl transition-shadow">
+                    {step.icon}
+                    <h4
+                      className={`text-lg font-semibold mb-2 text-center ${
+                        isDarkMode ? 'text-white ' : 'text-blue-950 '
+                      }`}
                     >
-                      <span className="text-sm">
-                        {story.initialGrade} → {story.newGrade} (
-                        <span className="font-bold text-emerald-500">
-                          {story.difference === 1
-                            ? `+${story.difference} letter`
-                            : `+${story.difference} letters`}
-                        </span>
-                        )
-                      </span>
-                    </div>
+                      {step.title}
+                    </h4>
+                    <p
+                      className={`text-sm ${
+                        isDarkMode ? 'text-white ' : 'text-gray-700 '
+                      }`}
+                    >
+                      {step.description}
+                    </p>
                   </div>
                 </SwiperSlide>
               ))}
@@ -467,6 +436,8 @@ export default function Hero() {
         </div>
 
         <VerticalDivider />
+
+        {/* Add any additional sections here */}
       </div>
     </section>
   );

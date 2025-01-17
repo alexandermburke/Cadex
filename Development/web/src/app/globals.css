@@ -321,3 +321,74 @@ html {
   color: #ffffff;
   will-change: transform;
 }
+
+/* ------------------------------
+   NEW: Infinite SVG Flowing Line Animation
+   ------------------------------ */
+
+/* Updated .flowing-line class for infinite animation */
+.flowing-line {
+  stroke-dasharray: 1000; /* Placeholder value; should match path length */
+  stroke-dashoffset: 1000; /* Start with dash offset equal to dash array */
+  animation: draw 5s linear infinite;
+}
+
+/* Updated @keyframes for continuous flow */
+@keyframes draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* Existing delay classes */
+.delay-1 {
+  animation-delay: 1s;
+}
+
+.delay-2 {
+  animation-delay: 2s;
+}
+
+.delay-3 {
+  animation-delay: 3s;
+}
+
+.delay-4 {
+  animation-delay: 4s;
+}
+
+.delay-5 {
+  animation-delay: 5s;
+}
+
+.delay-6 {
+  animation-delay: 6s;
+}
+
+.delay-7 {
+  animation-delay: 7s;
+}
+
+.delay-8 {
+  animation-delay: 8s;
+}
+
+.delay-9 {
+  animation-delay: 9s;
+}
+
+.delay-10 {
+  animation-delay: 10s;
+}
+
+.delay-11 {
+  animation-delay: 11s;
+}
+
+.delay-12 {
+  animation-delay: 12s;
+}
+
+.delay-13 {
+  animation-delay: 13s;
+}
