@@ -96,7 +96,7 @@ export default function Hero() {
     localStorage.setItem('hasSeenDisclaimer', 'true');
   };
 
-  const animatedWord = 'Experience';
+  const animatedWord = 'Odyssey';
 
   // Features (focusing on law school)
   const features = [
@@ -311,7 +311,7 @@ export default function Hero() {
               </span>{' '}
               Awaits.
             </span>
-            <span className="sr-only">Your Dream School Experience Awaits.</span>
+            <span className="sr-only">Your Dream School Odyssey Awaits.</span>
           </h2>
 
           <p
@@ -348,7 +348,7 @@ export default function Hero() {
             featuresInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
           }`}
         >
-          <div className="w-1/2">
+          <div className="w-2/3">
             <h3
               className={`text-4xl sm:text-5xl font-semibold text-center ${
                 isDarkMode ? 'text-white ' : 'text-blue-950 '

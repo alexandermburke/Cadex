@@ -59,7 +59,7 @@ export default function Product() {
           </p>
           <a
             href="https://demo.cadexlaw.com"
-            className={`before:ease relative h-12 w-56 overflow-hidden rounded goldBackground text-white shadow-2xl transition-all before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-56 flex items-center justify-center`}
+            className={`before:ease relative h-12 w-56 text-xl overflow-hidden rounded goldBackground text-white shadow-2xl transition-all before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-56 flex items-center justify-center`}
           >
             Try our Demo
           </a>
