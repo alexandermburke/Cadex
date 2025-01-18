@@ -2,7 +2,7 @@
 import React from 'react';
 
 const HeroBackground = () => (
-  <div class="absolute inset-0 w-full h-full flex items-start justify-center overflow-hidden opacity-75 drop-shadow-lg">
+  <div class="absolute inset-0 w-full h-full flex items-start justify-center overflow-hidden opacity-55 drop-shadow-lg">
   <svg
         className="absolute w-[1520px] h-full left-1/2 -translate-x-1/2 -translate-y-1/4"
         viewBox="0 0 1520 448"
@@ -14,31 +14,31 @@ const HeroBackground = () => (
         <defs>
           <linearGradient id="paint0_linear_291_934" x1="1236" y1="285" x2="1286" y2="285.25">
             <stop stopColor="#CCD7ED"></stop>
-            <stop offset="1" stopColor="#2740CC"></stop>
+            <stop offset="1" stopColor="#2e3a65"></stop>
           </linearGradient>
           <linearGradient id="paint1_linear_291_934" x1="1392" y1="246" x2="1342" y2="246">
             <stop stopColor="#CCD7ED"></stop>
-            <stop offset="1" stopColor="#3B82F6"></stop>
+            <stop offset="1" stopColor="#2e3a65"></stop>
           </linearGradient>
           <linearGradient id="paint2_linear_291_934" x1="259.5" y1="272" x2="209" y2="272">
             <stop stopColor="#CCD7ED"></stop>
-            <stop offset="1" stopColor="#3B82F6"></stop>
+            <stop offset="1" stopColor="#2e3a65"></stop>
           </linearGradient>
           <linearGradient id="paint8_linear_291_934" x1="297" y1="145" x2="354" y2="145">
-            <stop stopColor="#2740CC"></stop>
-            <stop offset="1" stopColor="#3B82F6"></stop>
+            <stop stopColor="#2e3a65"></stop>
+            <stop offset="1" stopColor="#2e3a65"></stop>
           </linearGradient>
           <linearGradient id="paint12_linear_291_934" x1="297.5" y1="145" x2="355" y2="145">
-            <stop stopColor="#2740CC"></stop>
+            <stop stopColor="#2e3a65"></stop>
             <stop offset="1" stopColor="#1A7CD8"></stop>
           </linearGradient>
           <linearGradient id="paint13_linear_291_934" x1="1174.5" y1="100" x2="1231" y2="101">
-            <stop stopColor="#2740CC"></stop>
-            <stop offset="1" stopColor="#3B82F6"></stop>
+            <stop stopColor="#2e3a65"></stop>
+            <stop offset="1" stopColor="#2e3a65"></stop>
           </linearGradient>
           <linearGradient id="paint14_linear_291_934" x1="1285" y1="248.5" x2="1341" y2="248.5">
-            <stop stopColor="#2740CC"></stop>
-            <stop offset="1" stopColor="#3B82F6"></stop>
+            <stop stopColor="#2e3a65"></stop>
+            <stop offset="1" stopColor="#2e3a65"></stop>
           </linearGradient>
           <linearGradient
             id="paint15_radial_291_934"
@@ -47,8 +47,8 @@ const HeroBackground = () => (
             r="1"
             gradientTransform="translate(153.567 271.957) rotate(0.0432754) scale(56.4335 450.41)"
           >
-            <stop stopColor="#2740CC"></stop>
-            <stop offset="0.931035" stopColor="#3B82F6"></stop>
+            <stop stopColor="#2e3a65"></stop>
+            <stop offset="0.931035" stopColor="#2e3a65"></stop>
           </linearGradient>
           <clipPath id="clip0_291_934">
             <rect width="37" height="37" fill="white" transform="translate(307 127)"></rect>
@@ -152,8 +152,8 @@ const HeroBackground = () => (
               y2="28.4858"
               gradientUnits="userSpaceOnUse"
             >
-              <stop stopColor="#2740CC"></stop>
-              <stop offset="1" stopColor="#3B82F6"></stop>
+              <stop stopColor="#2e3a65"></stop>
+              <stop offset="1" stopColor="#2e3a65"></stop>
             </linearGradient>
             <linearGradient
               id="paint1_linear_292_979"
@@ -163,7 +163,7 @@ const HeroBackground = () => (
               y2="28.4858"
               gradientUnits="userSpaceOnUse"
             >
-              <stop stopColor="#2740CC"></stop>
+              <stop stopColor="#2e3a65"></stop>
               <stop offset="1" stopColor="#1A7CD8"></stop>
             </linearGradient>
           </defs>
@@ -200,8 +200,8 @@ const HeroBackground = () => (
               y2="28"
               gradientUnits="userSpaceOnUse"
             >
-              <stop stopColor="#2740CC"></stop>
-              <stop offset="1" stopColor="#3B82F6"></stop>
+              <stop stopColor="#2e3a65"></stop>
+              <stop offset="1" stopColor="#2e3a65"></stop>
             </linearGradient>
             <linearGradient
               id="paint1_linear_293_994"
@@ -211,8 +211,8 @@ const HeroBackground = () => (
               y2="28"
               gradientUnits="userSpaceOnUse"
             >
-              <stop stopColor="#2740CC"></stop>
-              <stop offset="1" stopColor="#3B82F6"></stop>
+              <stop stopColor="#2e3a65"></stop>
+              <stop offset="1" stopColor="#2e3a65"></stop>
             </linearGradient>
           </defs>
         </svg>
@@ -246,8 +246,8 @@ const HeroBackground = () => (
               y2="28.6025"
               gradientUnits="userSpaceOnUse"
             >
-              <stop stopColor="#2740CC"></stop>
-              <stop offset="1" stopColor="#3B82F6"></stop>
+              <stop stopColor="#2e3a65"></stop>
+              <stop offset="1" stopColor="#2e3a65"></stop>
             </linearGradient>
             <linearGradient
               id="paint1_linear_293_989"
@@ -257,8 +257,8 @@ const HeroBackground = () => (
               y2="34.1024"
               gradientUnits="userSpaceOnUse"
             >
-              <stop stopColor="#2740CC"></stop>
-              <stop offset="1" stopColor="#3B82F6"></stop>
+              <stop stopColor="#2e3a65"></stop>
+              <stop offset="1" stopColor="#2e3a65"></stop>
             </linearGradient>
           </defs>
         </svg>
@@ -292,8 +292,8 @@ const HeroBackground = () => (
               y2="28"
               gradientUnits="userSpaceOnUse"
             >
-              <stop stopColor="#2740CC"></stop>
-              <stop offset="1" stopColor="#3B82F6"></stop>
+              <stop stopColor="#2e3a65"></stop>
+              <stop offset="1" stopColor="#2e3a65"></stop>
             </linearGradient>
             <radialGradient
               id="paint1_radial_293_982"
@@ -303,8 +303,8 @@ const HeroBackground = () => (
               gradientUnits="userSpaceOnUse"
               gradientTransform="translate(0.566551 27.9574) rotate(0.0432754) scale(56.4335 450.41)"
             >
-              <stop stopColor="#2740CC"></stop>
-              <stop offset="0.931035" stopColor="#3B82F6"></stop>
+              <stop stopColor="#2e3a65"></stop>
+              <stop offset="0.931035" stopColor="#2e3a65"></stop>
             </radialGradient>
           </defs>
         </svg>

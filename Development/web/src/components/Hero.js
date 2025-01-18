@@ -316,7 +316,7 @@ export default function Hero() {
 
           <p
             className={`text-center text-2xl sm:text-2xl md:text-2xl ${
-              isDarkMode ? 'text-white' : 'text-slate-600'
+              isDarkMode ? 'text-white' : 'text-slate-700'
             } max-w-2xl my-2`}
           >
              By law students, for law students. We use AI to deliver high quality preparation
