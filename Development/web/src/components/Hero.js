@@ -315,11 +315,13 @@ export default function Hero() {
           </h2>
 
           <p
-            className={`text-center text-4xl sm:text-4xl md:text-4xl ${
-              isDarkMode ? 'text-white' : 'text-slate-800'
-            } max-w-2xl my-9`}
+            className={`text-center text-2xl sm:text-2xl md:text-2xl ${
+              isDarkMode ? 'text-white' : 'text-slate-600'
+            } max-w-2xl my-2`}
           >
-            By law students, for law students.
+             By law students, for law students. We use AI to deliver high quality preparation
+            at up to <span className="goldSolid font-bold">70%</span> lower costs than
+            traditional competitors.
           </p>
 
           <div className="flex justify-center mt-6 mb-6">
