@@ -315,8 +315,8 @@ export default function Hero() {
           </h2>
 
           <p
-            className={`text-center text-3xl sm:text-3xl md:text-3xl ${
-              isDarkMode ? 'text-white' : 'text-black'
+            className={`text-center text-4xl sm:text-4xl md:text-4xl ${
+              isDarkMode ? 'text-white' : 'text-slate-800'
             } max-w-2xl my-9`}
           >
             By law students, for law students.
