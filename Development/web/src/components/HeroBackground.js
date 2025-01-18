@@ -54,6 +54,8 @@ const HeroBackground = () => (
           <rect width="37" height="37" fill="white" transform="translate(307 127)"></rect>
         </clipPath>
       </defs>
+
+      {/* Flowing lines */}
       <path
         className="flowing-line"
         d="M613.5 236.5L654.5 278H879.5L957 200.5H1344.5L1412 134"
@@ -124,7 +126,8 @@ const HeroBackground = () => (
         d="M298 146H48.5"
         stroke="url(#paint1_linear_291_934)"
       ></path>
-      {/* FIRST ICON (Graduation Cap) */}
+
+      {/* FIRST ICON */}
       <svg
         width="58"
         height="58"
@@ -140,12 +143,16 @@ const HeroBackground = () => (
           rx="11.5"
           stroke="url(#paint0_linear_292_979)"
         ></rect>
-        <path
-          fillRule="evenodd"
-          clipRule="evenodd"
-          d="M28.9996 16L10 24.0003L29 32L48.0004 24.0003L28.9996 16ZM11.5 26.6668V32.3334C11.5 32.874 11.8217 33.3666 12.3 33.5552L27.3 39.2117C27.7596 39.3865 28.2404 39.3865 28.7 39.2117L43.7004 33.5552C44.1787 33.3666 44.5004 32.874 44.5004 32.3334V26.6668L29 32L11.5 26.6668Z"
-          fill="url(#paint1_linear_292_979)"
-        ></path>
+        <g transform="translate(7,7) scale(1.75)">
+          <path
+            d="M8.25 3v1.5M4.5 8.25H3m18 0h-1.5M4.5 12H3m18 0h-1.5m-15 3.75H3m18 0h-1.5M8.25 19.5V21M12 3v1.5m0 15V21m3.75-18v1.5m0 15V21m-9-1.5h10.5a2.25 2.25 0 0 0 2.25-2.25V6.75a2.25 2.25 0 0 0-2.25-2.25H6.75A2.25 2.25 0 0 0 4.5 6.75v10.5a2.25 2.25 0 0 0 2.25 2.25Zm.75-12h9v9h-9v-9Z"
+            stroke="#2e3a65"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            fill="none"
+          />
+        </g>
         <defs>
           <linearGradient
             id="paint0_linear_292_979"
@@ -171,7 +178,8 @@ const HeroBackground = () => (
           </linearGradient>
         </defs>
       </svg>
-      {/* SECOND ICON (Scales of Justice) */}
+
+      {/* SECOND ICON */}
       <svg
         width="57"
         height="57"
@@ -189,12 +197,16 @@ const HeroBackground = () => (
           rx="11.5"
           stroke="url(#paint0_linear_293_994)"
         ></rect>
-        <path
-          fillRule="evenodd"
-          clipRule="evenodd"
-          d="M28.5 14C28.5 13.1716 29.1716 12.5 30 12.5H35C35.8284 12.5 36.5 13.1716 36.5 14V16H44.5C45.3284 16 46 16.6716 46 17.5C46 18.3284 45.3284 19 44.5 19H36.5V23.0958C38.9897 23.581 41 25.8069 41 28.5C41 31.5376 38.5376 34 35.5 34C32.4624 34 30 31.5376 30 28.5C30 25.8069 32.0103 23.581 34.5 23.0958V19H21.5V33.7695C23.9897 34.2547 26 36.4806 26 39.1737C26 42.2113 23.5376 44.6737 20.5 44.6737C17.4624 44.6737 15 42.2113 15 39.1737C15 36.4806 17.0103 34.2547 19.5 33.7695V19H13.5C12.6716 19 12 18.3284 12 17.5C12 16.6716 12.6716 16 13.5 16H21.5V14C21.5 13.1716 22.1716 12.5 23 12.5H28C28.8284 12.5 29.5 13.1716 29.5 14V14H28.5Z"
-          fill="url(#paint1_linear_293_994)"
-        ></path>
+        <g transform="translate(7,7) scale(1.75)">
+          <path
+            d="M12 21v-8.25M15.75 21v-8.25M8.25 21v-8.25M3 9l9-6 9 6m-1.5 12V10.332A48.36 48.36 0 0 0 12 9.75c-2.551 0-5.056.2-7.5.582V21M3 21h18M12 6.75h.008v.008H12V6.75Z"
+            stroke="#2e3a65"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            fill="none"
+          />
+        </g>
         <defs>
           <linearGradient
             id="paint0_linear_293_994"
@@ -220,7 +232,8 @@ const HeroBackground = () => (
           </linearGradient>
         </defs>
       </svg>
-      {/* THIRD ICON (Law Book) */}
+
+      {/* THIRD ICON (Replaced with new one) */}
       <svg
         width="58"
         height="58"
@@ -238,10 +251,17 @@ const HeroBackground = () => (
           rx="11.5"
           stroke="url(#paint0_linear_293_989)"
         ></rect>
-        <path
-          d="M18 12H40C41.6569 12 43 13.3431 43 15V43C43 44.6569 41.6569 46 40 46H18C16.3431 46 15 44.6569 15 43V15C15 13.3431 16.3431 12 18 12ZM20 16V42H38V16H20ZM31 20C31 18.8954 31.8954 18 33 18C34.1046 18 35 18.8954 35 20C35 21.1046 34.1046 22 33 22C31.8954 22 31 21.1046 31 20ZM25 20C25 18.8954 25.8954 18 27 18C28.1046 18 29 18.8954 29 20C29 21.1046 28.1046 22 27 22C25.8954 22 25 21.1046 25 20Z"
-          fill="url(#paint1_linear_293_989)"
-        ></path>
+        {/* Scaled group to fit new 24x24 icon nicely */}
+        <g transform="translate(7,7) scale(1.75)">
+          <path
+            d="M4.26 10.147a60.438 60.438 0 0 0-.491 6.347A48.62 48.62 0 0 1 12 20.904a48.62 48.62 0 0 1 8.232-4.41 60.46 60.46 0 0 0-.491-6.347m-15.482 0a50.636 50.636 0 0 0-2.658-.813A59.906 59.906 0 0 1 12 3.493a59.903 59.903 0 0 1 10.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.717 50.717 0 0 1 12 13.489a50.702 50.702 0 0 1 7.74-3.342M6.75 15a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Zm0 0v-3.675A55.378 55.378 0 0 1 12 8.443m-7.007 11.55A5.981 5.981 0 0 0 6.75 15.75v-1.5"
+            stroke="#2e3a65"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            fill="none"
+          />
+        </g>
         <defs>
           <linearGradient
             id="paint0_linear_293_989"
@@ -267,6 +287,7 @@ const HeroBackground = () => (
           </linearGradient>
         </defs>
       </svg>
+
       {/* FOURTH ICON (Replaced Gavel) */}
       <svg
         width="57"
@@ -320,6 +341,8 @@ const HeroBackground = () => (
           </radialGradient>
         </defs>
       </svg>
+
+      {/* Floating circles */}
       <circle cx="932" cy="4" r="2" fill="#CCD7ED"></circle>
       <circle cx="1010" cy="108" r="2" fill="#CCD7ED"></circle>
       <circle cx="1156" cy="156" r="2" fill="#CCD7ED"></circle>
