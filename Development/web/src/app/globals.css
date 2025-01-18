@@ -330,7 +330,7 @@ html {
 .flowing-line {
   stroke-dasharray: 1000; /* Placeholder value; should match path length */
   stroke-dashoffset: 1000; /* Start with dash offset equal to dash array */
-  animation: draw 5s linear infinite;
+  animation: draw 15s linear infinite;
 }
 
 /* Updated @keyframes for continuous flow */

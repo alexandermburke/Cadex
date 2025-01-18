@@ -227,7 +227,7 @@ export default function Hero() {
 
   const VerticalDivider = () => (
     <div
-      className={`mx-auto w-[2px] my-0 ${
+      className={`mx-auto w-[2px] my-4 ${
         isDarkMode ? 'bg-white' : 'bg-gradient-to-b from-transparent via-slate-500 to-blue-950'
       } transition-all duration-700 ${
         loaded ? 'h-12 sm:h-16 md:h-20 opacity-0' : 'h-0 opacity-0'
@@ -249,7 +249,7 @@ export default function Hero() {
   return (
     <section className="w-full bg-transparent relative">
       {/* SVG Background with Blur */}
-      <HeroBackground className="absolute inset-0 w-full h-full filter blur-lg" />
+      <HeroBackground />
 
       {/* Disclaimer Popup */}
       {showDisclaimer && (
@@ -277,7 +277,7 @@ export default function Hero() {
         </div>
       )}
 
-      <div className=" mx-auto px-4 py-0 relative z-10 mt-4">
+      <div className=" mx-auto px-4 py-0 relative z-10 mt-8">
         {/* Hero Section */}
         <div
           className={`flex flex-col items-center text-center mx-auto transform transition-transform duration-700 ${
@@ -285,7 +285,7 @@ export default function Hero() {
           }`}
         >
           <h2
-            className={`text-4xl sm:text-6xl font-semibold py-2 mb-0 ${
+            className={`text-7xl sm:text-7xl font-semibold py-2 mb-20 ${
               isDarkMode ? 'text-white' : 'text-blue-950'
             } ` + poppins.className}
           >
@@ -317,11 +317,9 @@ export default function Hero() {
           <p
             className={`text-center text-3xl sm:text-3xl md:text-3xl ${
               isDarkMode ? 'text-white' : 'text-black'
-            } max-w-2xl my-6`}
+            } max-w-2xl my-9`}
           >
-            By law students, for law students. CadexLaw uses AI to deliver high quality preparation
-            at up to <span className="goldSolid font-bold">85%</span> lower costs than
-            traditional competitors.
+            By law students, for law students.
           </p>
 
           <div className="flex justify-center mt-6 mb-6">
@@ -344,11 +342,11 @@ export default function Hero() {
         {/* Features Carousel */}
         <div
           ref={featuresRef}
-          className={`flex flex-col items-center py-4 px-4 md:px-8 lg:px-16 bg-transparent transition-all duration-1000 ${
+          className={`flex flex-col items-center py-4 px-4 md:px-8 lg:px-16 my-20 bg-transparent transition-all duration-1000 ${
             featuresInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
           }`}
         >
-          <div className="w-3/4">
+          <div className="w-1/2">
             <h3
               className={`text-4xl sm:text-5xl font-semibold text-center ${
                 isDarkMode ? 'text-white ' : 'text-blue-950 '
