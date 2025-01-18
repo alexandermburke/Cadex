@@ -320,7 +320,7 @@ export default function Hero() {
             } max-w-2xl my-2`}
           >
              By law students, for law students. We use AI to deliver high quality preparation
-            at up to <span className="goldSolid font-bold">70%</span> lower costs than
+            at up to <span className="goldSolid font-bold">70% lower costs</span> than
             traditional competitors.
           </p>
 
