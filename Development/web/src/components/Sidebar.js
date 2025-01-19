@@ -4,38 +4,31 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
-import { 
-  FaLock, 
-  FaBook, 
-  FaBookOpen, 
-  FaBalanceScale, 
-  FaGraduationCap, 
-  FaCogs, 
-  FaStickyNote, 
-  FaFileInvoice, 
-  FaQuestionCircle, 
-  FaExclamationTriangle, 
-  FaGavel, 
-  FaTools, 
-  FaCheckCircle, 
-  FaClipboardList, 
-  FaClipboardCheck, 
-  FaIdCard, 
-  FaClock, 
-  FaRobot, 
-  FaChartBar, 
-  FaFileAlt, 
-  FaFolderOpen, 
-  FaParagraph, 
-  FaEye, 
-  FaUserSecret, 
-  FaCrosshairs, 
-  FaSearch, 
-  FaBrain, 
-  FaListAlt, 
-  FaComment, 
-  FaChevronDown, 
-  FaChevronUp 
+import {
+  FaLock,
+  FaBookOpen,
+  FaFolderOpen,
+  FaBrain,
+  FaListAlt,
+  FaTools,
+  FaBook,
+  FaGraduationCap,
+  FaStickyNote,
+  FaFileInvoice,
+  FaClipboardList,
+  FaClipboardCheck,
+  FaClock,
+  FaChartBar,
+  FaRobot,
+  FaListOl,
+  FaBookReader,
+  FaExclamationTriangle,
+  FaGavel,
+  FaHome,
+  FaUniversity,
+  FaComment,
+  FaChevronDown,
+  FaChevronUp,
 } from 'react-icons/fa';
 import { motion } from 'framer-motion';
 import clsx from 'clsx';
@@ -115,20 +108,22 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, i
   const router = useRouter();
   const { currentUser, userDataObj } = useAuth();
 
-  const plan = userDataObj?.billing?.plan?.toLowerCase() || 'free'; 
+  // Determine plan and theme
+  const plan = userDataObj?.billing?.plan?.toLowerCase() || 'free';
   const isDarkMode = userDataObj?.darkMode || false;
 
-  const hasAccess = plan === 'free'; 
-  const hasSimulationAccess = plan === 'free' || plan === 'basic'; // change to pro
+  // Access logic
+  const isFree = plan === 'free';
+  const isBasic = plan === 'basic';
+  const isPro = plan === 'pro';
 
-  const [isStudyResearchOpen, setIsStudyResearchOpen] = useState(false);
-  const [isCogsOpen, setIsCogsOpen] = useState(false);
-  const [isIracOpen, setIsIracOpen] = useState(false);
+  // Toggle states for sections
+  const [isCaseBriefBankOpen, setIsCaseBriefBankOpen] = useState(false);
+  const [isStudyToolsOpen, setIsStudyToolsOpen] = useState(false);
   const [isExamPrepOpen, setIsExamPrepOpen] = useState(false);
-  const [isContractsOpen, setIsContractsOpen] = useState(false);
-  const [isTortsOpen, setIsTortsOpen] = useState(false);
-  const [isCaseBriefsOpen, setIsCaseBriefsOpen] = useState(false);
+  const [isSubjectGuidesOpen, setIsSubjectGuidesOpen] = useState(false);
 
+  // Sidebar animation
   const sidebarVariants = {
     hidden: {
       x: '-100%',
@@ -146,10 +141,19 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, i
     },
   };
 
+  // Background styling based on dark/light mode
   const sidebarBackground = clsx({
     'bg-gradient-to-b from-blue-900 to-slate-900': isDarkMode,
     'bg-gradient-to-b from-blue-950 to-slate-950': !isDarkMode,
   });
+
+  // Plan badge styling
+  const planBadgeStyle = (() => {
+    if (isPro) return 'bg-gradient-to-r from-amber-400 to-amber-600 text-white';
+    if (isBasic) return 'bg-gradient-to-r from-teal-400 to-teal-600 text-white';
+    // default (free)
+    return 'bg-gradient-to-r from-blue-400 to-blue-600 text-white';
+  })();
 
   return (
     <motion.aside
@@ -169,276 +173,246 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, i
 
       {/* Navigation */}
       <nav className="flex-1 px-6 py-4 space-y-6">
-        {/* Study & Research */}
+        {/* Case Brief Bank */}
         <ToggleSection
-          isOpen={isStudyResearchOpen}
-          toggle={() => setIsStudyResearchOpen(!isStudyResearchOpen)}
-          title="Study & Research"
-          icon={<FaBook className="text-lg" />}
+          isOpen={isCaseBriefBankOpen}
+          toggle={() => setIsCaseBriefBankOpen(!isCaseBriefBankOpen)}
+          title="Case Brief Bank"
+          icon={<FaFolderOpen className="text-lg" />}
         >
-          {hasAccess ? (
-            <>
-              <NavLink 
-                href="/lawtools/dictionary" 
-                icon={<FaBookOpen className="text-sm" />} 
-                label="Legal Dictionary" 
-                active={activeLink === '/lawtools/dictionary'} 
-              />
-              <NavLink 
-                href="/lawtools/casesummaries" 
-                icon={<FaBalanceScale className="text-sm" />} 
-                label="Case Summaries" 
-                active={activeLink === '/lawtools/casesummaries'} 
-              />
-              <NavLink 
-                href="/lawtools/lecturesummaries" 
-                icon={<FaGraduationCap className="text-sm" />} 
-                label="Lecture Summaries" 
-                active={activeLink === '/lawtools/lecturesummaries'} 
-              />
-            </>
+          {/* These can be free for everyone */}
+          <NavLink
+            href="/casebriefs/summaries"
+            icon={<FaBookOpen className="text-sm" />}
+            label="Case Summaries"
+            active={activeLink === '/casebriefs/summaries'}
+          />
+          <NavLink
+            href="/casebriefs/analysis"
+            icon={<FaBrain className="text-sm" />}
+            label="Case Analysis"
+            active={activeLink === '/casebriefs/analysis'}
+          />
+          <NavLink
+            href="/casebriefs/briefing"
+            icon={<FaListAlt className="text-sm" />}
+            label="All Briefs"
+            active={activeLink === '/casebriefs/briefing'}
+          />
+        </ToggleSection>
+
+        {/* Study Tools */}
+        <ToggleSection
+          isOpen={isStudyToolsOpen}
+          toggle={() => setIsStudyToolsOpen(!isStudyToolsOpen)}
+          title="Study Tools"
+          icon={<FaTools className="text-lg" />}
+        >
+          {/* Free Resources */}
+          <NavLink
+            href="/lawtools/dictionary"
+            icon={<FaBook className="text-sm" />}
+            label="Legal Dictionary"
+            active={activeLink === '/lawtools/dictionary'}
+          />
+          <NavLink
+            href="/lawtools/lecturesummaries"
+            icon={<FaGraduationCap className="text-sm" />}
+            label="Lecture Summaries"
+            active={activeLink === '/lawtools/lecturesummaries'}
+          />
+
+          {/* Basic/Pro Resources: Generative Flashcards & IRAC Generator */}
+          {isBasic || isPro ? (
+            <NavLink
+              href="/ailawtools/flashcards"
+              icon={<FaStickyNote className="text-sm" />}
+              label="Flashcards & Outlines"
+              active={activeLink === '/ailawtools/flashcards'}
+            />
           ) : (
-            <>
-              <LockedNavLink icon={<FaBookOpen className="text-sm" />} label="Legal Dictionary" />
-              <LockedNavLink icon={<FaBalanceScale className="text-sm" />} label="Case Summaries" />
-              <LockedNavLink icon={<FaGraduationCap className="text-sm" />} label="Lecture Summaries" />
-            </>
+            <LockedNavLink
+              icon={<FaStickyNote className="text-sm" />}
+              label="Flashcards & Outlines"
+            />
+          )}
+          {isBasic || isPro ? (
+            <NavLink
+              href="/ailawtools/irac"
+              icon={<FaFileInvoice className="text-sm" />}
+              label="IRAC Generator"
+              active={activeLink === '/ailawtools/irac'}
+            />
+          ) : (
+            <LockedNavLink
+              icon={<FaFileInvoice className="text-sm" />}
+              label="IRAC Generator"
+            />
           )}
         </ToggleSection>
 
-        {/* Enhanced Study Tools */}
-        <ToggleSection
-          isOpen={isCogsOpen}
-          toggle={() => setIsCogsOpen(!isCogsOpen)}
-          title="Enhanced Study Tools"
-          icon={<FaCogs className="text-lg" />}
-        >
-          {hasAccess ? (
-            <>
-              <NavLink 
-                href="/ailawtools/flashcards" 
-                icon={<FaStickyNote className="text-sm" />} 
-                label="Generative Flashcards" 
-                active={activeLink === '/ailawtools/flashcards'} 
-              />
-              <NavLink 
-                href="/ailawtools/irac" 
-                icon={<FaFileInvoice className="text-sm" />} 
-                label="Generative IRAC" 
-                active={activeLink === '/ailawtools/irac'} 
-              />
-            </>
-          ) : (
-            <>
-              <LockedNavLink icon={<FaStickyNote className="text-sm" />} label="Generative Flashcards" />
-              <LockedNavLink icon={<FaFileInvoice className="text-sm" />} label="Generative IRAC" />
-            </>
-          )}
-        </ToggleSection>
-
-        {/* IRAC Method */}
-        <ToggleSection
-          isOpen={isIracOpen}
-          toggle={() => setIsIracOpen(!isIracOpen)}
-          title="IRAC Method"
-          icon={<FaQuestionCircle className="text-lg" />}
-        >
-          {hasAccess ? (
-            <>
-              <NavLink 
-                href="/irac/issue" 
-                icon={<FaExclamationTriangle className="text-sm" />} 
-                label="Issue" 
-                active={activeLink === '/irac/issue'} 
-              />
-              <NavLink 
-                href="/irac/rule" 
-                icon={<FaGavel className="text-sm" />} 
-                label="Rule" 
-                active={activeLink === '/irac/rule'} 
-              />
-              <NavLink 
-                href="/irac/application" 
-                icon={<FaTools className="text-sm" />} 
-                label="Application" 
-                active={activeLink === '/irac/application'} 
-              />
-              <NavLink 
-                href="/irac/conclusion" 
-                icon={<FaCheckCircle className="text-sm" />} 
-                label="Conclusion" 
-                active={activeLink === '/irac/conclusion'} 
-              />
-            </>
-          ) : (
-            <>
-              <LockedNavLink icon={<FaExclamationTriangle className="text-sm" />} label="Issue" />
-              <LockedNavLink icon={<FaGavel className="text-sm" />} label="Rule" />
-              <LockedNavLink icon={<FaTools className="text-sm" />} label="Application" />
-              <LockedNavLink icon={<FaCheckCircle className="text-sm" />} label="Conclusion" />
-            </>
-          )}
-        </ToggleSection>
-
-        {/* Exam Preparation */}
+        {/* Exam Prep */}
         <ToggleSection
           isOpen={isExamPrepOpen}
           toggle={() => setIsExamPrepOpen(!isExamPrepOpen)}
-          title="Exam Preparation"
+          title="Exam Prep"
           icon={<FaClipboardList className="text-lg" />}
         >
-          {hasSimulationAccess ? (
-            <>
-              <NavLink 
-                href="/ailawtools/examprep/practice-exams" 
-                icon={<FaClipboardCheck className="text-sm" />} 
-                label="Practice Exams" 
-                active={activeLink === '/ailawtools/examprep/practice-exams'} 
-              />
-              <NavLink 
-                href="/ailawtools/examprep/flashcards" 
-                icon={<FaIdCard className="text-sm" />} 
-                label="Flashcards" 
-                active={activeLink === '/ailawtools/examprep/flashcards'} 
-              />
-              <NavLink 
-                href="/ailawtools/examprep/timemanagement" 
-                icon={<FaClock className="text-sm" />} 
-                label="Time Management" 
-                active={activeLink === '/ailawtools/examprep/timemanagement'} 
-              />
-              <NavLink 
-                href="/ailawtools/lexapi" 
-                icon={<FaRobot className="text-sm" />} 
-                label="LExAPI Tutor" 
-                active={activeLink === '/ailawtools/lexapi'} 
-              />
-              <NavLink 
-                href="/ailawtools/examprep/insights" 
-                icon={<FaChartBar className="text-sm" />} 
-                label="Exam Insights" 
-                active={activeLink === '/ailawtools/examprep/insights'} 
-              />
-            </>
+          {/* Basic or Pro */}
+          {isBasic || isPro ? (
+            <NavLink
+              href="/ailawtools/examprep/practice-exams"
+              icon={<FaClipboardCheck className="text-sm" />}
+              label="Practice Exams"
+              active={activeLink === '/ailawtools/examprep/practice-exams'}
+            />
           ) : (
-            <>
-              <LockedNavLink icon={<FaClipboardCheck className="text-sm" />} label="Practice Exams" />
-              <LockedNavLink icon={<FaIdCard className="text-sm" />} label="Flashcards" />
-              <LockedNavLink icon={<FaClock className="text-sm" />} label="Time Management" />
-              <LockedNavLink icon={<FaRobot className="text-sm" />} label="LExAPI Tutor" />
-              <LockedNavLink icon={<FaChartBar className="text-sm" />} label="Exam Insights" />
-            </>
+            <LockedNavLink
+              icon={<FaClipboardCheck className="text-sm" />}
+              label="Practice Exams"
+            />
+          )}
+
+          {isBasic || isPro ? (
+            <NavLink
+              href="/ailawtools/examprep/timemanagement"
+              icon={<FaClock className="text-sm" />}
+              label="Time Management"
+              active={activeLink === '/ailawtools/examprep/timemanagement'}
+            />
+          ) : (
+            <LockedNavLink
+              icon={<FaClock className="text-sm" />}
+              label="Time Management"
+            />
+          )}
+
+          {/* Pro Only */}
+          {isPro ? (
+            <NavLink
+              href="/ailawtools/examprep/insights"
+              icon={<FaChartBar className="text-sm" />}
+              label="Exam Insights"
+              active={activeLink === '/ailawtools/examprep/insights'}
+            />
+          ) : (
+            <LockedNavLink
+              icon={<FaChartBar className="text-sm" />}
+              label="Exam Insights"
+            />
+          )}
+
+          {/* MBE Practice - basic or pro? Let's say basic */}
+          {isBasic || isPro ? (
+            <NavLink
+              href="/ailawtools/examprep/mbe"
+              icon={<FaListOl className="text-sm" />}
+              label="MBE Practice"
+              active={activeLink === '/ailawtools/examprep/mbe'}
+            />
+          ) : (
+            <LockedNavLink
+              icon={<FaListOl className="text-sm" />}
+              label="MBE Practice"
+            />
+          )}
+
+          {/* Pro Only */}
+          {isPro ? (
+            <NavLink
+              href="/ailawtools/lexapi"
+              icon={<FaRobot className="text-sm" />}
+              label="LExAPI Tutor"
+              active={activeLink === '/ailawtools/lexapi'}
+            />
+          ) : (
+            <LockedNavLink
+              icon={<FaRobot className="text-sm" />}
+              label="LExAPI Tutor"
+            />
           )}
         </ToggleSection>
 
-        {/* Contracts */}
+        {/* Subject Guides */}
         <ToggleSection
-          isOpen={isContractsOpen}
-          toggle={() => setIsContractsOpen(!isContractsOpen)}
-          title="Contracts"
-          icon={<FaFileInvoice className="text-lg" />}
+          isOpen={isSubjectGuidesOpen}
+          toggle={() => setIsSubjectGuidesOpen(!isSubjectGuidesOpen)}
+          title="Subject Guides"
+          icon={<FaBookReader className="text-lg" />}
         >
-          {hasAccess ? (
-            <>
-              <NavLink 
-                href="/contracts/basics" 
-                icon={<FaFileAlt className="text-sm" />} 
-                label="Basics" 
-                active={activeLink === '/contracts/basics'} 
-              />
-              <NavLink 
-                href="/contracts/advanced" 
-                icon={<FaFolderOpen className="text-sm" />} 
-                label="Advanced Topics" 
-                active={activeLink === '/contracts/advanced'} 
-              />
-              <NavLink 
-                href="/contracts/clauses" 
-                icon={<FaParagraph className="text-sm" />} 
-                label="Common Clauses" 
-                active={activeLink === '/contracts/clauses'} 
-              />
-            </>
+          {/* Contracts - free or basic? Let's keep it free */}
+          {isFree || isBasic || isPro ? (
+            <NavLink
+              href="/subjects/contracts"
+              icon={<FaFileInvoice className="text-sm" />}
+              label="Contracts"
+              active={activeLink === '/subjects/contracts'}
+            />
           ) : (
-            <>
-              <LockedNavLink icon={<FaFileAlt className="text-sm" />} label="Basics" />
-              <LockedNavLink icon={<FaFolderOpen className="text-sm" />} label="Advanced Topics" />
-              <LockedNavLink icon={<FaParagraph className="text-sm" />} label="Common Clauses" />
-            </>
+            <LockedNavLink
+              icon={<FaFileInvoice className="text-sm" />}
+              label="Contracts"
+            />
           )}
-        </ToggleSection>
 
-        {/* Torts */}
-        <ToggleSection
-          isOpen={isTortsOpen}
-          toggle={() => setIsTortsOpen(!isTortsOpen)}
-          title="Torts"
-          icon={<FaExclamationTriangle className="text-lg" />}
-        >
-          {hasAccess ? (
-            <>
-              <NavLink 
-                href="/torts/overview" 
-                icon={<FaEye className="text-sm" />} 
-                label="Overview" 
-                active={activeLink === '/torts/overview'} 
-              />
-              <NavLink 
-                href="/torts/negligence" 
-                icon={<FaUserSecret className="text-sm" />} 
-                label="Negligence" 
-                active={activeLink === '/torts/negligence'} 
-              />
-              <NavLink 
-                href="/torts/intentional" 
-                icon={<FaCrosshairs className="text-sm" />} 
-                label="Intentional Torts" 
-                active={activeLink === '/torts/intentional'} 
-              />
-            </>
+          {/* Torts - free or basic? Let's keep it free */}
+          {isFree || isBasic || isPro ? (
+            <NavLink
+              href="/subjects/torts"
+              icon={<FaExclamationTriangle className="text-sm" />}
+              label="Torts"
+              active={activeLink === '/subjects/torts'}
+            />
           ) : (
-            <>
-              <LockedNavLink icon={<FaEye className="text-sm" />} label="Overview" />
-              <LockedNavLink icon={<FaUserSecret className="text-sm" />} label="Negligence" />
-              <LockedNavLink icon={<FaCrosshairs className="text-sm" />} label="Intentional Torts" />
-            </>
+            <LockedNavLink
+              icon={<FaExclamationTriangle className="text-sm" />}
+              label="Torts"
+            />
           )}
-        </ToggleSection>
 
-        {/* Case Briefs */}
-        <ToggleSection
-          isOpen={isCaseBriefsOpen}
-          toggle={() => setIsCaseBriefsOpen(!isCaseBriefsOpen)}
-          title="Case Briefs"
-          icon={<FaSearch className="text-lg" />}
-        >
-          {hasAccess ? (
-            <>
-              <NavLink 
-                href="/casebriefs/analysis" 
-                icon={<FaBrain className="text-sm" />} 
-                label="Case Analysis" 
-                active={activeLink === '/casebriefs/analysis'} 
-              />
-              <NavLink 
-                href="/casebriefs/summaries" 
-                icon={<FaListAlt className="text-sm" />} 
-                label="Case Summaries" 
-                active={activeLink === '/casebriefs/summaries'} 
-              />
-              <NavLink 
-                href="/casebriefs/briefing" 
-                icon={<FaBookOpen className="text-sm" />} 
-                label="See all Case Briefs" 
-                active={activeLink === '/casebriefs/briefing'} 
-              />
-            </>
+          {/* Criminal Law - basic or pro */}
+          {isBasic || isPro ? (
+            <NavLink
+              href="/subjects/crimlaw"
+              icon={<FaGavel className="text-sm" />}
+              label="Criminal Law"
+              active={activeLink === '/subjects/crimlaw'}
+            />
           ) : (
-            <>
-              <LockedNavLink icon={<FaBrain className="text-sm" />} label="Case Analysis" />
-              <LockedNavLink icon={<FaListAlt className="text-sm" />} label="Case Summaries" />
-              <LockedNavLink icon={<FaBookOpen className="text-sm" />} label="See all Case Briefs" />
-            </>
+            <LockedNavLink
+              icon={<FaGavel className="text-sm" />}
+              label="Criminal Law"
+            />
+          )}
+
+          {/* Property - pro only */}
+          {isPro ? (
+            <NavLink
+              href="/subjects/property"
+              icon={<FaHome className="text-sm" />}
+              label="Property"
+              active={activeLink === '/subjects/property'}
+            />
+          ) : (
+            <LockedNavLink
+              icon={<FaHome className="text-sm" />}
+              label="Property"
+            />
+          )}
+
+          {/* Constitutional Law - pro only */}
+          {isPro ? (
+            <NavLink
+              href="/subjects/constitutional-law"
+              icon={<FaUniversity className="text-sm" />}
+              label="Constitutional Law"
+              active={activeLink === '/subjects/constitutional-law'}
+            />
+          ) : (
+            <LockedNavLink
+              icon={<FaUniversity className="text-sm" />}
+              label="Constitutional Law"
+            />
           )}
         </ToggleSection>
 
@@ -468,10 +442,7 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, i
           <span
             className={clsx(
               'px-3 py-1 rounded text-xs font-semibold uppercase whitespace-nowrap',
-              {
-                'bg-gradient-to-r from-blue-400 to-blue-600 text-white': hasAccess,
-                'bg-gradient-to-r from-emerald-400 to-emerald-600 text-white': !hasAccess,
-              }
+              planBadgeStyle
             )}
           >
             {plan.charAt(0).toUpperCase() + plan.slice(1)}
