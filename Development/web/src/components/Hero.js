@@ -98,7 +98,6 @@ export default function Hero() {
 
   const animatedWord = 'Odyssey';
 
-  // Features (focusing on law school)
   const features = [
     {
       icon: <FaGavel className={`${isDarkMode ? 'text-white' : 'text-blue-950'} text-4xl mb-4`} />,
