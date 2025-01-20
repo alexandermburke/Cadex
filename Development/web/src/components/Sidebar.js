@@ -33,9 +33,6 @@ import {
 import { motion } from 'framer-motion';
 import clsx from 'clsx';
 
-/**
- * Reusable NavLink component for active and hover states.
- */
 const NavLink = ({ href, icon, label, active }) => (
   <li>
     <Link
@@ -55,9 +52,7 @@ const NavLink = ({ href, icon, label, active }) => (
   </li>
 );
 
-/**
- * Reusable LockedNavLink component for locked access.
- */
+
 const LockedNavLink = ({ icon, label }) => (
   <li>
     <div className="flex items-center justify-between gap-2 p-3 text-gray-400 cursor-not-allowed">
@@ -70,9 +65,7 @@ const LockedNavLink = ({ icon, label }) => (
   </li>
 );
 
-/**
- * Reusable ToggleSection component for collapsible sidebar sections.
- */
+
 const ToggleSection = ({
   isOpen,
   toggle,
@@ -108,22 +101,20 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, i
   const router = useRouter();
   const { currentUser, userDataObj } = useAuth();
 
-  // Determine plan and theme
+ 
   const plan = userDataObj?.billing?.plan?.toLowerCase() || 'free';
   const isDarkMode = userDataObj?.darkMode || false;
 
   // Access logic
   const isFree = plan === 'free';
-  const isBasic = plan === 'basic';
-  const isPro = plan === 'pro';
+  const isBasic = plan === 'free';
+  const isPro = plan === 'free';
 
-  // Toggle states for sections
   const [isCaseBriefBankOpen, setIsCaseBriefBankOpen] = useState(false);
   const [isStudyToolsOpen, setIsStudyToolsOpen] = useState(false);
   const [isExamPrepOpen, setIsExamPrepOpen] = useState(false);
   const [isSubjectGuidesOpen, setIsSubjectGuidesOpen] = useState(false);
 
-  // Sidebar animation
   const sidebarVariants = {
     hidden: {
       x: '-100%',
@@ -141,7 +132,6 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, i
     },
   };
 
-  // Background styling based on dark/light mode
   const sidebarBackground = clsx({
     'bg-gradient-to-b from-blue-900 to-slate-900': isDarkMode,
     'bg-gradient-to-b from-blue-950 to-slate-950': !isDarkMode,
@@ -194,10 +184,10 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, i
             active={activeLink === '/casebriefs/analysis'}
           />
           <NavLink
-            href="/casebriefs/briefing"
+            href="/casebriefs/allbriefs"
             icon={<FaListAlt className="text-sm" />}
             label="All Briefs"
-            active={activeLink === '/casebriefs/briefing'}
+            active={activeLink === '/casebriefs/allbriefs'}
           />
         </ToggleSection>
 
@@ -320,27 +310,27 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, i
           {/* Pro Only */}
           {isPro ? (
             <NavLink
-              href="/ailawtools/lexapi"
-              icon={<FaRobot className="text-sm" />}
-              label="LExAPI Tutor"
-              active={activeLink === '/ailawtools/lexapi'}
-            />
+            href="/ailawtools/lexapi"
+            icon={
+              <FaBrain className="text-sm" />
+            }
+            label="LExAPI Tutor"
+            active={activeLink === '/ailawtools/lexapi'}
+          />
           ) : (
             <LockedNavLink
-              icon={<FaRobot className="text-sm" />}
+              icon={<FaBrain className="text-sm" />}
               label="LExAPI Tutor"
             />
           )}
         </ToggleSection>
 
-        {/* Subject Guides */}
         <ToggleSection
           isOpen={isSubjectGuidesOpen}
           toggle={() => setIsSubjectGuidesOpen(!isSubjectGuidesOpen)}
           title="Subject Guides"
           icon={<FaBookReader className="text-lg" />}
         >
-          {/* Contracts - free or basic? Let's keep it free */}
           {isFree || isBasic || isPro ? (
             <NavLink
               href="/subjects/contracts"
@@ -355,7 +345,6 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, i
             />
           )}
 
-          {/* Torts - free or basic? Let's keep it free */}
           {isFree || isBasic || isPro ? (
             <NavLink
               href="/subjects/torts"
@@ -370,7 +359,6 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, i
             />
           )}
 
-          {/* Criminal Law - basic or pro */}
           {isBasic || isPro ? (
             <NavLink
               href="/subjects/crimlaw"
@@ -385,7 +373,6 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, i
             />
           )}
 
-          {/* Property - pro only */}
           {isPro ? (
             <NavLink
               href="/subjects/property"
@@ -400,7 +387,6 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, i
             />
           )}
 
-          {/* Constitutional Law - pro only */}
           {isPro ? (
             <NavLink
               href="/subjects/constitutional-law"
@@ -416,7 +402,6 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, i
           )}
         </ToggleSection>
 
-        {/* Requests/Suggestions */}
         <section>
           <Link
             href="https://discord.gg/wKgH9ussWc"
@@ -428,7 +413,6 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, i
         </section>
       </nav>
 
-      {/* Sidebar Footer */}
       <footer className="px-6 py-4 bg-transparent">
         <div className="flex items-center gap-4">
           <div className="flex-1 min-w-0">
