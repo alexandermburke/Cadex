@@ -17,9 +17,9 @@ import {
   FaCogs,
   FaGraduationCap,
   FaComment,
-  FaLightbulb, // Additional icon
-  FaBook,        // Additional icon
-  FaLaptopCode,  // Additional icon
+  FaLightbulb,
+  FaBook,
+  FaLaptopCode,
 } from 'react-icons/fa';
 
 import { Swiper, SwiperSlide } from 'swiper/react';
@@ -30,7 +30,7 @@ import { useAuth } from '@/context/AuthContext';
 import { motion } from 'framer-motion';
 import clsx from 'clsx';
 
-import HeroBackground from './HeroBackground'; 
+import HeroBackground from './HeroBackground';
 
 const poppins = Poppins({
   subsets: ['latin'],
@@ -284,11 +284,11 @@ export default function Hero() {
           }`}
         >
           <h2
-            className={`text-7xl sm:text-7xl font-semibold py-2 mb-20 ${
+            className={`text-7xl sm:text-7xl font-semibold py-2 mb-14 ${
               isDarkMode ? 'text-white' : 'text-blue-950'
             } ` + poppins.className}
           >
-            <span className="block mb-4">
+            <span className="block mb-5">
               Your Dream School{' '}
               <span className="relative inline-block" key={animationTrigger} aria-hidden="true">
                 {animatedWord.split('').map((letter, letterIndex) => {
@@ -316,10 +316,11 @@ export default function Hero() {
           <p
             className={`text-center text-2xl sm:text-2xl md:text-2xl ${
               isDarkMode ? 'text-white' : 'text-slate-700'
-            } max-w-2xl my-2`}
+            } max-w-2xl my-0`}
           >
-             By law students, for law students. We use AI to deliver high quality preparation
-            at up to <span className="goldSolid font-bold">70% lower costs</span> than
+            By law students, for law students. Our platform combines expert insights and modern
+            technology to deliver high quality preparation at up to{' '}
+            <span className="goldSolid font-bold">70% lower costs</span> than
             traditional competitors.
           </p>
 
@@ -399,11 +400,11 @@ export default function Hero() {
               spaceBetween={20}
               slidesPerView="auto"
               autoplay={{
-                delay: 0, 
+                delay: 0,
                 disableOnInteraction: false,
-                reverseDirection: true, 
+                reverseDirection: true,
               }}
-              speed={15000} 
+              speed={15000}
               loop={true}
               freeMode={false}
               freeModeVelocityRatio={0.5}
@@ -435,8 +436,6 @@ export default function Hero() {
         </div>
 
         <VerticalDivider />
-
-        {/* Add any additional sections here */}
       </div>
     </section>
   );

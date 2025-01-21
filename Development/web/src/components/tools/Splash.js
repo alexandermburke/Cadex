@@ -14,8 +14,8 @@ const generateSnowflakes = (count) => {
     const size = Math.random() * 10 + 5; // 5px - 15px
     snowflakes.push({
       id: i,
-      left: Math.random() * 100,  // left position (%)
-      delay: Math.random() * 5,   // random delay
+      left: Math.random() * 100, // left position (%)
+      delay: Math.random() * 5, // random delay
       duration: Math.random() * 5 + 5, // 5s - 10s
       size,
       opacity: Math.random() * 0.5 + 0.4, // 0.4 - 0.9
@@ -28,7 +28,7 @@ const generateSnowflakes = (count) => {
 const snowflakeData = generateSnowflakes(50);
 
 export default function Splash() {
-  const { currentUser } = useAuth();
+  const { currentUser, userDataObj } = useAuth();
   const router = useRouter();
 
   // Sidebar state
@@ -64,9 +64,28 @@ export default function Splash() {
     visible: { opacity: 1, y: 0, transition: { duration: 0.8 } },
   };
 
-  const paragraphVariants = {
-    hidden: { opacity: 0 },
-    visible: { opacity: 1, transition: { delay: 0.3, duration: 0.8 } },
+  // Recent Activity from the user doc
+  const recentActivity = userDataObj?.recentActivity || [];
+
+  // Helper to format date/time
+  const formatDate = (isoString) => {
+    if (!isoString) return null;
+    const d = new Date(isoString);
+
+    // Example: January 20, 2025
+    const dateStr = d.toLocaleDateString(undefined, {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    });
+
+    // Example: 05:40 PM
+    const timeStr = d.toLocaleTimeString(undefined, {
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+
+    return { dateStr, timeStr };
   };
 
   return (
@@ -101,7 +120,7 @@ export default function Splash() {
               activeLink=""
               isSidebarVisible={isSidebarVisible}
               toggleSidebar={toggleSidebar}
-              isAiTutor={false} // or true if needed
+              isAiTutor={false}
             />
             {/* Overlay for mobile */}
             <motion.div
@@ -127,7 +146,7 @@ export default function Splash() {
           </button>
         </div>
 
-        {/* Hero / splash content */}
+        {/* Hero */}
         <motion.div
           className="max-w-4xl text-center"
           initial="hidden"
@@ -139,18 +158,66 @@ export default function Splash() {
             variants={headlineVariants}
           >
             Welcome to Your Dashboard,{' '}
-            <span>
-              {currentUser?.displayName || 'User'}
-            </span>
+            <span>{currentUser?.displayName || 'User'}</span>
           </motion.h1>
-          <motion.p
-            className="text-lg sm:text-xl text-gray-100 mb-8"
-            variants={paragraphVariants}
-          >
-            Explore a variety of law study aids and resources to help you
-            succeed. Pick from the options in the sidebar to start your work.
-          </motion.p>
         </motion.div>
+
+        {/* Recent Activity Section */}
+        {recentActivity.length > 0 && (
+          <motion.div
+            className="w-full max-w-2xl mt-8"
+            initial="hidden"
+            animate="visible"
+            variants={{ visible: { transition: { staggerChildren: 0.2 } } }}
+          >
+            <div className="bg-white bg-opacity-10 p-6 rounded-lg shadow-md">
+              <h2 className="text-2xl font-bold mb-4 text-center sm:text-left">
+                Recent Activity
+              </h2>
+
+              <div className="space-y-4">
+                {recentActivity.map((activity, idx) => {
+                  const { dateStr, timeStr } = formatDate(activity.date) || {};
+                  return (
+                    <div
+                      key={idx}
+                      className="p-4 rounded-md bg-gray-900 bg-opacity-20 hover:bg-opacity-30 transition-colors"
+                    >
+                      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center">
+                        <div>
+                          {/* Activity Name / Type */}
+                          {activity.type === 'brief' ? (
+                            <div className="font-semibold text-sm mb-1">
+                              Viewed a case brief:
+                              <span className="ml-1 italic">
+                                {activity.name}
+                              </span>
+                            </div>
+                          ) : (
+                            <div className="font-semibold text-sm mb-1">
+                              Some other activity:
+                              <span className="ml-1 italic">
+                                {activity.name}
+                              </span>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Date & Time */}
+                        {dateStr && timeStr && (
+                          <div className="text-xs text-gray-200 mt-2 sm:mt-0 sm:ml-2 flex-shrink-0">
+                            <div>{dateStr}</div>
+                            <div>{timeStr}</div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </motion.div>
+        )}
       </main>
     </div>
   );
