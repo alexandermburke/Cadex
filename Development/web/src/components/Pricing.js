@@ -48,7 +48,7 @@ const plans = [
         text: 'Ad-free user experience',
       },
       {
-        text: 'Cancel at any time, no questions asked',
+        text: 'Cancel at any time',
       },
     ],
     recommended: false,
@@ -62,7 +62,7 @@ const plans = [
     features: [
       { text: 'All Basic Plan Features' },
       {
-        text: 'Advanced Exam Prep Mode',
+        text: 'All Exam Prep Tools',
         info: 'Timed practice exams plus deeper analytics on strengths and weaknesses.',
       },
       {
@@ -79,6 +79,10 @@ const plans = [
       },
       {
         text: 'Upgraded LExAPI 3.0 Access',
+        info: 'accurate AI-based research, writing, and exam prep.',
+      },
+        {
+        text: 'Early Access to Subject Guides',
         info: 'accurate AI-based research, writing, and exam prep.',
       },
     ],
