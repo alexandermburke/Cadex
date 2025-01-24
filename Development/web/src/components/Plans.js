@@ -30,7 +30,7 @@ const plans = [
     description: 'Perfect for new or budget-conscious law students.',
     price: 12,
     interval: 'Per month',
-    promotion: 'First 7 days free', // Optional - can remove or keep
+    promotion: 'First 7 days free', 
     features: [
       {
         text: 'Unlimited Case Simulations',

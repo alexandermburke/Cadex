@@ -7,19 +7,18 @@ import { useRouter } from 'next/navigation';
 import Sidebar from '../Sidebar';
 import { FaTimes, FaBars } from 'react-icons/fa';
 
-/* Generate snowflake metadata */
 const generateSnowflakes = (count) => {
   const snowflakes = [];
   for (let i = 0; i < count; i++) {
-    const size = Math.random() * 10 + 5; // 5px - 15px
+    const size = Math.random() * 10 + 5; 
     snowflakes.push({
       id: i,
-      left: Math.random() * 100, // left position (%)
-      delay: Math.random() * 5, // random delay
-      duration: Math.random() * 5 + 5, // 5s - 10s
+      left: Math.random() * 100, 
+      delay: Math.random() * 5, 
+      duration: Math.random() * 5 + 5,
       size,
-      opacity: Math.random() * 0.5 + 0.4, // 0.4 - 0.9
-      blur: Math.random() * 2 + 1, // 1px - 3px blur
+      opacity: Math.random() * 0.5 + 0.4,
+      blur: Math.random() * 2 + 1, 
     });
   }
   return snowflakes;
@@ -30,12 +29,9 @@ const snowflakeData = generateSnowflakes(50);
 export default function Splash() {
   const { currentUser, userDataObj } = useAuth();
   const router = useRouter();
-
-  // Sidebar state
   const [isSidebarVisible, setIsSidebarVisible] = useState(true);
   const toggleSidebar = () => setIsSidebarVisible(!isSidebarVisible);
 
-  // If user not logged in, show login prompt
   if (!currentUser) {
     return (
       <div className="flex items-center justify-center h-screen bg-white text-gray-700">
@@ -58,28 +54,23 @@ export default function Splash() {
     );
   }
 
-  // Framer Motion variants for hero text
   const headlineVariants = {
     hidden: { opacity: 0, y: 30 },
     visible: { opacity: 1, y: 0, transition: { duration: 0.8 } },
   };
 
-  // Recent Activity from the user doc
   const recentActivity = userDataObj?.recentActivity || [];
 
-  // Helper to format date/time
   const formatDate = (isoString) => {
     if (!isoString) return null;
     const d = new Date(isoString);
 
-    // Example: January 20, 2025
     const dateStr = d.toLocaleDateString(undefined, {
       year: 'numeric',
       month: 'long',
       day: 'numeric',
     });
 
-    // Example: 05:40 PM
     const timeStr = d.toLocaleTimeString(undefined, {
       hour: '2-digit',
       minute: '2-digit',
@@ -90,10 +81,7 @@ export default function Splash() {
 
   return (
     <div className="relative flex h-screen text-white">
-      {/* Swirling AI-like background layer */}
       <div className="animatedBackground" />
-
-      {/* Snowflake particle layer */}
       <div className="snowflake-container">
         {snowflakeData.map((flake) => (
           <span
@@ -135,8 +123,7 @@ export default function Splash() {
       </AnimatePresence>
 
       {/* Main content area */}
-      <main className="flex-1 flex flex-col items-center justify-center p-4 sm:p-6 overflow-auto relative z-50">
-        {/* Mobile toggle (small screens) */}
+      <main className="flex-1 flex flex-col items-center justify-center p-4 sm:p-6 overflow-auto relative z-50 shadow-md">
         <div className="absolute top-4 left-4 md:hidden">
           <button
             onClick={toggleSidebar}

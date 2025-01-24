@@ -52,7 +52,6 @@ const NavLink = ({ href, icon, label, active }) => (
   </li>
 );
 
-
 const LockedNavLink = ({ icon, label }) => (
   <li>
     <div className="flex items-center justify-between gap-2 p-3 text-gray-400 cursor-not-allowed">
@@ -64,7 +63,6 @@ const LockedNavLink = ({ icon, label }) => (
     </div>
   </li>
 );
-
 
 const ToggleSection = ({
   isOpen,
@@ -101,19 +99,21 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, i
   const router = useRouter();
   const { currentUser, userDataObj } = useAuth();
 
- 
   const plan = userDataObj?.billing?.plan?.toLowerCase() || 'free';
   const isDarkMode = userDataObj?.darkMode || false;
 
   // Access logic
   const isFree = plan === 'free';
-  const isBasic = plan === 'free';
-  const isPro = plan === 'free';
+  const isBasic = plan === 'basic';
+  const isPro = plan === 'pro';
 
   const [isCaseBriefBankOpen, setIsCaseBriefBankOpen] = useState(false);
   const [isStudyToolsOpen, setIsStudyToolsOpen] = useState(false);
   const [isExamPrepOpen, setIsExamPrepOpen] = useState(false);
   const [isSubjectGuidesOpen, setIsSubjectGuidesOpen] = useState(false);
+
+  // New state for All Apps / My Apps toggle
+  const [showAllApps, setShowAllApps] = useState(true);
 
   const sidebarVariants = {
     hidden: {
@@ -133,8 +133,8 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, i
   };
 
   const sidebarBackground = clsx({
-    'bg-gradient-to-b from-blue-900 to-slate-900': isDarkMode,
-    'bg-gradient-to-b from-blue-950 to-slate-950': !isDarkMode,
+    'bg-gradient-to-br from-blue-900 to-purple-900': isDarkMode,
+    'bg-gradient-to-br from-blue-950 to-slate-950': !isDarkMode,
   });
 
   // Plan badge styling
@@ -147,7 +147,7 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, i
 
   return (
     <motion.aside
-      className={`z-[9999] fixed top-0 left-0 w-96 h-full ${sidebarBackground} text-white flex flex-col md:relative md:translate-x-0 overflow-y-auto transition-colors duration-500 shadow-md rounded-lg`}
+      className={`z-[9999] fixed top-0 left-0 w-96 h-full ${sidebarBackground} text-white flex flex-col md:relative md:translate-x-0 overflow-y-auto transition-colors duration-500 shadow-md rounded-md`}
       initial="hidden"
       animate={isSidebarVisible ? 'visible' : 'hidden'}
       variants={sidebarVariants}
@@ -156,10 +156,42 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, i
     >
       {/* Sidebar Header */}
       <div className="p-6 flex items-center justify-center bg-opacity-20">
-        <h1 className="text-3xl font-semibold relative overflow-hidden">
+        <h1 className="text-4xl font-normal relative overflow-hidden">
           Dashboard
         </h1>
       </div>
+
+      {/* All Apps / My Apps Toggle */}
+      <section className="flex items-center justify-center gap-4 my-4 px-6">
+        <span className="font-semibold">
+          My Apps
+        </span>
+        <div className="relative inline-block w-14 h-8 select-none transition duration-200 ease-in">
+          <input
+            type="checkbox"
+            name="appsToggle"
+            id="appsToggle"
+            checked={showAllApps}
+            onChange={() => setShowAllApps(!showAllApps)}
+            className="toggle-checkbox absolute h-0 w-0 opacity-0"
+          />
+          <label
+            htmlFor="appsToggle"
+            className={`toggle-label block overflow-hidden h-8 rounded-full cursor-pointer transition-colors duration-200 ${
+              isDarkMode ? 'bg-gray-600' : 'bg-gray-300'
+            }`}
+          >
+            <span
+              className={`absolute left-1 top-1 bg-transparent w-6 h-6 rounded-full transition-transform duration-200 ${
+                showAllApps ? 'translate-x-0' : 'translate-x-6'
+              }`}
+            ></span>
+          </label>
+        </div>
+        <span className="font-semibold">
+          All Apps
+        </span>
+      </section>
 
       {/* Navigation */}
       <nav className="flex-1 px-6 py-4 space-y-6">
@@ -212,7 +244,7 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, i
             active={activeLink === '/lawtools/lecturesummaries'}
           />
 
-          {/* Basic/Pro Resources: Generative Flashcards & IRAC Generator */}
+          {/* Generative Flashcards & IRAC Generator */}
           {isBasic || isPro ? (
             <NavLink
               href="/ailawtools/flashcards"
@@ -220,12 +252,13 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, i
               label="Flashcards & Outlines"
               active={activeLink === '/ailawtools/flashcards'}
             />
-          ) : (
+          ) : showAllApps ? (
             <LockedNavLink
               icon={<FaStickyNote className="text-sm" />}
               label="Flashcards & Outlines"
             />
-          )}
+          ) : null}
+
           {isBasic || isPro ? (
             <NavLink
               href="/ailawtools/irac"
@@ -233,12 +266,12 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, i
               label="IRAC Generator"
               active={activeLink === '/ailawtools/irac'}
             />
-          ) : (
+          ) : showAllApps ? (
             <LockedNavLink
               icon={<FaFileInvoice className="text-sm" />}
               label="IRAC Generator"
             />
-          )}
+          ) : null}
         </ToggleSection>
 
         {/* Exam Prep */}
@@ -248,7 +281,7 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, i
           title="Exam Prep"
           icon={<FaClipboardList className="text-lg" />}
         >
-          {/* Basic or Pro */}
+          {/* Practice Exams */}
           {isBasic || isPro ? (
             <NavLink
               href="/ailawtools/examprep/practice-exams"
@@ -256,13 +289,14 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, i
               label="Practice Exams"
               active={activeLink === '/ailawtools/examprep/practice-exams'}
             />
-          ) : (
+          ) : showAllApps ? (
             <LockedNavLink
               icon={<FaClipboardCheck className="text-sm" />}
               label="Practice Exams"
             />
-          )}
+          ) : null}
 
+          {/* Time Management */}
           {isBasic || isPro ? (
             <NavLink
               href="/ailawtools/examprep/timemanagement"
@@ -270,14 +304,14 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, i
               label="Time Management"
               active={activeLink === '/ailawtools/examprep/timemanagement'}
             />
-          ) : (
+          ) : showAllApps ? (
             <LockedNavLink
               icon={<FaClock className="text-sm" />}
               label="Time Management"
             />
-          )}
+          ) : null}
 
-          {/* Pro Only */}
+          {/* Exam Insights */}
           {isPro ? (
             <NavLink
               href="/ailawtools/examprep/insights"
@@ -285,14 +319,14 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, i
               label="Exam Insights"
               active={activeLink === '/ailawtools/examprep/insights'}
             />
-          ) : (
+          ) : showAllApps ? (
             <LockedNavLink
               icon={<FaChartBar className="text-sm" />}
               label="Exam Insights"
             />
-          )}
+          ) : null}
 
-          {/* MBE Practice - basic or pro? Let's say basic */}
+          {/* MBE Practice */}
           {isBasic || isPro ? (
             <NavLink
               href="/ailawtools/examprep/mbe"
@@ -300,37 +334,37 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, i
               label="MBE Practice"
               active={activeLink === '/ailawtools/examprep/mbe'}
             />
-          ) : (
+          ) : showAllApps ? (
             <LockedNavLink
               icon={<FaListOl className="text-sm" />}
               label="MBE Practice"
             />
-          )}
+          ) : null}
 
-          {/* Pro Only */}
+          {/* LExAPI Tutor */}
           {isPro ? (
             <NavLink
-            href="/ailawtools/lexapi"
-            icon={
-              <FaBrain className="text-sm" />
-            }
-            label="LExAPI Tutor"
-            active={activeLink === '/ailawtools/lexapi'}
-          />
-          ) : (
+              href="/ailawtools/lexapi"
+              icon={<FaBrain className="text-sm" />}
+              label="LExAPI Tutor"
+              active={activeLink === '/ailawtools/lexapi'}
+            />
+          ) : showAllApps ? (
             <LockedNavLink
               icon={<FaBrain className="text-sm" />}
               label="LExAPI Tutor"
             />
-          )}
+          ) : null}
         </ToggleSection>
 
+        {/* Subject Guides */}
         <ToggleSection
           isOpen={isSubjectGuidesOpen}
           toggle={() => setIsSubjectGuidesOpen(!isSubjectGuidesOpen)}
           title="Subject Guides"
           icon={<FaBookReader className="text-lg" />}
         >
+          {/* Contracts */}
           {isFree || isBasic || isPro ? (
             <NavLink
               href="/subjects/contracts"
@@ -338,13 +372,14 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, i
               label="Contracts"
               active={activeLink === '/subjects/contracts'}
             />
-          ) : (
+          ) : showAllApps ? (
             <LockedNavLink
               icon={<FaFileInvoice className="text-sm" />}
               label="Contracts"
             />
-          )}
+          ) : null}
 
+          {/* Torts */}
           {isFree || isBasic || isPro ? (
             <NavLink
               href="/subjects/torts"
@@ -352,13 +387,14 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, i
               label="Torts"
               active={activeLink === '/subjects/torts'}
             />
-          ) : (
+          ) : showAllApps ? (
             <LockedNavLink
               icon={<FaExclamationTriangle className="text-sm" />}
               label="Torts"
             />
-          )}
+          ) : null}
 
+          {/* Criminal Law */}
           {isBasic || isPro ? (
             <NavLink
               href="/subjects/crimlaw"
@@ -366,13 +402,14 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, i
               label="Criminal Law"
               active={activeLink === '/subjects/crimlaw'}
             />
-          ) : (
+          ) : showAllApps ? (
             <LockedNavLink
               icon={<FaGavel className="text-sm" />}
               label="Criminal Law"
             />
-          )}
+          ) : null}
 
+          {/* Property */}
           {isPro ? (
             <NavLink
               href="/subjects/property"
@@ -380,13 +417,14 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, i
               label="Property"
               active={activeLink === '/subjects/property'}
             />
-          ) : (
+          ) : showAllApps ? (
             <LockedNavLink
               icon={<FaHome className="text-sm" />}
               label="Property"
             />
-          )}
+          ) : null}
 
+          {/* Constitutional Law */}
           {isPro ? (
             <NavLink
               href="/subjects/constitutional-law"
@@ -394,12 +432,12 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, i
               label="Constitutional Law"
               active={activeLink === '/subjects/constitutional-law'}
             />
-          ) : (
+          ) : showAllApps ? (
             <LockedNavLink
               icon={<FaUniversity className="text-sm" />}
               label="Constitutional Law"
             />
-          )}
+          ) : null}
         </ToggleSection>
 
         <section>

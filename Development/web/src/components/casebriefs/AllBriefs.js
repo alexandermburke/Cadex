@@ -263,7 +263,7 @@ export default function AllBriefs() {
   return (
     <div
       className={`relative flex h-screen transition-colors duration-500 ${
-        isDarkMode ? 'bg-slate-900 text-white' : 'bg-gray-50 text-gray-800'
+        isDarkMode ? 'text-white' : 'text-gray-800'
       }`}
     >
       {/* Sidebar + overlay */}
@@ -271,7 +271,7 @@ export default function AllBriefs() {
         {isSidebarVisible && (
           <>
             <Sidebar
-              activeLink="/lawtools/allbriefs"
+              activeLink="/casebriefs/allbriefs"
               isSidebarVisible={isSidebarVisible}
               toggleSidebar={toggleSidebar}
               isDarkMode={isDarkMode}
@@ -288,9 +288,9 @@ export default function AllBriefs() {
       </AnimatePresence>
 
       {/* Main content */}
-      <main className="flex-1 flex flex-col px-6 overflow-auto h-screen">
+      <main className="flex-1 flex flex-col px-6 overflow-auto relative z-200 h-screen">
         {/* Header area */}
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center justify-between">
           {/* Toggle (Mobile) */}
           <button
             onClick={toggleSidebar}
@@ -396,7 +396,7 @@ export default function AllBriefs() {
                         isDarkMode ? 'text-gray-200' : 'text-gray-600'
                       }`}
                     >
-                      {c.content?.slice(0, 100) || 'No content available.'}...
+                      {c.title?.slice(0, 100) || 'No content available.'}...
                     </p>
                   </div>
                 ))}
