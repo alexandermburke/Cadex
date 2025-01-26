@@ -152,14 +152,13 @@ export default function NetworkingOpportunities() {
           className={clsx(
             'flex-1 w-full rounded-2xl shadow-xl p-6',
             isDarkMode
-              ? 'bg-gradient-to-br from-blue-950 to-slate-950 text-white'
+              ? 'bg-gradient-to-br from-slate-900 to-blue-950 text-white'
               : 'bg-white text-gray-800'
           )}
           variants={containerVariants}
           initial="hidden"
           animate="visible"
         >
-
           {isLoading && (
             <p className="text-sm animate-pulse">Loading networking events...</p>
           )}
@@ -195,6 +194,44 @@ export default function NetworkingOpportunities() {
                 <p className="text-sm">{event.description}</p>
               </div>
             ))}
+          </div>
+
+          {/* Additional content for law students */}
+          <div className="mt-8">
+            <p className="text-sm mb-4">
+              These opportunities are updated weekly to ensure you don&apos;t miss out on new events. 
+              Whether you’re looking to meet established legal practitioners, grow your professional 
+              circle, or discover mentorship opportunities, staying active in the networking scene 
+              can significantly influence your legal career.
+            </p>
+
+            <h3 className="text-lg font-semibold mb-2">Tips for Law Students:</h3>
+            <ul className="list-disc ml-5 text-sm mb-4">
+              <li className="mb-2">
+                <strong>Prepare an Elevator Pitch:</strong> Have a concise introduction ready—who you 
+                are, what you’re studying, and your areas of interest.
+              </li>
+              <li className="mb-2">
+                <strong>Ask Thoughtful Questions:</strong> Show genuine curiosity about other attendees’ 
+                practice areas, career paths, and experiences in the legal field.
+              </li>
+              <li className="mb-2">
+                <strong>Bring Business Cards (if appropriate):</strong> A simple card with your contact 
+                information can help new contacts remember you and follow up.
+              </li>
+              <li className="mb-2">
+                <strong>Follow Up Promptly:</strong> Connect on LinkedIn or send a brief email 
+                within a day or two of meeting someone. A simple follow-up goes a long way in 
+                building lasting professional relationships.
+              </li>
+            </ul>
+
+            <p className="text-sm">
+              Networking isn’t just about collecting business cards; it’s about fostering genuine 
+              relationships that can help you explore the legal world and potentially find 
+              mentorship or job opportunities. Check back next week to see what new events have 
+              been added!
+            </p>
           </div>
         </motion.div>
       </main>

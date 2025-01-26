@@ -209,7 +209,7 @@ export default function CareerResources() {
           className={clsx(
             'flex-1 w-full rounded-2xl shadow-xl p-6',
             isDarkMode
-              ? 'bg-gradient-to-br from-blue-950 to-slate-950 text-white'
+              ? 'bg-gradient-to-br from-slate-900 to-blue-950 text-white'
               : 'bg-white text-gray-800'
           )}
           variants={containerVariants}

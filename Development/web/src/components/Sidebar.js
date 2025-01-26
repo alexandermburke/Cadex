@@ -258,24 +258,43 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, i
           title="Case Brief Bank"
           icon={<FaFolderOpen className="text-lg" />}
         >
-          <NavLink
-            href="/casebriefs/summaries"
-            icon={<FaBookOpen className="text-sm" />}
-            label="Case Summaries"
-            active={activeLink === '/casebriefs/summaries'}
-          />
-          <NavLink
-            href="/casebriefs/analysis"
-            icon={<FaRobot className="text-sm" />} // Changed from FaBrain to FaRobot for uniqueness
-            label="Case Analysis"
-            active={activeLink === '/casebriefs/analysis'}
-          />
-          <NavLink
-            href="/casebriefs/allbriefs"
-            icon={<FaListAlt className="text-sm" />}
-            label="All Briefs"
-            active={activeLink === '/casebriefs/allbriefs'}
-          />
+          {isBasic || isPro || isExpert ? (
+            <>
+              <NavLink
+                href="/casebriefs/summaries"
+                icon={<FaBookOpen className="text-sm" />}
+                label="Case Summaries"
+                active={activeLink === '/casebriefs/summaries'}
+              />
+              <NavLink
+                href="/casebriefs/analysis"
+                icon={<FaRobot className="text-sm" />} // Changed from FaBrain to FaRobot for uniqueness
+                label="Case Analysis"
+                active={activeLink === '/casebriefs/analysis'}
+              />
+              <NavLink
+                href="/casebriefs/allbriefs"
+                icon={<FaListAlt className="text-sm" />}
+                label="All Briefs"
+                active={activeLink === '/casebriefs/allbriefs'}
+              />
+            </>
+          ) : showAllApps ? (
+            <>
+              <LockedNavLink
+                icon={<FaBookOpen className="text-sm" />}
+                label="Case Summaries"
+              />
+              <LockedNavLink
+                icon={<FaRobot className="text-sm" />}
+                label="Case Analysis"
+              />
+              <LockedNavLink
+                icon={<FaListAlt className="text-sm" />}
+                label="All Briefs"
+              />
+            </>
+          ) : null}
         </ToggleSection>
 
         <ToggleSection
@@ -284,43 +303,52 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, i
           title="Study Tools"
           icon={<FaTools className="text-lg" />}
         >
-          <NavLink
-            href="/lawtools/dictionary"
-            icon={<FaBook className="text-sm" />}
-            label="Legal Dictionary"
-            active={activeLink === '/lawtools/dictionary'}
-          />
-          <NavLink
-            href="/lawtools/lecturesummaries"
-            icon={<FaGraduationCap className="text-sm" />}
-            label="Lecture Summaries"
-            active={activeLink === '/lawtools/lecturesummaries'}
-          />
           {isBasic || isPro || isExpert ? (
-            <NavLink
-              href="/ailawtools/flashcards"
-              icon={<FaStickyNote className="text-sm" />}
-              label="Flashcards & Outlines"
-              active={activeLink === '/ailawtools/flashcards'}
-            />
+            <>
+              <NavLink
+                href="/lawtools/dictionary"
+                icon={<FaBook className="text-sm" />}
+                label="Legal Dictionary"
+                active={activeLink === '/lawtools/dictionary'}
+              />
+              <NavLink
+                href="/lawtools/lecturesummaries"
+                icon={<FaGraduationCap className="text-sm" />}
+                label="Lecture Summaries"
+                active={activeLink === '/lawtools/lecturesummaries'}
+              />
+              <NavLink
+                href="/ailawtools/flashcards"
+                icon={<FaStickyNote className="text-sm" />}
+                label="Flashcards & Outlines"
+                active={activeLink === '/ailawtools/flashcards'}
+              />
+              <NavLink
+                href="/ailawtools/irac"
+                icon={<FaBookReader className="text-sm" />} // Changed from FaFileInvoice to FaBookReader for uniqueness
+                label="IRAC Generator"
+                active={activeLink === '/ailawtools/irac'}
+              />
+            </>
           ) : showAllApps ? (
-            <LockedNavLink
-              icon={<FaStickyNote className="text-sm" />}
-              label="Flashcards & Outlines"
-            />
-          ) : null}
-          {isBasic || isPro || isExpert ? (
-            <NavLink
-              href="/ailawtools/irac"
-              icon={<FaBookReader className="text-sm" />} // Changed from FaFileInvoice to FaBookReader for uniqueness
-              label="IRAC Generator"
-              active={activeLink === '/ailawtools/irac'}
-            />
-          ) : showAllApps ? (
-            <LockedNavLink
-              icon={<FaBookReader className="text-sm" />}
-              label="IRAC Generator"
-            />
+            <>
+              <LockedNavLink
+                icon={<FaBook className="text-sm" />}
+                label="Legal Dictionary"
+              />
+              <LockedNavLink
+                icon={<FaGraduationCap className="text-sm" />}
+                label="Lecture Summaries"
+              />
+              <LockedNavLink
+                icon={<FaStickyNote className="text-sm" />}
+                label="Flashcards & Outlines"
+              />
+              <LockedNavLink
+                icon={<FaBookReader className="text-sm" />}
+                label="IRAC Generator"
+              />
+            </>
           ) : null}
         </ToggleSection>
 
@@ -330,70 +358,62 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, i
           title="Exam Prep"
           icon={<FaClipboardList className="text-lg" />}
         >
-          {isBasic || isPro || isExpert ? (
-            <NavLink
-              href="/ailawtools/examprep"
-              icon={<FaClipboardCheck className="text-sm" />}
-              label="Practice Exams"
-              active={activeLink === '/ailawtools/examprep'}
-            />
-          ) : showAllApps ? (
-            <LockedNavLink
-              icon={<FaClipboardCheck className="text-sm" />}
-              label="Practice Exams"
-            />
-          ) : null}
-          {isBasic || isPro || isExpert ? (
-            <NavLink
-              href="/ailawtools/examprep/timemanagement"
-              icon={<FaClock className="text-sm" />}
-              label="Time Management"
-              active={activeLink === '/ailawtools/examprep/timemanagement'}
-            />
-          ) : showAllApps ? (
-            <LockedNavLink
-              icon={<FaClock className="text-sm" />}
-              label="Time Management"
-            />
-          ) : null}
           {isPro || isExpert ? (
-            <NavLink
-              href="/ailawtools/insights"
-              icon={<FaChartBar className="text-sm" />}
-              label="Exam Insights"
-              active={activeLink === '/ailawtools/insights'}
-            />
+            <>
+              <NavLink
+                href="/ailawtools/examprep"
+                icon={<FaClipboardCheck className="text-sm" />}
+                label="Practice Exams"
+                active={activeLink === '/ailawtools/examprep'}
+              />
+              <NavLink
+                href="/ailawtools/examprep/timemanagement"
+                icon={<FaClock className="text-sm" />}
+                label="Time Management"
+                active={activeLink === '/ailawtools/examprep/timemanagement'}
+              />
+              <NavLink
+                href="/ailawtools/insights"
+                icon={<FaChartBar className="text-sm" />}
+                label="Exam Insights"
+                active={activeLink === '/ailawtools/insights'}
+              />
+              <NavLink
+                href="/ailawtools/examprep/mbe"
+                icon={<FaListOl className="text-sm" />}
+                label="MBE Practice"
+                active={activeLink === '/ailawtools/examprep/mbe'}
+              />
+              <NavLink
+                href="/ailawtools/lexapi"
+                icon={<FaBrain className="text-sm" />} 
+                label="LExAPI Tutor"
+                active={activeLink === '/ailawtools/lexapi'}
+              />
+            </>
           ) : showAllApps ? (
-            <LockedNavLink
-              icon={<FaChartBar className="text-sm" />}
-              label="Exam Insights"
-            />
-          ) : null}
-          {isBasic || isPro || isExpert ? (
-            <NavLink
-              href="/ailawtools/examprep/mbe"
-              icon={<FaListOl className="text-sm" />}
-              label="MBE Practice"
-              active={activeLink === '/ailawtools/examprep/mbe'}
-            />
-          ) : showAllApps ? (
-            <LockedNavLink
-              icon={<FaListOl className="text-sm" />}
-              label="MBE Practice"
-            />
-          ) : null}
-          {isPro || isExpert ? (
-            <NavLink
-              href="/ailawtools/lexapi"
-              icon={<FaBrain className="text-sm" />} 
-              label="LExAPI Tutor"
-              active={activeLink === '/ailawtools/lexapi'}
-            />
-          ) : showAllApps ? (
-            <LockedNavLink
-              icon={<FaBrain className="text-sm" />}
-              label="LExAPI Tutor"
-            />
+            <>
+              <LockedNavLink
+                icon={<FaClipboardCheck className="text-sm" />}
+                label="Practice Exams"
+              />
+              <LockedNavLink
+                icon={<FaClock className="text-sm" />}
+                label="Time Management"
+              />
+              <LockedNavLink
+                icon={<FaChartBar className="text-sm" />}
+                label="Exam Insights"
+              />
+              <LockedNavLink
+                icon={<FaListOl className="text-sm" />}
+                label="MBE Practice"
+              />
+              <LockedNavLink
+                icon={<FaBrain className="text-sm" />}
+                label="LExAPI Tutor"
+              />
+            </>
           ) : null}
         </ToggleSection>
 
@@ -403,70 +423,62 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, i
           title="Subject Guides"
           icon={<FaBookReader className="text-lg" />}
         >
-          {isFree || isBasic || isPro || isExpert ? (
-            <NavLink
-              href="/subjects/contracts"
-              icon={<FaBookReader className="text-sm" />} // Changed from FaFileInvoice to FaBookReader for uniqueness
-              label="Contracts"
-              active={activeLink === '/subjects/contracts'}
-            />
-          ) : showAllApps ? (
-            <LockedNavLink
-              icon={<FaBookReader className="text-sm" />}
-              label="Contracts"
-            />
-          ) : null}
-          {isFree || isBasic || isPro || isExpert ? (
-            <NavLink
-              href="/subjects/torts"
-              icon={<FaExclamationTriangle className="text-sm" />}
-              label="Torts"
-              active={activeLink === '/subjects/torts'}
-            />
-          ) : showAllApps ? (
-            <LockedNavLink
-              icon={<FaExclamationTriangle className="text-sm" />}
-              label="Torts"
-            />
-          ) : null}
           {isBasic || isPro || isExpert ? (
-            <NavLink
-              href="/subjects/crimlaw"
-              icon={<FaGavel className="text-sm" />}
-              label="Criminal Law"
-              active={activeLink === '/subjects/crimlaw'}
-            />
+            <>
+              <NavLink
+                href="/subjects/contracts"
+                icon={<FaBookReader className="text-sm" />}
+                label="Contracts"
+                active={activeLink === '/subjects/contracts'}
+              />
+              <NavLink
+                href="/subjects/torts"
+                icon={<FaExclamationTriangle className="text-sm" />}
+                label="Torts"
+                active={activeLink === '/subjects/torts'}
+              />
+              <NavLink
+                href="/subjects/crimlaw"
+                icon={<FaGavel className="text-sm" />}
+                label="Criminal Law"
+                active={activeLink === '/subjects/crimlaw'}
+              />
+              <NavLink
+                href="/subjects/property"
+                icon={<FaHome className="text-sm" />}
+                label="Property"
+                active={activeLink === '/subjects/property'}
+              />
+              <NavLink
+                href="/subjects/constitutional-law"
+                icon={<FaUniversity className="text-sm" />}
+                label="Constitutional Law"
+                active={activeLink === '/subjects/constitutional-law'}
+              />
+            </>
           ) : showAllApps ? (
-            <LockedNavLink
-              icon={<FaGavel className="text-sm" />}
-              label="Criminal Law"
-            />
-          ) : null}
-          {isPro || isExpert ? (
-            <NavLink
-              href="/subjects/property"
-              icon={<FaHome className="text-sm" />}
-              label="Property"
-              active={activeLink === '/subjects/property'}
-            />
-          ) : showAllApps ? (
-            <LockedNavLink
-              icon={<FaHome className="text-sm" />}
-              label="Property"
-            />
-          ) : null}
-          {isPro || isExpert ? (
-            <NavLink
-              href="/subjects/constitutional-law"
-              icon={<FaUniversity className="text-sm" />}
-              label="Constitutional Law"
-              active={activeLink === '/subjects/constitutional-law'}
-            />
-          ) : showAllApps ? (
-            <LockedNavLink
-              icon={<FaUniversity className="text-sm" />}
-              label="Constitutional Law"
-            />
+            <>
+              <LockedNavLink
+                icon={<FaBookReader className="text-sm" />}
+                label="Contracts"
+              />
+              <LockedNavLink
+                icon={<FaExclamationTriangle className="text-sm" />}
+                label="Torts"
+              />
+              <LockedNavLink
+                icon={<FaGavel className="text-sm" />}
+                label="Criminal Law"
+              />
+              <LockedNavLink
+                icon={<FaHome className="text-sm" />}
+                label="Property"
+              />
+              <LockedNavLink
+                icon={<FaUniversity className="text-sm" />}
+                label="Constitutional Law"
+              />
+            </>
           ) : null}
         </ToggleSection>
 
@@ -498,43 +510,41 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, i
           icon={<FaChalkboardTeacher className="text-lg" />}
         >
           {isExpert ? (
-            <NavLink
-              href="/lawtools/careerresources"
-              icon={<FaLightbulb className="text-sm" />}
-              label="Resume Review"
-              active={activeLink === '/lawtools/careerresources'}
-            />
+            <>
+              <NavLink
+                href="/lawtools/careerresources"
+                icon={<FaLightbulb className="text-sm" />}
+                label="Resume Review"
+                active={activeLink === '/lawtools/careerresources'}
+              />
+              <NavLink
+                href="/lawtools/interviewprep"
+                icon={<FaComment className="text-sm" />}
+                label="Interview Preparation"
+                active={activeLink === '/lawtools/interviewprep'}
+              />
+              <NavLink
+                href="/lawtools/networking"
+                icon={<FaChalkboardTeacher className="text-sm" />}
+                label="Networking Opportunities"
+                active={activeLink === '/lawtools/networking'}
+              />
+            </>
           ) : showAllApps ? (
-            <LockedNavLink
-              icon={<FaLightbulb className="text-sm" />}
-              label="Resume Review"
-            />
-          ) : null}
-          {isExpert ? (
-            <NavLink
-              href="/lawtools/interviewprep"
-              icon={<FaComment className="text-sm" />} // Changed from FaLightbulb to FaComment for uniqueness
-              label="Interview Preparation"
-              active={activeLink === '/lawtools/interviewprep'}
-            />
-          ) : showAllApps ? (
-            <LockedNavLink
-              icon={<FaComment className="text-sm" />}
-              label="Interview Preparation"
-            />
-          ) : null}
-          {isExpert ? (
-            <NavLink
-              href="/lawtools/networking"
-              icon={<FaChalkboardTeacher className="text-sm" />} // Changed from FaLightbulb to FaChalkboardTeacher for uniqueness
-              label="Networking Opportunities"
-              active={activeLink === '/lawtools/networking'}
-            />
-          ) : showAllApps ? (
-            <LockedNavLink
-              icon={<FaChalkboardTeacher className="text-sm" />}
-              label="Networking Opportunities"
-            />
+            <>
+              <LockedNavLink
+                icon={<FaLightbulb className="text-sm" />}
+                label="Resume Review"
+              />
+              <LockedNavLink
+                icon={<FaComment className="text-sm" />}
+                label="Interview Preparation"
+              />
+              <LockedNavLink
+                icon={<FaChalkboardTeacher className="text-sm" />}
+                label="Networking Opportunities"
+              />
+            </>
           ) : null}
         </ToggleSection>
 
