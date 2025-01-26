@@ -108,7 +108,7 @@ const plans = [
         info: 'Network with top-performing peers and share study outlines.',
       },
       {
-        text: 'Personalized Mentorship Sessions',
+        text: 'Access to Career & Internship Resources',
         info: 'Schedule 1:1 AI-assisted sessions to refine study strategy and address weak areas.',
       },
     ],

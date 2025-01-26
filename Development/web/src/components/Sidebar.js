@@ -266,7 +266,7 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, i
           />
           <NavLink
             href="/casebriefs/analysis"
-            icon={<FaBrain className="text-sm" />}
+            icon={<FaRobot className="text-sm" />} // Changed from FaBrain to FaRobot for uniqueness
             label="Case Analysis"
             active={activeLink === '/casebriefs/analysis'}
           />
@@ -312,13 +312,13 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, i
           {isBasic || isPro || isExpert ? (
             <NavLink
               href="/ailawtools/irac"
-              icon={<FaFileInvoice className="text-sm" />}
+              icon={<FaBookReader className="text-sm" />} // Changed from FaFileInvoice to FaBookReader for uniqueness
               label="IRAC Generator"
               active={activeLink === '/ailawtools/irac'}
             />
           ) : showAllApps ? (
             <LockedNavLink
-              icon={<FaFileInvoice className="text-sm" />}
+              icon={<FaBookReader className="text-sm" />}
               label="IRAC Generator"
             />
           ) : null}
@@ -385,7 +385,7 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, i
           {isPro || isExpert ? (
             <NavLink
               href="/ailawtools/lexapi"
-              icon={<FaBrain className="text-sm" />}
+              icon={<FaBrain className="text-sm" />} 
               label="LExAPI Tutor"
               active={activeLink === '/ailawtools/lexapi'}
             />
@@ -406,13 +406,13 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, i
           {isFree || isBasic || isPro || isExpert ? (
             <NavLink
               href="/subjects/contracts"
-              icon={<FaFileInvoice className="text-sm" />}
+              icon={<FaBookReader className="text-sm" />} // Changed from FaFileInvoice to FaBookReader for uniqueness
               label="Contracts"
               active={activeLink === '/subjects/contracts'}
             />
           ) : showAllApps ? (
             <LockedNavLink
-              icon={<FaFileInvoice className="text-sm" />}
+              icon={<FaBookReader className="text-sm" />}
               label="Contracts"
             />
           ) : null}
@@ -501,13 +501,39 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, i
             <NavLink
               href="/lawtools/careerresources"
               icon={<FaLightbulb className="text-sm" />}
-              label="Resume Review (Coming Soon)"
+              label="Resume Review"
               active={activeLink === '/lawtools/careerresources'}
             />
           ) : showAllApps ? (
             <LockedNavLink
               icon={<FaLightbulb className="text-sm" />}
               label="Resume Review"
+            />
+          ) : null}
+          {isExpert ? (
+            <NavLink
+              href="/lawtools/interviewprep"
+              icon={<FaComment className="text-sm" />} // Changed from FaLightbulb to FaComment for uniqueness
+              label="Interview Preparation"
+              active={activeLink === '/lawtools/interviewprep'}
+            />
+          ) : showAllApps ? (
+            <LockedNavLink
+              icon={<FaComment className="text-sm" />}
+              label="Interview Preparation"
+            />
+          ) : null}
+          {isExpert ? (
+            <NavLink
+              href="/lawtools/networking"
+              icon={<FaChalkboardTeacher className="text-sm" />} // Changed from FaLightbulb to FaChalkboardTeacher for uniqueness
+              label="Networking Opportunities"
+              active={activeLink === '/lawtools/networking'}
+            />
+          ) : showAllApps ? (
+            <LockedNavLink
+              icon={<FaChalkboardTeacher className="text-sm" />}
+              label="Networking Opportunities"
             />
           ) : null}
         </ToggleSection>

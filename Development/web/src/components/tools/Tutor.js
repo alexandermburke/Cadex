@@ -126,33 +126,38 @@ export default function AiTutor() {
 
   const isDarkMode = userDataObj?.darkMode || false;
 
-  // User session states
+  // -------------------------
+  // SIDEBAR & SESSION STATES
+  // -------------------------
+  const [isSidebarVisible, setIsSidebarVisible] = useState(true);
+  const toggleSidebar = () => setIsSidebarVisible(!isSidebarVisible);
+
   const [inputText, setInputText] = useState('');
   const [questionText, setQuestionText] = useState('');
   const [questionStem, setQuestionStem] = useState('');
   const [highlightedSections, setHighlightedSections] = useState([]);
   const [answerResult, setAnswerResult] = useState('');
-  const [isSidebarVisible, setIsSidebarVisible] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
+  const [isCommunicating, setIsCommunicating] = useState(false);
 
+  const [isSessionActive, setIsSessionActive] = useState(false);
+  const [currentQuestionCount, setCurrentQuestionCount] = useState(0);
+  const [answeredQuestions, setAnsweredQuestions] = useState([]);
+
+  // MODALS
   const [isConfigModalOpen, setIsConfigModalOpen] = useState(false);
   const [isLoadProgressModalOpen, setIsLoadProgressModalOpen] = useState(false);
   const [isFinalFeedbackModalOpen, setIsFinalFeedbackModalOpen] = useState(false);
-
   const [savedProgresses, setSavedProgresses] = useState([]);
-  const [currentQuestionCount, setCurrentQuestionCount] = useState(0);
-  const [answeredQuestions, setAnsweredQuestions] = useState([]);
-  const [isSessionActive, setIsSessionActive] = useState(false);
-  const [isCommunicating, setIsCommunicating] = useState(false);
 
   // ----------------------------------------
   // 2. TUTOR CONFIG FOR LAW SCHOOL
   // ----------------------------------------
   const [tutorConfig, setTutorConfig] = useState({
-    studyYear: '1L',              // e.g. '1L', '2L', '3L', 'LLM'
-    course: 'Contracts',          // e.g. 'Contracts', 'Torts'
-    subTopic: 'Formation',        // e.g. 'Formation', 'Performance'
-    complexity: 'Intermediate',   // Basic, Intermediate, Advanced, Expert
+    studyYear: '1L',
+    course: 'Contracts',
+    subTopic: 'Formation',
+    complexity: 'Intermediate',
     questionLimit: 5,
     userPrompt: '',
     showLegalReferences: true,
@@ -160,7 +165,6 @@ export default function AiTutor() {
     liveMode: false,
     highlightHue: 60,
     highlightOpacity: 0.6,
-    // New checkboxes for law students
     includeKeyCases: false,
     includeStatutes: false,
   });
@@ -173,83 +177,70 @@ export default function AiTutor() {
     { value: 'Expert', label: 'Expert' },
   ];
 
-  // Build out dynamic options
+  // Build out dynamic options based on studyYear/course
   const [topicOptions, setTopicOptions] = useState(studyMapping['1L'].topics);
   const [subTopicOptions, setSubTopicOptions] = useState(
-    studyMapping['1L'].subTopics['Contracts'] || []
+    studyMapping['1L'].subTopics['Contracts']
   );
 
-  // Canvas Visualizer Ref
+  // Canvas Visualizer Refs
   const visualizerCanvas = useRef(null);
   const animationFrameId = useRef(null);
-
-  // Refs for Line Animation
   const linesRef = useRef([]);
   const frameRef = useRef(0);
   const gradientRef = useRef(null);
-  const resizeObserverRef = useRef(null);
-
-  // Refs for Central Exclusion Area
   const centerRef = useRef({ x: 0, y: 0 });
-  const radiusRef = useRef(200); // Increased radius
+  const radiusRef = useRef(200);
 
-  // -------------------------------
-  // 3. UseEffect: Update topic/subTopic on studyYear changes
-  // -------------------------------
+  // -----------------------------------
+  // HOOKS MUST NOT BE CONDITIONAL
+  // -----------------------------------
+
+  // (A) Update topic/subTopic when studyYear changes
   useEffect(() => {
     const selectedYear = tutorConfig.studyYear;
     const yearMapping = studyMapping[selectedYear];
-
-    if (!yearMapping) {
-      console.error(`Invalid studyYear: ${selectedYear}`);
-      // Optionally, reset to default
-      setTutorConfig((prevConfig) => ({
-        ...prevConfig,
-        studyYear: '1L',
-      }));
-      return;
-    }
+    if (!yearMapping) return;
 
     const newTopicOptions = yearMapping.topics || [];
     const firstTopic = newTopicOptions[0]?.value || '';
-
-    const newSubTopicOptions =
-      yearMapping.subTopics[firstTopic] || [];
+    const newSubTopicOptions = yearMapping.subTopics[firstTopic] || [];
 
     setTopicOptions(newTopicOptions);
     setSubTopicOptions(newSubTopicOptions);
 
-    setTutorConfig((prevConfig) => ({
-      ...prevConfig,
-      course: firstTopic, // e.g. 'Contracts'
+    setTutorConfig((prev) => ({
+      ...prev,
+      course: firstTopic,
       subTopic: newSubTopicOptions[0]?.value || '',
     }));
   }, [tutorConfig.studyYear]);
 
+  // (B) Update subTopic when course changes
   useEffect(() => {
-    const selectedYear = tutorConfig.studyYear;
-    const yearMapping = studyMapping[selectedYear];
-
-    if (!yearMapping) {
-      console.error(`Invalid studyYear: ${selectedYear}`);
-      return;
-    }
+    const yearMapping = studyMapping[tutorConfig.studyYear];
+    if (!yearMapping) return;
 
     const selectedCourse = tutorConfig.course;
-    const newSubTopicOptions =
-      yearMapping.subTopics[selectedCourse] || [];
-
+    const newSubTopicOptions = yearMapping.subTopics[selectedCourse] || [];
     setSubTopicOptions(newSubTopicOptions);
 
-    setTutorConfig((prevConfig) => ({
-      ...prevConfig,
+    setTutorConfig((prev) => ({
+      ...prev,
       subTopic: newSubTopicOptions[0]?.value || '',
     }));
   }, [tutorConfig.course, tutorConfig.studyYear]);
 
-  // -------------------------------
-  // 4. Line Animation Visualizer
-  // -------------------------------
+  // (C) If questionLimit is reached => final feedback
+  useEffect(() => {
+    if (currentQuestionCount >= tutorConfig.questionLimit && questionText !== '') {
+      setCurrentQuestionCount(0);
+      openFinalFeedbackModal();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentQuestionCount, tutorConfig.questionLimit, questionText]);
+
+  // (D) Line Animation Visualizer
   useEffect(() => {
     const canvas = visualizerCanvas.current;
     if (!canvas) return;
@@ -257,7 +248,6 @@ export default function AiTutor() {
     const ctx = canvas.getContext('2d');
     const scale = window.devicePixelRatio || 1;
 
-    // Line Class Definition
     class Line {
       constructor(x, y) {
         this.x = x;
@@ -265,7 +255,7 @@ export default function AiTutor() {
         this.path = [];
         this.pathLength = 0;
         this.angle = 0;
-        this.speed = random(0.5, 2); // Reduced speed
+        this.speed = random(0.5, 2);
         this.target = { x: x + 0.1, y: y + 0.1 };
         this.thickness = Math.round(random(0.5, 3));
         this.maxLength = Math.round(random(100, 350));
@@ -284,24 +274,18 @@ export default function AiTutor() {
         this.y += Math.sin(this.angle) * this.speed;
 
         let isAnchor = false;
-        const target = this.target;
-        const dx = target.x - this.x;
-        const dy = target.y - this.y;
+        const dx = this.target.x - this.x;
+        const dy = this.target.y - this.y;
         const distance = Math.sqrt(dx * dx + dy * dy);
 
         if (distance < this.speed) {
           isAnchor = true;
-          this.x = target.x;
-          this.y = target.y;
+          this.x = this.target.x;
+          this.y = this.target.y;
           this.steer();
         }
 
-        this.path.push({
-          x: this.x,
-          y: this.y,
-          isAnchor: isAnchor,
-        });
-
+        this.path.push({ x: this.x, y: this.y, isAnchor });
         this.pathLength++;
       }
 
@@ -311,7 +295,6 @@ export default function AiTutor() {
         ctx.lineWidth = this.thickness;
 
         ctx.beginPath();
-
         if (this.hasShadow) {
           ctx.shadowOffsetX = 10;
           ctx.shadowOffsetY = 20;
@@ -319,8 +302,8 @@ export default function AiTutor() {
           ctx.shadowColor = 'rgba(0,0,0,0.09)';
         }
 
-        this.path.forEach(function (point, i) {
-          ctx[i === 0 ? 'moveTo' : 'lineTo'](point.x, point.y);
+        this.path.forEach((pt, i) => {
+          ctx[i === 0 ? 'moveTo' : 'lineTo'](pt.x, pt.y);
         });
 
         ctx.stroke();
@@ -337,10 +320,7 @@ export default function AiTutor() {
         const angleOptions = [-HALF_PI, 0, HALF_PI, -Math.PI];
         const angle = random(angleOptions);
 
-        // Squash all non-anchor points to squeeze out some extra performance
-        this.path = this.path.filter(function (point) {
-          return point.isAnchor === true;
-        });
+        this.path = this.path.filter((p) => p.isAnchor === true);
 
         this.target.x = this.x + Math.cos(angle) * distance;
         this.target.y = this.y + Math.sin(angle) * distance;
@@ -348,20 +328,22 @@ export default function AiTutor() {
       }
     }
 
-    // Helper Functions
+    const TWO_PI = Math.PI * 2;
+    const HALF_PI = Math.PI / 2;
+
     function random(min, max) {
       if (arguments.length === 0) return Math.random();
       if (Array.isArray(min)) return min[Math.floor(Math.random() * min.length)];
       if (typeof min === 'undefined') min = 1;
       if (typeof max === 'undefined') {
-        max = min || 1;
+        max = min;
         min = 0;
       }
       return min + Math.random() * (max - min);
     }
 
     function getRandomPointOutsideCircle(center, radius, xRange, yRange) {
-      let x, y, dx, dy, distanceSquared;
+      let x, y, dx, dy, distSq;
       let attempts = 0;
       const maxAttempts = 100;
 
@@ -370,25 +352,20 @@ export default function AiTutor() {
         y = random(yRange.min, yRange.max);
         dx = x - center.x;
         dy = y - center.y;
-        distanceSquared = dx * dx + dy * dy;
+        distSq = dx * dx + dy * dy;
         attempts++;
 
         if (attempts > maxAttempts) {
-          // Fallback to a point on the perimeter
           const angle = random(0, TWO_PI);
           x = center.x + radius * Math.cos(angle);
           y = center.y + radius * Math.sin(angle);
           break;
         }
-      } while (distanceSquared < radius * radius);
+      } while (distSq < radius * radius);
 
       return { x, y };
     }
 
-    const TWO_PI = Math.PI * 2;
-    const HALF_PI = Math.PI / 2;
-
-    // Initialize Canvas
     function resizeCanvas() {
       const parent = canvas.parentElement;
       if (!parent) return;
@@ -400,41 +377,34 @@ export default function AiTutor() {
       canvas.height = height * scale;
       ctx.scale(scale, scale);
 
-      // Update center and radius
       centerRef.current = { x: width / 2, y: height / 2 };
-      radiusRef.current = 165; // Increased radius as per user request
+      radiusRef.current = 165;
 
-      // Create gradient
       gradientRef.current = ctx.createLinearGradient(width * 0.25, 0, width * 0.75, 0);
-      gradientRef.current.addColorStop(0, '#ffffff'); // Start color
-      gradientRef.current.addColorStop(1, '#ffffff'); // End color
+      gradientRef.current.addColorStop(0, '#ffffff');
+      gradientRef.current.addColorStop(1, '#ffffff');
     }
 
-    // Animation Loop
     function drawFrame() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       ctx.lineCap = 'round';
       ctx.strokeStyle = gradientRef.current;
       ctx.fillStyle = '#F7FAFB';
 
-      // Update and Draw Lines
-      linesRef.current = linesRef.current.filter(function (line) {
+      linesRef.current = linesRef.current.filter((line) => {
         line.step();
         return line.alpha > 0.01;
       });
 
-      linesRef.current.forEach(function (line) {
-        line.draw();
-      });
+      linesRef.current.forEach((line) => line.draw());
 
-      // Add New Lines at Intervals
-      if (frameRef.current % 24 === 0) { // Increased interval to slow down animation
-        const center = centerRef.current;
-        const radius = radiusRef.current;
-        const xRange = { min: 0, max: canvas.width };
-        const yRange = { min: 0, max: canvas.height };
-
-        const { x, y } = getRandomPointOutsideCircle(center, radius, xRange, yRange);
+      if (frameRef.current % 24 === 0) {
+        const { x, y } = getRandomPointOutsideCircle(
+          centerRef.current,
+          radiusRef.current,
+          { min: 0, max: canvas.width },
+          { min: 0, max: canvas.height }
+        );
         linesRef.current.push(new Line(x, y));
       }
 
@@ -442,29 +412,59 @@ export default function AiTutor() {
       animationFrameId.current = requestAnimationFrame(drawFrame);
     }
 
-    // Initialize
     resizeCanvas();
     drawFrame();
 
-    // Handle Resize
-    const handleResize = () => {
-      resizeCanvas();
-    };
-
+    const handleResize = () => resizeCanvas();
     window.addEventListener('resize', handleResize);
 
-    // Cleanup on Unmount
     return () => {
       window.removeEventListener('resize', handleResize);
       cancelAnimationFrame(animationFrameId.current);
     };
-  }, []); // Empty dependency array ensures this runs once on mount
-
-  const toggleSidebar = () => setIsSidebarVisible(!isSidebarVisible);
+  }, []);
 
   // --------------------------------------
-  // 5. Handlers: get question, submit answer, etc.
+  // 8. Access Control => check auth after hooks
   // --------------------------------------
+  if (!currentUser) {
+    return (
+      <div className="flex items-center justify-center h-screen bg-gray-100">
+        <div className="text-center p-6 bg-white rounded shadow-md">
+          <p className="text-gray-700 mb-4">
+            Please{' '}
+            <a href="/login" className="text-blue-900 underline">
+              log in
+            </a>{' '}
+            to use the AI Law Tutor.
+          </p>
+          <button
+            onClick={() => router.push('/login')}
+            className="px-4 py-2 bg-blue-900 text-white rounded hover:bg-blue-700"
+          >
+            Go to Login
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // --------------------------------------
+  // HANDLERS
+  // --------------------------------------
+  const handleConfigChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setTutorConfig((prevConfig) => ({
+      ...prevConfig,
+      [name]: type === 'checkbox' ? checked : value,
+    }));
+  };
+
+  const handleStartTutoringSession = () => {
+    closeConfigModal();
+    handleGetQuestion();
+  };
+
   const handleGetQuestion = async () => {
     setIsLoading(true);
     setIsCommunicating(true);
@@ -475,29 +475,22 @@ export default function AiTutor() {
     setInputText('');
 
     try {
-      // POST to /api/tutor/get-ai-question but now for law students
       const response = await fetch('/api/tutor/get-ai-question', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(tutorConfig),
       });
-
       if (!response.ok) throw new Error('Failed to get AI question');
 
       const { question, highlightedSections } = await response.json();
-
-      if (!question) {
-        throw new Error('No question received from AI.');
-      }
+      if (!question) throw new Error('No question received from AI.');
 
       setHighlightedSections(highlightedSections || []);
       setQuestionStem(question);
       setQuestionText(question);
       setIsSessionActive(true);
-    } catch (error) {
-      console.error('Error fetching AI question:', error);
+    } catch (err) {
+      console.error('Error fetching AI question:', err);
       setQuestionText('An error occurred while fetching the question.');
     } finally {
       setIsLoading(false);
@@ -527,19 +520,14 @@ export default function AiTutor() {
           includeStatutes: tutorConfig.includeStatutes,
         }),
       });
-
       if (!response.ok) throw new Error('Failed to submit answer');
 
       const { feedback, correct, highlightedSections: newHighlights } = await response.json();
-
       const feedbackText = feedback !== undefined ? feedback : 'No feedback provided.';
       const isCorrect = typeof correct === 'boolean' ? correct : false;
 
       setAnswerResult(feedbackText);
-
-      if (newHighlights && newHighlights.length > 0) {
-        setHighlightedSections(newHighlights);
-      }
+      if (newHighlights?.length) setHighlightedSections(newHighlights);
 
       setAnsweredQuestions((prev) => [
         ...prev,
@@ -550,10 +538,9 @@ export default function AiTutor() {
           correct: isCorrect,
         },
       ]);
-
-      setCurrentQuestionCount((prevCount) => prevCount + 1);
-    } catch (error) {
-      console.error('Error submitting answer:', error);
+      setCurrentQuestionCount((c) => c + 1);
+    } catch (err) {
+      console.error('Error submitting answer:', err);
       setAnswerResult('An error occurred while submitting your answer.');
     } finally {
       setIsLoading(false);
@@ -561,17 +548,6 @@ export default function AiTutor() {
     }
   };
 
-  // If we exceed the questionLimit
-  useEffect(() => {
-    if (currentQuestionCount >= tutorConfig.questionLimit && questionText !== '') {
-      setCurrentQuestionCount(0);
-      openFinalFeedbackModal();
-    }
-  }, [currentQuestionCount, tutorConfig.questionLimit, questionText]);
-
-  // --------------------------------------
-  // 6. Configuration & Modal Handling
-  // --------------------------------------
   const openConfigModal = () => setIsConfigModalOpen(true);
   const closeConfigModal = () => setIsConfigModalOpen(false);
 
@@ -584,44 +560,23 @@ export default function AiTutor() {
   const openFinalFeedbackModal = () => setIsFinalFeedbackModalOpen(true);
   const closeFinalFeedbackModal = () => setIsFinalFeedbackModalOpen(false);
 
-  const handleConfigChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setTutorConfig((prevConfig) => ({
-      ...prevConfig,
-      [name]: type === 'checkbox' ? checked : value,
-    }));
-  };
-
-  const handleStartTutoringSession = () => {
-    closeConfigModal();
-    handleGetQuestion();
-  };
-
-  // --------------------------------------
-  // 7. Saving & Loading Progress
-  // --------------------------------------
   const handleSaveProgress = async () => {
     if (!currentUser) {
       alert('You need to be logged in to save your progress.');
       return;
     }
     try {
-      const progressData = {
+      const docData = {
         userId: currentUser.uid,
         tutorConfig: { ...tutorConfig },
         questionText: questionText || '',
         inputText: inputText || '',
         answerResult: answerResult || '',
-        currentQuestionCount: currentQuestionCount || 0,
-        answeredQuestions: answeredQuestions.map((q) => ({
-          question: q.question || '',
-          answer: q.answer || '',
-          feedback: q.feedback || '',
-          correct: q.correct || false,
-        })),
+        currentQuestionCount,
+        answeredQuestions: answeredQuestions.map((q) => ({ ...q })),
         timestamp: new Date().toISOString(),
       };
-      await addDoc(collection(db, 'tutorProgress'), progressData);
+      await addDoc(collection(db, 'tutorProgress'), docData);
       alert('Progress saved successfully!');
     } catch (error) {
       console.error('Error saving progress:', error);
@@ -631,33 +586,27 @@ export default function AiTutor() {
 
   const fetchSavedProgresses = async () => {
     if (!currentUser) {
-      alert('You need to be logged in to load progress.');
+      alert('You need to be logged in to load your progress.');
       return;
     }
     try {
       const qQuery = query(collection(db, 'tutorProgress'), where('userId', '==', currentUser.uid));
-      const querySnapshot = await getDocs(qQuery);
-      const results = [];
-      querySnapshot.forEach((doc) => {
-        results.push({ id: doc.id, ...doc.data() });
+      const snap = await getDocs(qQuery);
+      const loaded = [];
+      snap.forEach((docSnap) => {
+        loaded.push({ id: docSnap.id, ...docSnap.data() });
       });
-      setSavedProgresses(results);
-    } catch (error) {
-      console.error('Error fetching saved progresses:', error);
-      alert('An error occurred while fetching saved progresses.');
+      setSavedProgresses(loaded);
+    } catch (err) {
+      console.error('Error fetching saved progress:', err);
+      alert('Error fetching saved progresses.');
     }
   };
 
   const handleLoadProgress = (progress) => {
-    // Validate studyYear before loading
     if (!studyMapping[progress.tutorConfig.studyYear]) {
       alert(`Invalid studyYear "${progress.tutorConfig.studyYear}" in saved progress. Resetting to default.`);
-      setTutorConfig((prevConfig) => ({
-        ...prevConfig,
-        studyYear: '1L',
-      }));
-      closeLoadProgressModal();
-      return;
+      progress.tutorConfig.studyYear = '1L';
     }
 
     setTutorConfig(progress.tutorConfig);
@@ -674,7 +623,7 @@ export default function AiTutor() {
 
   const handleDeleteProgress = async (id) => {
     if (!currentUser) {
-      alert('You need to be logged in to delete progress.');
+      alert('You need to be logged in to delete your progress.');
       return;
     }
     try {
@@ -686,45 +635,21 @@ export default function AiTutor() {
     }
   };
 
-  // --------------------------------------
-  // 8. Access Control
-  // --------------------------------------
-  if (!currentUser) {
-    return (
-      <div className="flex items-center justify-center h-screen bg-gray-100">
-        <div className="text-center p-6 bg-white rounded shadow-md">
-          <p className="text-gray-700 mb-4">
-            Please{' '}
-            <a href="/login" className="text-blue-900 underline">
-              log in
-            </a>{' '}
-            to use the AI Law Tutor.
-          </p>
-          <button
-            onClick={() => router.push('/login')}
-            className="px-4 py-2 bg-blue-900 text-white rounded hover:bg-blue-700"
-          >
-            Go to Login
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  const isProUser =
-    userDataObj?.billing?.plan === 'Pro' || userDataObj?.billing?.plan === 'Developer';
+  // Subscription plan
+  const isProUser = userDataObj?.billing?.plan === 'Pro' || userDataObj?.billing?.plan === 'Developer';
 
   function messageDisplay() {
     if (isCommunicating) return 'AI is communicating...';
     return 'LExAPI';
   }
 
-  const highlightedReasons = highlightedSections
-    .filter((section) => section.highlight && section.reason && section.reason !== 'Not crucial')
-    .map((section) => ({ text: section.text, reason: section.reason }));
-
   const showHighlights = tutorConfig.liveMode || answerResult;
   const highlightColor = `hsla(${tutorConfig.highlightHue}, 100%, 50%, ${tutorConfig.highlightOpacity})`;
+
+  // For highlight reasons
+  const highlightedReasons = highlightedSections
+    .filter((s) => s.highlight && s.reason && s.reason !== 'Not crucial')
+    .map((s) => ({ text: s.text, reason: s.reason }));
 
   return (
     <div className="flex h-screen bg-gradient-to-br from-purple-900 to-blue-800 rounded shadow-md z-[150]">
@@ -782,7 +707,7 @@ export default function AiTutor() {
             </AnimatePresence>
           </button>
 
-          {/* Load Progress & Configure */}
+          {/* Load/Config Buttons */}
           <div className="inline-flex flex-row flex-nowrap items-center gap-2 sm:gap-4">
             <button
               onClick={openLoadProgressModal}
@@ -823,7 +748,6 @@ export default function AiTutor() {
           </div>
         )}
 
-        {/* Visualizer & Feedback */}
         <div className="w-full max-w-5xl flex flex-col items-center">
           {/* Visualizer Container */}
           <AnimatePresence>
@@ -844,7 +768,7 @@ export default function AiTutor() {
                   <textarea
                     className="w-48 sm:w-64 h-14 bg-transparent text-center p-2 rounded-md focus:outline-none 
                                focus:ring-2 focus:ring-blue-500 text-white font-semibold text-4xl"
-                    value={messageDisplay()}
+                    value={isCommunicating ? 'AI is communicating...' : 'LExAPI'}
                     readOnly
                     aria-label="AI Communication Status"
                     style={{ resize: 'none' }}
@@ -874,30 +798,28 @@ export default function AiTutor() {
               <h3 className="text-sm font-medium text-gray-200 mb-1">LExAPI</h3>
               <small className="text-gray-300 italic">Version 3.0</small>
               <div className="text-gray-100 mb-4 whitespace-pre-wrap">
-                {showHighlights && highlightedSections && highlightedSections.length > 0 ? (
-                  highlightedSections.map((section, idx) =>
-                    section.highlight ? (
-                      <motion.span
-                        key={idx}
-                        style={{
-                          backgroundColor: highlightColor,
-                          display: 'inline-block',
-                          transformOrigin: 'left center',
-                        }}
-                        title={section.reason}
-                        initial={{ scaleX: 0 }}
-                        animate={{ scaleX: 1 }}
-                        transition={{ duration: 1 }}
-                      >
-                        {section.text}
-                      </motion.span>
-                    ) : (
-                      <span key={idx}>{section.text}</span>
+                {showHighlights && highlightedSections?.length
+                  ? highlightedSections.map((section, idx) =>
+                      section.highlight ? (
+                        <motion.span
+                          key={idx}
+                          style={{
+                            backgroundColor: `hsla(${tutorConfig.highlightHue}, 100%, 50%, ${tutorConfig.highlightOpacity})`,
+                            display: 'inline-block',
+                            transformOrigin: 'left center',
+                          }}
+                          title={section.reason}
+                          initial={{ scaleX: 0 }}
+                          animate={{ scaleX: 1 }}
+                          transition={{ duration: 1 }}
+                        >
+                          {section.text}
+                        </motion.span>
+                      ) : (
+                        <span key={idx}>{section.text}</span>
+                      )
                     )
-                  )
-                ) : (
-                  <p>{questionStem}</p>
-                )}
+                  : questionStem}
               </div>
 
               {/* Why These Areas Are Highlighted */}
@@ -909,7 +831,8 @@ export default function AiTutor() {
                   <ul className="list-disc list-inside text-gray-200">
                     {highlightedReasons.map((hr, i) => (
                       <li key={i}>
-                        <span className="font-semibold">&quot;{hr.text.trim()}&quot;</span>: {hr.reason}
+                        <span className="font-semibold">&quot;{hr.text.trim()}&quot;</span>:
+                        {' '}{hr.reason}
                       </li>
                     ))}
                   </ul>
@@ -918,7 +841,7 @@ export default function AiTutor() {
             </div>
           )}
 
-          {/* Answer Input and Buttons */}
+          {/* Answer + Buttons */}
           {questionStem && currentQuestionCount < tutorConfig.questionLimit && (
             <div className="w-full max-w-5xl mb-6">
               {!answerResult && (
@@ -932,12 +855,11 @@ export default function AiTutor() {
                   value={inputText}
                   onChange={(e) => setInputText(e.target.value)}
                   placeholder="Enter your answer here..."
-                  rows="6"
+                  rows={6}
                   disabled={isLoading}
                   aria-label="Answer Input"
                 ></textarea>
               )}
-
               <div className="flex space-x-4 mt-4">
                 {!answerResult ? (
                   <button
@@ -987,21 +909,21 @@ export default function AiTutor() {
             </div>
           )}
 
-          {/* Initial welcome area (no question loaded) */}
+          {/* Initial “Click Configure AI Tutor” message */}
           {!questionStem && !questionText && (
             <div className="w-full max-w-5xl p-6 bg-white bg-opacity-20 backdrop-blur-md rounded-lg shadow-md text-center">
               <p className="text-gray-200 mb-4">
                 Click <span className="font-semibold">Configure AI Tutor</span> to start.
               </p>
               <p className="text-gray-400 text-sm">
-                <strong>Note:</strong> This AI Tutor helps you practice law school concepts, 
-                offers structured feedback, and references key principles or statutes. 
+                <strong>Note:</strong> This AI Tutor helps you practice law school concepts,
+                offers structured feedback, and references key principles or statutes.
                 It’s not a substitute for professional legal advice.
               </p>
             </div>
           )}
 
-          {/* Configuration Modal */}
+          {/* CONFIGURATION MODAL */}
           {isConfigModalOpen && (
             <motion.div
               className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-70 z-50"
@@ -1171,7 +1093,6 @@ export default function AiTutor() {
                       </label>
                     </div>
 
-                    {/* Live Mode */}
                     <div className="flex items-center mb-2">
                       <input
                         type="checkbox"
@@ -1292,9 +1213,12 @@ export default function AiTutor() {
               >
                 <h2 className="text-2xl font-semibold text-white mb-6">Session Feedback</h2>
                 <ul className="space-y-4">
-                  {answeredQuestions.map((item, index) => (
-                    <li key={index} className="p-4 border border-gray-700 rounded">
-                      <p className="font-semibold text-blue-300">Question {index + 1}:</p>
+                  {answeredQuestions.map((item, idx) => (
+                    <li
+                      key={idx}
+                      className="p-4 border border-gray-700 rounded"
+                    >
+                      <p className="font-semibold text-blue-300">Question {idx + 1}:</p>
                       <p className="text-gray-200 mb-2">{item.question}</p>
                       <p className="text-gray-200 mb-1">
                         <span className="font-semibold">Your Answer:</span> {item.answer}
