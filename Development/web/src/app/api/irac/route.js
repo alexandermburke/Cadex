@@ -12,13 +12,6 @@ export async function POST(request) {
         { status: 400 }
       );
     }
-
-    // 2. Craft an advanced IRAC prompt:
-    // - We specify the exact structure we want the model to return.
-    // - We instruct it to omit any extra disclaimers or commentary.
-    // - We mention that any deviation from JSON is unacceptable.
-    //
-    // This approach is designed to reduce "hallucinations" or extraneous text.
     const prompt = `
 You are an expert legal tutor who specializes in generating IRAC analyses for law students.
 IRAC stands for Issue, Rule, Analysis, Conclusion.
@@ -57,14 +50,9 @@ Given the scenario below, you must create an IRAC in strict JSON format with the
 Begin now.
     `;
 
-    // 3. Initialize the OpenAI client.
-    // Make sure OPENAI_API_KEY is set in your environment variables.
     const openai = new OpenAI({
       apiKey: process.env.OPENAI_API_KEY,
     });
-
-    // 4. Call OpenAI’s Chat Completion with more advanced settings, if needed.
-    //    Below is an example with extra parameters to refine output.
     const response = await openai.chat.completions.create({
       model: 'gpt-3.5-turbo',
       messages: [

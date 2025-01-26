@@ -404,30 +404,6 @@ export default function ExamPrep() {
               )}
             </AnimatePresence>
           </button>
-
-          {/* Pro Mode Button */}
-          <button
-            onClick={() => {
-              if (isProUser) {
-                router.push('/ailawtools/examprep/full-mode');
-              } else {
-                alert('Professional Mode requires a Pro subscription.');
-              }
-            }}
-            className={`px-4 py-2 rounded-md transition-colors duration-200 ${
-              isProUser
-                ? `${
-                    isDarkMode
-                      ? 'goldBackground goldShadow text-white hover:opacity-80'
-                      : 'goldBackground goldShadow text-white hover:opacity-80'
-                  }`
-                : 'bg-gray-300 text-gray-600 cursor-not-allowed'
-            }`}
-            disabled={!isProUser}
-            aria-label="Professional Mode"
-          >
-            Pro Mode
-          </button>
         </div>
         <div className="w-full flex flex-row flex-nowrap justify-end mb-4 gap-2 sm:gap-4">
           <button

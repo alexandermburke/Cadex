@@ -1,5 +1,5 @@
 'use client';
- 
+
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -36,9 +36,9 @@ import {
 } from 'react-icons/fa';
 import { motion } from 'framer-motion';
 import clsx from 'clsx';
- 
+
 const NavLink = ({ href, icon, label, active }) => (
-  <li>
+  <div>
     <Link
       href={href}
       className={clsx(
@@ -53,11 +53,11 @@ const NavLink = ({ href, icon, label, active }) => (
       {icon}
       <span>{label}</span>
     </Link>
-  </li>
+  </div>
 );
- 
+
 const LockedNavLink = ({ icon, label }) => (
-  <li>
+  <div>
     <div className="flex items-center justify-between gap-2 p-3 text-gray-400 cursor-not-allowed">
       <div className="flex items-center gap-3">
         {icon}
@@ -65,9 +65,9 @@ const LockedNavLink = ({ icon, label }) => (
       </div>
       <FaLock className="text-gray-400" size={14} />
     </div>
-  </li>
+  </div>
 );
- 
+
 const ToggleSection = ({ isOpen, toggle, title, icon, children }) => (
   <section>
     <button
@@ -83,32 +83,34 @@ const ToggleSection = ({ isOpen, toggle, title, icon, children }) => (
       {isOpen ? <FaChevronUp /> : <FaChevronDown />}
     </button>
     {isOpen && (
-      <ul id={`${title}-section`} className="mt-2 ml-6 space-y-1">
+      <div
+        id={`${title}-section`}
+        className="mt-2 ml-6 border-l-2 border-white pl-4"
+      >
         {children}
-      </ul>
+      </div>
     )}
   </section>
 );
- 
+
 export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, isAiTutor }) {
   const router = useRouter();
   const { currentUser, userDataObj } = useAuth();
   const plan = userDataObj?.billing?.plan?.toLowerCase() || 'free';
-  const isDarkMode = userDataObj?.darkMode || false;
   const isFree = plan === 'free';
-  const isBasic = plan === 'free';
-  const isPro = plan === 'free';
- 
+  const isBasic = plan === 'basic';
+  const isPro = plan === 'pro';
+  const isExpert = plan === 'free';
+  const isDarkMode = userDataObj?.darkMode || false;
+
   const [isCaseBriefBankOpen, setIsCaseBriefBankOpen] = useState(false);
   const [isStudyToolsOpen, setIsStudyToolsOpen] = useState(false);
   const [isExamPrepOpen, setIsExamPrepOpen] = useState(false);
   const [isSubjectGuidesOpen, setIsSubjectGuidesOpen] = useState(false);
   const [showAllApps, setShowAllApps] = useState(true);
-
-  // New sections
   const [isVideoLessonsOpen, setIsVideoLessonsOpen] = useState(false);
   const [isQuimbeeOpen, setIsQuimbeeOpen] = useState(false);
- 
+
   useEffect(() => {
     const storedCaseBriefBankOpen = localStorage.getItem('isCaseBriefBankOpen');
     if (storedCaseBriefBankOpen) {
@@ -126,7 +128,6 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, i
     if (storedSubjectGuidesOpen) {
       setIsSubjectGuidesOpen(storedSubjectGuidesOpen === 'true');
     }
-    // New sections
     const storedVideoLessonsOpen = localStorage.getItem('isVideoLessonsOpen');
     if (storedVideoLessonsOpen) {
       setIsVideoLessonsOpen(storedVideoLessonsOpen === 'true');
@@ -136,28 +137,28 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, i
       setIsQuimbeeOpen(storedQuimbeeOpen === 'true');
     }
   }, []);
- 
+
   const toggleCaseBriefBank = () => {
     setIsCaseBriefBankOpen(prev => {
       localStorage.setItem('isCaseBriefBankOpen', !prev);
       return !prev;
     });
   };
- 
+
   const toggleStudyTools = () => {
     setIsStudyToolsOpen(prev => {
       localStorage.setItem('isStudyToolsOpen', !prev);
       return !prev;
     });
   };
- 
+
   const toggleExamPrep = () => {
     setIsExamPrepOpen(prev => {
       localStorage.setItem('isExamPrepOpen', !prev);
       return !prev;
     });
   };
- 
+
   const toggleSubjectGuides = () => {
     setIsSubjectGuidesOpen(prev => {
       localStorage.setItem('isSubjectGuidesOpen', !prev);
@@ -165,7 +166,6 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, i
     });
   };
 
-  // New sections toggles
   const toggleVideoLessons = () => {
     setIsVideoLessonsOpen(prev => {
       localStorage.setItem('isVideoLessonsOpen', !prev);
@@ -179,7 +179,7 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, i
       return !prev;
     });
   };
- 
+
   const sidebarVariants = {
     hidden: {
       x: '-100%',
@@ -196,21 +196,22 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, i
       },
     },
   };
- 
+
   const sidebarBackground = clsx({
     'bg-gradient-to-br from-blue-900 to-purple-900': isDarkMode,
     'bg-gradient-to-br from-blue-950 to-slate-950': !isDarkMode,
   });
- 
+
   const planBadgeStyle = (() => {
     if (isPro) return 'bg-gradient-to-r from-amber-400 to-amber-600 text-white';
     if (isBasic) return 'bg-gradient-to-r from-teal-400 to-teal-600 text-white';
+    if (isExpert) return 'bg-gradient-to-r from-red-400 to-red-600 text-white';
     return 'bg-gradient-to-r from-blue-400 to-blue-600 text-white';
   })();
- 
+
   return (
     <motion.aside
-      className={`z-[9999] fixed top-0 left-0 w-96 h-full ${sidebarBackground} text-white flex flex-col md:relative md:translate-x-0 overflow-y-auto transition-colors duration-500 shadow-md rounded-md`}
+      className={`z-[100] fixed top-0 left-0 w-96 h-full ${sidebarBackground} text-white flex flex-col md:relative md:translate-x-0 overflow-y-auto transition-colors duration-500 shadow-xl rounded-md`}
       initial="hidden"
       animate={isSidebarVisible ? 'visible' : 'hidden'}
       variants={sidebarVariants}
@@ -222,7 +223,7 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, i
           Dashboard
         </h1>
       </div>
- 
+
       <section className="flex items-center justify-center gap-4 my-4 px-6">
         <span className="font-semibold">My Apps</span>
         <div className="relative inline-block w-14 h-8 select-none transition duration-200 ease-in">
@@ -249,7 +250,7 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, i
         </div>
         <span className="font-semibold">All Apps</span>
       </section>
- 
+
       <nav className="flex-1 px-6 py-4 space-y-6">
         <ToggleSection
           isOpen={isCaseBriefBankOpen}
@@ -276,7 +277,7 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, i
             active={activeLink === '/casebriefs/allbriefs'}
           />
         </ToggleSection>
- 
+
         <ToggleSection
           isOpen={isStudyToolsOpen}
           toggle={toggleStudyTools}
@@ -295,7 +296,7 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, i
             label="Lecture Summaries"
             active={activeLink === '/lawtools/lecturesummaries'}
           />
-          {isBasic || isPro ? (
+          {isBasic || isPro || isExpert ? (
             <NavLink
               href="/ailawtools/flashcards"
               icon={<FaStickyNote className="text-sm" />}
@@ -308,7 +309,7 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, i
               label="Flashcards & Outlines"
             />
           ) : null}
-          {isBasic || isPro ? (
+          {isBasic || isPro || isExpert ? (
             <NavLink
               href="/ailawtools/irac"
               icon={<FaFileInvoice className="text-sm" />}
@@ -322,19 +323,19 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, i
             />
           ) : null}
         </ToggleSection>
- 
+
         <ToggleSection
           isOpen={isExamPrepOpen}
           toggle={toggleExamPrep}
           title="Exam Prep"
           icon={<FaClipboardList className="text-lg" />}
         >
-          {isBasic || isPro ? (
+          {isBasic || isPro || isExpert ? (
             <NavLink
-              href="/ailawtools/examprep/practice-exams"
+              href="/ailawtools/examprep"
               icon={<FaClipboardCheck className="text-sm" />}
               label="Practice Exams"
-              active={activeLink === '/ailawtools/examprep/practice-exams'}
+              active={activeLink === '/ailawtools/examprep'}
             />
           ) : showAllApps ? (
             <LockedNavLink
@@ -342,7 +343,7 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, i
               label="Practice Exams"
             />
           ) : null}
-          {isBasic || isPro ? (
+          {isBasic || isPro || isExpert ? (
             <NavLink
               href="/ailawtools/examprep/timemanagement"
               icon={<FaClock className="text-sm" />}
@@ -355,12 +356,12 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, i
               label="Time Management"
             />
           ) : null}
-          {isPro ? (
+          {isPro || isExpert ? (
             <NavLink
-              href="/ailawtools/examprep/insights"
+              href="/ailawtools/insights"
               icon={<FaChartBar className="text-sm" />}
               label="Exam Insights"
-              active={activeLink === '/ailawtools/examprep/insights'}
+              active={activeLink === '/ailawtools/insights'}
             />
           ) : showAllApps ? (
             <LockedNavLink
@@ -368,7 +369,7 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, i
               label="Exam Insights"
             />
           ) : null}
-          {isBasic || isPro ? (
+          {isBasic || isPro || isExpert ? (
             <NavLink
               href="/ailawtools/examprep/mbe"
               icon={<FaListOl className="text-sm" />}
@@ -381,7 +382,7 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, i
               label="MBE Practice"
             />
           ) : null}
-          {isPro ? (
+          {isPro || isExpert ? (
             <NavLink
               href="/ailawtools/lexapi"
               icon={<FaBrain className="text-sm" />}
@@ -395,14 +396,14 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, i
             />
           ) : null}
         </ToggleSection>
- 
+
         <ToggleSection
           isOpen={isSubjectGuidesOpen}
           toggle={toggleSubjectGuides}
           title="Subject Guides"
           icon={<FaBookReader className="text-lg" />}
         >
-          {isFree || isBasic || isPro ? (
+          {isFree || isBasic || isPro || isExpert ? (
             <NavLink
               href="/subjects/contracts"
               icon={<FaFileInvoice className="text-sm" />}
@@ -415,7 +416,7 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, i
               label="Contracts"
             />
           ) : null}
-          {isFree || isBasic || isPro ? (
+          {isFree || isBasic || isPro || isExpert ? (
             <NavLink
               href="/subjects/torts"
               icon={<FaExclamationTriangle className="text-sm" />}
@@ -428,7 +429,7 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, i
               label="Torts"
             />
           ) : null}
-          {isBasic || isPro ? (
+          {isBasic || isPro || isExpert ? (
             <NavLink
               href="/subjects/crimlaw"
               icon={<FaGavel className="text-sm" />}
@@ -441,7 +442,7 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, i
               label="Criminal Law"
             />
           ) : null}
-          {isPro ? (
+          {isPro || isExpert ? (
             <NavLink
               href="/subjects/property"
               icon={<FaHome className="text-sm" />}
@@ -454,7 +455,7 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, i
               label="Property"
             />
           ) : null}
-          {isPro ? (
+          {isPro || isExpert ? (
             <NavLink
               href="/subjects/constitutional-law"
               icon={<FaUniversity className="text-sm" />}
@@ -469,17 +470,25 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, i
           ) : null}
         </ToggleSection>
 
-        {/* New Sections */}
         <ToggleSection
           isOpen={isVideoLessonsOpen}
           toggle={toggleVideoLessons}
           title="Video Lessons"
           icon={<FaVideo className="text-lg" />}
         >
-          <LockedNavLink
-            icon={<FaPlayCircle className="text-sm" />}
-            label="Directory (Coming Soon)"
-          />
+          {isExpert ? (
+            <NavLink
+              href="/videos/directory"
+              icon={<FaPlayCircle className="text-sm" />}
+              label="Directory (Coming Soon)"
+              active={activeLink === '/videos/directory'}
+            />
+          ) : showAllApps ? (
+            <LockedNavLink
+              icon={<FaPlayCircle className="text-sm" />}
+              label="Directory (Coming Soon)"
+            />
+          ) : null}
         </ToggleSection>
 
         <ToggleSection
@@ -488,12 +497,21 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, i
           title="Career & Internship Resources"
           icon={<FaChalkboardTeacher className="text-lg" />}
         >
-          <LockedNavLink
-            icon={<FaLightbulb className="text-sm" />}
-            label="Resume Review (Coming Soon)"
-          />
+          {isExpert ? (
+            <NavLink
+              href="/lawtools/careerresources"
+              icon={<FaLightbulb className="text-sm" />}
+              label="Resume Review (Coming Soon)"
+              active={activeLink === '/lawtools/careerresources'}
+            />
+          ) : showAllApps ? (
+            <LockedNavLink
+              icon={<FaLightbulb className="text-sm" />}
+              label="Resume Review"
+            />
+          ) : null}
         </ToggleSection>
- 
+
         <section>
           <Link
             href="https://discord.gg/wKgH9ussWc"
@@ -504,7 +522,7 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, i
           </Link>
         </section>
       </nav>
- 
+
       <footer className="px-6 py-4 bg-transparent">
         <div className="flex items-center gap-4">
           <div className="flex-1 min-w-0">

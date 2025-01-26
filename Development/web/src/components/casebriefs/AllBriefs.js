@@ -11,6 +11,7 @@ import {
   FaSearch,
   FaChevronLeft,
   FaChevronRight,
+  FaArrowRight,
 } from 'react-icons/fa';
 import { useRouter, useSearchParams } from 'next/navigation';
 
@@ -27,13 +28,6 @@ import {
 // Auth
 import { useAuth } from '@/context/AuthContext';
 
-/**
- * AllBriefs:
- * - Shows ~18 cases per page from Firestore's 'capCases' collection
- * - Displays a modal with a case brief (fetched from /api/casebrief-summary) when a case is selected
- * - Allows toggling between bullet-point or standard paragraph formatting
- * - Logs user views in "users/{uid}.recentActivity" (up to 3 items)
- */
 export default function AllBriefs() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -60,7 +54,7 @@ export default function AllBriefs() {
   const [bulletpointView, setBulletpointView] = useState(false);
 
   // Pagination
-  const ITEMS_PER_PAGE = 18;
+  const ITEMS_PER_PAGE = 21;
   const [isLoading, setIsLoading] = useState(false);
 
   // -------------------------------------------------
@@ -288,7 +282,7 @@ export default function AllBriefs() {
       </AnimatePresence>
 
       {/* Main content */}
-      <main className="flex-1 flex flex-col px-6 overflow-auto relative z-200 h-screen">
+      <main className="flex-1 flex flex-col px-6 relative z-200 h-screen">
         {/* Header area */}
         <div className="flex items-center justify-between">
           {/* Toggle (Mobile) */}
@@ -326,7 +320,7 @@ export default function AllBriefs() {
         {/* Body */}
         <div
           className={`flex-1 w-full rounded-2xl shadow-xl p-6 ${
-            isDarkMode ? 'bg-slate-800 text-white' : 'bg-white text-gray-800'
+            isDarkMode ? 'bg-gradient-to-br from-slate-900 to-blue-950 text-white' : 'bg-white text-gray-800'
           } flex flex-col items-center`}
         >
           {/* Search bar */}
@@ -407,7 +401,7 @@ export default function AllBriefs() {
                 <button
                   onClick={goToPrevPage}
                   disabled={currentPage === 1}
-                  className={`px-3 py-1 rounded-md font-semibold flex items-center gap-1 ${
+                  className={`px-3 py-1 rounded-full font-semibold flex items-center gap-1 ${
                     currentPage === 1
                       ? 'bg-gray-300 cursor-not-allowed opacity-70'
                       : isDarkMode
@@ -422,7 +416,7 @@ export default function AllBriefs() {
                   <button
                     key={num}
                     onClick={() => goToPage(num)}
-                    className={`px-3 py-1 rounded-md font-semibold ${
+                    className={`px-3 py-1 rounded-full font-semibold ${
                       num === currentPage
                         ? isDarkMode
                           ? 'bg-blue-500 text-white'
@@ -439,7 +433,7 @@ export default function AllBriefs() {
                 <button
                   onClick={goToNextPage}
                   disabled={currentPage === totalPages || totalPages === 0}
-                  className={`px-3 py-1 rounded-md font-semibold flex items-center gap-1 ${
+                  className={`px-3 py-1 rounded-full font-semibold flex items-center gap-1 ${
                     currentPage === totalPages || totalPages === 0
                       ? 'bg-gray-300 cursor-not-allowed opacity-70'
                       : isDarkMode
@@ -504,7 +498,7 @@ export default function AllBriefs() {
               {/* Close Button */}
               <button
                 onClick={closeCase}
-                className={`inline-block px-3 py-1 rounded-md font-semibold text-sm transition-colors duration-300 ${
+                className={`inline-block px-3 py-1 rounded-full font-semibold text-sm transition-colors duration-300 ${
                   isDarkMode
                     ? 'bg-blue-600 hover:bg-blue-500 text-white'
                     : 'bg-blue-950 hover:bg-blue-800 text-white'
@@ -654,6 +648,14 @@ export default function AllBriefs() {
                         {caseBrief.dissent || 'Not provided.'}
                       </p>
                     )}
+                  </div>
+                  <div className="text-xs italic text-gray-400">
+                    Verified by LExAPI 3.0
+                  </div>
+
+                  {/* "See full Case Brief ->" addition */}
+                  <div className="mt-3 text-blue-600 hover:underline cursor-pointer flex items-center gap-1 text-sm font-semibold">
+                    See full Case Brief
                   </div>
                 </div>
               )

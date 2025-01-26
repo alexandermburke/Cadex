@@ -1,11 +1,11 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import Sidebar from '../Sidebar';
+import clsx from 'clsx';
 import { motion, AnimatePresence } from 'framer-motion';
+import { FaBars, FaTimes, FaSave, FaSyncAlt, FaFilePdf } from 'react-icons/fa';
+import Sidebar from '../Sidebar';
 import { useRouter } from 'next/navigation';
-import { FaBars, FaTimes } from 'react-icons/fa';
-
 // Firebase
 import { db } from '@/firebase';
 import {
@@ -73,7 +73,6 @@ const courseNameMapping = [
   'Business Associations',
   'Wills & Trusts',
   'Professional Responsibility',
-  // Add or remove as needed for your curriculum
 ];
 
 export default function AIExamFlashCard() {
@@ -146,23 +145,30 @@ export default function AIExamFlashCard() {
     }, 1000);
   };
 
-  // Early return if user not logged in
+  // If user is not logged in
   if (!currentUser) {
     return (
       <div
-        className={`flex items-center justify-center h-screen ${
-          isDarkMode ? 'bg-slate-800 text-white' : 'bg-gray-100 text-gray-800'
-        }`}
+        className={clsx(
+          'flex items-center justify-center h-screen',
+          isDarkMode ? 'bg-slate-900 text-white' : 'bg-gray-100 text-gray-800'
+        )}
       >
-        <div className="p-6 rounded shadow-md text-center">
+        <div
+          className={clsx(
+            'p-6 rounded shadow-md text-center',
+            isDarkMode ? 'bg-slate-800 text-white' : 'bg-white text-gray-700'
+          )}
+        >
           <p className="mb-4">Please log in to use this tool.</p>
           <button
             onClick={() => router.push('/login')}
-            className={`px-4 py-2 rounded ${
+            className={clsx(
+              'px-4 py-2 rounded text-white',
               isDarkMode
-                ? 'bg-blue-700 hover:bg-blue-600 text-white'
-                : 'bg-blue-600 hover:bg-blue-700 text-white'
-            }`}
+                ? 'bg-blue-700 hover:bg-blue-600'
+                : 'bg-blue-600 hover:bg-blue-700'
+            )}
           >
             Go to Login
           </button>
@@ -225,7 +231,7 @@ export default function AIExamFlashCard() {
 
   const handleLoadProgress = (progress) => {
     setStudyConfig(progress.studyConfig);
-    setFlashcards(progress.flashcards);
+    setFlashcards(progress.flashcards || []);
     setAnsweredFlashcards(progress.answeredFlashcards || []);
     setCurrentFlashcardIndex(progress.currentFlashcardIndex || 0);
     setTimerDuration(progress.timerDuration || 0);
@@ -274,7 +280,7 @@ export default function AIExamFlashCard() {
       const response = await fetch('/api/generate-flashcards', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ config: studyConfig }), // changed from examConfig to studyConfig
+        body: JSON.stringify({ config: studyConfig }),
       });
       if (!response.ok) throw new Error('Failed generating');
       const { flashcards: newFCs } = await response.json();
@@ -322,7 +328,6 @@ export default function AIExamFlashCard() {
       },
     ]);
 
-    // If instant feedback is toggled on, reveal the answer right away:
     if (studyConfig.instantFeedback) {
       setIsAnswerRevealed(true);
     } else {
@@ -333,7 +338,6 @@ export default function AIExamFlashCard() {
   // Move to next flashcard
   const nextFlashcard = () => {
     setIsAnswerRevealed(false);
-    // Reset timer if needed
     if (studyConfig.resetTimerEveryQuestion && studyConfig.timerMinutes > 0) {
       startTimer(studyConfig.timerMinutes);
     }
@@ -347,14 +351,29 @@ export default function AIExamFlashCard() {
   // Final feedback modal
   const closeFinalFeedbackModal = () => setIsFinalFeedbackModalOpen(false);
 
+  // FRAMER MOTION container for the main area
+  const mainContainerVariants = {
+    hidden: { opacity: 0, y: 50 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.4, ease: 'easeInOut' },
+    },
+  };
+
   return (
-    <div className={`flex h-screen ${isDarkMode ? 'bg-slate-800' : 'bg-transparent'} rounded shadow-md`}>
-      {/* Sidebar */}
+    <div
+      className={clsx(
+        'relative flex h-screen transition-colors duration-500',
+        isDarkMode ? 'text-white' : 'text-gray-800'
+      )}
+    >
+      {/* Sidebar + overlay (mobile) */}
       <AnimatePresence>
         {isSidebarVisible && (
           <>
             <Sidebar
-              activeLink="/ailawtools/flashcards" // Adjust as needed
+              activeLink="/ailawtools/flashcards"
               isSidebarVisible={isSidebarVisible}
               toggleSidebar={toggleSidebar}
               isDarkMode={isDarkMode}
@@ -370,121 +389,166 @@ export default function AIExamFlashCard() {
         )}
       </AnimatePresence>
 
-      <main className="flex-1 flex flex-col p-4 overflow-auto">
-        {/* Top Bar */}
-       <div className="flex items-center justify-between mb-6">
-                <button
-                  onClick={toggleSidebar}
-                  className={`text-gray-600 hover:text-gray-400`}
-                  aria-label={isSidebarVisible ? 'Hide Sidebar' : 'Show Sidebar'}
+      {/* Main content container */}
+      <main className="flex-1 flex flex-col px-6 relative z-200 h-screen">
+        {/* Top bar */}
+        <div className="flex items-center justify-between">
+          <button
+            onClick={toggleSidebar}
+            className={clsx(
+              'text-blue-900 dark:text-white p-2 rounded transition-colors hover:bg-black/10 focus:outline-none md:hidden'
+            )}
+            aria-label={isSidebarVisible ? 'Hide Sidebar' : 'Show Sidebar'}
+          >
+            <AnimatePresence mode="wait" initial={false}>
+              {isSidebarVisible ? (
+                <motion.div
+                  key="close-icon"
+                  initial={{ rotate: 90, opacity: 0 }}
+                  animate={{ rotate: 0, opacity: 1 }}
+                  exit={{ rotate: -90, opacity: 0 }}
+                  transition={{ duration: 0.3 }}
                 >
-                  <AnimatePresence mode="wait" initial={false}>
-                    {isSidebarVisible ? (
-                      <motion.div
-                        key="close-icon"
-                        initial={{ rotate: 90, opacity: 0 }}
-                        animate={{ rotate: 0, opacity: 1 }}
-                        exit={{ rotate: -90, opacity: 0 }}
-                        transition={{ duration: 0.3 }}
-                      >
-                        <FaTimes size={24} />
-                      </motion.div>
-                    ) : (
-                      <motion.div
-                        key="menu-icon"
-                        initial={{ rotate: -90, opacity: 0 }}
-                        animate={{ rotate: 0, opacity: 1 }}
-                        exit={{ rotate: 90, opacity: 0 }}
-                        transition={{ duration: 0.3 }}
-                      >
-                        <FaBars size={24} />
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </button>
-          {/* Timer display */}
-          <div className="text-lg font-semibold">
-            {timeLeft > 0 ? `Time Left: ${formatTime()}` : ''}
-          </div>
-
-          {/* Buttons: Save, Load, Configure */}
-          <div className="inline-flex flex-row flex-nowrap items-center gap-2 sm:gap-4">
-            <button
-              onClick={openLoadProgressModal}
-              className={`group relative h-10 sm:h-12 w-28 sm:w-40 overflow-hidden rounded ${
-                isDarkMode ? 'bg-blue-700' : 'bg-blue-950'
-              } text-white duration-200 before:absolute before:right-0 before:top-0 before:h-full before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-56 text-sm sm:text-base shadow-md`}
-              aria-label="Load Progress"
-            >
-              Load Progress
-            </button>
-            <button
-              onClick={openConfigModal}
-              className={`group relative h-10 sm:h-12 w-28 sm:w-40 overflow-hidden rounded ${
-                isDarkMode ? 'bg-blue-700' : 'bg-blue-950'
-              } text-white duration-200 before:absolute before:right-0 before:top-0 before:h-full before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-56 text-sm sm:text-base shadow-md`}
-              aria-label="Configure Flashcards"
-            >
-              Configure
-            </button>
-          </div>
+                  <FaTimes size={20} />
+                </motion.div>
+              ) : (
+                <motion.div
+                  key="bars-icon"
+                  initial={{ rotate: -90, opacity: 0 }}
+                  animate={{ rotate: 0, opacity: 1 }}
+                  exit={{ rotate: 90, opacity: 0 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <FaBars size={20} />
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </button>
         </div>
 
-        {/* Main Flashcard Area */}
-        <div className="flex-1 flex flex-col items-center justify-center w-full max-w-3xl mx-auto">
-          {/* No flashcards yet */}
+        {/* Container for content (mirroring IRAC styling) */}
+        <motion.div
+          className={clsx(
+            'flex-1 w-full rounded-2xl shadow-xl p-6 overflow-y-auto',
+            isDarkMode
+              ? 'bg-gradient-to-br from-slate-900 to-blue-950 text-white'
+              : 'bg-white text-gray-800'
+          )}
+          variants={mainContainerVariants}
+          initial="hidden"
+          animate="visible"
+        >
+          {/* Top row: Timer and config buttons */}
+          <div className="flex items-center justify-between mb-4">
+            <div className="text-lg font-semibold">
+              {timeLeft > 0 ? `Time Left: ${formatTime()}` : ''}
+            </div>
+            <div className="inline-flex flex-row flex-nowrap items-center gap-2 sm:gap-4">
+              {/* Load Progress Button */}
+              <button
+                           onClick={openLoadProgressModal}
+                           className={clsx(
+                             'flex items-center justify-center w-10 h-10 rounded-full bg-transparent',
+                             'hover:text-slate-200 transition-colors duration-200',
+                             isDarkMode ? 'text-gray-200' : 'text-blue-950'
+                           )}
+                           aria-label="Load IRAC Progress"
+                         >
+                           <motion.div
+                             whileHover={{ scale: 1.2, rotate: 360 }}
+                             transition={{ duration: 0.5 }}
+                           >
+                             <FaSyncAlt size={20} />
+                           </motion.div>
+                         </button>
+
+              {/* Configure Button */}
+              <button
+                           onClick={openConfigModal}
+                           className={clsx(
+                             'group relative h-10 sm:h-12 px-4 sm:px-6 overflow-hidden rounded-md text-white duration-200',
+                             isDarkMode ? 'bg-blue-700' : 'bg-blue-950',
+                             'before:absolute before:right-0 before:top-0 before:h-full before:w-5 ' +
+                               'before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 ' +
+                               'before:duration-700 hover:before:-translate-x-56 text-xs sm:text-base shadow-md'
+                           )}
+                           aria-label="Configure IRAC"
+                         >
+                           Configure
+                         </button>
+            </div>
+          </div>
+
+          {/* If no flashcards generated */}
           {flashcards.length === 0 && !isLoading && (
             <div
-              className={`w-full max-w-3xl p-6 ${
-                isDarkMode ? 'bg-slate-700' : 'bg-white'
-              } rounded-lg shadow-md text-center`}
+              className={clsx(
+                'w-full max-w-3xl p-6 rounded-lg shadow-md text-center mx-auto',
+                isDarkMode ? 'bg-slate-700 text-white' : 'bg-white text-black'
+              )}
             >
               <h2
-                className={`text-2xl font-semibold mb-4 ${
+                className={clsx(
+                  'text-2xl font-semibold mb-4',
                   isDarkMode ? 'text-white' : 'text-blue-900'
-                }`}
+                )}
               >
                 No flashcards generated yet.
               </h2>
-              <p className={`${isDarkMode ? 'text-gray-300' : 'text-gray-500'}`}>
+              <p
+                className={clsx(
+                  isDarkMode ? 'text-gray-300' : 'text-gray-500'
+                )}
+              >
                 Click <strong>Configure</strong> to set up your flashcards.
               </p>
             </div>
           )}
 
-          {/* Loading bar in place of text */}
+          {/* Loading bar */}
           {isLoading && (
             <div className="w-full h-1 bg-blue-500 z-50 animate-pulse my-4" />
           )}
 
-          {/* Display current flashcard */}
-          {flashcards.length > 0 && currentFlashcard && (
+          {/* Flashcard display */}
+          {flashcards.length > 0 && flashcards[currentFlashcardIndex] && (
             <motion.div
               key={currentFlashcardIndex}
-              className={`relative w-full max-w-xl p-6 my-4 rounded-xl shadow-md ${
+              className={clsx(
+                'relative w-full max-w-xl p-6 my-4 rounded-xl shadow-md',
                 isDarkMode ? 'bg-gray-800 text-white' : 'bg-white text-gray-700'
-              }`}
+              )}
               initial={{ opacity: 0, y: 50 }}
               animate={{ opacity: 1, y: 0 }}
             >
               <h2 className="text-xl font-semibold mb-2">Question:</h2>
-              <p className="mb-4">{currentFlashcard.question}</p>
+              <p className="mb-4">
+                {flashcards[currentFlashcardIndex].question}
+              </p>
 
               {isAnswerRevealed ? (
                 <>
-                  <h3 className="text-lg font-semibold mb-2 text-blue-500">Answer:</h3>
+                  <h3
+                    className={clsx(
+                      'text-lg font-semibold mb-2',
+                      isDarkMode ? 'text-blue-300' : 'text-blue-500'
+                    )}
+                  >
+                    Answer:
+                  </h3>
                   <p className="mb-4">
-                    {currentFlashcard.correctAnswer || currentFlashcard.answer}
+                    {flashcards[currentFlashcardIndex].correctAnswer ||
+                      flashcards[currentFlashcardIndex].answer}
                   </p>
                   <div className="mt-4 flex justify-between">
                     <button
-                      onClick={markIncorrect}
+                      onClick={() => recordAnswer(false)}
                       className="px-4 py-2 rounded bg-red-500 hover:bg-red-600 text-white"
                     >
                       I Got It Wrong
                     </button>
                     <button
-                      onClick={markCorrect}
+                      onClick={() => recordAnswer(true)}
                       className="px-4 py-2 rounded bg-emerald-500 hover:bg-emerald-600 text-white"
                     >
                       I Got It Right
@@ -494,12 +558,13 @@ export default function AIExamFlashCard() {
               ) : (
                 <div className="flex justify-center">
                   <button
-                    onClick={handleShowAnswer}
-                    className={`px-4 py-2 rounded ${
+                    onClick={() => setIsAnswerRevealed(true)}
+                    className={clsx(
+                      'px-4 py-2 rounded',
                       isDarkMode
                         ? 'bg-blue-700 hover:bg-blue-600 text-white'
                         : 'bg-blue-600 hover:bg-blue-700 text-white'
-                    }`}
+                    )}
                   >
                     Show Answer
                   </button>
@@ -510,361 +575,460 @@ export default function AIExamFlashCard() {
 
           {/* Flashcard progress info */}
           {flashcards.length > 0 && (
-            <div className="mt-2 text-sm text-gray-400">
+            <div className="mt-2 text-sm text-gray-400 text-center">
               <p>
                 Questions Answered: {answeredFlashcards.length} / {studyConfig.questionLimit}
               </p>
             </div>
           )}
-        </div>
-      </main>
+        </motion.div>
 
-      {/* Load Progress Modal */}
-      <AnimatePresence>
-        {isLoadProgressModalOpen && (
-          <motion.div
-            className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-          >
+        {/* Load Progress Modal */}
+        <AnimatePresence>
+          {isLoadProgressModalOpen && (
             <motion.div
-              className={`p-6 rounded-lg w-11/12 max-w-3xl shadow-lg overflow-y-auto max-h-screen ${
-                isDarkMode ? 'bg-gray-800 text-white' : 'bg-white text-gray-800'
-              }`}
-              initial={{ scale: 0.8, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.8, opacity: 0 }}
-              transition={{ duration: 0.3 }}
+              className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
             >
-              <h2 className="text-2xl font-semibold mb-4">Load Saved Progress</h2>
-              {savedProgresses.length === 0 ? (
-                <p>No saved progress found.</p>
-              ) : (
-                <ul className="space-y-4">
-                  {savedProgresses.map((prog) => (
-                    <li
-                      key={prog.id}
-                      className={`p-4 border rounded ${
-                        isDarkMode ? 'border-gray-700' : 'border-gray-300'
-                      }`}
-                    >
-                      <div className="flex justify-between items-start">
-                        <div>
-                          <p className="font-semibold text-blue-400 mb-1">
-                            Study Year: {prog.studyConfig?.studyYear}
-                          </p>
-                          <p className="text-sm">Proficiency: {prog.studyConfig?.proficiency}</p>
-                          <p className="text-sm">Course: {prog.studyConfig?.courseName}</p>
-                          <p className="text-sm">Questions: {prog.studyConfig?.questionLimit}</p>
-                          <p className="text-sm">
-                            Timer: {prog.studyConfig?.timerMinutes || 0} min
-                          </p>
-                          <p className="text-sm">
-                            Reset Timer:{' '}
-                            {prog.studyConfig?.resetTimerEveryQuestion ? 'Yes' : 'No'}
-                          </p>
-                          <p className="text-sm">
-                            Instant Feedback:{' '}
-                            {prog.studyConfig?.instantFeedback ? 'Yes' : 'No'}
-                          </p>
-                          <p className="text-sm">
-                            Saved on: {new Date(prog.timestamp).toLocaleString()}
-                          </p>
+              <motion.div
+                className={clsx(
+                  'p-6 rounded-lg w-11/12 max-w-3xl shadow-lg overflow-y-auto max-h-screen',
+                  isDarkMode ? 'bg-gray-800 text-white' : 'bg-white text-gray-800'
+                )}
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.8, opacity: 0 }}
+                transition={{ duration: 0.3 }}
+              >
+                <h2 className="text-2xl font-semibold mb-4">Load Saved Progress</h2>
+                {savedProgresses.length === 0 ? (
+                  <p>No saved progress found.</p>
+                ) : (
+                  <ul className="space-y-4">
+                    {savedProgresses.map((prog) => (
+                      <li
+                        key={prog.id}
+                        className={clsx(
+                          'p-4 border rounded',
+                          isDarkMode ? 'border-gray-700' : 'border-gray-300'
+                        )}
+                      >
+                        <div className="flex justify-between items-start">
+                          <div>
+                            <p className="font-semibold text-blue-400 mb-1">
+                              Study Year: {prog.studyConfig?.studyYear}
+                            </p>
+                            <p className="text-sm">Proficiency: {prog.studyConfig?.proficiency}</p>
+                            <p className="text-sm">Course: {prog.studyConfig?.courseName}</p>
+                            <p className="text-sm">Questions: {prog.studyConfig?.questionLimit}</p>
+                            <p className="text-sm">
+                              Timer: {prog.studyConfig?.timerMinutes || 0} min
+                            </p>
+                            <p className="text-sm">
+                              Reset Timer:{' '}
+                              {prog.studyConfig?.resetTimerEveryQuestion ? 'Yes' : 'No'}
+                            </p>
+                            <p className="text-sm">
+                              Instant Feedback:{' '}
+                              {prog.studyConfig?.instantFeedback ? 'Yes' : 'No'}
+                            </p>
+                            <p className="text-sm">
+                              Saved on: {new Date(prog.timestamp).toLocaleString()}
+                            </p>
+                          </div>
+                          <div className="flex space-x-2">
+                            <button
+                              onClick={() => handleLoadProgress(prog)}
+                              className={clsx(
+                                'h-10 w-20 sm:w-24 overflow-hidden rounded transition-colors duration-200 text-sm sm:text-base',
+                                isDarkMode
+                                  ? 'bg-blue-700 hover:bg-blue-600'
+                                  : 'bg-blue-700 hover:bg-blue-800',
+                                'text-white'
+                              )}
+                            >
+                              Load
+                            </button>
+                            <button
+                              onClick={() => handleDeleteProgress(prog.id)}
+                              className="h-10 w-20 sm:w-24 overflow-hidden rounded bg-red-600 text-white transition-colors duration-200 hover:bg-red-700 text-sm sm:text-base"
+                            >
+                              Delete
+                            </button>
+                          </div>
                         </div>
-                        <div className="flex space-x-2">
-                          <button
-                            onClick={() => handleLoadProgress(prog)}
-                            className={`h-10 w-20 sm:w-24 overflow-hidden rounded ${
-                              isDarkMode
-                                ? 'bg-blue-700 hover:bg-blue-600'
-                                : 'bg-blue-700 hover:bg-blue-800'
-                            } text-white transition-colors duration-200 text-sm sm:text-base`}
-                          >
-                            Load
-                          </button>
-                          <button
-                            onClick={() => handleDeleteProgress(prog.id)}
-                            className="h-10 w-20 sm:w-24 overflow-hidden rounded bg-red-600 text-white transition-colors duration-200 hover:bg-red-700 text-sm sm:text-base"
-                          >
-                            Delete
-                          </button>
-                        </div>
-                      </div>
-                    </li>
-                  ))}
-                </ul>
-              )}
-              <div className="text-right mt-4">
-                <button
-                  onClick={closeLoadProgressModal}
-                  className={`h-10 sm:h-12 px-4 py-2 rounded ${
-                    isDarkMode
-                      ? 'bg-gray-700 hover:bg-gray-600 text-white'
-                      : 'bg-gray-300 hover:bg-gray-400 text-gray-800'
-                  }`}
-                >
-                  Close
-                </button>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Final Feedback Modal */}
-      <AnimatePresence>
-        {isFinalFeedbackModalOpen && (
-          <motion.div
-            className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-          >
-            <motion.div
-              className={`p-6 rounded-lg w-11/12 max-w-3xl shadow-lg max-h-[80vh] overflow-y-auto ${
-                isDarkMode ? 'bg-gray-800 text-white' : 'bg-white text-gray-800'
-              }`}
-              initial={{ scale: 0.8, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.8, opacity: 0 }}
-              transition={{ duration: 0.3 }}
-            >
-              <h2 className="text-2xl font-semibold mb-4">Final Feedback</h2>
-              {answeredFlashcards.map((card, idx) => (
-                <div
-                  key={idx}
-                  className={`mb-4 p-4 rounded border ${
-                    isDarkMode ? 'border-gray-700' : 'border-gray-300'
-                  }`}
-                >
-                  <p className="font-semibold text-blue-400 mb-1">Flashcard {idx + 1}</p>
-                  <p>
-                    <strong>Question:</strong> {card.question}
-                  </p>
-                  <p>
-                    <strong>Correct Answer:</strong> {card.correctAnswer}
-                  </p>
-                  <p
-                    className={`font-bold mt-1 ${
-                      card.isCorrect ? 'text-emerald-500' : 'text-red-500'
-                    }`}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+                <div className="text-right mt-4">
+                  <button
+                    onClick={closeLoadProgressModal}
+                    className={clsx(
+                      'h-10 sm:h-12 px-4 py-2 rounded',
+                      isDarkMode
+                        ? 'bg-gray-700 hover:bg-gray-600 text-white'
+                        : 'bg-gray-300 hover:bg-gray-400 text-gray-800'
+                    )}
                   >
-                    {card.isCorrect ? '✓ You got it right' : '✗ You got it wrong'}
+                    Close
+                  </button>
+                </div>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Final Feedback Modal */}
+        <AnimatePresence>
+          {isFinalFeedbackModalOpen && (
+            <motion.div
+              className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+            >
+              <motion.div
+                className={clsx(
+                  'p-6 rounded-lg w-11/12 max-w-3xl shadow-lg max-h-[80vh] overflow-y-auto',
+                  isDarkMode ? 'bg-gray-800 text-white' : 'bg-white text-gray-800'
+                )}
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.8, opacity: 0 }}
+                transition={{ duration: 0.3 }}
+              >
+                <h2 className="text-2xl font-semibold mb-4">Final Feedback</h2>
+                {answeredFlashcards.map((card, idx) => (
+                  <div
+                    key={idx}
+                    className={clsx(
+                      'mb-4 p-4 rounded border',
+                      isDarkMode ? 'border-gray-700' : 'border-gray-300'
+                    )}
+                  >
+                    <p
+                      className={clsx(
+                        'font-semibold mb-1',
+                        isDarkMode ? 'text-blue-300' : 'text-blue-900'
+                      )}
+                    >
+                      Flashcard {idx + 1}
+                    </p>
+                    <p>
+                      <strong>Question:</strong> {card.question}
+                    </p>
+                    <p>
+                      <strong>Answer:</strong> {card.correctAnswer || card.answer}
+                    </p>
+                    <p
+                      className={clsx(
+                        'font-bold mt-1',
+                        card.isCorrect ? 'text-emerald-500' : 'text-red-500'
+                      )}
+                    >
+                      {card.isCorrect ? '✓ You got it right' : '✗ You got it wrong'}
+                    </p>
+                  </div>
+                ))}
+                <div className="text-right mt-4">
+                  <button
+                    onClick={closeFinalFeedbackModal}
+                    className={clsx(
+                      'h-10 sm:h-12 px-4 py-2 rounded font-semibold',
+                      isDarkMode
+                        ? 'bg-blue-700 hover:bg-blue-600 text-white'
+                        : 'bg-blue-600 hover:bg-blue-700 text-white'
+                    )}
+                  >
+                    Close
+                  </button>
+                </div>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Configuration Modal */}
+        <AnimatePresence>
+          {isConfigModalOpen && (
+            <motion.div
+              className={clsx(
+                'fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 overflow-y-scroll'
+              )}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+            >
+              <motion.div
+                className={clsx(
+                  'w-11/12 max-w-lg p-6 rounded shadow-lg overflow-y-auto',
+                  isDarkMode ? 'bg-gray-800 text-white' : 'bg-white text-gray-800'
+                )}
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.8, opacity: 0 }}
+                transition={{ duration: 0.3 }}
+              >
+                <div className="flex justify-between items-center mb-4">
+                  <h2 className="text-xl font-semibold">Flashcard Configuration</h2>
+                  <button
+                    onClick={closeConfigModal}
+                    className={clsx(
+                      'text-gray-500 hover:text-gray-700',
+                      isDarkMode ? 'hover:text-gray-300' : ''
+                    )}
+                  >
+                    ✕
+                  </button>
+                </div>
+
+                {/* Study Year */}
+                <div className="mb-4">
+                  <label className="block font-semibold mb-1">Year/Level:</label>
+                  <select
+                    name="studyYear"
+                    value={studyConfig.studyYear}
+                    onChange={handleConfigChange}
+                    className={clsx(
+                      'w-full p-3 border rounded',
+                      isDarkMode ? 'bg-gray-700 border-gray-600' : 'bg-gray-100 border-gray-300'
+                    )}
+                  >
+                    {studyYearMapping.map((item) => (
+                      <option key={item.value} value={item.value}>
+                        {item.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Proficiency */}
+                <div className="mb-4">
+                  <label className="block font-semibold mb-1">Proficiency:</label>
+                  <select
+                    name="proficiency"
+                    value={studyConfig.proficiency}
+                    onChange={handleConfigChange}
+                    className={clsx(
+                      'w-full p-3 border rounded',
+                      isDarkMode ? 'bg-gray-700 border-gray-600' : 'bg-gray-100 border-gray-300'
+                    )}
+                  >
+                    {proficiencyMapping.map((opt) => (
+                      <option key={opt.value} value={opt.value}>
+                        {opt.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Course Name */}
+                <div className="mb-4">
+                  <label className="block font-semibold mb-1">Course/Subject:</label>
+                  <select
+                    name="courseName"
+                    value={studyConfig.courseName}
+                    onChange={handleConfigChange}
+                    className={clsx(
+                      'w-full p-3 border rounded',
+                      isDarkMode ? 'bg-gray-700 border-gray-600' : 'bg-gray-100 border-gray-300'
+                    )}
+                  >
+                    {courseNameMapping.map((course, idx) => (
+                      <option key={idx} value={course}>
+                        {course}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Number of flashcards */}
+                <div className="mb-4">
+                  <label className="block font-semibold mb-1">Number of Flashcards:</label>
+                  <input
+                    type="range"
+                    min="1"
+                    max="20"
+                    name="questionLimit"
+                    value={studyConfig.questionLimit}
+                    onChange={handleConfigChange}
+                    className="w-full"
+                  />
+                  <p className="text-right">Selected: {studyConfig.questionLimit}</p>
+                </div>
+
+                {/* Timer field (minutes) */}
+                <div className="mb-4">
+                  <label className="block font-semibold mb-1">Timer (in minutes):</label>
+                  <input
+                    type="number"
+                    min="0"
+                    max="180"
+                    name="timerMinutes"
+                    value={studyConfig.timerMinutes}
+                    onChange={handleConfigChange}
+                    className={clsx(
+                      'w-full p-2 rounded',
+                      isDarkMode ? 'bg-gray-700 border-gray-600' : 'bg-gray-100 border-gray-300'
+                    )}
+                    placeholder="Enter a time limit (e.g. 30)"
+                  />
+                  <p className="text-sm text-gray-400 mt-1">
+                    If &gt; 0, a countdown starts once flashcards are generated.
                   </p>
                 </div>
-              ))}
-              <div className="text-right mt-4">
-                <button
-                  onClick={closeFinalFeedbackModal}
-                  className={`h-10 sm:h-12 px-4 py-2 rounded font-semibold ${
-                    isDarkMode
-                      ? 'bg-blue-700 hover:bg-blue-600 text-white'
-                      : 'bg-blue-600 hover:bg-blue-700 text-white'
-                  }`}
-                >
-                  Close
-                </button>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
 
-      {/* Configuration Modal */}
-      <AnimatePresence>
-        {isConfigModalOpen && (
-          <motion.div
-            className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 overflow-y-scroll"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-          >
-            <motion.div
-              className={`w-11/12 max-w-lg p-6 rounded shadow-lg overflow-y-auto ${
-                isDarkMode ? 'bg-gray-800 text-white' : 'bg-white text-gray-800'
-              }`}
-              initial={{ scale: 0.8, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.8, opacity: 0 }}
-              transition={{ duration: 0.3 }}
-            >
-              <div className="flex justify-between items-center mb-4">
-                <h2 className="text-xl font-semibold">Flashcard Configuration</h2>
-                <button
-                  onClick={closeConfigModal}
-                  className={`text-gray-500 hover:text-gray-700 ${
-                    isDarkMode ? 'hover:text-gray-300' : ''
-                  }`}
-                >
-                  ✕
-                </button>
-              </div>
+                {/* Reset Timer On Each Question */}
+                <div className="flex items-center mb-4">
+                  <input
+                    type="checkbox"
+                    name="resetTimerEveryQuestion"
+                    checked={studyConfig.resetTimerEveryQuestion}
+                    onChange={handleConfigChange}
+                    className="mr-2"
+                  />
+                  <label className="font-semibold text-sm">Reset Timer On Each Question</label>
+                </div>
 
-              {/* Study Year */}
-              <div className="mb-4">
-                <label className="block font-semibold mb-1">Year/Level:</label>
-                <select
-                  name="studyYear"
-                  value={studyConfig.studyYear}
-                  onChange={handleConfigChange}
-                  className={`w-full p-3 border rounded ${
-                    isDarkMode ? 'bg-gray-700 border-gray-600' : 'bg-gray-100 border-gray-300'
-                  }`}
-                >
-                  {studyYearMapping.map((item) => (
-                    <option key={item.value} value={item.value}>
-                      {item.label}
-                    </option>
-                  ))}
-                </select>
-              </div>
+                {/* Instant Feedback */}
+                <div className="flex items-center mb-4">
+                  <input
+                    type="checkbox"
+                    name="instantFeedback"
+                    checked={studyConfig.instantFeedback}
+                    onChange={handleConfigChange}
+                    className="mr-2"
+                  />
+                  <label className="font-semibold text-sm">
+                    Instant Feedback (reveal answer immediately upon marking correct/wrong)
+                  </label>
+                </div>
 
-              {/* Proficiency (difficulty) */}
-              <div className="mb-4">
-                <label className="block font-semibold mb-1">Proficiency:</label>
-                <select
-                  name="proficiency"
-                  value={studyConfig.proficiency}
-                  onChange={handleConfigChange}
-                  className={`w-full p-3 border rounded ${
-                    isDarkMode ? 'bg-gray-700 border-gray-600' : 'bg-gray-100 border-gray-300'
-                  }`}
-                >
-                  {proficiencyMapping.map((opt) => (
-                    <option key={opt.value} value={opt.value}>
-                      {opt.label}
-                    </option>
-                  ))}
-                </select>
-              </div>
+                {/* Include Explanations */}
+                <div className="flex items-center mb-4">
+                  <input
+                    type="checkbox"
+                    name="includeExplanations"
+                    checked={studyConfig.includeExplanations}
+                    onChange={handleConfigChange}
+                    className="mr-2"
+                  />
+                  <label className="font-semibold text-sm">Include Extended Explanations</label>
+                </div>
 
-              {/* Course Name */}
-              <div className="mb-4">
-                <label className="block font-semibold mb-1">Course/Subject:</label>
-                <select
-                  name="courseName"
-                  value={studyConfig.courseName}
-                  onChange={handleConfigChange}
-                  className={`w-full p-3 border rounded ${
-                    isDarkMode ? 'bg-gray-700 border-gray-600' : 'bg-gray-100 border-gray-300'
-                  }`}
-                >
-                  {courseNameMapping.map((course, idx) => (
-                    <option key={idx} value={course}>
-                      {course}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Number of flashcards */}
-              <div className="mb-4">
-                <label className="block font-semibold mb-1">Number of Flashcards:</label>
-                <input
-                  type="range"
-                  min="1"
-                  max="20"
-                  name="questionLimit"
-                  value={studyConfig.questionLimit}
-                  onChange={handleConfigChange}
-                  className="w-full"
-                />
-                <p className="text-right">Selected: {studyConfig.questionLimit}</p>
-              </div>
-
-              {/* Timer field (in minutes) */}
-              <div className="mb-4">
-                <label className="block font-semibold mb-1">Timer (in minutes):</label>
-                <input
-                  type="number"
-                  min="0"
-                  max="180"
-                  name="timerMinutes"
-                  value={studyConfig.timerMinutes}
-                  onChange={handleConfigChange}
-                  className={`w-full p-2 rounded ${
-                    isDarkMode ? 'bg-gray-700 border-gray-600' : 'bg-gray-100 border-gray-300'
-                  }`}
-                  placeholder="Enter a time limit (e.g., 30)"
-                />
-                <p className="text-sm text-gray-400 mt-1">
-                  If &gt; 0, a countdown starts once flashcards are generated.
-                </p>
-              </div>
-
-              {/* Reset Timer On Each Question */}
-              <div className="flex items-center mb-4">
-                <input
-                  type="checkbox"
-                  name="resetTimerEveryQuestion"
-                  checked={studyConfig.resetTimerEveryQuestion}
-                  onChange={handleConfigChange}
-                  className="mr-2"
-                />
-                <label className="font-semibold text-sm">Reset Timer On Each Question</label>
-              </div>
-
-              {/* Instant Feedback */}
-              <div className="flex items-center mb-4">
-                <input
-                  type="checkbox"
-                  name="instantFeedback"
-                  checked={studyConfig.instantFeedback}
-                  onChange={handleConfigChange}
-                  className="mr-2"
-                />
-                <label className="font-semibold text-sm">
-                  Instant Feedback (reveal answer immediately upon marking correct/wrong)
-                </label>
-              </div>
-
-              {/* Include Explanations */}
-              <div className="flex items-center mb-4">
-                <input
-                  type="checkbox"
-                  name="includeExplanations"
-                  checked={studyConfig.includeExplanations}
-                  onChange={handleConfigChange}
-                  className="mr-2"
-                />
-                <label className="font-semibold text-sm">Include Extended Explanations</label>
-              </div>
-
-              {/* Action Buttons */}
-              <div className="flex justify-end space-x-4">
-                 <button
-       type="button"
-      onClick={handleGenerateFlashcards}
-     className="relative h-12 w-full sm:w-56 overflow-hidden rounded bg-blue-950 text-white shadow-lg transition-colors duration-200 before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-56"
-     aria-label="Start Tutoring Session"
- >
-  Start Flashcards
-         <motion.span
-     className="absolute right-4 top-3"
-             initial={{ x: -10, opacity: 0 }}
-                                 animate={{ x: 0, opacity: 1 }}
-                        transition={{ delay: 0.3, duration: 0.3 }}
-                              >
-             <i className="fa-solid fa-arrow-right"></i>
-               </motion.span>
-                       </button>
-                 <button
+                {/* Action Buttons */}
+                <div className="flex justify-end space-x-4">
+                  <button
+                    type="button"
+                    onClick={handleGenerateFlashcards}
+                    className={clsx(
+                      'relative h-12 w-full sm:w-56 overflow-hidden rounded bg-blue-950 text-white shadow-lg transition-colors duration-200',
+                      'before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 ' +
+                        'before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-56'
+                    )}
+                    aria-label="Start Flashcards"
+                  >
+                    Start Flashcards
+                    <motion.span
+                      className="absolute right-4 top-3"
+                      initial={{ x: -10, opacity: 0 }}
+                      animate={{ x: 0, opacity: 1 }}
+                      transition={{ delay: 0.3, duration: 0.3 }}
+                    >
+                      <i className="fa-solid fa-arrow-right"></i>
+                    </motion.span>
+                  </button>
+                  <button
                     type="button"
                     onClick={closeConfigModal}
-                    className={`h-10 sm:h-12 px-6 py-2 rounded ${
+                    className={clsx(
+                      'h-10 sm:h-12 px-6 py-2 rounded text-sm sm:text-base transition-colors duration-200',
                       isDarkMode
                         ? 'bg-gray-600 text-gray-300 hover:bg-gray-500'
                         : 'bg-gray-300 text-gray-700 hover:bg-gray-400'
-                    } transition-colors duration-200 text-sm sm:text-base`}
+                    )}
                   >
                     Cancel
                   </button>
-              </div>
+                </div>
+              </motion.div>
             </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+          )}
+        </AnimatePresence>
+
+        {/* Final Feedback Modal */}
+        <AnimatePresence>
+          {isFinalFeedbackModalOpen && (
+            <motion.div
+              className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+            >
+              <motion.div
+                className={clsx(
+                  'p-6 rounded-lg w-11/12 max-w-3xl shadow-lg max-h-[80vh] overflow-y-auto',
+                  isDarkMode ? 'bg-gray-800 text-white' : 'bg-white text-gray-800'
+                )}
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.8, opacity: 0 }}
+                transition={{ duration: 0.3 }}
+              >
+                <h2 className="text-2xl font-semibold mb-4">Final Feedback</h2>
+                {answeredFlashcards.map((card, idx) => (
+                  <div
+                    key={idx}
+                    className={clsx(
+                      'mb-4 p-4 rounded border',
+                      isDarkMode ? 'border-gray-700' : 'border-gray-300'
+                    )}
+                  >
+                    <p
+                      className={clsx(
+                        'font-semibold mb-1',
+                        isDarkMode ? 'text-blue-300' : 'text-blue-900'
+                      )}
+                    >
+                      Flashcard {idx + 1}
+                    </p>
+                    <p>
+                      <strong>Question:</strong> {card.question}
+                    </p>
+                    <p>
+                      <strong>Answer:</strong> {card.correctAnswer || card.answer}
+                    </p>
+                    <p
+                      className={clsx(
+                        'font-bold mt-1',
+                        card.isCorrect ? 'text-emerald-500' : 'text-red-500'
+                      )}
+                    >
+                      {card.isCorrect ? '✓ You got it right' : '✗ You got it wrong'}
+                    </p>
+                  </div>
+                ))}
+                <div className="text-right mt-4">
+                  <button
+                    onClick={closeFinalFeedbackModal}
+                    className={clsx(
+                      'h-10 sm:h-12 px-4 py-2 rounded font-semibold',
+                      isDarkMode
+                        ? 'bg-blue-700 hover:bg-blue-600 text-white'
+                        : 'bg-blue-600 hover:bg-blue-700 text-white'
+                    )}
+                  >
+                    Close
+                  </button>
+                </div>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </main>
     </div>
   );
 }
