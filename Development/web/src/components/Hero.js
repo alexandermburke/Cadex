@@ -316,10 +316,9 @@ export default function Hero() {
           <p
             className={`text-center text-2xl sm:text-2xl md:text-2xl ${
               isDarkMode ? 'text-white' : 'text-slate-700'
-            } max-w-2xl my-0`}
+            } max-w-2xl mb-10`}
           >
-            By law students, for law students. Our platform combines expert insights and modern
-            technology to deliver high quality preparation at up to{' '}
+            By law students, for law students. Our platform combines expert insights and AI to deliver high quality preparation at up to{' '}
             <span className="goldSolid font-bold">70% lower costs</span> than
             traditional competitors.
           </p>

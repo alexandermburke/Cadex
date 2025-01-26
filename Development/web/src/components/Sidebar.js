@@ -1,6 +1,6 @@
 'use client';
-
-import React, { useState } from 'react';
+ 
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
@@ -29,10 +29,14 @@ import {
   FaComment,
   FaChevronDown,
   FaChevronUp,
+  FaVideo,
+  FaPlayCircle,
+  FaChalkboardTeacher,
+  FaLightbulb
 } from 'react-icons/fa';
 import { motion } from 'framer-motion';
 import clsx from 'clsx';
-
+ 
 const NavLink = ({ href, icon, label, active }) => (
   <li>
     <Link
@@ -51,7 +55,7 @@ const NavLink = ({ href, icon, label, active }) => (
     </Link>
   </li>
 );
-
+ 
 const LockedNavLink = ({ icon, label }) => (
   <li>
     <div className="flex items-center justify-between gap-2 p-3 text-gray-400 cursor-not-allowed">
@@ -63,14 +67,8 @@ const LockedNavLink = ({ icon, label }) => (
     </div>
   </li>
 );
-
-const ToggleSection = ({
-  isOpen,
-  toggle,
-  title,
-  icon,
-  children,
-}) => (
+ 
+const ToggleSection = ({ isOpen, toggle, title, icon, children }) => (
   <section>
     <button
       onClick={toggle}
@@ -85,36 +83,103 @@ const ToggleSection = ({
       {isOpen ? <FaChevronUp /> : <FaChevronDown />}
     </button>
     {isOpen && (
-      <ul
-        id={`${title}-section`}
-        className="mt-2 ml-6 space-y-1"
-      >
+      <ul id={`${title}-section`} className="mt-2 ml-6 space-y-1">
         {children}
       </ul>
     )}
   </section>
 );
-
+ 
 export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, isAiTutor }) {
   const router = useRouter();
   const { currentUser, userDataObj } = useAuth();
-
   const plan = userDataObj?.billing?.plan?.toLowerCase() || 'free';
   const isDarkMode = userDataObj?.darkMode || false;
-
-  // Access logic
   const isFree = plan === 'free';
-  const isBasic = plan === 'basic';
-  const isPro = plan === 'pro';
-
+  const isBasic = plan === 'free';
+  const isPro = plan === 'free';
+ 
   const [isCaseBriefBankOpen, setIsCaseBriefBankOpen] = useState(false);
   const [isStudyToolsOpen, setIsStudyToolsOpen] = useState(false);
   const [isExamPrepOpen, setIsExamPrepOpen] = useState(false);
   const [isSubjectGuidesOpen, setIsSubjectGuidesOpen] = useState(false);
-
-  // New state for All Apps / My Apps toggle
   const [showAllApps, setShowAllApps] = useState(true);
 
+  // New sections
+  const [isVideoLessonsOpen, setIsVideoLessonsOpen] = useState(false);
+  const [isQuimbeeOpen, setIsQuimbeeOpen] = useState(false);
+ 
+  useEffect(() => {
+    const storedCaseBriefBankOpen = localStorage.getItem('isCaseBriefBankOpen');
+    if (storedCaseBriefBankOpen) {
+      setIsCaseBriefBankOpen(storedCaseBriefBankOpen === 'true');
+    }
+    const storedStudyToolsOpen = localStorage.getItem('isStudyToolsOpen');
+    if (storedStudyToolsOpen) {
+      setIsStudyToolsOpen(storedStudyToolsOpen === 'true');
+    }
+    const storedExamPrepOpen = localStorage.getItem('isExamPrepOpen');
+    if (storedExamPrepOpen) {
+      setIsExamPrepOpen(storedExamPrepOpen === 'true');
+    }
+    const storedSubjectGuidesOpen = localStorage.getItem('isSubjectGuidesOpen');
+    if (storedSubjectGuidesOpen) {
+      setIsSubjectGuidesOpen(storedSubjectGuidesOpen === 'true');
+    }
+    // New sections
+    const storedVideoLessonsOpen = localStorage.getItem('isVideoLessonsOpen');
+    if (storedVideoLessonsOpen) {
+      setIsVideoLessonsOpen(storedVideoLessonsOpen === 'true');
+    }
+    const storedQuimbeeOpen = localStorage.getItem('isQuimbeeOpen');
+    if (storedQuimbeeOpen) {
+      setIsQuimbeeOpen(storedQuimbeeOpen === 'true');
+    }
+  }, []);
+ 
+  const toggleCaseBriefBank = () => {
+    setIsCaseBriefBankOpen(prev => {
+      localStorage.setItem('isCaseBriefBankOpen', !prev);
+      return !prev;
+    });
+  };
+ 
+  const toggleStudyTools = () => {
+    setIsStudyToolsOpen(prev => {
+      localStorage.setItem('isStudyToolsOpen', !prev);
+      return !prev;
+    });
+  };
+ 
+  const toggleExamPrep = () => {
+    setIsExamPrepOpen(prev => {
+      localStorage.setItem('isExamPrepOpen', !prev);
+      return !prev;
+    });
+  };
+ 
+  const toggleSubjectGuides = () => {
+    setIsSubjectGuidesOpen(prev => {
+      localStorage.setItem('isSubjectGuidesOpen', !prev);
+      return !prev;
+    });
+  };
+
+  // New sections toggles
+  const toggleVideoLessons = () => {
+    setIsVideoLessonsOpen(prev => {
+      localStorage.setItem('isVideoLessonsOpen', !prev);
+      return !prev;
+    });
+  };
+
+  const toggleQuimbee = () => {
+    setIsQuimbeeOpen(prev => {
+      localStorage.setItem('isQuimbeeOpen', !prev);
+      return !prev;
+    });
+  };
+ 
   const sidebarVariants = {
     hidden: {
       x: '-100%',
@@ -131,20 +196,18 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, i
       },
     },
   };
-
+ 
   const sidebarBackground = clsx({
     'bg-gradient-to-br from-blue-900 to-purple-900': isDarkMode,
     'bg-gradient-to-br from-blue-950 to-slate-950': !isDarkMode,
   });
-
-  // Plan badge styling
+ 
   const planBadgeStyle = (() => {
     if (isPro) return 'bg-gradient-to-r from-amber-400 to-amber-600 text-white';
     if (isBasic) return 'bg-gradient-to-r from-teal-400 to-teal-600 text-white';
-    // default (free)
     return 'bg-gradient-to-r from-blue-400 to-blue-600 text-white';
   })();
-
+ 
   return (
     <motion.aside
       className={`z-[9999] fixed top-0 left-0 w-96 h-full ${sidebarBackground} text-white flex flex-col md:relative md:translate-x-0 overflow-y-auto transition-colors duration-500 shadow-md rounded-md`}
@@ -154,18 +217,14 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, i
       exit="hidden"
       aria-label="Sidebar Navigation"
     >
-      {/* Sidebar Header */}
       <div className="p-6 flex items-center justify-center bg-opacity-20">
         <h1 className="text-4xl font-normal relative overflow-hidden">
           Dashboard
         </h1>
       </div>
-
-      {/* All Apps / My Apps Toggle */}
+ 
       <section className="flex items-center justify-center gap-4 my-4 px-6">
-        <span className="font-semibold">
-          My Apps
-        </span>
+        <span className="font-semibold">My Apps</span>
         <div className="relative inline-block w-14 h-8 select-none transition duration-200 ease-in">
           <input
             type="checkbox"
@@ -188,21 +247,16 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, i
             ></span>
           </label>
         </div>
-        <span className="font-semibold">
-          All Apps
-        </span>
+        <span className="font-semibold">All Apps</span>
       </section>
-
-      {/* Navigation */}
+ 
       <nav className="flex-1 px-6 py-4 space-y-6">
-        {/* Case Brief Bank */}
         <ToggleSection
           isOpen={isCaseBriefBankOpen}
-          toggle={() => setIsCaseBriefBankOpen(!isCaseBriefBankOpen)}
+          toggle={toggleCaseBriefBank}
           title="Case Brief Bank"
           icon={<FaFolderOpen className="text-lg" />}
         >
-          {/* These can be free for everyone */}
           <NavLink
             href="/casebriefs/summaries"
             icon={<FaBookOpen className="text-sm" />}
@@ -222,15 +276,13 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, i
             active={activeLink === '/casebriefs/allbriefs'}
           />
         </ToggleSection>
-
-        {/* Study Tools */}
+ 
         <ToggleSection
           isOpen={isStudyToolsOpen}
-          toggle={() => setIsStudyToolsOpen(!isStudyToolsOpen)}
+          toggle={toggleStudyTools}
           title="Study Tools"
           icon={<FaTools className="text-lg" />}
         >
-          {/* Free Resources */}
           <NavLink
             href="/lawtools/dictionary"
             icon={<FaBook className="text-sm" />}
@@ -243,8 +295,6 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, i
             label="Lecture Summaries"
             active={activeLink === '/lawtools/lecturesummaries'}
           />
-
-          {/* Generative Flashcards & IRAC Generator */}
           {isBasic || isPro ? (
             <NavLink
               href="/ailawtools/flashcards"
@@ -258,7 +308,6 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, i
               label="Flashcards & Outlines"
             />
           ) : null}
-
           {isBasic || isPro ? (
             <NavLink
               href="/ailawtools/irac"
@@ -273,15 +322,13 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, i
             />
           ) : null}
         </ToggleSection>
-
-        {/* Exam Prep */}
+ 
         <ToggleSection
           isOpen={isExamPrepOpen}
-          toggle={() => setIsExamPrepOpen(!isExamPrepOpen)}
+          toggle={toggleExamPrep}
           title="Exam Prep"
           icon={<FaClipboardList className="text-lg" />}
         >
-          {/* Practice Exams */}
           {isBasic || isPro ? (
             <NavLink
               href="/ailawtools/examprep/practice-exams"
@@ -295,8 +342,6 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, i
               label="Practice Exams"
             />
           ) : null}
-
-          {/* Time Management */}
           {isBasic || isPro ? (
             <NavLink
               href="/ailawtools/examprep/timemanagement"
@@ -310,8 +355,6 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, i
               label="Time Management"
             />
           ) : null}
-
-          {/* Exam Insights */}
           {isPro ? (
             <NavLink
               href="/ailawtools/examprep/insights"
@@ -325,8 +368,6 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, i
               label="Exam Insights"
             />
           ) : null}
-
-          {/* MBE Practice */}
           {isBasic || isPro ? (
             <NavLink
               href="/ailawtools/examprep/mbe"
@@ -340,8 +381,6 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, i
               label="MBE Practice"
             />
           ) : null}
-
-          {/* LExAPI Tutor */}
           {isPro ? (
             <NavLink
               href="/ailawtools/lexapi"
@@ -356,15 +395,13 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, i
             />
           ) : null}
         </ToggleSection>
-
-        {/* Subject Guides */}
+ 
         <ToggleSection
           isOpen={isSubjectGuidesOpen}
-          toggle={() => setIsSubjectGuidesOpen(!isSubjectGuidesOpen)}
+          toggle={toggleSubjectGuides}
           title="Subject Guides"
           icon={<FaBookReader className="text-lg" />}
         >
-          {/* Contracts */}
           {isFree || isBasic || isPro ? (
             <NavLink
               href="/subjects/contracts"
@@ -378,8 +415,6 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, i
               label="Contracts"
             />
           ) : null}
-
-          {/* Torts */}
           {isFree || isBasic || isPro ? (
             <NavLink
               href="/subjects/torts"
@@ -393,8 +428,6 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, i
               label="Torts"
             />
           ) : null}
-
-          {/* Criminal Law */}
           {isBasic || isPro ? (
             <NavLink
               href="/subjects/crimlaw"
@@ -408,8 +441,6 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, i
               label="Criminal Law"
             />
           ) : null}
-
-          {/* Property */}
           {isPro ? (
             <NavLink
               href="/subjects/property"
@@ -423,8 +454,6 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, i
               label="Property"
             />
           ) : null}
-
-          {/* Constitutional Law */}
           {isPro ? (
             <NavLink
               href="/subjects/constitutional-law"
@@ -440,6 +469,31 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, i
           ) : null}
         </ToggleSection>
 
+        {/* New Sections */}
+        <ToggleSection
+          isOpen={isVideoLessonsOpen}
+          toggle={toggleVideoLessons}
+          title="Video Lessons"
+          icon={<FaVideo className="text-lg" />}
+        >
+          <LockedNavLink
+            icon={<FaPlayCircle className="text-sm" />}
+            label="Directory (Coming Soon)"
+          />
+        </ToggleSection>
+
+        <ToggleSection
+          isOpen={isQuimbeeOpen}
+          toggle={toggleQuimbee}
+          title="Career & Internship Resources"
+          icon={<FaChalkboardTeacher className="text-lg" />}
+        >
+          <LockedNavLink
+            icon={<FaLightbulb className="text-sm" />}
+            label="Resume Review (Coming Soon)"
+          />
+        </ToggleSection>
+ 
         <section>
           <Link
             href="https://discord.gg/wKgH9ussWc"
@@ -450,7 +504,7 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, i
           </Link>
         </section>
       </nav>
-
+ 
       <footer className="px-6 py-4 bg-transparent">
         <div className="flex items-center gap-4">
           <div className="flex-1 min-w-0">
