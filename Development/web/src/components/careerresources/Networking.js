@@ -150,7 +150,7 @@ export default function NetworkingOpportunities() {
 
         <motion.div
           className={clsx(
-            'flex-1 w-full rounded-2xl shadow-xl p-6',
+            'flex-1 w-full rounded-2xl shadow-xl p-6 overflow-y-auto',
             isDarkMode
               ? 'bg-gradient-to-br from-slate-900 to-blue-950 text-white'
               : 'bg-white text-gray-800'

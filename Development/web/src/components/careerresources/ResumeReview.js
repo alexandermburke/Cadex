@@ -179,7 +179,7 @@ export default function ResumeReviewer() {
         {/* Container for Resume Reviewer */}
         <motion.div
           className={clsx(
-            'flex-1 w-full rounded-2xl shadow-xl p-6',
+            'flex-1 w-full rounded-2xl shadow-xl p-6 overflow-y-auto',
             isDarkMode
               ? 'bg-gradient-to-br from-slate-900 to-blue-950 text-white'
               : 'bg-white text-gray-800'
@@ -188,49 +188,78 @@ export default function ResumeReviewer() {
           initial="hidden"
           animate="visible"
         >
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Left Section: File Upload and AI Feedback */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            {/* Left Section: File Upload and AI Feedback (improved UI) */}
             <div
               className={clsx(
-                'p-4 flex flex-col space-y-4 rounded-lg border',
-                isDarkMode ? 'border-slate-700' : 'border-gray-300'
+                'p-6 rounded-lg shadow-md flex flex-col space-y-4',
+                isDarkMode
+                  ? 'bg-gradient-to-tr from-slate-800 to-slate-700 border border-slate-700'
+                  : 'bg-gradient-to-tr from-blue-50 to-blue-100 border border-blue-200'
               )}
             >
               <div className="flex flex-col space-y-2">
-                <label className="font-medium text-sm">
-                  Upload your Resume (PDF):
-                </label>
-                <input
-                  type="file"
-                  accept="application/pdf"
-                  onChange={handleResumeFileChange}
+                <h2
                   className={clsx(
-                    'border rounded-md text-sm p-2 bg-white',
-                    'focus:outline-none focus:ring-2 focus:ring-blue-500',
-                    isDarkMode && 'text-gray-800'
+                    'text-xl font-bold',
+                    isDarkMode ? 'text-blue-400' : 'text-blue-900'
                   )}
-                />
+                >
+                  Upload Your Resume
+                </h2>
+                <p className="text-sm">
+                  Upload your PDF resume to get instant AI-based feedback on how to
+                  improve it for the legal job market.
+                </p>
               </div>
 
-              <button
-                onClick={handleAnalyzeResume}
-                className={clsx(
-                  'flex items-center w-44 justify-center gap-2 px-4 py-2 bg-blue-700 rounded text-white',
-                  'hover:bg-blue-800 transition-colors'
-                )}
-              >
-                <FaUpload />
-                <span>Analyze Resume</span>
-              </button>
+              {/* Custom File Upload Button */}
+              <div className="flex flex-col md:flex-row md:items-center gap-4">
+                <label
+                  htmlFor="resume-upload"
+                  className={clsx(
+                    'cursor-pointer inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-700 rounded hover:bg-blue-800 focus:outline-none'
+                  )}
+                >
+                  <FaUpload className="mr-2" />
+                  <span>Select PDF</span>
+                </label>
+                <input
+                  id="resume-upload"
+                  type="file"
+                  accept="application/pdf"
+                  className="hidden"
+                  onChange={handleResumeFileChange}
+                />
 
+                {/* Analyze Button */}
+                <button
+                  onClick={handleAnalyzeResume}
+                  className={clsx(
+                    'flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium rounded text-white',
+                    'bg-blue-600 hover:bg-blue-700'
+                  )}
+                >
+                  <FaRobot />
+                  <span>Analyze Resume</span>
+                </button>
+              </div>
+
+              {/* Status / Feedback Display */}
               {uploadStatus && (
-                <p className="text-xs mt-1 italic">{uploadStatus}</p>
+                <p
+                  className={clsx(
+                    'text-sm italic mt-1',
+                    isDarkMode ? 'text-gray-200' : 'text-gray-700'
+                  )}
+                >
+                  {uploadStatus}
+                </p>
               )}
-
               {analysisResult && (
                 <div
                   className={clsx(
-                    'mt-3 p-4 rounded text-sm',
+                    'mt-4 p-4 rounded text-sm',
                     isDarkMode
                       ? 'bg-slate-800 text-gray-100'
                       : 'bg-gray-100 text-gray-900'
@@ -242,17 +271,17 @@ export default function ResumeReviewer() {
               )}
             </div>
 
-            {/* Right Section: PDF Preview (no border, sleek view) */}
+            {/* Right Section: PDF Preview */}
             <div className="flex flex-col">
               <div className="flex items-center gap-2 mb-2">
                 <h4 className="font-medium text-sm">Resume Preview</h4>
               </div>
-              <div className="relative w-full h-[600px] rounded overflow-hidden">
-                <iframe
-                  title="Resume Preview"
-                  src={pdfSrc}
+              <div className="relative w-full h-[600px] rounded overflow-hidden bg-white">
+                {/* Using embed with #toolbar=0 to remove default PDF controls */}
+                <embed
+                  src={`${pdfSrc}#toolbar=0&navpanes=0&scrollbar=0`}
+                  type="application/pdf"
                   className="w-full h-full"
-                  style={{ border: 'none' }}
                 />
               </div>
               <p className="text-xs mt-2 italic">
@@ -264,7 +293,7 @@ export default function ResumeReviewer() {
           </div>
 
           {/* Potential Jobs Section (UI Only) */}
-          <div className="mt-8">
+          <div className="mt-10">
             <h2 className="text-2xl font-semibold mb-4 flex items-center gap-2">
               <FaBriefcase className="text-blue-500" />
               Potential Job Matches
@@ -279,11 +308,13 @@ export default function ResumeReviewer() {
                     : 'bg-gray-50 text-gray-800 border border-gray-200'
                 )}
               >
-                <h3 className="text-lg font-bold mb-1">Junior Associate (Litigation)</h3>
+                <h3 className="text-lg font-bold mb-1">
+                  Junior Associate (Litigation)
+                </h3>
                 <p className="text-sm mb-2">Location: New York, NY</p>
                 <p className="text-sm">
-                  A mid-sized litigation firm seeking law graduates with strong research and
-                  writing skills. Focus on commercial disputes.
+                  A mid-sized litigation firm seeking law graduates with strong
+                  research and writing skills. Focus on commercial disputes.
                 </p>
                 <button
                   className={clsx(
@@ -308,8 +339,8 @@ export default function ResumeReviewer() {
                 </h3>
                 <p className="text-sm mb-2">Location: Boston, MA</p>
                 <p className="text-sm">
-                  A year-long fellowship for graduates passionate about criminal defense
-                  and advocacy for underrepresented communities.
+                  A year-long fellowship for graduates passionate about criminal
+                  defense and advocacy for underrepresented communities.
                 </p>
                 <button
                   className={clsx(
@@ -334,8 +365,8 @@ export default function ResumeReviewer() {
                 </h3>
                 <p className="text-sm mb-2">Location: San Francisco, CA</p>
                 <p className="text-sm">
-                  Tech startup seeking law student interns for corporate, IP, and contract
-                  work in a fast-paced environment.
+                  Tech startup seeking law student interns for corporate, IP, and
+                  contract work in a fast-paced environment.
                 </p>
                 <button
                   className={clsx(
@@ -360,8 +391,8 @@ export default function ResumeReviewer() {
                 </h3>
                 <p className="text-sm mb-2">Location: Washington, D.C.</p>
                 <p className="text-sm">
-                  Entry-level legal/policy position focusing on legislative analysis, research,
-                  and regulatory compliance at a federal agency.
+                  Entry-level legal/policy position focusing on legislative
+                  analysis, research, and regulatory compliance at a federal agency.
                 </p>
                 <button
                   className={clsx(
@@ -412,8 +443,8 @@ export default function ResumeReviewer() {
                 </h3>
                 <p className="text-sm mb-2">Location: Chicago, IL</p>
                 <p className="text-sm">
-                  Top-tier law firm seeking recent grads for mergers & acquisitions team.
-                  Opportunity for cross-border deal exposure.
+                  Top-tier law firm seeking recent grads for mergers & acquisitions
+                  team. Opportunity for cross-border deal exposure.
                 </p>
                 <button
                   className={clsx(

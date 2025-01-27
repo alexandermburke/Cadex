@@ -319,7 +319,7 @@ export default function AllBriefs() {
 
         {/* Body */}
         <div
-          className={`flex-1 w-full rounded-2xl shadow-xl p-6 ${
+          className={`flex-1 w-full rounded-2xl shadow-xl p-6 overflow-y-auto ${
             isDarkMode ? 'bg-gradient-to-br from-slate-900 to-blue-950 text-white' : 'bg-white text-gray-800'
           } flex flex-col items-center`}
         >
