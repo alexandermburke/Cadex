@@ -1,5 +1,3 @@
-// components/AllBriefs.js
-
 'use client';
 
 import React, { useState, useEffect } from 'react';
@@ -12,21 +10,19 @@ import {
   FaChevronLeft,
   FaChevronRight,
   FaArrowRight,
+  FaRobot,
 } from 'react-icons/fa';
 import { useRouter, useSearchParams } from 'next/navigation';
 
 // Firebase
 import { db } from '@/firebase';
-import {
-  collection,
-  getDocs,
-  doc,
-  getDoc,
-  updateDoc,
-} from 'firebase/firestore';
+import { collection, getDocs, doc, getDoc, updateDoc } from 'firebase/firestore';
 
 // Auth
 import { useAuth } from '@/context/AuthContext';
+
+// Next.js Link
+import Link from 'next/link';
 
 export default function AllBriefs() {
   const router = useRouter();
@@ -247,7 +243,7 @@ export default function AllBriefs() {
   };
 
   // -----------------------------
-  // Toggle bulletpoint vs. normal
+  // Toggle bullet points vs. normal
   // -----------------------------
   const handleBulletpointToggle = (e) => {
     setBulletpointView(e.target.checked);
@@ -320,7 +316,9 @@ export default function AllBriefs() {
         {/* Body */}
         <div
           className={`flex-1 w-full rounded-2xl shadow-xl p-6 overflow-y-auto ${
-            isDarkMode ? 'bg-gradient-to-br from-slate-900 to-blue-950 text-white' : 'bg-white text-gray-800'
+            isDarkMode
+              ? 'bg-gradient-to-br from-slate-900 to-blue-950 text-white'
+              : 'bg-white text-gray-800'
           } flex flex-col items-center`}
         >
           {/* Search bar */}
@@ -412,23 +410,25 @@ export default function AllBriefs() {
                   <FaChevronLeft /> Prev
                 </button>
 
-                {Array.from({ length: totalPages }, (_, i) => i + 1).map((num) => (
-                  <button
-                    key={num}
-                    onClick={() => goToPage(num)}
-                    className={`px-3 py-1 rounded-full font-semibold ${
-                      num === currentPage
-                        ? isDarkMode
-                          ? 'bg-blue-500 text-white'
-                          : 'bg-blue-800 text-white'
-                        : isDarkMode
-                        ? 'bg-slate-700 hover:bg-slate-600 text-white'
-                        : 'bg-gray-200 hover:bg-gray-300 text-gray-800'
-                    }`}
-                  >
-                    {num}
-                  </button>
-                ))}
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                  (num) => (
+                    <button
+                      key={num}
+                      onClick={() => goToPage(num)}
+                      className={`px-3 py-1 rounded-full font-semibold ${
+                        num === currentPage
+                          ? isDarkMode
+                            ? 'bg-blue-500 text-white'
+                            : 'bg-blue-800 text-white'
+                          : isDarkMode
+                          ? 'bg-slate-700 hover:bg-slate-600 text-white'
+                          : 'bg-gray-200 hover:bg-gray-300 text-gray-800'
+                      }`}
+                    >
+                      {num}
+                    </button>
+                  )
+                )}
 
                 <button
                   onClick={goToNextPage}
@@ -653,16 +653,18 @@ export default function AllBriefs() {
                     Verified by LExAPI 3.0
                   </div>
 
-                  {/* "See full Case Brief ->" addition */}
-                  <div className="mt-3 text-blue-600 hover:underline cursor-pointer flex items-center gap-1 text-sm font-semibold">
+                  {/* "See full Case Brief ->" -> Link to /casebriefs/summaries */}
+                  <Link
+                    href={`/casebriefs/summaries?caseId=${selectedCase.id}`}
+                    className="mt-3 text-blue-600 hover:underline cursor-pointer flex items-center gap-1 text-sm font-semibold"
+                  >
                     See full Case Brief
-                  </div>
+                    <FaArrowRight />
+                  </Link>
                 </div>
               )
             ) : (
-              <div className="text-sm text-gray-400">
-                No summary available.
-              </div>
+              <div className="text-sm text-gray-400">No summary available.</div>
             )}
           </motion.div>
         </div>
