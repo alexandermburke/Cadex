@@ -1,11 +1,3 @@
-/********************************************************************************************
- * ResumeReviewer.jsx
- * - A single-page resume reviewer catering to law students.
- * - Displays a PDF preview (defaulting to "default.pdf") and offers AI-based feedback.
- * - Maintains similar layout, color scheme, and styling as the original component.
- * - Includes a new section at the bottom showcasing potential job matches (UI only).
- ********************************************************************************************/
-
 'use client';
 
 import React, { useState } from 'react';
@@ -32,6 +24,59 @@ export default function ResumeReviewer() {
 
   // PDF preview (use default.pdf if no file uploaded)
   const [pdfSrc, setPdfSrc] = useState('/default.pdf');
+
+  // Handle resume file selection
+  const handleResumeFileChange = (e) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      setResumeFile(file);
+      setAnalysisResult('');
+      setUploadStatus('File selected. Ready for AI feedback.');
+
+      // Generate a local preview URL
+      const fileUrl = URL.createObjectURL(file);
+      setPdfSrc(fileUrl);
+    }
+  };
+
+  // Call the new API route to parse PDF & get GPT feedback
+  const handleAnalyzeResume = async () => {
+    if (!resumeFile) {
+      setUploadStatus('Please select a PDF resume file first.');
+      return;
+    }
+
+    setUploadStatus('Analyzing your resume with GPT-3.5...');
+    setAnalysisResult('');
+
+    try {
+      const formData = new FormData();
+      formData.append('pdf', resumeFile);
+
+      const res = await fetch('/api/openai/resumereview', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!res.ok) {
+        const errorData = await res.json();
+        console.error('Error from server:', errorData.error);
+        setUploadStatus('There was an error analyzing your resume.');
+        return;
+      }
+
+      const data = await res.json();
+      if (data.analysis) {
+        setAnalysisResult(data.analysis);
+        setUploadStatus('Analysis complete!');
+      } else {
+        setUploadStatus('No analysis result returned.');
+      }
+    } catch (error) {
+      console.error('Error analyzing resume:', error);
+      setUploadStatus('There was an error analyzing your resume.');
+    }
+  };
 
   // If not logged in, show prompt to log in
   if (!currentUser) {
@@ -67,48 +112,14 @@ export default function ResumeReviewer() {
     );
   }
 
-  // Handle resume file selection
-  const handleResumeFileChange = (e) => {
-    if (e.target.files && e.target.files[0]) {
-      const file = e.target.files[0];
-      setResumeFile(file);
-      setAnalysisResult('');
-      setUploadStatus('File selected. Ready for AI feedback.');
-
-      // Generate a local preview URL
-      const fileUrl = URL.createObjectURL(file);
-      setPdfSrc(fileUrl);
-    }
-  };
-
-  // Simulated AI analysis (replace with your own API call if desired)
-  const handleAnalyzeResume = async () => {
-    if (!resumeFile) {
-      setUploadStatus('Please select a PDF resume file first.');
-      return;
-    }
-    setUploadStatus('Analyzing your resume with AI...');
-    try {
-      // Simulate a delay for "analysis"
-      setTimeout(() => {
-        setAnalysisResult(
-          'Your resume effectively highlights your legal writing skills, but consider emphasizing real-world litigation or advocacy experience. Expand on your law school honors and include relevant coursework aligned with your career goals.'
-        );
-        setUploadStatus('Analysis complete!');
-      }, 2000);
-    } catch (error) {
-      setUploadStatus('There was an error analyzing your resume.');
-    }
-  };
-
   // Framer Motion variants for the main container
   const containerVariants = {
     hidden: { opacity: 0, y: 50 },
     visible: {
       opacity: 1,
       y: 0,
-      transition: { duration: 0.4, ease: 'easeInOut' }
-    }
+      transition: { duration: 0.4, ease: 'easeInOut' },
+    },
   };
 
   return (
@@ -189,7 +200,7 @@ export default function ResumeReviewer() {
           animate="visible"
         >
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {/* Left Section: File Upload and AI Feedback (improved UI) */}
+            {/* Left Section: File Upload and AI Feedback */}
             <div
               className={clsx(
                 'p-6 rounded-lg shadow-md flex flex-col space-y-4',
@@ -208,12 +219,12 @@ export default function ResumeReviewer() {
                   Upload Your Resume
                 </h2>
                 <p className="text-sm">
-                  Upload your PDF resume to get instant AI-based feedback on how to
-                  improve it for the legal job market.
+                  Upload your PDF resume to get AI-based feedback. We’ll extract
+                  the text and let GPT-3.5 “grade” it from a law firm hiring perspective.
                 </p>
               </div>
 
-              {/* Custom File Upload Button */}
+              {/* File Upload & Analyze Buttons */}
               <div className="flex flex-col md:flex-row md:items-center gap-4">
                 <label
                   htmlFor="resume-upload"
@@ -232,7 +243,6 @@ export default function ResumeReviewer() {
                   onChange={handleResumeFileChange}
                 />
 
-                {/* Analyze Button */}
                 <button
                   onClick={handleAnalyzeResume}
                   className={clsx(
@@ -256,16 +266,20 @@ export default function ResumeReviewer() {
                   {uploadStatus}
                 </p>
               )}
+
+              {/* Display AI Analysis */}
               {analysisResult && (
                 <div
                   className={clsx(
-                    'mt-4 p-4 rounded text-sm',
+                    'mt-4 p-4 rounded text-sm whitespace-pre-wrap',
                     isDarkMode
-                      ? 'bg-slate-800 text-gray-100'
-                      : 'bg-gray-100 text-gray-900'
+                      ? 'bg-slate-800 text-gray-100 border border-slate-700'
+                      : 'bg-gray-100 text-gray-900 border border-gray-300'
                   )}
                 >
-                  <h4 className="font-semibold mb-2">AI Feedback:</h4>
+                  <h4 className="font-semibold mb-2">
+                    GPT-3.5 Law Firm Feedback:
+                  </h4>
                   <p>{analysisResult}</p>
                 </div>
               )}
@@ -276,11 +290,12 @@ export default function ResumeReviewer() {
               <div className="flex items-center gap-2 mb-2">
                 <h4 className="font-medium text-sm">Resume Preview</h4>
               </div>
-              <div className="relative w-full h-[600px] rounded overflow-hidden">
+              <div className="relative w-full h-[600px] rounded-md overflow-hidden">
                 <embed
                   src={`${pdfSrc}#toolbar=0&navpanes=0&scrollbar=0`}
                   type="application/pdf"
-                  className="w-full h-full"
+                  className="absolute top-0 left-0 w-full h-full"
+                  style={{ margin: 0, padding: 0 }}
                 />
               </div>
               <p className="text-xs mt-2 italic">

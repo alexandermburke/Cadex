@@ -30,6 +30,7 @@
     "next-themes": "^0.3.0",
     "node-fetch": "^3.3.2",
     "openai": "^4.76.0",
+    "pdf-parse": "^1.1.1",
     "pdfjs-dist": "^3.11.174",
     "raw-body": "^3.0.0",
     "react": "^18",

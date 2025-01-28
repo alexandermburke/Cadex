@@ -203,10 +203,10 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, i
   });
 
   const planBadgeStyle = (() => {
-    if (isPro) return 'bg-gradient-to-r from-amber-400 to-amber-600 text-white';
-    if (isBasic) return 'bg-gradient-to-r from-teal-400 to-teal-600 text-white';
-    if (isExpert) return 'bg-gradient-to-r from-red-400 to-red-600 text-white';
-    return 'bg-gradient-to-r from-blue-400 to-blue-600 text-white';
+    if (isPro) return 'bg-gradient-to-r from-emerald-400 to-emerald-600 text-white';
+    if (isBasic) return 'bg-gradient-to-r from-blue-400 to-blue-600 text-white';
+    if (isExpert) return 'bg-gradient-to-r from-teal-400 to-teal-500 text-white';
+    return 'bg-gradient-to-r from-gray-400 to-gray-400 text-white';
   })();
 
   return (
