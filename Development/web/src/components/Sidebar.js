@@ -100,7 +100,7 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, i
   const isFree = plan === 'free';
   const isBasic = plan === 'basic';
   const isPro = plan === 'pro';
-  const isExpert = plan === 'free';
+  const isExpert = plan === 'expert';
   const isDarkMode = userDataObj?.darkMode || false;
 
   const [isCaseBriefBankOpen, setIsCaseBriefBankOpen] = useState(false);
