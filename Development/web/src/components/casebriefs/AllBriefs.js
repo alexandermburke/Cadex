@@ -10,13 +10,18 @@ import {
   FaChevronLeft,
   FaChevronRight,
   FaArrowRight,
-  FaRobot,
 } from 'react-icons/fa';
 import { useRouter, useSearchParams } from 'next/navigation';
 
 // Firebase
 import { db } from '@/firebase';
-import { collection, getDocs, doc, getDoc, updateDoc } from 'firebase/firestore';
+import {
+  collection,
+  getDocs,
+  doc,
+  getDoc,
+  updateDoc,
+} from 'firebase/firestore';
 
 // Auth
 import { useAuth } from '@/context/AuthContext';
@@ -163,7 +168,9 @@ export default function AllBriefs() {
       const userDocRef = doc(db, 'users', currentUser.uid);
       const userSnap = await getDoc(userDocRef);
       if (!userSnap.exists()) {
-        console.warn(`User document for UID ${currentUser.uid} does not exist.`);
+        console.warn(
+          `User document for UID ${currentUser.uid} does not exist.`
+        );
         return;
       }
 
@@ -201,22 +208,28 @@ export default function AllBriefs() {
     // Log user view
     await logCaseView(c);
 
-    // Construct the payload with only the title
-    const payload = { title: c.title };
-    console.log('Sending title to API for summary generation.');
+    // If a summary is already stored, just use it
+    if (c.briefSummary) {
+      console.log('Using existing briefSummary from Firestore.');
+      setCaseBrief(c.briefSummary);
+      return;
+    }
 
-    // Fetch the summary from the API
+    // Otherwise, fetch the summary from the API
     setIsSummaryLoading(true);
 
     try {
-      console.log('Fetching summary from /api/casebrief-summary');
+      const payload = {
+        title: c.title,
+        date: c.decisionDate || '', // Add date for more context
+      };
+
+      console.log('Fetching summary from /api/casebrief-summary with:', payload);
       const res = await fetch('/api/casebrief-summary', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       });
-
-      console.log('Received response from /api/casebrief-summary:', res.status);
 
       if (!res.ok) {
         const errorData = await res.json();
@@ -227,7 +240,40 @@ export default function AllBriefs() {
 
       const data = await res.json();
       console.log('Summary data received:', data);
+
+      // Save the generated summary into Firestore
+      await updateDoc(doc(db, 'capCases', c.id), {
+        briefSummary: {
+          ruleOfLaw: data.ruleOfLaw || '',
+          facts: data.facts || '',
+          issue: data.issue || '',
+          holding: data.holding || '',
+          reasoning: data.reasoning || '',
+          dissent: data.dissent || '',
+        },
+      });
+
+      // Update local state so we can display it
       setCaseBrief(data);
+
+      // Also update our local capCases array with the new data
+      setCapCases((prev) =>
+        prev.map((cc) =>
+          cc.id === c.id
+            ? {
+                ...cc,
+                briefSummary: {
+                  ruleOfLaw: data.ruleOfLaw || '',
+                  facts: data.facts || '',
+                  issue: data.issue || '',
+                  holding: data.holding || '',
+                  reasoning: data.reasoning || '',
+                  dissent: data.dissent || '',
+                },
+              }
+            : cc
+        )
+      );
     } catch (error) {
       console.error('Error fetching summary:', error);
       setCaseBrief({ error: 'Error fetching summary.' });
@@ -315,7 +361,7 @@ export default function AllBriefs() {
 
         {/* Body */}
         <div
-          className={`flex-1 w-full rounded-2xl shadow-xl p-6 overflow-y-auto ${
+          className={`flex-1 w-full rounded-2xl shadow-xl p-6 overflow-y-auto overflow-x-auto ${
             isDarkMode
               ? 'bg-gradient-to-br from-slate-900 to-blue-950 text-white'
               : 'bg-white text-gray-800'
@@ -384,11 +430,11 @@ export default function AllBriefs() {
                       Date: {c.decisionDate || 'N/A'}
                     </p>
                     <p
-                      className={`text-xs mt-2 line-clamp-2 ${
+                      className={`text-xs mt-2 line-clamp-2 italic ${
                         isDarkMode ? 'text-gray-200' : 'text-gray-600'
                       }`}
                     >
-                      {c.title?.slice(0, 100) || 'No content available.'}...
+                  {c.briefSummary?.facts?.slice(0, 100) || 'No content generated'}...
                     </p>
                   </div>
                 ))}
@@ -518,7 +564,8 @@ export default function AllBriefs() {
               }`}
             >
               <p className="leading-relaxed whitespace-pre-wrap text-sm">
-                {selectedCase.content || 'No detailed content available for this case.'}
+                {selectedCase.content ||
+                  'No detailed content available for this case.'}
               </p>
             </div>
 

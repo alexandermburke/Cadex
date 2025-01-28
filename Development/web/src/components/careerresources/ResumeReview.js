@@ -276,8 +276,7 @@ export default function ResumeReviewer() {
               <div className="flex items-center gap-2 mb-2">
                 <h4 className="font-medium text-sm">Resume Preview</h4>
               </div>
-              <div className="relative w-full h-[600px] rounded overflow-hidden bg-white">
-                {/* Using embed with #toolbar=0 to remove default PDF controls */}
+              <div className="relative w-full h-[600px] rounded overflow-hidden">
                 <embed
                   src={`${pdfSrc}#toolbar=0&navpanes=0&scrollbar=0`}
                   type="application/pdf"

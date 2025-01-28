@@ -9,25 +9,10 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 // Firebase
 import { db } from '@/firebase';
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, getDoc, updateDoc } from 'firebase/firestore';
 
 // Auth
 import { useAuth } from '@/context/AuthContext';
-
-// Simple helper for applying highlight placeholders if you still need that
-function applyHighlightsToText(text, highlights = []) {
-  let result = text;
-  const sortedHighlights = [...highlights].sort((a, b) => b.length - a.length);
-  sortedHighlights.forEach((highlight) => {
-    if (!highlight.trim()) return;
-    const regex = new RegExp(
-      highlight.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'),
-      'gi'
-    );
-    result = result.replace(regex, (match) => `<mark>${match}</mark>`);
-  });
-  return result;
-}
 
 export default function CaseSummaries() {
   const router = useRouter();
@@ -53,10 +38,9 @@ export default function CaseSummaries() {
     if (!currentUser) {
       return;
     }
-    // If user is logged in but no caseId, we just do nothing special here.
   }, [currentUser]);
 
-  // If we have a ?caseId=, fetch that case from Firestore + generate a detailed summary
+  // If we have a ?caseId=, fetch that case from Firestore + check for stored "detailedSummary"
   useEffect(() => {
     if (!currentUser || !capCaseId) return;
 
@@ -68,9 +52,18 @@ export default function CaseSummaries() {
           console.error(`Case with ID ${capCaseId} not found in capCases.`);
           return;
         }
+
         const fetchedCase = { id: docSnap.id, ...docSnap.data() };
         setCapCase(fetchedCase);
-        await getCapCaseSummary(fetchedCase);
+
+        // Check if we already have a "detailedSummary" in Firestore
+        if (fetchedCase.detailedSummary) {
+          console.log('Using existing detailedSummary from Firestore.');
+          setCaseBrief(fetchedCase.detailedSummary);
+        } else {
+          // Otherwise, fetch a new "detailed" version from the API
+          await getCapCaseSummary(fetchedCase);
+        }
       } catch (error) {
         console.error('Error fetching the capCase:', error);
       }
@@ -85,7 +78,12 @@ export default function CaseSummaries() {
     setCaseBrief(null);
 
     try {
-      const payload = { title: capCaseObj.title, detailed: true };
+      const payload = {
+        title: capCaseObj.title,
+        date: capCaseObj.decisionDate || '',
+        detailed: true, // Indicate to your /api/casebrief-summary that we want an extended version
+      };
+
       const res = await fetch('/api/casebrief-summary', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -101,6 +99,35 @@ export default function CaseSummaries() {
 
       const data = await res.json();
       setCaseBrief(data);
+
+      // Store the "detailed" summary in Firestore
+      await updateDoc(doc(db, 'capCases', capCaseObj.id), {
+        detailedSummary: {
+          ruleOfLaw: data.ruleOfLaw || '',
+          facts: data.facts || '',
+          issue: data.issue || '',
+          holding: data.holding || '',
+          reasoning: data.reasoning || '',
+          dissent: data.dissent || '',
+        },
+      });
+
+      // Also update local capCase so we don’t re-fetch
+      setCapCase((prev) =>
+        prev
+          ? {
+              ...prev,
+              detailedSummary: {
+                ruleOfLaw: data.ruleOfLaw || '',
+                facts: data.facts || '',
+                issue: data.issue || '',
+                holding: data.holding || '',
+                reasoning: data.reasoning || '',
+                dissent: data.dissent || '',
+              },
+            }
+          : null
+      );
     } catch (err) {
       console.error('Error fetching summary for full view:', err);
       setCaseBrief({ error: 'Error fetching summary.' });
@@ -447,12 +474,10 @@ export default function CaseSummaries() {
               : 'bg-white text-gray-800'
           } flex flex-col items-center justify-center`}
         >
-          <h2 className="text-xl font-semibold mb-4">
-            No Case Selected
-          </h2>
+          <h2 className="text-xl font-semibold mb-4">No Case Selected</h2>
           <p className="text-base max-w-lg text-center">
-            Please open <strong>All Briefs</strong> and select a case if you’d like
-            to view its full summary here.
+            Please open <strong>All Briefs</strong> and select a case if you’d
+            like to view its full summary here.
           </p>
         </div>
       </main>

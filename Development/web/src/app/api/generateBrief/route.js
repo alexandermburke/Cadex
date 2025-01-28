@@ -10,7 +10,10 @@ export async function POST(request) {
     const { caseDescription, category, skillLevel } = await request.json();
 
     if (!caseDescription || !category || !skillLevel) {
-      return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
+      return NextResponse.json(
+        { error: 'Missing required fields' },
+        { status: 400 }
+      );
     }
 
     const configuration = new Configuration({
@@ -19,7 +22,10 @@ export async function POST(request) {
 
     if (!configuration.apiKey) {
       console.error('OpenAI API key is missing.');
-      return NextResponse.json({ error: 'Server configuration error' }, { status: 500 });
+      return NextResponse.json(
+        { error: 'Server configuration error' },
+        { status: 500 }
+      );
     }
 
     const openai = new OpenAIApi(configuration);
@@ -40,7 +46,13 @@ export async function POST(request) {
 
     return NextResponse.json({ brief }, { status: 200 });
   } catch (error) {
-    console.error('Error generating brief:', error.response ? error.response.data : error.message);
-    return NextResponse.json({ error: 'Failed to generate brief' }, { status: 500 });
+    console.error(
+      'Error generating brief:',
+      error.response ? error.response.data : error.message
+    );
+    return NextResponse.json(
+      { error: 'Failed to generate brief' },
+      { status: 500 }
+    );
   }
 }
