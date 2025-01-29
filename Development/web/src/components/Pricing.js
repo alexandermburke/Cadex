@@ -48,7 +48,7 @@ const plans = [
         text: 'Ad-free user experience',
       },
       {
-        text: 'Cancel at any time',
+        text: 'Cancel at any time, no questions asked.',
       },
     ],
     recommended: false,
@@ -93,6 +93,7 @@ const plans = [
     description: 'Best for 2L & 3L students or those seeking top performance.',
     price: 30,
     interval: 'Per month',
+    promotion: 'First 7 days free',
     features: [
       { text: 'All Pro Plan Features' },
       {

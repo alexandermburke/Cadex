@@ -30,7 +30,7 @@ const plans = [
     description: 'Perfect for new or budget-conscious law students.',
     price: 12,
     interval: 'Per month',
-    promotion: 'First 7 days free', 
+    promotion: 'First 7 days free',
     features: [
       {
         text: 'Unlimited Case Simulations',
@@ -48,7 +48,7 @@ const plans = [
         text: 'Ad-free user experience',
       },
       {
-        text: 'Cancel at any time, no questions asked',
+        text: 'Cancel at any time, no questions asked.',
       },
     ],
     recommended: false,
@@ -58,10 +58,11 @@ const plans = [
     description: 'Robust preparation for law students needing advanced tools.',
     price: 20,
     interval: 'Per month',
+    promotion: 'First 7 days free',
     features: [
       { text: 'All Basic Plan Features' },
       {
-        text: 'Advanced Exam Prep Mode',
+        text: 'All Exam Prep Tools',
         info: 'Timed practice exams plus deeper analytics on strengths and weaknesses.',
       },
       {
@@ -80,6 +81,10 @@ const plans = [
         text: 'Upgraded LExAPI 3.0 Access',
         info: 'accurate AI-based research, writing, and exam prep.',
       },
+        {
+        text: 'Early Access to Subject Guides',
+        info: 'accurate AI-based research, writing, and exam prep.',
+      },
     ],
     recommended: true,
   },
@@ -88,6 +93,7 @@ const plans = [
     description: 'Best for 2L & 3L students or those seeking top performance.',
     price: 30,
     interval: 'Per month',
+    promotion: 'First 7 days free',
     features: [
       { text: 'All Pro Plan Features' },
       {
@@ -103,7 +109,7 @@ const plans = [
         info: 'Network with top-performing peers and share study outlines.',
       },
       {
-        text: 'Personalized Mentorship Sessions',
+        text: 'Access to Career & Internship Resources',
         info: 'Schedule 1:1 AI-assisted sessions to refine study strategy and address weak areas.',
       },
     ],
@@ -122,7 +128,6 @@ export default function Plans() {
   const [billingCycle, setBillingCycle] = useState('monthly'); 
   const [holidaySale, setHolidaySale] = useState(false); 
 
-  // Filter out plans that the user already has or surpasses
   let filteredPlans = plans;
   if (currentPlan === 'Basic') {
     filteredPlans = plans.filter((plan) => plan.name !== 'Basic');
@@ -132,19 +137,16 @@ export default function Plans() {
     filteredPlans = [];
   }
 
-  // Price Formatting
   function formatPrice(price) {
     let finalPrice = price;
     let originalPrice = price;
 
     if (billingCycle === 'yearly') {
-      // 10% discount for yearly billing
       finalPrice = price * 12 * 0.9;
       originalPrice = price * 12;
     }
 
     if (holidaySale) {
-      // 50% off forever if holidaySale is enabled
       const discountedPrice = finalPrice / 1.25;
       return (
         <>
@@ -162,17 +164,14 @@ export default function Plans() {
     return `$${finalPrice.toFixed(2)}`;
   }
 
-  // Handling plan updates
   async function handleUpdatePlan() {
     if (!selectedPlan) return;
 
     const billing = { plan: selectedPlan };
     const userRef = doc(db, 'users', currentUser.uid);
 
-    // Save billing info to Firestore
     await setDoc(userRef, { billing }, { merge: true });
 
-    // Send to checkout for selected plan
     const options = {
       method: 'POST',
       headers: {
@@ -183,7 +182,7 @@ export default function Plans() {
         userId: currentUser.uid,
         email: currentUser.email,
         plan: selectedPlan,
-        billingCycle, // Pass billing cycle to backend
+        billingCycle, 
       }),
     };
 
@@ -278,7 +277,7 @@ export default function Plans() {
             }`}
           >
             {/* Promotion Badge for Basic Plan (optional) */}
-            {plan.promotion && plan.name === 'Basic' && (
+            {plan.promotion && (
               <div className="absolute top-0 left-0 transform -translate-y-1/2 px-4 py-1 goldBackgroundAlt text-gray-800 text-sm font-semibold rounded-full shadow-md">
                 {plan.promotion}
               </div>
