@@ -393,7 +393,7 @@ export default function CaseSummaries() {
                     )}
                   </div>
                   <div className="text-xs italic text-gray-400">
-                    Summarized by LExAPI 3.0 (Detailed Mode)
+                    Verified by LExAPI 3.0 (Detailed Mode)
                   </div>
                 </div>
               )

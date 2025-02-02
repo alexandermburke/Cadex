@@ -374,7 +374,7 @@ export default function AllBriefs() {
               <input
                 type="text"
                 placeholder="Search Cases..."
-                className="bg-transparent placeholder-gray-500 dark:placeholder-white/70 focus:outline-none text-sm flex-1"
+                className="bg-transparent placeholder-gray-500 dark:placeholder-white/70 text-gray-500 dark:text-white/70 focus:outline-none text-sm flex-1"
                 value={searchTerm}
                 onChange={(e) => {
                   setSearchTerm(e.target.value);
