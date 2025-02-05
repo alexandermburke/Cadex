@@ -58,7 +58,6 @@ const plans = [
     description: 'Robust preparation for law students needing advanced tools.',
     price: 20,
     interval: 'Per month',
-    promotion: 'First 7 days free',
     features: [
       { text: 'All Basic Plan Features' },
       {
@@ -93,7 +92,6 @@ const plans = [
     description: 'Best for 2L & 3L students or those seeking top performance.',
     price: 30,
     interval: 'Per month',
-    promotion: 'First 7 days free',
     features: [
       { text: 'All Pro Plan Features' },
       {
