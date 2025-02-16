@@ -211,7 +211,7 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, i
 
   return (
     <motion.aside
-      className={`z-[100] fixed top-0 left-0 w-96 h-full ${sidebarBackground} text-white flex flex-col md:relative md:translate-x-0 overflow-y-auto transition-colors duration-500 shadow-xl rounded-md`}
+      className={`z-[1] fixed top-0 left-0 w-96 h-full ${sidebarBackground} text-white flex flex-col md:relative md:translate-x-0 overflow-y-auto transition-colors duration-500 shadow-xl rounded-md`}
       initial="hidden"
       animate={isSidebarVisible ? 'visible' : 'hidden'}
       variants={sidebarVariants}

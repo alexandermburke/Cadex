@@ -392,3 +392,24 @@ html {
 .delay-13 {
   animation-delay: 13s;
 }
+
+/* In your global CSS or a suitable location */
+@keyframes dash {
+  0% {
+    stroke-dasharray: 1, 100;
+    stroke-dashoffset: 0;
+  }
+  50% {
+    stroke-dasharray: 90, 100;
+    stroke-dashoffset: -15;
+  }
+  100% {
+    stroke-dasharray: 1, 100;
+    stroke-dashoffset: -125;
+  }
+}
+
+.animate-progress {
+  animation: dash 1.5s ease-in-out infinite;
+  stroke: currentColor; /* So it inherits text-blue-500 from Tailwind */
+}
