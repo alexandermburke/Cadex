@@ -28,7 +28,7 @@ const plans = [
   {
     name: 'Basic',
     description: 'Perfect for new or budget-conscious law students.',
-    price: 12,
+    price: 15,
     interval: 'Per month',
     features: [
       {

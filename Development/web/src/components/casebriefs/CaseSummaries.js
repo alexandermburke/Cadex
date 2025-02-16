@@ -30,7 +30,7 @@ export default function CaseSummaries() {
 
   const capCaseId = searchParams.get('caseId');
 
-  // Ref for PDF export
+  // Use a ref on the outermost container to capture the whole UI for PDF export.
   const pdfRef = useRef(null);
 
   useEffect(() => {
@@ -151,7 +151,7 @@ export default function CaseSummaries() {
     if (!pdfRef.current) return;
     try {
       const originalFontSize = pdfRef.current.style.fontSize;
-      pdfRef.current.style.fontSize = '18px';
+      pdfRef.current.style.fontSize = '24px';
       const canvas = await html2canvas(pdfRef.current, { scale: 2 });
       const imgData = canvas.toDataURL('image/png');
       const pdf = new jsPDF('p', 'mm', 'a4');
@@ -167,10 +167,19 @@ export default function CaseSummaries() {
 
   if (!currentUser) {
     return (
-      <div className={`flex items-center justify-center h-screen transition-colors ${isDarkMode ? 'bg-gradient-to-br from-slate-900 to-slate-800 text-white' : 'bg-gradient-to-br from-gray-100 to-white text-gray-800'}`}>
+      <div className={`flex items-center justify-center h-screen transition-colors ${isDarkMode 
+        ? 'bg-gradient-to-br from-slate-900 to-slate-800 text-white' 
+        : 'bg-gradient-to-br from-gray-100 to-white text-gray-800'}`}>
         <div className="p-6 bg-white dark:bg-slate-800 rounded-2xl shadow-xl text-center">
-          <p className="mb-4 text-lg font-semibold">Please log in to access your Case Summaries.</p>
-          <button onClick={() => router.push('/login')} className={`px-4 py-2 rounded-md text-sm font-semibold transition-colors duration-300 ${isDarkMode ? 'bg-blue-600 hover:bg-blue-500 text-white' : 'bg-blue-950 hover:bg-blue-800 text-white'}`}>
+          <p className="mb-4 text-lg font-semibold">
+            Please log in to access your Case Summaries.
+          </p>
+          <button
+            onClick={() => router.push('/login')}
+            className={`px-4 py-2 rounded-md text-sm font-semibold transition-colors duration-300 ${isDarkMode 
+              ? 'bg-blue-600 hover:bg-blue-500 text-white' 
+              : 'bg-blue-950 hover:bg-blue-800 text-white'}`}
+          >
             Go to Login
           </button>
         </div>
@@ -179,7 +188,7 @@ export default function CaseSummaries() {
   }
 
   return (
-    <div className={`relative flex h-screen transition-colors duration-500 ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>
+    <div ref={pdfRef} className={`relative flex h-screen transition-colors duration-500 ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>
       <AnimatePresence>
         {isSidebarVisible && (
           <>
@@ -219,11 +228,17 @@ export default function CaseSummaries() {
             </AnimatePresence>
           </button>
         </div>
-        <div className={`flex-1 w-full rounded-2xl shadow-xl p-6 overflow-y-auto overflow-x-auto ${isDarkMode ? 'bg-gradient-to-br from-slate-900 to-blue-950 text-white' : 'bg-white text-gray-800'} flex flex-col items-center`}>
+        <div className={`flex-1 w-full rounded-2xl shadow-xl p-6 overflow-y-auto overflow-x-auto ${isDarkMode 
+          ? 'bg-gradient-to-br from-slate-900 to-blue-950 text-white' 
+          : 'bg-white text-gray-800'} flex flex-col items-center`}>
           <h1 className="text-2xl font-bold mb-4">Full Case Brief (Detailed)</h1>
-          <div className={`p-6 rounded-xl mb-6 ${isDarkMode ? 'bg-slate-800 text-white border border-slate-700' : 'bg-gray-100 text-gray-800 border border-gray-300'}`}>
+          <div className={`p-6 rounded-xl mb-6 ${isDarkMode 
+            ? 'bg-slate-800 text-white border border-slate-700' 
+            : 'bg-gray-100 text-gray-800 border border-gray-300'}`}>
             <h2 className="text-xl font-semibold">{capCase?.title}</h2>
-            <p className={`text-sm mt-1 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+            <p className={`text-sm mt-1 ${isDarkMode 
+              ? 'text-gray-300' 
+              : 'text-gray-700'}`}>
               {capCase?.jurisdiction || 'Unknown'} | Volume: {capCase?.volume || 'N/A'} | Date: {capCase?.decisionDate || 'N/A'}
             </p>
             <div className="flex items-center text-xs mt-1">
@@ -239,7 +254,9 @@ export default function CaseSummaries() {
               )}
             </div>
           </div>
-          <div className={`max-h-60 overflow-auto rounded-xl mb-6 p-6 ${isDarkMode ? 'bg-slate-700 border border-slate-600 text-gray-100' : 'bg-gray-50 border border-gray-200 text-gray-700'}`}>
+          <div className={`max-h-60 overflow-auto rounded-xl mb-6 p-6 ${isDarkMode 
+            ? 'bg-slate-700 border border-slate-600 text-gray-100' 
+            : 'bg-gray-50 border border-gray-200 text-gray-700'}`}>
             <p className="text-base whitespace-pre-wrap leading-relaxed">
               {capCase?.content || 'No detailed content available.'}
             </p>
@@ -257,14 +274,16 @@ export default function CaseSummaries() {
               <label htmlFor="bulletPointsToggle" className="toggle-label block overflow-hidden h-8 rounded-full bg-gray-300 cursor-pointer"></label>
             </div>
           </div>
-          <div ref={pdfRef} className="w-full">
+          <div className="w-full" >
             {isSummaryLoading ? (
-              <div className="text-sm text-gray-400">We are verifying the Case Brief please wait..</div>
+              <div className="text-sm text-gray-400">We are verifying the Case Brief, please wait...</div>
             ) : caseBrief ? (
               caseBrief.error ? (
                 <div className="text-sm text-red-500">{caseBrief.error || 'No summary available.'}</div>
               ) : (
-                <div className={`p-6 rounded-xl ${isDarkMode ? 'bg-slate-800 text-white border border-blue-600' : 'bg-white text-gray-800 border border-blue-200'}`}>
+                <div className={`p-6 rounded-xl ${isDarkMode 
+                  ? 'bg-slate-800 text-white border border-blue-600' 
+                  : 'bg-white text-gray-800 border border-blue-200'}`}>
                   <h3 className={`font-bold mb-4 ${isDarkMode ? 'text-blue-300' : 'text-blue-700'} text-lg`}>Detailed Case Brief</h3>
                   <div className="mb-4">
                     <strong className="block text-lg">Rule of Law:</strong>
@@ -334,8 +353,7 @@ export default function CaseSummaries() {
                       <p className="text-base mt-2">{caseBrief.dissent || 'Not provided.'}</p>
                     )}
                   </div>
-                  <div className="text-xs italic text-gray-400">Verified by LExAPI 3.0 (Detailed Mode)</div>
-                </div>
+                 </div>
               )
             ) : (
               <div className="text-sm text-gray-400">No summary available.</div>
@@ -346,6 +364,7 @@ export default function CaseSummaries() {
             whileHover={{ scale: 1.1, rotate: 5 }}
             whileTap={{ scale: 0.9, rotate: -5 }}
             className="mt-6 p-3 rounded-full bg-blue-600 text-white shadow-lg"
+            aria-label="Save as PDF"
           >
             <FaDownload size={24} />
           </motion.button>
