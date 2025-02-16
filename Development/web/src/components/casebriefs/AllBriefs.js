@@ -713,7 +713,7 @@ export default function AllBriefs() {
 
             {/* Structured Case Brief */}
             {isSummaryLoading ? (
-              <div className="text-sm text-gray-400">Loading summary...</div>
+              <div className="text-sm text-gray-400">We are verifying the Case Brief please wait..</div>
             ) : caseBrief ? (
               caseBrief.error ? (
                 <div className="text-sm text-red-500">{caseBrief.error || 'No summary available.'}</div>
