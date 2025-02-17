@@ -7,10 +7,25 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { FaBars, FaTimes, FaDownload } from 'react-icons/fa';
 import { motion, AnimatePresence } from 'framer-motion';
 import { db } from '@/firebase';
-import { doc, getDoc, updateDoc } from 'firebase/firestore';
+import {
+  doc,
+  getDoc,
+  updateDoc,
+  collection,
+  query,
+  where,
+  limit,
+  getDocs,
+} from 'firebase/firestore';
 import { useAuth } from '@/context/AuthContext';
 import html2canvas from 'html2canvas';
 import { jsPDF } from 'jspdf';
+
+const simplifyText = (text = '', maxLength = 100) => {
+  if (!text) return 'Not provided.';
+  if (text.length <= maxLength) return text;
+  return text.slice(0, maxLength) + '...';
+};
 
 export default function CaseSummaries() {
   const router = useRouter();
@@ -21,7 +36,6 @@ export default function CaseSummaries() {
   const [isSidebarVisible, setIsSidebarVisible] = useState(true);
   const toggleSidebar = () => setIsSidebarVisible(!isSidebarVisible);
 
-  // Store the case from Firestore
   const [capCase, setCapCase] = useState(null);
 
   // The AI-generated brief
@@ -30,14 +44,11 @@ export default function CaseSummaries() {
   // For loading state
   const [isSummaryLoading, setIsSummaryLoading] = useState(false);
 
-  // Bullet-point or paragraph view
-  const [bulletpointView, setBulletpointView] = useState(false);
+  // For re-running summary if it fails
+  const [reRunCount, setReRunCount] = useState(0);
 
   // Verification state
   const [isVerified, setIsVerified] = useState(false);
-
-  // For re-running summary if it fails
-  const [reRunCount, setReRunCount] = useState(0);
 
   // The case ID from the query params
   const capCaseId = searchParams.get('caseId');
@@ -45,10 +56,85 @@ export default function CaseSummaries() {
   // A ref to capture the entire page for PDF
   const pdfRef = useRef(null);
 
+  // --- View Modes: 'classic', 'bulletpoint', 'simplified' ---
+  const [viewMode, setViewMode] = useState('classic');
+
+  // Setup the toggles. Each has a label and a value.
+  const viewModes = [
+    { label: 'Classic', value: 'classic' },
+    { label: 'Bullets', value: 'bulletpoint' },
+    { label: 'Simple', value: 'simplified' },
+  ];
+
+  // We find which index is selected to move the highlight
+  const selectedIndex = viewModes.findIndex((m) => m.value === viewMode);
+
+  // Related cases (fetched from Firestore)
+  const [relatedCases, setRelatedCases] = useState([]);
+
+  // Helper to render fields according to view mode
+  const renderFieldContent = (fieldText) => {
+    if (!fieldText) return 'Not provided.';
+    if (viewMode === 'bulletpoint') {
+      return (
+        <ul className="list-disc list-inside text-base mt-2">
+          <li>{fieldText}</li>
+        </ul>
+      );
+    } else if (viewMode === 'simplified') {
+      // Return a brief descriptor in simplified mode
+      return <p className="text-base mt-2">{simplifyText(fieldText)}</p>;
+    }
+    // Classic
+    return <p className="text-base mt-2">{fieldText}</p>;
+  };
+
+  // Special handling for Facts, removing enumerations if found
+  const renderFactsContent = (factsText) => {
+    if (!factsText) return <p className="text-base mt-2">Not provided.</p>;
+
+    // Attempt to parse enumerated facts "1. fact" "2. fact" ...
+    const enumeratedFacts = factsText.match(/(?:\d\.\s*[^0-9]+)/g);
+
+    if (viewMode === 'simplified') {
+      // Show a brief descriptor
+      return <p className="text-base mt-2">{simplifyText(factsText)}</p>;
+    }
+
+    if (enumeratedFacts && enumeratedFacts.length > 0) {
+      if (viewMode === 'bulletpoint') {
+        return (
+          <ul className="list-disc list-inside text-base mt-2">
+            {enumeratedFacts.map((fact, index) => {
+              // Remove "1. ", "2. " prefix
+              const strippedFact = fact.replace(/^\d+\.\s*/, '');
+              return <li key={index}>{strippedFact.trim()}</li>;
+            })}
+          </ul>
+        );
+      }
+      // "Classic" enumerated
+      return (
+        <>
+          {enumeratedFacts.map((fact, index) => {
+            const strippedFact = fact.replace(/^\d+\.\s*/, '');
+            return (
+              <p key={index} className="text-base mt-2">
+                {strippedFact.trim()}
+              </p>
+            );
+          })}
+        </>
+      );
+    }
+    return <p className="text-base mt-2">{factsText}</p>;
+  };
+
   useEffect(() => {
     if (!currentUser) return;
   }, [currentUser]);
 
+  // Fetch the main case and summary
   useEffect(() => {
     if (!currentUser || !capCaseId) return;
 
@@ -82,6 +168,34 @@ export default function CaseSummaries() {
 
     fetchCapCaseAndSummary();
   }, [capCaseId, currentUser]);
+
+  // Fetch related cases when capCase is available
+  useEffect(() => {
+    if (!capCase) return;
+
+    const fetchRelatedCases = async () => {
+      try {
+        // Example: find up to 3 other cases with the same jurisdiction
+        // but exclude the current case's ID
+        const q = query(
+          collection(db, 'capCases'),
+          where('jurisdiction', '==', capCase.jurisdiction || ''),
+          where('__name__', '!=', capCase.id),
+          limit(3)
+        );
+        const querySnap = await getDocs(q);
+        const results = [];
+        querySnap.forEach((docItem) => {
+          results.push({ id: docItem.id, ...docItem.data() });
+        });
+        setRelatedCases(results);
+      } catch (e) {
+        console.error('Error fetching related cases:', e);
+      }
+    };
+
+    fetchRelatedCases();
+  }, [capCase]);
 
   // Fetch a new "detailed" summary
   const getCapCaseSummary = async (capCaseObj) => {
@@ -124,9 +238,7 @@ export default function CaseSummaries() {
       });
 
       setCapCase((prev) =>
-        prev
-          ? { ...prev, detailedSummary: { ...data, verified: false } }
-          : null
+        prev ? { ...prev, detailedSummary: { ...data, verified: false } } : null
       );
 
       // Now verify
@@ -139,7 +251,7 @@ export default function CaseSummaries() {
     }
   };
 
-  // Verify
+  // Verify the summary
   const verifyDetailedSummary = async (summaryData, capCaseObj) => {
     try {
       const verifyRes = await fetch('/api/casebrief-verification', {
@@ -175,11 +287,6 @@ export default function CaseSummaries() {
     }
   };
 
-  // Toggle bullet points
-  const handleBulletpointToggle = (e) => {
-    setBulletpointView(e.target.checked);
-  };
-
   // PDF export
   const saveAsPDF = async () => {
     if (!pdfRef.current) return;
@@ -204,6 +311,30 @@ export default function CaseSummaries() {
     } catch (error) {
       console.error('Error generating PDF:', error);
     }
+  };
+
+  /**
+   * A more robust citation generator:
+   * e.g., "Case Title, [Volume] [Reporter] [Page] ([Year])"
+   */
+  const generateCitation = (caseObj, reporter = 'U.S.', page = '___') => {
+    let year = '____';
+    if (caseObj.decisionDate) {
+      const parsedDate = new Date(caseObj.decisionDate);
+      if (!isNaN(parsedDate)) {
+        year = parsedDate.getFullYear();
+      }
+    }
+
+    // Example: "Roe v. Wade, 410 U.S. 113 (1973)"
+    return `${caseObj.title || 'N/A'}, ${caseObj.volume || '___'} ${reporter} ${page} (${year})`;
+  };
+
+  const generateBluebookCitation = (caseObj, page = '___') => {
+    // For demonstration, we'll pass "U.S." as the reporter.
+    const baseCitation = generateCitation(caseObj, 'U.S.', page);
+    // In a real app, you'd add official abbreviations, attorneys, or pin-cites, etc.
+    return `Bluebook: ${baseCitation}`;
   };
 
   if (!currentUser) {
@@ -262,6 +393,7 @@ export default function CaseSummaries() {
       </AnimatePresence>
 
       <main className="flex-1 flex flex-col px-6 relative z-50 h-screen">
+        {/* Top bar with sidebar toggle only */}
         <div className="flex items-center justify-between">
           <button
             onClick={toggleSidebar}
@@ -344,34 +476,50 @@ export default function CaseSummaries() {
             </div>
           </div>
 
-          {/* Toggle bullet points */}
-          <div className="flex items-center gap-3 mb-4">
-            <label className="font-semibold text-sm">
-              {bulletpointView ? 'Bullet Points' : 'Classic View'}
-            </label>
-            <div className="relative inline-block w-14 h-8 select-none transition duration-200 ease-in">
-              <input
-                type="checkbox"
-                id="bulletPointsToggle"
-                checked={bulletpointView}
-                onChange={handleBulletpointToggle}
-                className="toggle-checkbox absolute h-0 w-0 opacity-0"
+          {/* --- 3-Way Animated Toggle for viewMode (below Case Info) --- */}
+          <div className="relative flex items-center justify-center mb-6">
+            <div
+              className={`relative flex items-center rounded-full p-1 ${
+                isDarkMode ? 'bg-slate-700' : 'bg-gray-200'
+              }`}
+              style={{ width: '240px' }}
+            >
+              {/* The "highlight" background that moves under the selected segment */}
+              <motion.div
+                className={`absolute top-0 left-0 h-full rounded-full ${
+                  isDarkMode ? 'bg-slate-600' : 'bg-white'
+                } shadow`}
+                style={{ width: '33.33%' }}
+                initial={false}
+                animate={{ x: `${selectedIndex * 100}%` }}
+                transition={{ type: 'spring', stiffness: 300, damping: 30 }}
               />
-              <label
-                htmlFor="bulletPointsToggle"
-                className="toggle-label block overflow-hidden h-8 rounded-full bg-gray-300 cursor-pointer"
-              ></label>
+              {viewModes.map((mode, i) => (
+                <button
+                  key={mode.value}
+                  onClick={() => setViewMode(mode.value)}
+                  className={`relative z-10 flex-1 text-xs sm:text-sm font-semibold py-1 transition-colors ${
+                    selectedIndex === i
+                      ? isDarkMode
+                        ? 'text-blue-300'
+                        : 'text-blue-600'
+                      : isDarkMode
+                      ? 'text-gray-200'
+                      : 'text-gray-700'
+                  }`}
+                >
+                  {mode.label}
+                </button>
+              ))}
             </div>
           </div>
 
           {/* Detailed Summary / Loading / Error */}
           <div className="w-full">
             {isSummaryLoading ? (
-              // REPLACED: "We are verifying..." with a circular progress
+              // Circular progress
               <div className="flex flex-col items-center justify-center space-y-3">
-                {/* Circular Progress Container */}
                 <div className="relative w-16 h-16">
-                  {/* Outer SVG (gray track) */}
                   <svg className="transform -rotate-90" viewBox="0 0 36 36">
                     <path
                       className="text-gray-300"
@@ -383,7 +531,6 @@ export default function CaseSummaries() {
                         a 15.9155 15.9155 0 0 1 0 -31.831
                       "
                     />
-                    {/* Animated colored arc */}
                     <path
                       className="text-blue-500 animate-progress"
                       strokeWidth="4"
@@ -422,91 +569,41 @@ export default function CaseSummaries() {
                   >
                     Detailed Case Brief
                   </h3>
+
                   {/* Rule of Law */}
                   <div className="mb-4">
                     <strong className="block text-lg">Rule of Law:</strong>
-                    {bulletpointView ? (
-                      <ul className="list-disc list-inside text-base mt-2">
-                        <li>{caseBrief.ruleOfLaw || 'Not provided.'}</li>
-                      </ul>
-                    ) : (
-                      <p className="text-base mt-2">
-                        {caseBrief.ruleOfLaw || 'Not provided.'}
-                      </p>
-                    )}
+                    {renderFieldContent(caseBrief.ruleOfLaw)}
                   </div>
+
                   {/* Facts */}
                   <div className="mb-4">
                     <strong className="block text-lg">Facts:</strong>
-                    {(() => {
-                      if (!caseBrief.facts) {
-                        return <p className="text-base mt-2">Not provided.</p>;
-                      }
-                      const factsArray = caseBrief.facts.match(/(?:\d\.\s*[^0-9]+)/g);
-                      if (factsArray && factsArray.length > 0) {
-                        return (
-                          <ul className="list-disc list-inside text-base mt-2">
-                            {factsArray.map((fact, index) => (
-                              <li key={index}>{fact.trim()}</li>
-                            ))}
-                          </ul>
-                        );
-                      } else {
-                        return <p className="text-base mt-2">{caseBrief.facts}</p>;
-                      }
-                    })()}
+                    {renderFactsContent(caseBrief.facts)}
                   </div>
+
                   {/* Issue */}
                   <div className="mb-4">
                     <strong className="block text-lg">Issue:</strong>
-                    {bulletpointView ? (
-                      <ul className="list-disc list-inside text-base mt-2">
-                        <li>{caseBrief.issue || 'Not provided.'}</li>
-                      </ul>
-                    ) : (
-                      <p className="text-base mt-2">
-                        {caseBrief.issue || 'Not provided.'}
-                      </p>
-                    )}
+                    {renderFieldContent(caseBrief.issue)}
                   </div>
+
                   {/* Holding */}
                   <div className="mb-4">
                     <strong className="block text-lg">Holding:</strong>
-                    {bulletpointView ? (
-                      <ul className="list-disc list-inside text-base mt-2">
-                        <li>{caseBrief.holding || 'Not provided.'}</li>
-                      </ul>
-                    ) : (
-                      <p className="text-base mt-2">
-                        {caseBrief.holding || 'Not provided.'}
-                      </p>
-                    )}
+                    {renderFieldContent(caseBrief.holding)}
                   </div>
+
                   {/* Reasoning */}
                   <div className="mb-4">
                     <strong className="block text-lg">Reasoning:</strong>
-                    {bulletpointView ? (
-                      <ul className="list-disc list-inside text-base mt-2">
-                        <li>{caseBrief.reasoning || 'Not provided.'}</li>
-                      </ul>
-                    ) : (
-                      <p className="text-base mt-2">
-                        {caseBrief.reasoning || 'Not provided.'}
-                      </p>
-                    )}
+                    {renderFieldContent(caseBrief.reasoning)}
                   </div>
+
                   {/* Dissent */}
                   <div className="mb-4">
                     <strong className="block text-lg">Dissent:</strong>
-                    {bulletpointView ? (
-                      <ul className="list-disc list-inside text-base mt-2">
-                        <li>{caseBrief.dissent || 'Not provided.'}</li>
-                      </ul>
-                    ) : (
-                      <p className="text-base mt-2">
-                        {caseBrief.dissent || 'Not provided.'}
-                      </p>
-                    )}
+                    {renderFieldContent(caseBrief.dissent)}
                   </div>
                 </div>
               )
@@ -514,6 +611,71 @@ export default function CaseSummaries() {
               <div className="text-sm text-gray-400">No summary available.</div>
             )}
           </div>
+
+          {/* Related Cases Section (Animated / Modern) */}
+          <div className="w-full mt-8">
+            <h2 className="text-lg font-bold mb-2">Related Cases</h2>
+            <motion.div
+              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 w-full"
+              layout
+            >
+              <AnimatePresence>
+                {relatedCases && relatedCases.length > 0 ? (
+                  relatedCases.map((rcase) => (
+                    <motion.div
+                      key={rcase.id}
+                      layout
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: 20 }}
+                      transition={{ duration: 0.3 }}
+                      className={`p-4 rounded-xl shadow-lg cursor-pointer ${
+                        isDarkMode
+                          ? 'bg-slate-800 border border-slate-700 text-white'
+                          : 'bg-white border border-gray-300 text-gray-800'
+                      } hover:shadow-xl transition-shadow`}
+                      onClick={() => router.push(`/casebriefs/summaries?caseId=${rcase.id}`)}
+                    >
+                      <h3 className="text-lg font-semibold mb-2 truncate">
+                        {rcase.title}
+                      </h3>
+                      <p className="text-sm">
+                        {rcase.jurisdiction || 'Unknown'}
+                      </p>
+                      <p className="text-xs mt-1 text-gray-400">
+                        Volume: {rcase.volume || 'N/A'} | Date: {rcase.decisionDate || 'N/A'}
+                      </p>
+                    </motion.div>
+                  ))
+                ) : (
+                  <p className="text-sm text-gray-400 col-span-full">
+                    No related cases found.
+                  </p>
+                )}
+              </AnimatePresence>
+            </motion.div>
+          </div>
+
+          {/* Citation Generator Section */}
+          {capCase && (
+            <div className="w-full mt-8">
+              <h2 className="text-lg font-bold mb-2">Citation Generator</h2>
+              <div
+                className={`p-4 rounded-lg ${
+                  isDarkMode
+                    ? 'bg-slate-800 border border-slate-700'
+                    : 'bg-gray-100 border border-gray-300'
+                }`}
+              >
+                <p className="text-base italic">
+                  {generateCitation(capCase, 'U.S.', '113')}
+                </p>
+                <p className="text-base italic mt-2">
+                  {generateBluebookCitation(capCase, '113')}
+                </p>
+              </div>
+            </div>
+          )}
 
           {/* PDF Save button */}
           <motion.button
