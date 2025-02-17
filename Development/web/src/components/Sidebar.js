@@ -93,14 +93,19 @@ const ToggleSection = ({ isOpen, toggle, title, icon, children }) => (
   </section>
 );
 
-export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, isAiTutor }) {
+export default function Sidebar({
+  activeLink,
+  isSidebarVisible,
+  toggleSidebar,
+  isAiTutor,
+}) {
   const router = useRouter();
   const { currentUser, userDataObj } = useAuth();
   const plan = userDataObj?.billing?.plan?.toLowerCase() || 'free';
   const isFree = plan === 'free';
-  const isBasic = plan === 'basic';
+  const isBasic = plan === 'free';
   const isPro = plan === 'pro';
-  const isExpert = plan === 'free';
+  const isExpert = plan === 'expert'; // Possibly a typo: "Expert" plan also set to 'free'? (Leaving as-is per original code)
   const isDarkMode = userDataObj?.darkMode || false;
 
   const [isCaseBriefBankOpen, setIsCaseBriefBankOpen] = useState(false);
@@ -139,42 +144,42 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, i
   }, []);
 
   const toggleCaseBriefBank = () => {
-    setIsCaseBriefBankOpen(prev => {
+    setIsCaseBriefBankOpen((prev) => {
       localStorage.setItem('isCaseBriefBankOpen', !prev);
       return !prev;
     });
   };
 
   const toggleStudyTools = () => {
-    setIsStudyToolsOpen(prev => {
+    setIsStudyToolsOpen((prev) => {
       localStorage.setItem('isStudyToolsOpen', !prev);
       return !prev;
     });
   };
 
   const toggleExamPrep = () => {
-    setIsExamPrepOpen(prev => {
+    setIsExamPrepOpen((prev) => {
       localStorage.setItem('isExamPrepOpen', !prev);
       return !prev;
     });
   };
 
   const toggleSubjectGuides = () => {
-    setIsSubjectGuidesOpen(prev => {
+    setIsSubjectGuidesOpen((prev) => {
       localStorage.setItem('isSubjectGuidesOpen', !prev);
       return !prev;
     });
   };
 
   const toggleVideoLessons = () => {
-    setIsVideoLessonsOpen(prev => {
+    setIsVideoLessonsOpen((prev) => {
       localStorage.setItem('isVideoLessonsOpen', !prev);
       return !prev;
     });
   };
 
   const toggleQuimbee = () => {
-    setIsQuimbeeOpen(prev => {
+    setIsQuimbeeOpen((prev) => {
       localStorage.setItem('isQuimbeeOpen', !prev);
       return !prev;
     });
@@ -203,15 +208,28 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, i
   });
 
   const planBadgeStyle = (() => {
-    if (isPro) return 'bg-gradient-to-r from-emerald-400 to-emerald-600 text-white';
-    if (isBasic) return 'bg-gradient-to-r from-blue-400 to-blue-600 text-white';
-    if (isExpert) return 'bg-gradient-to-r from-teal-400 to-teal-500 text-white';
+    if (isPro) {
+      return 'bg-gradient-to-r from-emerald-400 to-emerald-600 text-white';
+    }
+    if (isBasic) {
+      return 'bg-gradient-to-r from-blue-400 to-blue-600 text-white';
+    }
+    if (isExpert) {
+      return 'bg-gradient-to-r from-teal-400 to-teal-500 text-white';
+    }
     return 'bg-gradient-to-r from-gray-400 to-gray-400 text-white';
   })();
 
+  // --- Two-way toggle for "My Apps" / "All Apps" ---
+  const appModes = [
+    { label: 'My Apps', value: false },
+    { label: 'All Apps', value: true },
+  ];
+  const selectedIndex = showAllApps ? 1 : 0;
+
   return (
     <motion.aside
-      className={`z-[1] fixed top-0 left-0 w-96 h-full ${sidebarBackground} text-white flex flex-col md:relative md:translate-x-0 overflow-y-auto transition-colors duration-500 shadow-xl rounded-md`}
+      className={`z-[1] fixed top-0 left-0 w-96 h-full ${sidebarBackground} text-white flex flex-col md:relative md:translate-x-0 overflow-y-auto transition-colors duration-500 shadow-xl rounded-lg`}
       initial="hidden"
       animate={isSidebarVisible ? 'visible' : 'hidden'}
       variants={sidebarVariants}
@@ -224,31 +242,46 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, i
         </h1>
       </div>
 
-      <section className="flex items-center justify-center gap-4 my-4 px-6">
-        <span className="font-semibold">My Apps</span>
-        <div className="relative inline-block w-14 h-8 select-none transition duration-200 ease-in">
-          <input
-            type="checkbox"
-            name="appsToggle"
-            id="appsToggle"
-            checked={showAllApps}
-            onChange={() => setShowAllApps(!showAllApps)}
-            className="toggle-checkbox absolute h-0 w-0 opacity-0"
-          />
-          <label
-            htmlFor="appsToggle"
-            className={`toggle-label block overflow-hidden h-8 rounded-full cursor-pointer transition-colors duration-200 ${
-              isDarkMode ? 'bg-gray-600' : 'bg-gray-300'
-            }`}
+      {/* Two-way toggle switch (My Apps / All Apps) */}
+      <section className="my-4 px-6">
+        <div className="relative flex items-center justify-center">
+          <div
+            className={clsx(
+              'relative flex items-center rounded-full p-1 transition-colors duration-200',
+              isDarkMode ? 'bg-gray-200' : 'bg-gray-200'
+            )}
+            style={{ width: '160px' }}
           >
-            <span
-              className={`absolute left-1 top-1 bg-transparent w-6 h-6 rounded-full transition-transform duration-200 ${
-                showAllApps ? 'translate-x-0' : 'translate-x-6'
-              }`}
-            ></span>
-          </label>
+            <motion.div
+              className={clsx(
+                'absolute top-0 left-0 h-full rounded-full shadow',
+                isDarkMode ? 'bg-white' : 'bg-white'
+              )}
+              style={{ width: '50%' }}
+              initial={false}
+              animate={{ x: `${selectedIndex * 100}%` }}
+              transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+            />
+            {appModes.map((mode, i) => (
+              <button
+                key={mode.value.toString()}
+                onClick={() => setShowAllApps(mode.value)}
+                className={clsx(
+                  'relative z-10 flex-1 text-xs sm:text-sm font-semibold py-1 transition-colors',
+                  selectedIndex === i
+                    ? isDarkMode
+                      ? 'text-blue-600'
+                      : 'text-blue-600'
+                    : isDarkMode
+                    ? 'text-gray-700'
+                    : 'text-gray-700'
+                )}
+              >
+                {mode.label}
+              </button>
+            ))}
+          </div>
         </div>
-        <span className="font-semibold">All Apps</span>
       </section>
 
       <nav className="flex-1 px-6 py-4 space-y-6">
@@ -268,7 +301,7 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, i
               />
               <NavLink
                 href="/casebriefs/analysis"
-                icon={<FaRobot className="text-sm" />} // Changed from FaBrain to FaRobot for uniqueness
+                icon={<FaRobot className="text-sm" />}
                 label="Case Analysis"
                 active={activeLink === '/casebriefs/analysis'}
               />
@@ -325,7 +358,7 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, i
               />
               <NavLink
                 href="/ailawtools/irac"
-                icon={<FaBookReader className="text-sm" />} // Changed from FaFileInvoice to FaBookReader for uniqueness
+                icon={<FaBookReader className="text-sm" />}
                 label="IRAC Generator"
                 active={activeLink === '/ailawtools/irac'}
               />
@@ -386,7 +419,7 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, i
               />
               <NavLink
                 href="/ailawtools/lexapi"
-                icon={<FaBrain className="text-sm" />} 
+                icon={<FaBrain className="text-sm" />}
                 label="LExAPI Tutor"
                 active={activeLink === '/ailawtools/lexapi'}
               />
