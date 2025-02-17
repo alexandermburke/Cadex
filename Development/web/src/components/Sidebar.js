@@ -103,9 +103,9 @@ export default function Sidebar({
   const { currentUser, userDataObj } = useAuth();
   const plan = userDataObj?.billing?.plan?.toLowerCase() || 'free';
   const isFree = plan === 'free';
-  const isBasic = plan === 'free';
+  const isBasic = plan === 'basic'; // Changed to free for testing purposes; testing enviornment
   const isPro = plan === 'pro';
-  const isExpert = plan === 'expert'; // Possibly a typo: "Expert" plan also set to 'free'? (Leaving as-is per original code)
+  const isExpert = plan === 'expert'; 
   const isDarkMode = userDataObj?.darkMode || false;
 
   const [isCaseBriefBankOpen, setIsCaseBriefBankOpen] = useState(false);
@@ -140,6 +140,12 @@ export default function Sidebar({
     const storedQuimbeeOpen = localStorage.getItem('isQuimbeeOpen');
     if (storedQuimbeeOpen) {
       setIsQuimbeeOpen(storedQuimbeeOpen === 'true');
+    }
+
+    // Restore showAllApps toggle
+    const storedShowAllApps = localStorage.getItem('showAllApps');
+    if (storedShowAllApps) {
+      setShowAllApps(storedShowAllApps === 'true');
     }
   }, []);
 
@@ -185,6 +191,12 @@ export default function Sidebar({
     });
   };
 
+  // Save showAllApps toggle to localStorage
+  const handleToggleShowAllApps = (value) => {
+    setShowAllApps(value);
+    localStorage.setItem('showAllApps', value);
+  };
+
   const sidebarVariants = {
     hidden: {
       x: '-100%',
@@ -220,7 +232,6 @@ export default function Sidebar({
     return 'bg-gradient-to-r from-gray-400 to-gray-400 text-white';
   })();
 
-  // --- Two-way toggle for "My Apps" / "All Apps" ---
   const appModes = [
     { label: 'My Apps', value: false },
     { label: 'All Apps', value: true },
@@ -265,7 +276,7 @@ export default function Sidebar({
             {appModes.map((mode, i) => (
               <button
                 key={mode.value.toString()}
-                onClick={() => setShowAllApps(mode.value)}
+                onClick={() => handleToggleShowAllApps(mode.value)}
                 className={clsx(
                   'relative z-10 flex-1 text-xs sm:text-sm font-semibold py-1 transition-colors',
                   selectedIndex === i

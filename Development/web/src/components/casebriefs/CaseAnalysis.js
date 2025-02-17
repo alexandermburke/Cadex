@@ -471,8 +471,8 @@ export default function CaseAnalysis() {
               <motion.div
                 className={`rounded-xl p-6 h-full ${
                   isDarkMode
-                    ? 'bg-slate-800 border border-slate-700 text-white'
-                    : 'bg-transparent border border-gray-200 text-gray-800'
+                    ? 'bg-slate-800 text-white'
+                    : 'bg-transparent text-gray-800'
                 }`}
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}

@@ -21,7 +21,7 @@ import { useAuth } from '@/context/AuthContext';
 import html2canvas from 'html2canvas';
 import { jsPDF } from 'jspdf';
 
-const simplifyText = (text = '', maxLength = 100) => {
+const simplifyText = (text = '', maxLength = 400) => {
   if (!text) return 'Not provided.';
   if (text.length <= maxLength) return text;
   return text.slice(0, maxLength) + '...';
@@ -37,42 +37,28 @@ export default function CaseSummaries() {
   const toggleSidebar = () => setIsSidebarVisible(!isSidebarVisible);
 
   const [capCase, setCapCase] = useState(null);
-
-  // The AI-generated brief
+  // caseBrief will hold either the detailedSummary or the briefSummary depending on viewMode
   const [caseBrief, setCaseBrief] = useState(null);
-
-  // For loading state
   const [isSummaryLoading, setIsSummaryLoading] = useState(false);
-
-  // For re-running summary if it fails
   const [reRunCount, setReRunCount] = useState(0);
-
-  // Verification state
   const [isVerified, setIsVerified] = useState(false);
 
-  // The case ID from the query params
   const capCaseId = searchParams.get('caseId');
-
-  // A ref to capture the entire page for PDF
   const pdfRef = useRef(null);
 
   // --- View Modes: 'classic', 'bulletpoint', 'simplified' ---
+  // When in simplified mode, we will show the briefSummary from Firebase.
   const [viewMode, setViewMode] = useState('classic');
-
-  // Setup the toggles. Each has a label and a value.
   const viewModes = [
     { label: 'Classic', value: 'classic' },
     { label: 'Bullets', value: 'bulletpoint' },
     { label: 'Simple', value: 'simplified' },
   ];
-
-  // We find which index is selected to move the highlight
   const selectedIndex = viewModes.findIndex((m) => m.value === viewMode);
 
-  // Related cases (fetched from Firestore)
   const [relatedCases, setRelatedCases] = useState([]);
 
-  // Helper to render fields according to view mode
+  // Helper functions for rendering fields according to view mode.
   const renderFieldContent = (fieldText) => {
     if (!fieldText) return 'Not provided.';
     if (viewMode === 'bulletpoint') {
@@ -82,22 +68,18 @@ export default function CaseSummaries() {
         </ul>
       );
     } else if (viewMode === 'simplified') {
-      // Return a brief descriptor in simplified mode
       return <p className="text-base mt-2">{simplifyText(fieldText)}</p>;
     }
-    // Classic
     return <p className="text-base mt-2">{fieldText}</p>;
   };
 
-  // Special handling for Facts, removing enumerations if found
   const renderFactsContent = (factsText) => {
     if (!factsText) return <p className="text-base mt-2">Not provided.</p>;
 
-    // Attempt to parse enumerated facts "1. fact" "2. fact" ...
+    // Attempt to parse enumerated facts "1. fact", "2. fact", etc.
     const enumeratedFacts = factsText.match(/(?:\d\.\s*[^0-9]+)/g);
 
     if (viewMode === 'simplified') {
-      // Show a brief descriptor
       return <p className="text-base mt-2">{simplifyText(factsText)}</p>;
     }
 
@@ -106,14 +88,12 @@ export default function CaseSummaries() {
         return (
           <ul className="list-disc list-inside text-base mt-2">
             {enumeratedFacts.map((fact, index) => {
-              // Remove "1. ", "2. " prefix
               const strippedFact = fact.replace(/^\d+\.\s*/, '');
               return <li key={index}>{strippedFact.trim()}</li>;
             })}
           </ul>
         );
       }
-      // "Classic" enumerated
       return (
         <>
           {enumeratedFacts.map((fact, index) => {
@@ -134,7 +114,8 @@ export default function CaseSummaries() {
     if (!currentUser) return;
   }, [currentUser]);
 
-  // Fetch the main case and summary
+  // Fetch the main case and its summary.
+  // If viewMode is 'simplified', use briefSummary; otherwise, use detailedSummary.
   useEffect(() => {
     if (!currentUser || !capCaseId) return;
 
@@ -149,17 +130,28 @@ export default function CaseSummaries() {
         const fetchedCase = { id: docSnap.id, ...docSnap.data() };
         setCapCase(fetchedCase);
 
-        // If we already have a "detailedSummary"
-        if (fetchedCase.detailedSummary) {
-          setCaseBrief(fetchedCase.detailedSummary);
-          if (fetchedCase.detailedSummary.verified === true) {
-            setIsVerified(true);
+        if (viewMode === 'simplified') {
+          if (fetchedCase.briefSummary) {
+            setCaseBrief(fetchedCase.briefSummary);
+            if (fetchedCase.briefSummary.verified === true) {
+              setIsVerified(true);
+            } else {
+              await verifyBriefSummary(fetchedCase.briefSummary, fetchedCase);
+            }
           } else {
-            await verifyDetailedSummary(fetchedCase.detailedSummary, fetchedCase);
+            await getCapCaseBriefSummary(fetchedCase);
           }
         } else {
-          // Otherwise, fetch a new "detailed" summary
-          await getCapCaseSummary(fetchedCase);
+          if (fetchedCase.detailedSummary) {
+            setCaseBrief(fetchedCase.detailedSummary);
+            if (fetchedCase.detailedSummary.verified === true) {
+              setIsVerified(true);
+            } else {
+              await verifyDetailedSummary(fetchedCase.detailedSummary, fetchedCase);
+            }
+          } else {
+            await getCapCaseSummary(fetchedCase);
+          }
         }
       } catch (error) {
         console.error('Error fetching the capCase:', error);
@@ -167,16 +159,14 @@ export default function CaseSummaries() {
     };
 
     fetchCapCaseAndSummary();
-  }, [capCaseId, currentUser]);
+  }, [capCaseId, currentUser, viewMode]);
 
-  // Fetch related cases when capCase is available
+  // Fetch related cases (e.g., by matching jurisdiction)
   useEffect(() => {
     if (!capCase) return;
 
     const fetchRelatedCases = async () => {
       try {
-        // Example: find up to 3 other cases with the same jurisdiction
-        // but exclude the current case's ID
         const q = query(
           collection(db, 'capCases'),
           where('jurisdiction', '==', capCase.jurisdiction || ''),
@@ -197,11 +187,10 @@ export default function CaseSummaries() {
     fetchRelatedCases();
   }, [capCase]);
 
-  // Fetch a new "detailed" summary
+  // Fetch a new detailed summary (for classic and bulletpoint view modes)
   const getCapCaseSummary = async (capCaseObj) => {
     setIsSummaryLoading(true);
     setCaseBrief(null);
-
     try {
       const payload = {
         title: capCaseObj.title,
@@ -224,7 +213,6 @@ export default function CaseSummaries() {
       const data = await res.json();
       setCaseBrief(data);
 
-      // Store in Firestore
       await updateDoc(doc(db, 'capCases', capCaseObj.id), {
         detailedSummary: {
           ruleOfLaw: data.ruleOfLaw || '',
@@ -241,7 +229,6 @@ export default function CaseSummaries() {
         prev ? { ...prev, detailedSummary: { ...data, verified: false } } : null
       );
 
-      // Now verify
       await verifyDetailedSummary(data, capCaseObj);
     } catch (err) {
       console.error('Error fetching summary for full view:', err);
@@ -251,7 +238,57 @@ export default function CaseSummaries() {
     }
   };
 
-  // Verify the summary
+  // Fetch a new brief summary (for simplified view mode)
+  const getCapCaseBriefSummary = async (capCaseObj) => {
+    setIsSummaryLoading(true);
+    setCaseBrief(null);
+    try {
+      const payload = {
+        title: capCaseObj.title,
+        date: capCaseObj.decisionDate || '',
+      };
+
+      const res = await fetch('/api/casebrief-summary', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      if (!res.ok) {
+        const errorData = await res.json();
+        console.error('Failed to get brief summary:', errorData.error);
+        setCaseBrief({ error: errorData.error || 'No summary available.' });
+        return;
+      }
+
+      const data = await res.json();
+      setCaseBrief(data);
+
+      await updateDoc(doc(db, 'capCases', capCaseObj.id), {
+        briefSummary: {
+          ruleOfLaw: data.ruleOfLaw || '',
+          facts: data.facts || '',
+          issue: data.issue || '',
+          holding: data.holding || '',
+          reasoning: data.reasoning || '',
+          dissent: data.dissent || '',
+          verified: false,
+        },
+      });
+
+      setCapCase((prev) =>
+        prev ? { ...prev, briefSummary: { ...data, verified: false } } : null
+      );
+
+      await verifyBriefSummary(data, capCaseObj);
+    } catch (err) {
+      console.error('Error fetching brief summary for simple view:', err);
+      setCaseBrief({ error: 'Error fetching summary.' });
+    } finally {
+      setIsSummaryLoading(false);
+    }
+  };
+
+  // Verify the detailed summary
   const verifyDetailedSummary = async (summaryData, capCaseObj) => {
     try {
       const verifyRes = await fetch('/api/casebrief-verification', {
@@ -274,8 +311,6 @@ export default function CaseSummaries() {
       } else {
         console.log('Verification explanation:', verifyData.explanation);
         setIsVerified(false);
-
-        // Try re-run once if unverified
         if (reRunCount < 1) {
           setReRunCount(reRunCount + 1);
           await getCapCaseSummary(capCaseObj);
@@ -287,13 +322,46 @@ export default function CaseSummaries() {
     }
   };
 
-  // PDF export
+  // Verify the brief summary (for simplified view)
+  const verifyBriefSummary = async (summaryData, capCaseObj) => {
+    try {
+      const verifyRes = await fetch('/api/casebrief-verification', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          briefSummary: summaryData,
+          caseTitle: capCaseObj.title,
+          decisionDate: capCaseObj.decisionDate,
+          jurisdiction: capCaseObj.jurisdiction,
+        }),
+      });
+      const verifyData = await verifyRes.json();
+
+      if (verifyData.verified === true) {
+        await updateDoc(doc(db, 'capCases', capCaseObj.id), {
+          'briefSummary.verified': true,
+        });
+        setIsVerified(true);
+      } else {
+        console.log('Verification explanation:', verifyData.explanation);
+        setIsVerified(false);
+        if (reRunCount < 1) {
+          setReRunCount(reRunCount + 1);
+          await getCapCaseBriefSummary(capCaseObj);
+        }
+      }
+    } catch (verifyError) {
+      console.error('Error verifying brief summary:', verifyError);
+      setIsVerified(false);
+    }
+  };
+
+  // PDF export functionality
   const saveAsPDF = async () => {
     if (!pdfRef.current) return;
 
     try {
       const originalFontSize = pdfRef.current.style.fontSize;
-      // Increase temporarily for PDF clarity
       pdfRef.current.style.fontSize = '24px';
 
       const canvas = await html2canvas(pdfRef.current, { scale: 2 });
@@ -306,17 +374,13 @@ export default function CaseSummaries() {
       pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
       pdf.save(`${capCase?.title || 'case-brief'}.pdf`);
 
-      // Revert
       pdfRef.current.style.fontSize = originalFontSize;
     } catch (error) {
       console.error('Error generating PDF:', error);
     }
   };
 
-  /**
-   * A more robust citation generator:
-   * e.g., "Case Title, [Volume] [Reporter] [Page] ([Year])"
-   */
+  // Citation generators
   const generateCitation = (caseObj, reporter = 'U.S.', page = '___') => {
     let year = '____';
     if (caseObj.decisionDate) {
@@ -325,15 +389,11 @@ export default function CaseSummaries() {
         year = parsedDate.getFullYear();
       }
     }
-
-    // Example: "Roe v. Wade, 410 U.S. 113 (1973)"
     return `${caseObj.title || 'N/A'}, ${caseObj.volume || '___'} ${reporter} ${page} (${year})`;
   };
 
   const generateBluebookCitation = (caseObj, page = '___') => {
-    // For demonstration, we'll pass "U.S." as the reporter.
     const baseCitation = generateCitation(caseObj, 'U.S.', page);
-    // In a real app, you'd add official abbreviations, attorneys, or pin-cites, etc.
     return `Bluebook: ${baseCitation}`;
   };
 
@@ -393,7 +453,7 @@ export default function CaseSummaries() {
       </AnimatePresence>
 
       <main className="flex-1 flex flex-col px-6 relative z-50 h-screen">
-        {/* Top bar with sidebar toggle only */}
+        {/* Top Bar with Sidebar Toggle */}
         <div className="flex items-center justify-between">
           <button
             onClick={toggleSidebar}
@@ -433,7 +493,9 @@ export default function CaseSummaries() {
               : 'bg-white text-gray-800'
           } flex flex-col items-center`}
         >
-          <h1 className="text-2xl font-bold mb-4">Full Case Brief (Detailed)</h1>
+          <h1 className="text-2xl font-bold mb-4">
+            {viewMode === 'simplified' ? 'Case Brief (Simple)' : 'Full Case Brief (Detailed)'}
+          </h1>
 
           {/* Case Info */}
           <div
@@ -453,7 +515,9 @@ export default function CaseSummaries() {
               {capCase?.decisionDate || 'N/A'}
             </p>
             <div className="flex items-center text-xs mt-1">
-              <span className="text-gray-400">Verified by LExAPI 3.0 (Detailed Mode)</span>
+              <span className="text-gray-400">
+                Verified by LExAPI 3.0 ({viewMode === 'simplified' ? 'Simple Mode' : 'Detailed Mode'})
+              </span>
               {isVerified ? (
                 <motion.div
                   initial={{ opacity: 0, scale: 0 }}
@@ -476,7 +540,7 @@ export default function CaseSummaries() {
             </div>
           </div>
 
-          {/* --- 3-Way Animated Toggle for viewMode (below Case Info) --- */}
+          {/* 3-Way Animated Toggle for viewMode */}
           <div className="relative flex items-center justify-center mb-6">
             <div
               className={`relative flex items-center rounded-full p-1 ${
@@ -484,7 +548,6 @@ export default function CaseSummaries() {
               }`}
               style={{ width: '240px' }}
             >
-              {/* The "highlight" background that moves under the selected segment */}
               <motion.div
                 className={`absolute top-0 left-0 h-full rounded-full ${
                   isDarkMode ? 'bg-slate-600' : 'bg-white'
@@ -514,10 +577,9 @@ export default function CaseSummaries() {
             </div>
           </div>
 
-          {/* Detailed Summary / Loading / Error */}
+          {/* Summary Section */}
           <div className="w-full">
             {isSummaryLoading ? (
-              // Circular progress
               <div className="flex flex-col items-center justify-center space-y-3">
                 <div className="relative w-16 h-16">
                   <svg className="transform -rotate-90" viewBox="0 0 36 36">
@@ -567,40 +629,36 @@ export default function CaseSummaries() {
                       isDarkMode ? 'text-blue-300' : 'text-blue-700'
                     } text-lg`}
                   >
-                    Detailed Case Brief
+                    {viewMode === 'simplified'
+                      ? 'Brief Case Summary'
+                      : 'Detailed Case Brief'}
                   </h3>
 
-                  {/* Rule of Law */}
                   <div className="mb-4">
                     <strong className="block text-lg">Rule of Law:</strong>
                     {renderFieldContent(caseBrief.ruleOfLaw)}
                   </div>
 
-                  {/* Facts */}
                   <div className="mb-4">
                     <strong className="block text-lg">Facts:</strong>
                     {renderFactsContent(caseBrief.facts)}
                   </div>
 
-                  {/* Issue */}
                   <div className="mb-4">
                     <strong className="block text-lg">Issue:</strong>
                     {renderFieldContent(caseBrief.issue)}
                   </div>
 
-                  {/* Holding */}
                   <div className="mb-4">
                     <strong className="block text-lg">Holding:</strong>
                     {renderFieldContent(caseBrief.holding)}
                   </div>
 
-                  {/* Reasoning */}
                   <div className="mb-4">
                     <strong className="block text-lg">Reasoning:</strong>
                     {renderFieldContent(caseBrief.reasoning)}
                   </div>
 
-                  {/* Dissent */}
                   <div className="mb-4">
                     <strong className="block text-lg">Dissent:</strong>
                     {renderFieldContent(caseBrief.dissent)}
@@ -612,7 +670,7 @@ export default function CaseSummaries() {
             )}
           </div>
 
-          {/* Related Cases Section (Animated / Modern) */}
+          {/* Related Cases */}
           <div className="w-full mt-8">
             <h2 className="text-lg font-bold mb-2">Related Cases</h2>
             <motion.div
@@ -656,7 +714,7 @@ export default function CaseSummaries() {
             </motion.div>
           </div>
 
-          {/* Citation Generator Section */}
+          {/* Citation Generator */}
           {capCase && (
             <div className="w-full mt-8">
               <h2 className="text-lg font-bold mb-2">Citation Generator</h2>
@@ -677,7 +735,7 @@ export default function CaseSummaries() {
             </div>
           )}
 
-          {/* PDF Save button */}
+          {/* PDF Save Button */}
           <motion.button
             onClick={saveAsPDF}
             whileHover={{ scale: 1.1, rotate: 5 }}

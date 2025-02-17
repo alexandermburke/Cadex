@@ -475,33 +475,6 @@ export default function AllBriefs() {
             </motion.button>
           </div>
 
-          {/* Filter Section */}
-          <motion.div
-            className="w-full max-w-md mx-auto mb-4 flex gap-4"
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-          >
-            <input
-              type="date"
-              className="w-1/2 rounded-full px-3 py-2 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              value={filterDate}
-              onChange={(e) => {
-                setFilterDate(e.target.value);
-                setCurrentPage(1);
-              }}
-            />
-            <input
-              type="text"
-              placeholder="Filter by Jurisdiction"
-              className="w-1/2 rounded-full px-3 py-2 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              value={filterJurisdiction}
-              onChange={(e) => {
-                setFilterJurisdiction(e.target.value);
-                setCurrentPage(1);
-              }}
-            />
-          </motion.div>
 
           {/* Search bar */}
           <div className="mb-6 w-full flex justify-center">
@@ -531,9 +504,11 @@ export default function AllBriefs() {
                   <div
                     key={c.id}
                     onClick={() => openCase(c)}
-                    className={`relative p-4 rounded-lg shadow cursor-pointer hover:shadow-lg transition-shadow ${
-                      isDarkMode ? 'bg-slate-700 text-white' : 'bg-gray-50 text-gray-800'
-                    }`}
+                    className={`p-4 rounded-xl shadow-lg transition-shadow cursor-pointer group flex flex-col ${
+                      isDarkMode
+                        ? 'bg-slate-800 border border-slate-700 text-white'
+                        : 'bg-white border border-gray-300 text-gray-800'
+                    } hover:shadow-xl`}
                   >
                     {/* If this case is favorited, show a small heart icon */}
                     {favorites.includes(c.id) && (
@@ -735,47 +710,47 @@ export default function AllBriefs() {
 
             {/* Structured Case Brief */}
             {isSummaryLoading ? (
-  <div className="flex flex-col items-center justify-center space-y-3">
-    {/* Circular Progress Container */}
-    <div className="relative w-16 h-16">
-      {/* Outer SVG (gray track) */}
-      <svg
-        className="transform -rotate-90"
-        viewBox="0 0 36 36"
-      >
-        <path
-          className="text-gray-300"
-          strokeWidth="4"
-          fill="none"
-          d="
-            M18 2.0845
-            a 15.9155 15.9155 0 0 1 0 31.831
-            a 15.9155 15.9155 0 0 1 0 -31.831
-          "
-        />
-        {/* Animated colored arc */}
-        <path
-          className="text-blue-500 animate-progress"
-          strokeWidth="4"
-          strokeLinecap="round"
-          fill="none"
-          /* This initial dasharray ensures part of the circle is 'filled' */
-          strokeDasharray="25, 100"
-          d="
-            M18 2.0845
-            a 15.9155 15.9155 0 0 1 0 31.831
-            a 15.9155 15.9155 0 0 1 0 -31.831
-          "
-        />
-      </svg>
-      {/* (Optional) If you want text inside the circle, place it here */}
-      <div className="absolute inset-0 flex items-center justify-center text-sm font-semibold">
-        
-      </div>
-    </div>
-    <div className="text-sm text-gray-400">
-      We are verifying the Case Brief please wait..
-    </div>
+              <div className="flex flex-col items-center justify-center space-y-3">
+                {/* Circular Progress Container */}
+                <div className="relative w-16 h-16">
+                  {/* Outer SVG (gray track) */}
+                  <svg
+                    className="transform -rotate-90"
+                    viewBox="0 0 36 36"
+                  >
+                    <path
+                      className="text-gray-300"
+                      strokeWidth="4"
+                      fill="none"
+                      d="
+                        M18 2.0845
+                        a 15.9155 15.9155 0 0 1 0 31.831
+                        a 15.9155 15.9155 0 0 1 0 -31.831
+                      "
+                    />
+                    {/* Animated colored arc */}
+                    <path
+                      className="text-blue-500 animate-progress"
+                      strokeWidth="4"
+                      strokeLinecap="round"
+                      fill="none"
+                      /* This initial dasharray ensures part of the circle is 'filled' */
+                      strokeDasharray="25, 100"
+                      d="
+                        M18 2.0845
+                        a 15.9155 15.9155 0 0 1 0 31.831
+                        a 15.9155 15.9155 0 0 1 0 -31.831
+                      "
+                    />
+                  </svg>
+                  {/* (Optional) If you want text inside the circle, place it here */}
+                  <div className="absolute inset-0 flex items-center justify-center text-sm font-semibold">
+                    
+                  </div>
+                </div>
+                <div className="text-sm text-gray-400">
+                  We are verifying the Case Brief please wait..
+                </div>
               </div>
             ) : caseBrief ? (
               caseBrief.error ? (
