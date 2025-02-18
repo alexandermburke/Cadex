@@ -20,18 +20,6 @@ import {
 // Import your extended local dictionary here:
 import localDictionary from '@/context/LocalDictionary';
 
-/**
- * A comprehensive, feature-rich Legal Dictionary component.
- * This component:
- *  - Shows a list of common legal terms, their definitions, synonyms, references, etc.
- *  - Provides a search bar to filter terms.
- *  - Allows logged-in users to "favorite" terms (stored in Firestore).
- *  - Allows an admin (or any user logic) to add new dictionary entries if desired.
- *  - Has a user-friendly UI consistent with the previously shown design.
- *  - Includes dark mode support from user settings.
- *  - Renders a Sidebar for navigation, and supports mobile toggling with animations.
- */
-
 export default function LegalDictionary() {
   const router = useRouter();
   const { currentUser, userDataObj } = useAuth();
@@ -55,6 +43,15 @@ export default function LegalDictionary() {
 
   // Track expanded/collapsed definitions
   const [expandedTerm, setExpandedTerm] = useState(null);
+
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 21;
+
+  // Reset pagination when search query changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery]);
 
   // Check if current user is admin for adding new terms
   const isAdmin = userDataObj?.role === 'admin';
@@ -117,6 +114,13 @@ export default function LegalDictionary() {
     const query = searchQuery.toLowerCase();
     return term.name.toLowerCase().includes(query);
   });
+
+  // Pagination calculations
+  const totalPages = Math.ceil(filteredTerms.length / itemsPerPage);
+  const paginatedTerms = filteredTerms.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
 
   // Toggle expanded term definition
   const toggleExpandTerm = (termId) => {
@@ -476,7 +480,7 @@ export default function LegalDictionary() {
               {/* Terms list */}
               <div className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 overflow-auto max-h-full pr-2">
                 <AnimatePresence>
-                  {filteredTerms.map((term) => {
+                  {paginatedTerms.map((term) => {
                     const isFavorited = favoriteTermIds.includes(term.id);
                     const isExpanded = expandedTerm === term.id;
 
@@ -584,10 +588,49 @@ export default function LegalDictionary() {
                   })}
                 </AnimatePresence>
               </div>
-              {/* If no results */}
+
+              {/* No results message */}
               {filteredTerms.length === 0 && (
                 <div className="text-sm text-gray-500 mt-4">
                   No terms match your query.
+                </div>
+              )}
+
+              {/* Pagination Controls */}
+              {filteredTerms.length > itemsPerPage && (
+                <div className="flex items-center justify-center space-x-2 mt-4">
+                  <button
+                    onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                    disabled={currentPage === 1}
+                    className="px-3 py-1 rounded-md text-sm font-semibold transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed bg-blue-600 hover:bg-blue-500 text-white"
+                  >
+                    Previous
+                  </button>
+                  {Array.from({ length: totalPages }).map((_, index) => {
+                    const pageNumber = index + 1;
+                    return (
+                      <button
+                        key={pageNumber}
+                        onClick={() => setCurrentPage(pageNumber)}
+                        className={`px-3 py-1 rounded-md text-sm font-semibold transition-colors duration-300 ${
+                          currentPage === pageNumber
+                            ? 'bg-blue-600 text-white'
+                            : 'bg-gray-200 hover:bg-gray-300 text-gray-800'
+                        }`}
+                      >
+                        {pageNumber}
+                      </button>
+                    );
+                  })}
+                  <button
+                    onClick={() =>
+                      setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                    }
+                    disabled={currentPage === totalPages}
+                    className="px-3 py-1 rounded-md text-sm font-semibold transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed bg-blue-600 hover:bg-blue-500 text-white"
+                  >
+                    Next
+                  </button>
                 </div>
               )}
             </>

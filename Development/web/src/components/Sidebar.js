@@ -370,7 +370,7 @@ export default function Sidebar({
               <NavLink
                 href="/ailawtools/irac"
                 icon={<FaBookReader className="text-sm" />}
-                label="IRAC Generator"
+                label="IRAC Drafting"
                 active={activeLink === '/ailawtools/irac'}
               />
             </>
@@ -390,7 +390,7 @@ export default function Sidebar({
               />
               <LockedNavLink
                 icon={<FaBookReader className="text-sm" />}
-                label="IRAC Generator"
+                label="IRAC Drafting"
               />
             </>
           ) : null}

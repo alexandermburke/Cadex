@@ -18,6 +18,7 @@ import {
   deleteDoc,
   query,
   where,
+  updateDoc,
 } from 'firebase/firestore';
 
 // We'll dynamically import jsPDF in handleSaveAsPDF
@@ -59,7 +60,7 @@ export default function Irac() {
     detailLevel: 'Intermediate',
     includeCounterAnalysis: true,
     numberOfIrac: 1,
-    scenario: '', // We'll store the chosen scenario from the dropdown
+    scenario: '',
   });
 
   // Pre-defined scenario options
@@ -74,6 +75,12 @@ export default function Irac() {
   // Load/Save progress
   const [isLoadProgressModalOpen, setIsLoadProgressModalOpen] = useState(false);
   const [savedProgresses, setSavedProgresses] = useState([]);
+
+  // -----------------------
+  // NEW: IMPORT CASE BRIEF
+  // -----------------------
+  const [isImportModalOpen, setIsImportModalOpen] = useState(false);
+  const [favoriteBriefs, setFavoriteBriefs] = useState([]);
 
   // -------------
   // AUTH CHECK
@@ -154,7 +161,10 @@ export default function Irac() {
 
   const fetchSavedProgresses = async () => {
     try {
-      const q = query(collection(db, 'iracProgress'), where('userId', '==', currentUser.uid));
+      const q = query(
+        collection(db, 'iracProgress'),
+        where('userId', '==', currentUser.uid)
+      );
       const querySnapshot = await getDocs(q);
       const loaded = [];
       querySnapshot.forEach((docSnap) => {
@@ -218,9 +228,7 @@ export default function Irac() {
       if (!response.ok) {
         setAiError(data.error || 'An error occurred while generating the IRAC.');
       } else {
-        // The server now returns 7 fields:
-        // issue, rule, analysis, counterAnalysis, subIssues, sources, conclusion
-        // We'll store them. If AI gave us something for subIssues, etc., it populates.
+        // The server now returns: issue, rule, analysis, conclusion, subIssues, sources, counterAnalysis
         setIrac({
           issue: data.issue || '',
           rule: data.rule || '',
@@ -266,30 +274,27 @@ export default function Irac() {
     try {
       const { jsPDF } = await import('jspdf');
 
-      const doc = new jsPDF('p', 'pt', 'letter');
-      doc.setFontSize(14);
+      const docPdf = new jsPDF('p', 'pt', 'letter');
+      docPdf.setFontSize(14);
 
-      // We'll define a small helper to handle multiline text
       let x = 40;
       let y = 60;
 
-      doc.text('IRAC Analysis', x, y);
-      y += 30; // Move down
+      docPdf.text('IRAC Analysis', x, y);
+      y += 30;
 
-      doc.setFontSize(12);
+      docPdf.setFontSize(12);
 
-      // Helper function to add multiline sections
       const addSection = (label, content) => {
         if (!content || !content.trim()) return;
-        const lines = doc.splitTextToSize(`${label}: ${content}`, 500);
+        const lines = docPdf.splitTextToSize(`${label}: ${content}`, 500);
         lines.forEach((line) => {
-          doc.text(line, x, y);
-          y += 14; // line spacing
+          docPdf.text(line, x, y);
+          y += 14;
         });
-        y += 10; // gap after each section
+        y += 10;
       };
 
-      // Add each IRAC field
       addSection('Issue', irac.issue);
       addSection('Rule', irac.rule);
       addSection('Analysis', irac.analysis);
@@ -298,11 +303,61 @@ export default function Irac() {
       addSection('Sources', sources);
       addSection('Conclusion', irac.conclusion);
 
-      doc.save('irac.pdf');
+      docPdf.save('irac.pdf');
     } catch (err) {
       console.error('Error generating PDF:', err);
       alert('There was an error generating the PDF.');
     }
+  };
+
+  // -------------
+  // IMPORT CASE BRIEF FROM FAVORITES
+  // -------------
+  const openImportModal = async () => {
+    if (!currentUser) return;
+    try {
+      // Get user's favorites from userDataObj
+      const favIds = userDataObj?.favorites || [];
+      if (!favIds.length) {
+        // No favorites found
+        setFavoriteBriefs([]);
+        setIsImportModalOpen(true);
+        return;
+      }
+      // Fetch capCases from Firestore and filter by favorites
+      const snapshot = await getDocs(collection(db, 'capCases'));
+      const loaded = [];
+      snapshot.forEach((docSnap) => {
+        if (favIds.includes(docSnap.id)) {
+          loaded.push({ id: docSnap.id, ...docSnap.data() });
+        }
+      });
+      setFavoriteBriefs(loaded);
+    } catch (error) {
+      console.error('Error fetching favorite briefs:', error);
+    } finally {
+      setIsImportModalOpen(true);
+    }
+  };
+
+  const handleImportBrief = (brief) => {
+    // 'brief' is the 'briefSummary' object from a capCase
+    // Map the fields to IRAC:
+    // Example: IRAC issue = brief.issue, IRAC rule = brief.ruleOfLaw, etc.
+    setIrac({
+      issue: brief.issue || '',
+      rule: brief.ruleOfLaw || '',
+      analysis: brief.reasoning || '',
+      conclusion: brief.holding || '',
+    });
+
+    // For sub-issues, sources, counterAnalysis, etc., adapt to your preference
+    setSubIssues(brief.facts || '');
+    setSources(''); // or some other field if you like
+    setCounterAnalysis(brief.dissent || '');
+
+    // Close the modal
+    setIsImportModalOpen(false);
   };
 
   // -------------
@@ -394,9 +449,9 @@ export default function Irac() {
           initial="hidden"
           animate="visible"
         >
-          {/* Right-side Icon Buttons: Load, Save, Configure */}
+          {/* Right-side Icon Buttons: Load, Save, Configure, IMPORT */}
           <div className="w-full flex items-center justify-end mb-4 gap-4">
-            {/* Load Progress (animated icon) */}
+            {/* Load Progress */}
             <button
               onClick={openLoadProgressModal}
               className={clsx(
@@ -414,7 +469,7 @@ export default function Irac() {
               </motion.div>
             </button>
 
-            {/* Save Progress (animated icon) */}
+            {/* Save Progress */}
             <button
               onClick={handleSaveProgress}
               className={clsx(
@@ -430,6 +485,21 @@ export default function Irac() {
               >
                 <FaSave size={20} />
               </motion.div>
+            </button>
+
+            {/* Import from Favorites Button */}
+            <button
+              onClick={openImportModal}
+              className={clsx(
+                'group relative h-10 sm:h-12 px-4 sm:px-6 overflow-hidden rounded-md text-white duration-200',
+                isDarkMode ? 'bg-blue-700' : 'bg-blue-950',
+                'before:absolute before:right-0 before:top-0 before:h-full before:w-5 ' +
+                  'before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 ' +
+                  'before:duration-700 hover:before:-translate-x-56 text-xs sm:text-base shadow-md'
+              )}
+              aria-label="Import Case Brief"
+            >
+              Import Case Brief
             </button>
 
             {/* Configure Button */}
@@ -468,7 +538,8 @@ export default function Irac() {
                   isDarkMode ? 'text-gray-300' : 'text-gray-600'
                 )}
               >
-                Click <span className="font-semibold">Configure</span> to generate your IRAC.
+                Click <span className="font-semibold">Configure</span> or{' '}
+                <span className="font-semibold">Import Case Brief</span> to generate your IRAC.
               </p>
               <p
                 className={clsx(
@@ -967,7 +1038,9 @@ export default function Irac() {
                   Load Saved Progress
                 </h2>
                 {savedProgresses.length === 0 ? (
-                  <p className={clsx(isDarkMode ? 'text-gray-300' : 'text-gray-700')}>
+                  <p
+                    className={clsx(isDarkMode ? 'text-gray-300' : 'text-gray-700')}
+                  >
                     No saved progresses found.
                   </p>
                 ) : (
@@ -1084,6 +1157,79 @@ export default function Irac() {
                     aria-label="Close Load Progress Modal"
                   >
                     Close
+                  </button>
+                </div>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* IMPORT CASE BRIEF MODAL */}
+        <AnimatePresence>
+          {isImportModalOpen && (
+            <motion.div
+              className={clsx(
+                'fixed inset-0 flex items-center justify-center z-50',
+                isDarkMode ? 'bg-black bg-opacity-70' : 'bg-black bg-opacity-50'
+              )}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+            >
+              <motion.div
+                className={clsx(
+                  'p-8 rounded-lg w-11/12 max-w-md shadow-lg overflow-y-auto max-h-screen',
+                  isDarkMode ? 'bg-gray-700 text-white' : 'bg-white text-black'
+                )}
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.8, opacity: 0 }}
+                transition={{ duration: 0.3 }}
+              >
+                <h2 className="text-2xl font-semibold mb-6">
+                  Import a Favorite Case Brief
+                </h2>
+                {favoriteBriefs.length === 0 ? (
+                  <p>No favorite case briefs found.</p>
+                ) : (
+                  <ul className="space-y-4">
+                    {favoriteBriefs.map((fav) => {
+                      // 'fav.briefSummary' holds the actual summary
+                      return (
+                        <li
+                          key={fav.id}
+                          className={clsx(
+                            'p-4 border rounded cursor-pointer hover:bg-blue-100',
+                            isDarkMode
+                              ? 'border-gray-600 hover:bg-white/10'
+                              : 'border-gray-300'
+                          )}
+                          onClick={() => handleImportBrief(fav.briefSummary || {})}
+                        >
+                          <p className="font-semibold text-sm mb-1">
+                            {fav.title || 'Untitled Case'}
+                          </p>
+                          <p className="text-xs text-gray-400">
+                            {fav.jurisdiction} | {fav.decisionDate}
+                          </p>
+                          {/* Possibly show a snippet of facts or ruleOfLaw */}
+                        </li>
+                      );
+                    })}
+                  </ul>
+                )}
+                <div className="flex justify-end mt-6">
+                  <button
+                    type="button"
+                    onClick={() => setIsImportModalOpen(false)}
+                    className={clsx(
+                      'px-4 py-2 rounded text-sm font-semibold transition-colors duration-300',
+                      isDarkMode
+                        ? 'bg-gray-600 hover:bg-gray-500 text-gray-300'
+                        : 'bg-gray-300 hover:bg-gray-400 text-gray-700'
+                    )}
+                  >
+                    Cancel
                   </button>
                 </div>
               </motion.div>
