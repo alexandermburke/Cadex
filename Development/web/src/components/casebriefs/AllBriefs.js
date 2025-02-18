@@ -293,7 +293,7 @@ export default function AllBriefs() {
     await logCaseView(c);
 
     if (favorites.includes(c.id)) {
-      setIsFavorited(true);
+      // Already handled by favorites state
     }
 
     // If we already have a briefSummary
@@ -475,7 +475,6 @@ export default function AllBriefs() {
             </motion.button>
           </div>
 
-
           {/* Search bar */}
           <div className="mb-6 w-full flex justify-center">
             <div className="relative flex items-center bg-gray-50 dark:bg-white/10 rounded-full px-3 py-2 w-full max-w-md">
@@ -510,21 +509,30 @@ export default function AllBriefs() {
                         : 'bg-white border border-gray-300 text-gray-800'
                     } hover:shadow-xl`}
                   >
-                    {/* If this case is favorited, show a small heart icon */}
-                    {favorites.includes(c.id) && (
-                      <div className="absolute top-2 right-2">
-                        <FaHeart className="text-red-500" size={16} />
-                      </div>
-                    )}
                     <div className="flex justify-between items-center mb-2">
                       <h3 className="text-md font-semibold line-clamp-1">{c.title}</h3>
-                      <span
-                        className={`text-xs py-1 px-2 rounded-full ${
-                          isDarkMode ? 'bg-blue-200 text-blue-900' : 'bg-blue-900 text-white'
-                        }`}
-                      >
-                        {c.jurisdiction || 'Unknown'}
-                      </span>
+                      <div className="flex items-center space-x-2">
+                        <span
+                          className={`text-xs py-1 px-2 rounded-full ${
+                            isDarkMode ? 'bg-blue-200 text-blue-900' : 'bg-blue-900 text-white'
+                          }`}
+                        >
+                          {c.jurisdiction || 'Unknown'}
+                        </span>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleToggleFavorite(c.id);
+                          }}
+                          aria-label="Toggle Favorite"
+                        >
+                          {favorites.includes(c.id) ? (
+                            <FaHeart className="text-red-500" size={16} />
+                          ) : (
+                            <FaRegHeart className="text-gray-400" size={16} />
+                          )}
+                        </button>
+                      </div>
                     </div>
                     <p className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
                       Volume: {c.volume || 'N/A'}
@@ -543,12 +551,14 @@ export default function AllBriefs() {
                 ))}
               </div>
 
-              {/* Pagination */}
-              <div className="mt-6 flex items-center justify-center gap-4">
-                <button
+              {/* Modern Bigger Pagination */}
+              <div className="mt-6 flex items-center justify-center gap-2">
+                <motion.button
                   onClick={goToPrevPage}
                   disabled={currentPage === 1}
-                  className={`px-3 py-1 rounded-full font-semibold flex items-center gap-1 ${
+                  whileHover={{ scale: currentPage !== 1 ? 1.1 : 1 }}
+                  whileTap={{ scale: currentPage !== 1 ? 0.9 : 1 }}
+                  className={`px-4 py-2 rounded-full text-base font-semibold transition-colors duration-200 ${
                     currentPage === 1
                       ? 'bg-gray-300 cursor-not-allowed opacity-70'
                       : isDarkMode
@@ -556,13 +566,15 @@ export default function AllBriefs() {
                       : 'bg-blue-950 hover:bg-blue-800 text-white'
                   }`}
                 >
-                  <FaChevronLeft /> Prev
-                </button>
+                  <FaChevronLeft className="mr-1" /> Prev
+                </motion.button>
                 {Array.from({ length: totalPages }, (_, i) => i + 1).map((num) => (
-                  <button
+                  <motion.button
                     key={num}
                     onClick={() => goToPage(num)}
-                    className={`px-3 py-1 rounded-full font-semibold ${
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    className={`px-4 py-2 rounded-full text-base font-semibold transition-colors duration-200 ${
                       num === currentPage
                         ? isDarkMode
                           ? 'bg-blue-500 text-white'
@@ -573,12 +585,18 @@ export default function AllBriefs() {
                     }`}
                   >
                     {num}
-                  </button>
+                  </motion.button>
                 ))}
-                <button
+                <motion.button
                   onClick={goToNextPage}
                   disabled={currentPage === totalPages || totalPages === 0}
-                  className={`px-3 py-1 rounded-full font-semibold flex items-center gap-1 ${
+                  whileHover={{
+                    scale: currentPage === totalPages || totalPages === 0 ? 1 : 1.1,
+                  }}
+                  whileTap={{
+                    scale: currentPage === totalPages || totalPages === 0 ? 1 : 0.9,
+                  }}
+                  className={`px-4 py-2 rounded-full text-base font-semibold transition-colors duration-200 flex items-center gap-1 ${
                     currentPage === totalPages || totalPages === 0
                       ? 'bg-gray-300 cursor-not-allowed opacity-70'
                       : isDarkMode
@@ -587,7 +605,7 @@ export default function AllBriefs() {
                   }`}
                 >
                   Next <FaChevronRight />
-                </button>
+                </motion.button>
               </div>
             </>
           )}
@@ -625,34 +643,14 @@ export default function AllBriefs() {
                   <span className="text-gray-400">
                     Verified by LExAPI 3.0 AI assistant (Beta)
                   </span>
-                  {isVerified ? (
-                    <motion.div
-                      initial={{ opacity: 0, scale: 0 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      transition={{ duration: 0.5 }}
-                      className="ml-2 flex items-center justify-center w-6 h-6 border-2 border-emerald-500 rounded-full"
-                    >
-                      <span className="text-emerald-500 font-bold text-lg">✓</span>
-                    </motion.div>
-                  ) : (
-                    <motion.div
-                      initial={{ opacity: 0, scale: 0 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      transition={{ duration: 0.5 }}
-                      className="ml-2 flex items-center justify-center w-6 h-6 border-2 border-red-500 rounded-full"
-                    >
-                      <span className="text-red-500 font-bold text-lg">✕</span>
-                    </motion.div>
-                  )}
-                  {/* Favorite Button */}
                   <motion.button
-                    onClick={toggleFavorite}
+                    onClick={() => handleToggleFavorite(selectedCase.id)}
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.9 }}
                     className="ml-4"
                     aria-label="Toggle Favorite"
                   >
-                    {isFavorited ? (
+                    {favorites.includes(selectedCase.id) ? (
                       <FaHeart className="text-red-500" size={20} />
                     ) : (
                       <FaRegHeart className="text-gray-400" size={20} />
@@ -664,7 +662,7 @@ export default function AllBriefs() {
               {/* Close Button */}
               <button
                 onClick={closeCase}
-                className={`inline-block px-3 py-1 rounded-full font-semibold text-sm transition-colors duration-300 ${
+                className={`inline-block px-4 py-2 rounded-full font-semibold text-sm transition-colors duration-300 ${
                   isDarkMode
                     ? 'bg-blue-600 hover:bg-blue-500 text-white'
                     : 'bg-blue-950 hover:bg-blue-800 text-white'
@@ -711,13 +709,8 @@ export default function AllBriefs() {
             {/* Structured Case Brief */}
             {isSummaryLoading ? (
               <div className="flex flex-col items-center justify-center space-y-3">
-                {/* Circular Progress Container */}
                 <div className="relative w-16 h-16">
-                  {/* Outer SVG (gray track) */}
-                  <svg
-                    className="transform -rotate-90"
-                    viewBox="0 0 36 36"
-                  >
+                  <svg className="transform -rotate-90" viewBox="0 0 36 36">
                     <path
                       className="text-gray-300"
                       strokeWidth="4"
@@ -728,13 +721,11 @@ export default function AllBriefs() {
                         a 15.9155 15.9155 0 0 1 0 -31.831
                       "
                     />
-                    {/* Animated colored arc */}
                     <path
                       className="text-blue-500 animate-progress"
                       strokeWidth="4"
                       strokeLinecap="round"
                       fill="none"
-                      /* This initial dasharray ensures part of the circle is 'filled' */
                       strokeDasharray="25, 100"
                       d="
                         M18 2.0845
@@ -743,10 +734,7 @@ export default function AllBriefs() {
                       "
                     />
                   </svg>
-                  {/* (Optional) If you want text inside the circle, place it here */}
-                  <div className="absolute inset-0 flex items-center justify-center text-sm font-semibold">
-                    
-                  </div>
+                  <div className="absolute inset-0 flex items-center justify-center text-sm font-semibold"></div>
                 </div>
                 <div className="text-sm text-gray-400">
                   We are verifying the Case Brief please wait..
