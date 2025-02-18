@@ -522,7 +522,7 @@ export default function AllBriefs() {
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
-                            handleToggleFavorite(c.id);
+                            toggleFavorite(c.id);
                           }}
                           aria-label="Toggle Favorite"
                         >
@@ -635,16 +635,33 @@ export default function AllBriefs() {
                     isDarkMode ? 'text-gray-300' : 'text-gray-700'
                   }`}
                 >
-                  {selectedCase.jurisdiction || 'Unknown'} | Volume:{' '}
-                  {selectedCase.volume || 'N/A'} | Date:{' '}
-                  {selectedCase.decisionDate || 'N/A'}
+                  {selectedCase.jurisdiction || 'Unknown'} | Volume: {selectedCase.volume || 'N/A'} | Date: {selectedCase.decisionDate || 'N/A'}
                 </p>
                 <div className="flex items-center text-xs mt-1">
                   <span className="text-gray-400">
                     Verified by LExAPI 3.0 AI assistant (Beta)
                   </span>
+                  {isVerified ? (
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ duration: 0.5 }}
+                      className="ml-2 flex items-center justify-center w-6 h-6 border-2 border-emerald-500 rounded-full"
+                    >
+                      <span className="text-emerald-500 font-bold text-lg">✓</span>
+                    </motion.div>
+                  ) : (
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ duration: 0.5 }}
+                      className="ml-2 flex items-center justify-center w-6 h-6 border-2 border-red-500 rounded-full"
+                    >
+                      <span className="text-red-500 font-bold text-lg">✕</span>
+                    </motion.div>
+                  )}
                   <motion.button
-                    onClick={() => handleToggleFavorite(selectedCase.id)}
+                    onClick={() => toggleFavorite(selectedCase.id)}
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.9 }}
                     className="ml-4"
