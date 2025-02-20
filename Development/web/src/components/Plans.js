@@ -1,4 +1,3 @@
-// /components/Plans.js
 'use client';
 
 import { Poppins } from 'next/font/google';
@@ -10,6 +9,8 @@ import { db } from '@/firebase';
 import { useRouter } from 'next/navigation';
 import { FaInfoCircle } from 'react-icons/fa';
 import { BsStars } from 'react-icons/bs';
+import { motion } from 'framer-motion';
+import clsx from 'clsx';
 
 const poppins = Poppins({
   subsets: ['latin'],
@@ -23,13 +24,13 @@ const poppins = Poppins({
  *  - Expert: $30
  * (All well below Quimbee's $19-$29 range)
  */
-
 const plans = [
   {
     name: 'Basic',
     description: 'Perfect for new or budget-conscious law students.',
     price: 15,
     interval: 'Per month',
+    promotion: 'First 7 days free',
     features: [
       {
         text: 'Unlimited Case Simulations',
@@ -57,7 +58,6 @@ const plans = [
     description: 'Robust preparation for law students needing advanced tools.',
     price: 20,
     interval: 'Per month',
-    promotion: 'First 7 days free',
     features: [
       { text: 'All Basic Plan Features' },
       {
@@ -78,11 +78,11 @@ const plans = [
       },
       {
         text: 'Upgraded LExAPI 3.0 Access',
-        info: 'accurate AI-based research, writing, and exam prep.',
+        info: 'Accurate AI-based research, writing, and exam prep.',
       },
-        {
+      {
         text: 'Early Access to Subject Guides',
-        info: 'accurate AI-based research, writing, and exam prep.',
+        info: 'Accurate AI-based research, writing, and exam prep.',
       },
     ],
     recommended: true,
@@ -125,6 +125,16 @@ export default function Plans() {
 
   const [billingCycle, setBillingCycle] = useState('monthly'); 
   const [holidaySale, setHolidaySale] = useState(false); 
+
+  // New billing toggle options (using the same style as the sidebar toggle)
+  const billingOptions = [
+    { label: 'Pay monthly', value: 'monthly' },
+    { label: 'Pay yearly', value: 'yearly' },
+  ];
+  const selectedBillingIndex = billingCycle === 'monthly' ? 0 : 1;
+  const handleToggleBillingCycle = (value) => {
+    setBillingCycle(value);
+  };
 
   let filteredPlans = plans;
   if (currentPlan === 'Basic') {
@@ -232,32 +242,43 @@ export default function Plans() {
         </p>
       </section>
 
-      {/* Billing Cycle Toggle */}
-      <section className="flex items-center justify-center gap-4 my-10">
-        <span className={`font-semibold ${poppins.className}`}>
-          Monthly Billing
-        </span>
-        <div className="relative inline-block w-14 h-8 select-none transition duration-200 ease-in">
-          <input
-            type="checkbox"
-            name="billingCycleToggle"
-            id="billingCycleToggle"
-            checked={billingCycle === 'yearly'}
-            onChange={() =>
-              setBillingCycle(billingCycle === 'monthly' ? 'yearly' : 'monthly')
-            }
-            className="toggle-checkbox absolute h-0 w-0 opacity-0"
+      <section className="flex items-center justify-center my-10">
+        <div
+          className={clsx(
+            'relative flex items-center rounded-full p-2 transition-colors duration-200',
+            isDarkMode ? 'bg-gray-200' : 'bg-gray-200'
+          )}
+          style={{ width: '250px' }}
+        >
+          <motion.div
+            className={clsx(
+              'absolute top-0 left-0 h-full rounded-full shadow',
+              isDarkMode ? 'bg-white' : 'bg-white'
+            )}
+            style={{ width: '50%' }}
+            initial={false}
+            animate={{ x: `${selectedBillingIndex * 100}%` }}
+            transition={{ type: 'spring', stiffness: 300, damping: 30 }}
           />
-          <label
-            htmlFor="billingCycleToggle"
-            className={`toggle-label block overflow-hidden h-8 rounded-full cursor-pointer transition-colors duration-200 ${
-              isDarkMode ? 'bg-gray-600' : 'bg-gray-300'
-            }`}
-          ></label>
+          {billingOptions.map((option, i) => (
+            <button
+              key={option.value}
+              onClick={() => handleToggleBillingCycle(option.value)}
+              className={clsx(
+                'relative z-10 flex-1 text-sm sm:text-md font-semibold py-1 transition-colors',
+                selectedBillingIndex === i
+                  ? isDarkMode
+                    ? 'text-blue-600'
+                    : 'text-blue-600'
+                  : isDarkMode
+                  ? 'text-gray-700'
+                  : 'text-gray-700'
+              )}
+            >
+              {option.label}
+            </button>
+          ))}
         </div>
-        <span className={`font-semibold ${poppins.className}`}>
-          Yearly Billing
-        </span>
       </section>
 
       {/* Plans Grid */}
@@ -325,10 +346,7 @@ export default function Plans() {
             {/* Plan Features */}
             <ul className="flex flex-col gap-2 mb-4 relative">
               {plan.features.map((feature, featureIndex) => (
-                <li
-                  key={featureIndex}
-                  className="flex items-start gap-2 group"
-                >
+                <li key={featureIndex} className="flex items-start gap-2 group">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     className="h-5 w-5 text-green-500 flex-shrink-0 mt-1"
@@ -336,18 +354,9 @@ export default function Plans() {
                     viewBox="0 0 24 24"
                     stroke="currentColor"
                   >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M5 13l4 4L19 7"
-                    />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
-                  <span
-                    className={`flex-1 ${
-                      isDarkMode ? 'text-gray-300' : 'text-gray-700'
-                    }`}
-                  >
+                  <span className={clsx('flex-1', isDarkMode ? 'text-gray-300' : 'text-gray-700')}>
                     {feature.text}
                   </span>
                   {feature.info && (
@@ -412,16 +421,8 @@ export default function Plans() {
             >
               Which plan should I choose?
             </h3>
-            <p
-              className={`${
-                isDarkMode ? 'text-gray-300' : 'text-gray-700'
-              }`}
-            >
-              Basic is great if you want essential AI-powered tools and case
-              simulations at a low cost. Pro is ideal for students who need
-              advanced features like AI IRAC generation and deeper analytics.
-              Expert is for those aiming for top class performance, offering the
-              highest level of AI assistance and exclusive study communities.
+            <p className={isDarkMode ? 'text-gray-300' : 'text-gray-700'}>
+              Basic is great if you want essential AI-powered tools and case simulations at a low cost. Pro is ideal for students who need advanced features like AI IRAC generation and deeper analytics. Expert is for those aiming for top class performance, offering the highest level of AI assistance and exclusive study communities.
             </p>
           </div>
 
@@ -433,14 +434,8 @@ export default function Plans() {
             >
               How do I upgrade my plan?
             </h3>
-            <p
-              className={`${
-                isDarkMode ? 'text-gray-300' : 'text-gray-700'
-              }`}
-            >
-              Select the desired plan from the options above. Once you click
-              “Get Plan,” you’ll be taken through a secure checkout flow handled
-              by Stripe. After completion, your account will instantly upgrade.
+            <p className={isDarkMode ? 'text-gray-300' : 'text-gray-700'}>
+              Select the desired plan from the options above. Once you click “Get Plan,” you’ll be taken through a secure checkout flow handled by Stripe. After completion, your account will instantly upgrade.
             </p>
           </div>
 
@@ -452,14 +447,8 @@ export default function Plans() {
             >
               Can I switch between monthly and yearly billing?
             </h3>
-            <p
-              className={`${
-                isDarkMode ? 'text-gray-300' : 'text-gray-700'
-              }`}
-            >
-              Yes! Toggle the billing cycle above the plan cards. Yearly billing
-              includes a 10% discount. If you switch mid-subscription, your next
-              billing date will reflect the new cycle and pricing.
+            <p className={isDarkMode ? 'text-gray-300' : 'text-gray-700'}>
+              Yes! Use the toggle above to switch between billing cycles. Yearly billing includes a 10% discount. If you switch mid-subscription, your next billing date will reflect the new cycle and pricing.
             </p>
           </div>
 
@@ -471,14 +460,8 @@ export default function Plans() {
             >
               Is there a free trial available?
             </h3>
-            <p
-              className={`${
-                isDarkMode ? 'text-gray-300' : 'text-gray-700'
-              }`}
-            >
-              Yes. All plans include a 7-day free trial for new users. You
-              can cancel at any time before the trial ends without being
-              charged.
+            <p className={isDarkMode ? 'text-gray-300' : 'text-gray-700'}>
+              Yes. All plans include a 7-day free trial for new users. You can cancel at any time before the trial ends without being charged.
             </p>
           </div>
 
@@ -490,15 +473,8 @@ export default function Plans() {
             >
               How do I cancel my subscription?
             </h3>
-            <p
-              className={`${
-                isDarkMode ? 'text-gray-300' : 'text-gray-700'
-              }`}
-            >
-              Go to Billing &amp; Plan settings and select “Cancel
-              Subscription.” You&pos;ll be re-directed to Stripe where you can cancel your plan.
-              Your plan will remain active until the end of your
-              current billing period, and you won’t be charged moving forward.
+            <p className={isDarkMode ? 'text-gray-300' : 'text-gray-700'}>
+              Go to Billing &amp; Plan settings and select “Cancel Subscription.” You’ll be re-directed to Stripe where you can cancel your plan. Your plan will remain active until the end of your current billing period, and you won’t be charged moving forward.
             </p>
           </div>
 
@@ -510,15 +486,8 @@ export default function Plans() {
             >
               Is this cheaper than other services?
             </h3>
-            <p
-              className={`${
-                isDarkMode ? 'text-gray-300' : 'text-gray-700'
-              }`}
-            >
-              Absolutely. Our plans range from $10 to $30 per month, which is
-              significantly lower than Quimbee&apos;s $19–$29 tiers. We aim to
-              provide high-quality, AI-driven study tools at an even more
-              affordable rate.
+            <p className={isDarkMode ? 'text-gray-300' : 'text-gray-700'}>
+              Absolutely. Our plans range from $10 to $30 per month, which is significantly lower than Quimbee&apos;s $19–$29 tiers. We aim to provide high-quality, AI-driven study tools at an even more affordable rate.
             </p>
           </div>
         </div>
