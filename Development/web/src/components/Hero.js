@@ -1,5 +1,4 @@
 'use client';
-
 import React, { useState, useEffect } from 'react';
 import { Poppins } from 'next/font/google';
 import Link from 'next/link';
@@ -41,6 +40,11 @@ export default function Hero() {
   const { currentUser, userDataObj } = useAuth();
   const isDarkMode = userDataObj?.darkMode || false;
   const [loaded, setLoaded] = useState(false);
+  const [stats, setStats] = useState({
+    cases: 0,
+    newUsers: 0,
+    statsProvided: 0,
+  });
 
   // Animate stats counters
   const animateStats = (start, end, setter) => {
@@ -98,152 +102,118 @@ export default function Hero() {
 
   const animatedWord = 'Odyssey';
 
+  // Tailored Features for CadexLaw.com
   const features = [
     {
       icon: (
         <FaGavel className={`${isDarkMode ? 'text-white' : 'text-blue-950'} text-4xl mb-4`} />
       ),
-      title: 'Interactive Practice Exams',
+      title: 'Case Brief Bank',
       description:
-        'Experience real exam conditions with AI-generated practice tests.',
+        'Browse a comprehensive bank of case briefs, summaries, and analyses—including All Briefs—to grasp key rulings fast.',
     },
     {
       icon: (
-        <FaSearch className={`${isDarkMode ? 'text-white' : 'text-blue-950'} text-4xl mb-4`} />
+        <FaBook className={`${isDarkMode ? 'text-white' : 'text-blue-950'} text-4xl mb-4`} />
       ),
-      title: 'Personalized Study Materials',
-      description: 'Access materials tailored to your strengths and weaknesses.',
-    },
-    {
-      icon: (
-        <FaTasks className={`${isDarkMode ? 'text-white' : 'text-blue-950'} text-4xl mb-4`} />
-      ),
-      title: 'Progress Tracking',
-      description: 'Monitor your improvement with detailed analytics.',
-    },
-    {
-      icon: (
-        <FaFileAlt className={`${isDarkMode ? 'text-white' : 'text-blue-950'} text-4xl mb-4`} />
-      ),
-      title: 'Instant Feedback',
-      description: 'Immediate feedback to identify areas of improvement.',
+      title: 'Study Tools',
+      description:
+        'Utilize a legal dictionary, lecture summaries, flashcards, outlines, and IRAC drafting guides to enhance your learning.',
     },
     {
       icon: (
         <FaRobot className={`${isDarkMode ? 'text-white' : 'text-blue-950'} text-4xl mb-4`} />
       ),
-      title: 'AI-Powered Tutoring',
-      description: '24/7 AI tutors for quick assistance.',
-    },
-    {
-      icon: (
-        <FaChartLine className={`${isDarkMode ? 'text-white' : 'text-blue-950'} text-4xl mb-4`} />
-      ),
-      title: 'Adaptive Learning',
-      description: 'Material adapts to your learning style for maximum efficiency.',
+      title: 'Exam Prep & AI-Powered Exam Prep',
+      description:
+        'Access practice exams, time management tools, exam insights, MBE practice, and LExAPI Tutor—with extensive configuration to tailor your prep.',
     },
     {
       icon: (
         <FaFileContract className={`${isDarkMode ? 'text-white' : 'text-blue-950'} text-4xl mb-4`} />
       ),
-      title: 'Exam Strategies',
-      description: 'Effective methods for tackling tough law school questions.',
-    },
-    {
-      icon: (
-        <FaBalanceScale className={`${isDarkMode ? 'text-white' : 'text-blue-950'} text-4xl mb-4`} />
-      ),
-      title: 'Question Bank',
-      description: 'Thousands of practice questions across legal topics.',
-    },
-    {
-      icon: (
-        <FaLightbulb className={`${isDarkMode ? 'text-white' : 'text-blue-950'} text-4xl mb-4`} />
-      ),
-      title: 'Smart Flashcards',
-      description: 'Reinforce your knowledge with intelligent flashcards.',
-    },
-    {
-      icon: (
-        <FaBook className={`${isDarkMode ? 'text-white' : 'text-blue-950'} text-4xl mb-4`} />
-      ),
-      title: 'Comprehensive Guides',
-      description: 'In-depth guides covering all essential legal subjects.',
-    },
-    {
-      icon: (
-        <FaLaptopCode className={`${isDarkMode ? 'text-white' : 'text-blue-950'} text-4xl mb-4`} />
-      ),
-      title: 'Interactive Coding Modules',
-      description: 'Engage with coding modules tailored for legal studies.',
-    },
-    {
-      icon: (
-        <FaComment className={`${isDarkMode ? 'text-white' : 'text-blue-950'} text-4xl mb-4`} />
-      ),
-      title: 'Community Support',
-      description: 'Join a community of peers for collaborative learning.',
-    },
-  ];
-
-  const howItWorks = [
-    {
-      icon: (
-        <FaUserPlus className={`${isDarkMode ? 'text-white' : 'text-blue-950'} text-4xl mb-4`} />
-      ),
-      title: 'Sign Up & Personalize',
-      description: 'Create your account and customize your study preferences to get started.',
-    },
-    {
-      icon: (
-        <FaCogs className={`${isDarkMode ? 'text-white' : 'text-blue-950'} text-4xl mb-4`} />
-      ),
-      title: 'Access AI Tools',
-      description: 'Utilize our AI-powered tools for practice exams, flashcards, and more.',
+      title: 'Subject Guides',
+      description:
+        'Get in-depth guides on Contracts, Torts, Criminal Law, Property, and Constitutional Law to master core subjects.',
     },
     {
       icon: (
         <FaGraduationCap className={`${isDarkMode ? 'text-white' : 'text-blue-950'} text-4xl mb-4`} />
       ),
-      title: 'Track Your Progress',
-      description: 'Monitor your performance with detailed analytics and tailored feedback.',
+      title: 'Video Lessons',
+      description:
+        'Learn through engaging video lessons—with a comprehensive directory coming soon.',
     },
     {
       icon: (
-        <FaRobot className={`${isDarkMode ? 'text-white' : 'text-blue-950'} text-4xl mb-4`} />
+        <FaUserPlus className={`${isDarkMode ? 'text-white' : 'text-blue-950'} text-4xl mb-4`} />
       ),
-      title: 'Achieve Success',
-      description: 'Leverage CadexLaw’s resources to excel in your law studies and exams.',
+      title: 'Career & Internship Resources',
+      description:
+        'Enhance your resume with our reviewer, prepare for interviews, and discover networking opportunities to jumpstart your career.',
+    },
+  ];
+
+  // Tailored How It Works for CadexLaw.com
+  const howItWorks = [
+    {
+      icon: (
+        <FaUserPlus className={`${isDarkMode ? 'text-white' : 'text-blue-950'} text-4xl mb-4`} />
+      ),
+      title: 'Sign Up & Customize',
+      description:
+        'Create your account, set your legal study and career goals, and personalize your experience.',
     },
     {
       icon: (
-        <FaChartLine className={`${isDarkMode ? 'text-white' : 'text-blue-950'} text-4xl mb-4`} />
+        <FaSearch className={`${isDarkMode ? 'text-white' : 'text-blue-950'} text-4xl mb-4`} />
       ),
-      title: 'Advanced Analytics',
-      description: 'Gain insights into your study patterns with our advanced analytics tools.',
+      title: 'Discover Resources',
+      description:
+        'Explore our extensive library—from case briefs to study tools, exam prep modules, and subject guides.',
     },
     {
       icon: (
-        <FaLightbulb className={`${isDarkMode ? 'text-white' : 'text-blue-950'} text-4xl mb-4`} />
+        <FaCogs className={`${isDarkMode ? 'text-white' : 'text-blue-950'} text-4xl mb-4`} />
       ),
-      title: 'Innovative Learning Methods',
-      description: 'Experience cutting-edge learning techniques designed for law students.',
-    },
-    {
-      icon: (
-        <FaBook className={`${isDarkMode ? 'text-white' : 'text-blue-950'} text-4xl mb-4`} />
-      ),
-      title: 'Extensive Resources',
-      description: 'Access a vast library of legal resources to support your studies.',
+      title: 'Leverage Advanced Tools',
+      description:
+        'Utilize AI-powered exam prep, interactive learning, and highly configurable study modules tailored to your needs.',
     },
     {
       icon: (
         <FaComment className={`${isDarkMode ? 'text-white' : 'text-blue-950'} text-4xl mb-4`} />
       ),
-      title: 'Expert Support',
-      description: 'Connect with legal experts for guidance and mentorship.',
+      title: 'Achieve Success & Connect',
+      description:
+        'Track your progress, gain expert feedback, and engage with a supportive community of legal professionals.',
     },
   ];
+
+  // Framer Motion Variants for Advanced Animations
+  const cardVariants = {
+    hidden: {},
+    visible: {
+      transition: {
+        staggerChildren: 0.2,
+      },
+    },
+  };
+
+  const iconVariants = {
+    hidden: { opacity: 0, scale: 0.5 },
+    visible: { opacity: 1, scale: 1, transition: { duration: 0.5 } },
+  };
+
+  const titleVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
+  };
+
+  const descriptionVariants = {
+    hidden: { opacity: 0 },
+    visible: { opacity: 1, transition: { duration: 0.5 } },
+  };
 
   // Vertical divider (spacing remains unchanged)
   const VerticalDivider = () => (
@@ -262,12 +232,6 @@ export default function Hero() {
   const [featuresRef, featuresInView] = useInView({
     threshold: 0.1,
     triggerOnce: true,
-  });
-
-  const [stats, setStats] = useState({
-    cases: 0,
-    newUsers: 0,
-    statsProvided: 0,
   });
 
   return (
@@ -324,9 +288,14 @@ export default function Hero() {
           >
             <span className="block mb-5">
               Your Dream School{' '}
-              <span className="relative inline-block" key={animationTrigger} aria-hidden="true">
+              <span
+                className="relative inline-block"
+                key={animationTrigger}
+                aria-hidden="true"
+              >
                 {animatedWord.split('').map((letter, letterIndex) => {
-                  if (letter === ' ') return <span key={letterIndex}>&nbsp;</span>;
+                  if (letter === ' ')
+                    return <span key={letterIndex}>&nbsp;</span>;
                   return (
                     <span
                       key={letterIndex}
@@ -340,7 +309,9 @@ export default function Hero() {
               </span>{' '}
               Awaits.
             </span>
-            <span className="sr-only">Your Dream School Odyssey Awaits.</span>
+            <span className="sr-only">
+              Your Dream School Odyssey Awaits.
+            </span>
           </h2>
 
           <p
@@ -348,8 +319,10 @@ export default function Hero() {
               isDarkMode ? 'text-white' : 'text-slate-700'
             } max-w-2xl mb-10`}
           >
-            By law students, for law students. Our platform combines expert insights and AI to deliver high quality preparation at up to{' '}
-            <span className="goldSolid font-bold">70% lower costs</span> than traditional competitors.
+            By law students, for law students. Our platform combines expert
+            insights and AI to deliver high quality preparation at up to{' '}
+            <span className="goldSolid font-bold">70% Lower Costs</span> than
+            traditional competitors.
           </p>
 
           <div className="flex justify-center mt-6 mb-6">
@@ -367,7 +340,7 @@ export default function Hero() {
 
         <VerticalDivider />
 
-        {/* Redesigned Features Section with original spacing */}
+        {/* Redesigned Features Section with Advanced Animations and Less Wide Cards */}
         <div
           ref={featuresRef}
           className={`flex flex-col items-center py-4 px-4 md:px-8 lg:px-16 my-20 transition-all duration-1000 ${
@@ -385,26 +358,47 @@ export default function Hero() {
             {features.map((feature, index) => (
               <motion.div
                 key={`feature-${index}`}
-                className={`p-6 rounded-lg shadow-lg ${isDarkMode ? 'bg-gray-800' : 'bg-white'} border border-transparent hover:border-blue-500 transition-all duration-300`}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
+                className={`p-6 rounded-lg shadow-lg w-full max-w-sm ${
+                  isDarkMode ? 'bg-gray-800' : 'bg-white'
+                } border border-transparent hover:border-blue-500 transition-all duration-300`}
+                variants={cardVariants}
+                initial="hidden"
+                whileInView="visible"
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.1 }}
                 whileHover={{ scale: 1.05 }}
               >
-                <div className="flex justify-center">{feature.icon}</div>
-                <h4 className={`mt-4 text-xl font-semibold text-center ${isDarkMode ? 'text-white' : 'text-blue-950'}`}>
+                <motion.div
+                  className="flex justify-center"
+                  variants={iconVariants}
+                  whileHover={{ scale: 1.1, rotate: 5 }}
+                >
+                  {feature.icon}
+                </motion.div>
+                <motion.h4
+                  className={`mt-4 text-xl font-semibold text-center ${
+                    isDarkMode ? 'text-white' : 'text-blue-950'
+                  }`}
+                  variants={titleVariants}
+                >
                   {feature.title}
-                </h4>
-                <p className={`mt-2 text-center text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                </motion.h4>
+                <motion.p
+                  className={`mt-2 text-center text-sm ${
+                    isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                  }`}
+                  variants={descriptionVariants}
+                >
                   {feature.description}
-                </p>
+                </motion.p>
               </motion.div>
             ))}
           </div>
 
           <h3
-            className={`text-4xl sm:text-5xl font-bold text-center ${isDarkMode ? 'text-white' : 'text-blue-950'} mt-16 mb-12`}
+            className={`text-4xl sm:text-5xl font-bold text-center ${
+              isDarkMode ? 'text-white' : 'text-blue-950'
+            } mt-16 mb-12`}
           >
             How It Works
           </h3>
@@ -412,7 +406,9 @@ export default function Hero() {
             {howItWorks.map((step, index) => (
               <motion.div
                 key={`how-it-works-${index}`}
-                className={`p-6 rounded-lg shadow-lg ${isDarkMode ? 'bg-gray-800' : 'bg-white'} border border-transparent hover:border-blue-500 transition-all duration-300`}
+                className={`p-6 rounded-lg shadow-lg ${
+                  isDarkMode ? 'bg-gray-800' : 'bg-white'
+                } border border-transparent hover:border-blue-500 transition-all duration-300`}
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
@@ -420,10 +416,18 @@ export default function Hero() {
                 whileHover={{ scale: 1.05 }}
               >
                 <div className="flex justify-center">{step.icon}</div>
-                <h4 className={`mt-4 text-xl font-semibold text-center ${isDarkMode ? 'text-white' : 'text-blue-950'}`}>
+                <h4
+                  className={`mt-4 text-xl font-semibold text-center ${
+                    isDarkMode ? 'text-white' : 'text-blue-950'
+                  }`}
+                >
                   {step.title}
                 </h4>
-                <p className={`mt-2 text-center text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                <p
+                  className={`mt-2 text-center text-sm ${
+                    isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                  }`}
+                >
                   {step.description}
                 </p>
               </motion.div>

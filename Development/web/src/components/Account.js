@@ -16,6 +16,7 @@ import { db } from '@/firebase';
  * 2. Beautiful tile layout for subscription details, toggles, etc.
  * 3. Maintains existing functionality: fetch billing, manage toggles, update Firestore, etc.
  * 4. More modern design cues: shadowed cards, color-coded statuses, bigger toggles, etc.
+ * 5. NEW: Update Log button & modal with a detailed log ranging from the initial release to version 0.9.0.
  */
 
 export default function Account() {
@@ -37,6 +38,9 @@ export default function Account() {
   const [emailNotifications, setEmailNotifications] = useState(
     userDataObj?.emailNotifications || true
   );
+
+  // NEW: State to control Update Log modal visibility
+  const [showUpdateLog, setShowUpdateLog] = useState(false);
 
   // Grab the subscription plan
   const plan = subscriptionData.plan || 'Free';
@@ -253,13 +257,8 @@ export default function Account() {
                   transition-all duration-200 flex items-center justify-center
                 `}
               >
-                <span className="font-semibold">
-                  Upgrade Account
-                </span>
-                <i
-                  className="ml-2 fa-solid fa-arrow-right transition-transform 
-                  duration-300 group-hover:translate-x-1"
-                ></i>
+                <span className="font-semibold">Upgrade Account</span>
+                <i className="ml-2 fa-solid fa-arrow-right transition-transform duration-300 group-hover:translate-x-1"></i>
               </Link>
             )}
             {(plan === 'Pro' || plan === 'Basic' || plan === 'Developer') && (
@@ -273,13 +272,8 @@ export default function Account() {
                   transition-all duration-200 flex items-center justify-center
                 `}
               >
-                <span className="font-semibold">
-                  Cancel Subscription
-                </span>
-                <i
-                  className="ml-2 fa-solid fa-arrow-right transition-transform 
-                  duration-300 group-hover:translate-x-1"
-                ></i>
+                <span className="font-semibold">Cancel Subscription</span>
+                <i className="ml-2 fa-solid fa-arrow-right transition-transform duration-300 group-hover:translate-x-1"></i>
               </a>
             )}
           </div>
@@ -344,7 +338,7 @@ export default function Account() {
           <h2 className="text-xl font-bold mb-4">Account Stats</h2>
           <div className="space-y-2 text-sm">
             <p>
-              <strong>Open Cases:</strong> {vals.cases}
+              <strong>Case Briefs:</strong> {vals.cases}
             </p>
             <p>
               <strong>Public Profile:</strong>{' '}
@@ -363,10 +357,92 @@ export default function Account() {
             </p>
           </div>
         </section>
-      </div> 
+      </div>
+
+      {/* Update Log Button */}
+      <div className="flex justify-center mt-4">
+        <button
+          onClick={() => setShowUpdateLog(true)}
+          className="group relative h-12 w-full sm:w-56 overflow-hidden rounded bg-gradient-to-r from-blue-600 to-blue-800 text-white text-sm sm:text-base shadow hover:opacity-90 transition-all duration-200 flex items-center justify-center"
+        >
+          <span className="font-semibold">Update Log</span>
+        </button>
+      </div>
+
       <div className="mt-auto">
         <LogoFiller />
       </div>
-    </div>   
-  );  
+
+      {/* Update Log Modal */}
+      {showUpdateLog && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+          <div
+            className={`max-w-2xl w-full p-6 rounded-lg shadow-lg ${
+              isDarkMode ? 'bg-gray-800 text-white' : 'bg-white text-blue-950'
+            }`}
+          >
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-2xl font-bold">Update Log</h3>
+              <button onClick={() => setShowUpdateLog(false)} className="text-xl font-bold">
+                &times;
+              </button>
+            </div>
+            <div className="space-y-6 max-h-96 overflow-y-auto">
+              {/* Version 0.9.0 */}
+              <div>
+                <h4 className="text-xl font-semibold">Version 0.9.0</h4>
+                <ul className="list-disc list-inside space-y-1">
+                  <li>Advanced AI-driven legal analysis engine implemented for deeper case insights.</li>
+                  <li>Integrated multiple legal databases to enhance resource indexing.</li>
+                  <li>Introduced interactive case timeline visualizations.</li>
+                  <li>Revamped UI with modern design elements and responsive layouts.</li>
+                  <li>Enhanced security protocols with advanced encryption techniques.</li>
+                </ul>
+              </div>
+              {/* Version 0.8.0 */}
+              <div>
+                <h4 className="text-xl font-semibold">Version 0.8.0</h4>
+                <ul className="list-disc list-inside space-y-1">
+                  <li>Refined natural language query processing for improved legal research accuracy.</li>
+                  <li>Integrated real-time updates for legal statutes and case law changes.</li>
+                  <li>Optimized dark mode with enhanced high-contrast themes for accessibility.</li>
+                  <li>Streamlined subscription management workflows for a smoother user experience.</li>
+                </ul>
+              </div>
+              {/* Version 0.7.0 */}
+              <div>
+                <h4 className="text-xl font-semibold">Version 0.7.0</h4>
+                <ul className="list-disc list-inside space-y-1">
+                  <li>Launched the Cadexlaw AI Chatbot to deliver instant legal query responses.</li>
+                  <li>Expanded the legal resource library with updated case summaries and briefs.</li>
+                  <li>Enhanced search functionality with predictive text and contextual suggestions.</li>
+                  <li>Resolved various UI bugs to improve overall navigation and user experience.</li>
+                </ul>
+              </div>
+              {/* Version 0.6.0 */}
+              <div>
+                <h4 className="text-xl font-semibold">Version 0.6.0</h4>
+                <ul className="list-disc list-inside space-y-1">
+                  <li>Introduced interactive study notes and collaborative features for users.</li>
+                  <li>Optimized data fetching performance to accelerate legal content loading times.</li>
+                  <li>Laid the groundwork for future AI-driven legal research enhancements.</li>
+                  <li>Incorporated early user feedback to enhance UI responsiveness and stability.</li>
+                </ul>
+              </div>
+              {/* Initial Release */}
+              <div>
+                <h4 className="text-xl font-semibold">Initial Release</h4>
+                <ul className="list-disc list-inside space-y-1">
+                  <li>Launched Cadexlaw.com as an AI Law Tool for advanced legal research.</li>
+                  <li>Introduced a comprehensive library of legal study materials and case law databases.</li>
+                  <li>Implemented basic AI-assisted research tools and study recommendations.</li>
+                  <li>Established the core framework for continuous enhancements in legal research.</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
 }
