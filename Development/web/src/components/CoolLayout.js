@@ -47,17 +47,63 @@ export default function CoolLayout({ children }) {
                 });
             }
 
+            // Array for shooting stars
+            const shootingStars = [];
+
+            // Helper function to spawn a single shooting star
+            function spawnShootingStar() {
+                return {
+                    x: Math.random() * canvas.width,       // Random starting X
+                    y: Math.random() * canvas.height,      // Random starting Y
+                    length: Math.random() * 80 + 20,       // Trail length
+                    speed: Math.random() * 2 + 2,          // Speed
+                    angle: Math.random() * Math.PI * 2,    // Random direction
+                    opacity: 1                             // Start fully visible
+                };
+            }
+
             let animationFrameId;
             function animate(time) {
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
+
                 stars.forEach(star => {
-                    // Calculate a twinkle factor using a sine wave (0 to 1)
                     const twinkle = (Math.sin(time * 0.001 * star.twinkleSpeed + star.offset) + 1) / 2;
                     ctx.beginPath();
                     ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
                     ctx.fillStyle = `rgba(255, 255, 255, ${twinkle})`;
                     ctx.fill();
                 });
+
+                // Occasionally spawn a new shooting star
+                if (Math.random() < 0.003) { 
+                    shootingStars.push(spawnShootingStar());
+                }
+
+                shootingStars.forEach((star, index) => {
+                    star.x += Math.cos(star.angle) * star.speed;
+                    star.y += Math.sin(star.angle) * star.speed;
+
+                    star.opacity -= 0.005;
+
+                    ctx.beginPath();
+                    ctx.moveTo(star.x, star.y);
+                    ctx.lineTo(
+                        star.x - Math.cos(star.angle) * star.length,
+                        star.y - Math.sin(star.angle) * star.length
+                    );
+                    ctx.strokeStyle = `rgba(255, 255, 255, ${star.opacity})`;
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+
+                    if (
+                        star.opacity <= 0 ||
+                        star.x < 0 || star.x > canvas.width ||
+                        star.y < 0 || star.y > canvas.height
+                    ) {
+                        shootingStars.splice(index, 1);
+                    }
+                });
+
                 animationFrameId = requestAnimationFrame(animate);
             }
             animate();
@@ -70,11 +116,14 @@ export default function CoolLayout({ children }) {
     }, [isDarkMode]);
 
     return (
-        <div className={`flex flex-col flex-1 w-full transition-colors duration-300 ${
-            isDarkMode 
-                ? 'bg-gradient-to-br from-blue-950 via-gray-900 to-slate-950'
-                : 'bg-gradient-to-br from-slate-50 via-white to-blue-50'
-        }`} style={{ position: 'relative', overflow: 'hidden' }}>
+        <div
+            className={`flex flex-col flex-1 w-full transition-colors duration-300 ${
+                isDarkMode 
+                    ? 'bg-gradient-to-br from-blue-950 via-gray-900 to-slate-950'
+                    : 'bg-gradient-to-br from-slate-50 via-white to-blue-50'
+            }`}
+            style={{ position: 'relative', overflow: 'hidden' }}
+        >
             {isDarkMode && (
                 <canvas
                     ref={canvasRef}
