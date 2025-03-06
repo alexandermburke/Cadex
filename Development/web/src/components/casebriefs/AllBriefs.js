@@ -12,8 +12,7 @@ import {
   FaArrowRight,
   FaHeart,
   FaRegHeart,
-  FaSync,
-  FaShareAlt
+  FaSync
 } from 'react-icons/fa';
 import { useRouter, useSearchParams } from 'next/navigation';
 
@@ -31,6 +30,9 @@ export default function AllBriefs() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { currentUser, userDataObj } = useAuth();
+  const plan = userDataObj?.billing?.plan?.toLowerCase() || 'free';
+  const isPro = plan === 'pro';
+  const isExpert = plan === 'expert';
 
   // Dark mode preference
   const isDarkMode = userDataObj?.darkMode || false;
@@ -97,7 +99,7 @@ export default function AllBriefs() {
     }
   };
 
-  // Share case functionality
+  // Share case functionality (not used in this component)
   const shareCase = async () => {
     if (!selectedCase) return;
     const shareData = {
@@ -673,37 +675,17 @@ export default function AllBriefs() {
                       <span className="text-red-500 font-bold text-lg">✕</span>
                     </motion.div>
                   )}
-                  <motion.button
-                    onClick={() => toggleFavorite(selectedCase.id)}
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.9 }}
-                    className="ml-4"
-                    aria-label="Toggle Favorite"
-                  >
-                    {favorites.includes(selectedCase.id) ? (
-                      <FaHeart className="text-red-500" size={20} />
-                    ) : (
-                      <FaRegHeart className="text-gray-400" size={20} />
-                    )}
-                  </motion.button>
-                  <motion.button
-                    onClick={() => reRunSummary(selectedCase)}
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.9 }}
-                    className="ml-4"
-                    aria-label="Re-generate Brief"
-                  >
-                    <FaSync size={20} className="text-gray-400" />
-                  </motion.button>
-                  <motion.button
-                    onClick={shareCase}
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.9 }}
-                    className="ml-4"
-                    aria-label="Share Case"
-                  >
-                    <FaShareAlt size={20} className="text-gray-400" />
-                  </motion.button>
+                  {(isPro || isExpert) && (
+                    <motion.button
+                      onClick={() => reRunSummary(selectedCase)}
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                      className="ml-4"
+                      aria-label="Re-generate Brief"
+                    >
+                      <FaSync size={20} className="text-gray-400" />
+                    </motion.button>
+                  )}
                 </div>
               </div>
 

@@ -361,7 +361,7 @@ export default function Sidebar({
                 label="Lecture Summaries"
                 active={activeLink === '/lawtools/lecturesummaries'}
               />
-              <NavLink
+              <LockedNavLink
                 href="/ailawtools/flashcards"
                 icon={<FaStickyNote className="text-sm" />}
                 label="Flashcards & Outlines"

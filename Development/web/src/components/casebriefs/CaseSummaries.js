@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import Sidebar from '../Sidebar';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { FaBars, FaTimes, FaDownload } from 'react-icons/fa';
+import { FaBars, FaTimes, FaDownload, FaSync, FaShareAlt } from 'react-icons/fa';
 import { motion, AnimatePresence } from 'framer-motion';
 import { db } from '@/firebase';
 import {
@@ -31,6 +31,9 @@ export default function CaseSummaries() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { currentUser, userDataObj } = useAuth();
+  const plan = userDataObj?.billing?.plan?.toLowerCase() || 'free';
+  const isPro = plan === 'free'; // change to pro in production release
+  const isExpert = plan === 'expert';
   const isDarkMode = userDataObj?.darkMode || false;
 
   const [isSidebarVisible, setIsSidebarVisible] = useState(true);
@@ -113,6 +116,36 @@ export default function CaseSummaries() {
   useEffect(() => {
     if (!currentUser) return;
   }, [currentUser]);
+
+  // Share functionality
+  const shareCase = async () => {
+    if (!capCase) return;
+    const shareData = {
+      title: capCase.title,
+      text: 'Check out this case brief on CadexLaw',
+      url: window.location.href,
+    };
+    if (navigator.share) {
+      try {
+        await navigator.share(shareData);
+      } catch (err) {
+        console.error('Error sharing:', err);
+      }
+    } else {
+      navigator.clipboard.writeText(window.location.href);
+      alert('URL copied to clipboard');
+    }
+  };
+
+  // Re-generate summary function (calls appropriate summary function based on view mode)
+  const reGenerateSummary = async () => {
+    if (!capCase) return;
+    if (viewMode === 'simplified') {
+      await getCapCaseBriefSummary(capCase);
+    } else {
+      await getCapCaseSummary(capCase);
+    }
+  };
 
   // Fetch the main case and its summary.
   // If viewMode is 'simplified', use briefSummary; otherwise, use detailedSummary.
@@ -537,6 +570,26 @@ export default function CaseSummaries() {
                   <span className="text-red-500 font-bold text-lg">✕</span>
                 </motion.div>
               )}
+              {(isPro || isExpert) && (
+                <motion.button
+                  onClick={reGenerateSummary}
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                  className="ml-4"
+                  aria-label="Re-generate Summary"
+                >
+                  <FaSync size={16} className="text-gray-400" />
+                </motion.button>
+              )}
+              <motion.button
+                onClick={shareCase}
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+                className="ml-4"
+                aria-label="Share Case"
+              >
+                <FaShareAlt size={16} className="text-gray-400" />
+              </motion.button>
             </div>
           </div>
 
