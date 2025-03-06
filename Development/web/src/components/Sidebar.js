@@ -72,7 +72,7 @@ const ToggleSection = ({ isOpen, toggle, title, icon, children }) => (
   <section>
     <button
       onClick={toggle}
-      className="w-full flex items-center justify-between p-3 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 hover:bg-blue-800 hover:bg-opacity-75 transition-colors duration-200"
+      className="w-full flex items-center justify-between p-3 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 hover:bg-blue-600 hover:bg-opacity-75 transition-colors duration-200"
       aria-expanded={isOpen}
       aria-controls={`${title}-section`}
     >
