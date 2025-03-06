@@ -467,7 +467,7 @@ export default function Sidebar({
           title="Subject Guides"
           icon={<FaBookReader className="text-lg" />}
         >
-          {isBasic || isPro || isExpert ? (
+          {isPro || isExpert ? (
             <>
               <NavLink
                 href="/subjects/contracts"
