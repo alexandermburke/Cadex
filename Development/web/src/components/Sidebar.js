@@ -603,7 +603,7 @@ export default function Sidebar({
         </section>
       </nav>
 
-      <footer className="px-6 py-4 bg-transparent">
+      <footer className="px-6 py-20 bg-transparent">
         <div className="flex items-center gap-4">
           <div className="flex-1 min-w-0">
             <p className="font-semibold truncate">
