@@ -44,8 +44,8 @@ const NavLink = ({ href, icon, label, active }) => (
       className={clsx(
         'flex items-center gap-3 p-3 rounded transition-colors duration-200',
         {
-          'bg-blue-800': active,
-          'hover:bg-blue-800 hover:bg-opacity-75': !active,
+          'bg-blue-600': active,
+          'hover:bg-blue-600 hover:bg-opacity-75': !active,
         }
       )}
       aria-current={active ? 'page' : undefined}
@@ -215,8 +215,8 @@ export default function Sidebar({
   };
 
   const sidebarBackground = clsx({
-    'bg-gradient-to-br from-blue-900 to-purple-900': isDarkMode,
-    'bg-gradient-to-br from-blue-950 to-slate-950': !isDarkMode,
+    'bg-gradient-to-br from-blue-700 to-purple-700': !isDarkMode,
+    'bg-gradient-to-tr from-blue-900 to-slate-900': isDarkMode,
   });
 
   const planBadgeStyle = (() => {
@@ -603,7 +603,7 @@ export default function Sidebar({
         </section>
       </nav>
 
-      <footer className="px-6 py-20 bg-transparent">
+      <footer className="px-6 py-14 bg-transparent">
         <div className="flex items-center gap-4">
           <div className="flex-1 min-w-0">
             <p className="font-semibold truncate">
