@@ -12,6 +12,8 @@ import {
   FaArrowRight,
   FaHeart,
   FaRegHeart,
+  FaSync,
+  FaShareAlt
 } from 'react-icons/fa';
 import { useRouter, useSearchParams } from 'next/navigation';
 
@@ -92,6 +94,26 @@ export default function AllBriefs() {
       console.log('Updated favorites:', updatedFavorites);
     } catch (error) {
       console.error('Error updating favorites:', error);
+    }
+  };
+
+  // Share case functionality
+  const shareCase = async () => {
+    if (!selectedCase) return;
+    const shareData = {
+      title: selectedCase.title,
+      text: 'Check out this case brief on CadexLaw',
+      url: window.location.href,
+    };
+    if (navigator.share) {
+      try {
+        await navigator.share(shareData);
+      } catch (err) {
+        console.error("Error sharing:", err);
+      }
+    } else {
+      navigator.clipboard.writeText(window.location.href);
+      alert("URL copied to clipboard");
     }
   };
 
@@ -412,7 +434,6 @@ export default function AllBriefs() {
 
   return (
     <div className="relative flex h-screen transition-colors duration-500 bg-transparent">
-      {/* Sidebar + overlay */}
       <AnimatePresence>
         {isSidebarVisible && (
           <>
@@ -433,17 +454,14 @@ export default function AllBriefs() {
         )}
       </AnimatePresence>
 
-      {/* Main content */}
       <main className="flex-1 flex flex-col px-6 relative z-200 h-screen">
-        {/* Body Container */}
         <div
           className={`flex-1 w-full rounded-2xl shadow-xl p-6 overflow-y-auto overflow-x-auto ${
             isDarkMode
-              ? 'bg-gradient-to-br from-slate-900 to-blue-950 text-white'
+              ? 'bg-gradient-to-br from-blue-950 to-slate-900 text-white'
               : 'bg-white text-gray-800'
           } flex flex-col items-center`}
         >
-          {/* Tab Section */}
           <div className="w-full max-w-md mx-auto mb-4 flex justify-around">
             <motion.button
               className={`px-4 py-2 font-semibold transition-colors duration-300 ${
@@ -475,7 +493,6 @@ export default function AllBriefs() {
             </motion.button>
           </div>
 
-          {/* Search bar */}
           <div className="mb-6 w-full flex justify-center">
             <div className="relative flex items-center bg-gray-50 dark:bg-white/10 rounded-full px-3 py-2 w-full max-w-md">
               <FaSearch className="text-gray-700 dark:text-white/70 mr-2" />
@@ -493,7 +510,6 @@ export default function AllBriefs() {
             </div>
           </div>
 
-          {/* Cases Grid or loading */}
           {isLoading ? (
             <div className="w-full h-1 bg-blue-500 animate-pulse" />
           ) : (
@@ -503,7 +519,7 @@ export default function AllBriefs() {
                   <div
                     key={c.id}
                     onClick={() => openCase(c)}
-                    className={`p-4 rounded-xl shadow-lg transition-shadow cursor-pointer group flex flex-col ${
+                    className={`p-4 rounded-xl shadow-lg transition-shadow transition-transform transform hover:scale-105 cursor-pointer group flex flex-col ${
                       isDarkMode
                         ? 'bg-slate-800 border border-slate-700 text-white'
                         : 'bg-white border border-gray-300 text-gray-800'
@@ -551,7 +567,6 @@ export default function AllBriefs() {
                 ))}
               </div>
 
-              {/* Modern Bigger Pagination */}
               <div className="mt-6 flex items-center justify-center gap-2">
                 <motion.button
                   onClick={goToPrevPage}
@@ -612,7 +627,6 @@ export default function AllBriefs() {
         </div>
       </main>
 
-      {/* View Brief Modal */}
       {selectedCase && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
           <motion.div
@@ -626,7 +640,6 @@ export default function AllBriefs() {
             exit={{ scale: 0.7, opacity: 0 }}
             transition={{ duration: 0.3 }}
           >
-            {/* Modal Header */}
             <div className="flex justify-between items-start mb-4">
               <div>
                 <h2 className="text-2xl font-bold">{selectedCase.title}</h2>
@@ -673,10 +686,27 @@ export default function AllBriefs() {
                       <FaRegHeart className="text-gray-400" size={20} />
                     )}
                   </motion.button>
+                  <motion.button
+                    onClick={() => reRunSummary(selectedCase)}
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
+                    className="ml-4"
+                    aria-label="Re-generate Brief"
+                  >
+                    <FaSync size={20} className="text-gray-400" />
+                  </motion.button>
+                  <motion.button
+                    onClick={shareCase}
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
+                    className="ml-4"
+                    aria-label="Share Case"
+                  >
+                    <FaShareAlt size={20} className="text-gray-400" />
+                  </motion.button>
                 </div>
               </div>
 
-              {/* Close Button */}
               <button
                 onClick={closeCase}
                 className={`inline-block px-4 py-2 rounded-full font-semibold text-sm transition-colors duration-300 ${
@@ -690,7 +720,6 @@ export default function AllBriefs() {
               </button>
             </div>
 
-            {/* Case Full Text */}
             <div
               className={`max-h-60 overflow-auto border-b pb-3 mb-4 ${
                 isDarkMode
@@ -703,7 +732,6 @@ export default function AllBriefs() {
               </p>
             </div>
 
-            {/* Toggle bullet points vs. normal */}
             <div className="flex items-center gap-3 mb-4">
               <label className="font-semibold text-sm">
                 {bulletpointView ? 'Bullet Points' : 'Classic View'}
@@ -723,7 +751,6 @@ export default function AllBriefs() {
               </div>
             </div>
 
-            {/* Structured Case Brief */}
             {isSummaryLoading ? (
               <div className="flex flex-col items-center justify-center space-y-3">
                 <div className="relative w-16 h-16">
@@ -777,7 +804,6 @@ export default function AllBriefs() {
                   >
                     Case Brief
                   </h3>
-                  {/* Rule of Law */}
                   <div className="mb-3">
                     <strong>Rule of Law:</strong>
                     {bulletpointView ? (
@@ -790,7 +816,6 @@ export default function AllBriefs() {
                       </p>
                     )}
                   </div>
-                  {/* Facts */}
                   <div className="mb-3">
                     <strong>Facts:</strong>
                     {bulletpointView ? (
@@ -803,7 +828,6 @@ export default function AllBriefs() {
                       </p>
                     )}
                   </div>
-                  {/* Issue */}
                   <div className="mb-3">
                     <strong>Issue:</strong>
                     {bulletpointView ? (
@@ -816,7 +840,6 @@ export default function AllBriefs() {
                       </p>
                     )}
                   </div>
-                  {/* Holding */}
                   <div className="mb-3">
                     <strong>Holding:</strong>
                     {bulletpointView ? (
@@ -829,7 +852,6 @@ export default function AllBriefs() {
                       </p>
                     )}
                   </div>
-                  {/* Reasoning */}
                   <div className="mb-3">
                     <strong>Reasoning:</strong>
                     {bulletpointView ? (
@@ -842,7 +864,6 @@ export default function AllBriefs() {
                       </p>
                     )}
                   </div>
-                  {/* Dissent */}
                   <div>
                     <strong>Dissent:</strong>
                     {bulletpointView ? (
@@ -858,7 +879,6 @@ export default function AllBriefs() {
                   <div className="text-xs italic text-gray-400">
                     Still in development, information may not be fully accurate.
                   </div>
-                  {/* "See full Case Brief ->" Link */}
                   <Link
                     href={`/casebriefs/summaries?caseId=${selectedCase.id}`}
                     className="mt-3 text-blue-600 hover:underline cursor-pointer flex items-center gap-1 text-sm font-semibold"

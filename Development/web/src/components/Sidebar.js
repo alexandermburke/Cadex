@@ -216,7 +216,7 @@ export default function Sidebar({
 
   const sidebarBackground = clsx({
     'bg-gradient-to-br from-blue-700 to-purple-700': !isDarkMode,
-    'bg-gradient-to-br from-slate-900 to-blue-950': isDarkMode,
+    'bg-gradient-to-tr from-slate-900 to-blue-950': isDarkMode,
   });
 
   const planBadgeStyle = (() => {
