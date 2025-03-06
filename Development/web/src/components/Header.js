@@ -6,6 +6,8 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import Image from 'next/image';
 import Button from './Button';
+import { FaBars, FaTimes } from 'react-icons/fa';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const poppins = Poppins({ subsets: ["latin"], weight: ['400', '100', '200', '300', '500', '600', '700'] });
 
@@ -72,14 +74,14 @@ export default function Header() {
         <nav className='flex flex-col gap-2'>
             <Link 
                 className={`p-2 rounded-lg border-solid border duration-200 text-lg border-blue-950 border-x-4 border-y-4 
-                ${isDarkMode ? 'hover:text-slate-500 hover:bg-blue-950 text-white' : 'hover:text-slate-200 hover:bg-blue-950 text-black'}`}
+                ${isDarkMode ? 'hover:text-slate-500 hover:bg-blue-950 text-white' : 'hover:text-slate-500 hover:bg-blue-950 text-black'}`}
                 href={'/ailawtools/splash'}
             >
                 <p>Dashboard</p>
             </Link>
             <Link 
                 className={`p-2 rounded-lg border-solid border duration-200 text-lg border-blue-950 border-x-4 border-y-4 
-                ${isDarkMode ? 'hover:text-slate-500 hover:bg-blue-950 text-white' : 'hover:text-slate-200 hover:bg-blue-950 text-black'}`}
+                ${isDarkMode ? 'hover:text-slate-500 hover:bg-blue-950 text-white' : 'hover:text-slate-500 hover:bg-blue-950 text-black'}`}
                 href={'/pricing'} 
             >
                 <p>Pricing</p>
@@ -95,7 +97,6 @@ export default function Header() {
     ) {
         navActions = (
             <>
-              
                 <div className='hidden items-stretch md:flex'>
                     <Link 
                         href={'/admin'} 
@@ -136,7 +137,7 @@ export default function Header() {
             <nav className='flex flex-col gap-2'>
                 <Link 
                     href={'/ailawtools/splash'} 
-                    className={`p-2 rounded border-solid border duration-200 text-lg border-blue-950 border-x-4 border-y-4
+                    className={`p-2 rounded-lg border-solid border duration-200 text-lg border-blue-950 border-x-4 border-y-4
                     ${isDarkMode ? 'hover:text-slate-500 hover:bg-blue-950 text-white' : 'hover:text-slate-500 hover:bg-blue-950 text-black'}`}
                 >
                     <div className="flex items-center">
@@ -146,14 +147,14 @@ export default function Header() {
                 </Link>
                 <Link 
                     href={'/admin'} 
-                    className={`p-2 rounded border-solid border duration-200 text-lg border-blue-950 border-x-4 border-y-4
+                    className={`p-2 rounded-lg border-solid border duration-200 text-lg border-blue-950 border-x-4 border-y-4
                     ${isDarkMode ? 'hover:text-slate-500 hover:bg-blue-950 text-white' : 'hover:text-slate-500 hover:bg-blue-950 text-black'}`}
                 >
                     <p>Pro</p>
                 </Link>
                 <Link 
                     href={'/admin/account'} 
-                    className={`p-2 rounded border-solid border duration-200 text-lg border-blue-950 border-x-4 border-y-4
+                    className={`p-2 rounded-lg border-solid border duration-200 text-lg border-blue-950 border-x-4 border-y-4
                     ${isDarkMode ? 'hover:text-slate-500 hover:bg-blue-950 text-white' : 'hover:text-slate-500 hover:bg-blue-950 text-black'}`}
                 >
                     <p>Account</p>
@@ -191,22 +192,38 @@ export default function Header() {
                 </Link>
                 {navActions}
                 <button
-                    onClick={() => { setShowMenu(!showMenu) }}
+                    onClick={() => setShowMenu(!showMenu)}
                     className='grid md:hidden place-items-center p-4 duration-200 rounded-lg'
                 >
-                    {showMenu ? (
-                        <i className="fa-solid fa-xmark text-lg icon-transition icon-xmark"></i>
-                    ) : (
-                        <i className="fa-solid fa-bars text-lg icon-transition icon-bars"></i>
-                    )}
+                    <AnimatePresence mode="wait" initial={false}>
+                        {showMenu ? (
+                            <motion.div
+                                key="close-icon"
+                                initial={{ rotate: 90, opacity: 0 }}
+                                animate={{ rotate: 0, opacity: 1 }}
+                                exit={{ rotate: -90, opacity: 0 }}
+                                transition={{ duration: 0.3 }}
+                            >
+                                <FaTimes className="text-lg" />
+                            </motion.div>
+                        ) : (
+                            <motion.div
+                                key="bars-icon"
+                                initial={{ rotate: -90, opacity: 0 }}
+                                animate={{ rotate: 0, opacity: 1 }}
+                                exit={{ rotate: 90, opacity: 0 }}
+                                transition={{ duration: 0.3 }}
+                            >
+                                <FaBars className="text-lg" />
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
                 </button>
             </div>
 
             {showMenu && (
                 <div 
-                    className={`absolute md:hidden top-full left-4 right-4 pt-4 z-50 drop-down-animation 
-                    flex flex-col gap-2 rounded-2xl shadow-lg transition-all duration-300 
-                    ${isDarkMode ? 'bg-blue-950 text-white border border-slate-700' : 'bg-white text-black border border-gray-200'}`}
+                    className={`absolute md:hidden top-full left-4 right-4 pt-4 z-50 drop-down-animation flex flex-col gap-2 rounded-2xl shadow-lg transition-all duration-300 ${isDarkMode ? 'bg-blue-950 text-white border border-slate-700' : 'bg-white text-black border border-gray-200'}`}
                 >
                     <div className={`flex flex-col p-4 ${isDarkMode ? 'text-white' : 'text-black'}`}>
                         {menuActions}
