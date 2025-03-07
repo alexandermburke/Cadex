@@ -9,15 +9,6 @@ import LogoFiller from './LogoFiller';
 import { doc, updateDoc } from 'firebase/firestore';
 import { db } from '@/firebase';
 
-/**
- * Redesigned Account Page:
- * --------------------------------
- * 1. Hero section at top with user info, subscription status.
- * 2. Beautiful tile layout for subscription details, toggles, etc.
- * 3. Maintains existing functionality: fetch billing, manage toggles, update Firestore, etc.
- * 4. More modern design cues: shadowed cards, color-coded statuses, bigger toggles, etc.
- * 5. NEW: Update Log button & modal with a detailed log ranging from the initial release to version 0.9.0.
- */
 
 export default function Account() {
   const { currentUser, userDataObj, refreshUserData } = useAuth();

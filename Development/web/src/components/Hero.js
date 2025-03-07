@@ -108,7 +108,7 @@ export default function Hero() {
       icon: (
         <FaGavel className={`${isDarkMode ? 'text-white' : 'text-blue-950'} text-4xl mb-4`} />
       ),
-      title: 'Case Brief Bank',
+      title: '5,000+ Case Briefs',
       description:
         'Browse a comprehensive bank of case briefs, summaries, and analyses—including All Briefs—to grasp key rulings fast.',
     },

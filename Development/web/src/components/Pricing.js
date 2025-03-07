@@ -27,17 +27,17 @@ const poppins = Poppins({
 const plans = [
   {
     name: 'Basic',
-    description: 'Perfect for new or budget-conscious law students.',
+    description: 'Perfect for 1L or Students that only need Case Briefs.',
     price: 8,
     interval: 'Per month',
     promotion: 'First 7 days free',
     features: [
       {
-        text: 'Unlimited Case Simulations',
+        text: 'Instant Access to 5,000+ Briefs',
         info: 'Practice issue-spotting and drafting in real-life legal scenarios.',
       },
       {
-        text: 'Access to Case Briefs & Summaries',
+        text: 'Advanced Case Summaries',
         info: 'Unlimited access to our database of Case briefs with detailed summaries.',
       },
       {
@@ -65,7 +65,7 @@ const plans = [
         info: 'Timed practice exams plus deeper analytics on strengths and weaknesses.',
       },
       {
-        text: 'AI IRAC Generator & Issue Spotter',
+        text: 'IRAC Generator & Issue Spotter',
         info: 'Quickly generate IRAC outlines for assignments, exams, or practice scenarios.',
       },
       {
@@ -73,7 +73,7 @@ const plans = [
         info: 'Adaptive flashcards to focus on areas needing improvement.',
       },
       {
-        text: 'Priority Customer Support',
+        text: 'Ability to Re-Generate Briefs',
         info: 'Faster response times for technical and content-related questions.',
       },
       {
@@ -81,7 +81,7 @@ const plans = [
         info: 'Accurate AI-based research, writing, and exam prep.',
       },
       {
-        text: 'Early Access to Subject Guides',
+        text: 'Early Access to Beta Features',
         info: 'Accurate AI-based research, writing, and exam prep.',
       },
     ],
@@ -112,6 +112,7 @@ const plans = [
       },
     ],
     recommended: false,
+    comingSoon: false,
   },
 ];
 
@@ -302,6 +303,18 @@ export default function Plans() {
               </div>
             )}
 
+            {/* Coming Soon Badge for Expert Tier */}
+            {plan.comingSoon && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.8, y: -10 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+                className="absolute top-4 left-1/2 transform -translate-x-1/2 px-4 py-1 bg-gradient-to-r from-purple-500 to-pink-500 text-white text-xs font-bold rounded-full shadow-xl"
+              >
+                Coming Soon
+              </motion.div>
+            )}
+
             {/* Plan Header */}
             <div className="flex items-center justify-between mb-4">
               <h3
@@ -379,7 +392,7 @@ export default function Plans() {
       {selectedPlan && (
         <div className="flex flex-col items-center w-full max-w-md mx-auto">
           <Button
-            text={`Get ${selectedPlan}`}
+            text={`Start 7 Day free trial`}
             clickHandler={handleUpdatePlan}
             additionalClasses="w-full sm:w-56 h-12 text-lg"
           />
@@ -422,7 +435,7 @@ export default function Plans() {
               Which plan should I choose?
             </h3>
             <p className={isDarkMode ? 'text-gray-300' : 'text-gray-700'}>
-              Basic is great if you want essential AI-powered tools and case simulations at a low cost. Pro is ideal for students who need advanced features like AI IRAC generation and deeper analytics. Expert is for those aiming for top class performance, offering the highest level of AI assistance and exclusive study communities.
+              Basic is great if you want essential AI-powered tools and case simulations at a low cost. Pro is ideal for students who need advanced features like IRAC generation and deeper analytics. Expert is for those aiming for top class performance, offering the highest level of AI assistance and exclusive study communities.
             </p>
           </div>
 

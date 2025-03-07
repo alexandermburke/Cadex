@@ -51,7 +51,7 @@ function SEOHead() {
       <meta name="twitter:title" content="CadexLaw - Law Student Study Aid, Legal Simulation, Court Case Practice" />
       <meta
         name="twitter:description"
-        content="Enhance your legal education with CadexLaw's realistic court simulations, interactive mock trials, LSAT prep, comprehensive exam preparation, and advanced legal research tools. Your ultimate legal study platform."
+        content="Enhance your legal education with CadexLaw's 5,000+ Case Briefs, interactive UX, Case Summaries, comprehensive exam preparation, and advanced legal research tools. Your ultimate legal study platform."
       />
       <meta name="twitter:image" content="https://www.cadexlaw.com/images/twitter-card.jpg" />
       <meta name="twitter:creator" content="@CadexLaw" />

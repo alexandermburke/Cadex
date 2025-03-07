@@ -83,10 +83,8 @@ export default function CaseAnalysis() {
 
   // Simple “Generate Citations” function (placeholder)
   const generateCitationsInText = (text) => {
-    // If autoCitationsOn is OFF, just return the text as-is
     if (!autoCitationsOn) return text;
-
-    // For example, find words like "Roe v. Wade" and append "(Auto-Cited)"
+    // Finds patterns like "Roe v. Wade" and appends "(Auto-Cited)"
     return text.replace(
       /\b([A-Z][a-z]+ v\. [A-Z][a-z]+)/g,
       (match) => `${match} (Auto-Cited)`
@@ -153,12 +151,9 @@ export default function CaseAnalysis() {
       };
       analysisToUpdate.versions.push(newVersion);
 
-      // If auto-citations are toggled on, run generateCitations
-      analysisToUpdate.details = generateCitationsInText(
-        analysisToUpdate.details
-      );
+      // If auto-citations are toggled on, update the details accordingly
+      analysisToUpdate.details = generateCitationsInText(analysisToUpdate.details);
 
-      // Then update the array
       const updatedList = [...savedAnalyses];
       updatedList[index] = analysisToUpdate;
 
@@ -200,10 +195,7 @@ export default function CaseAnalysis() {
 
   // Simple share function
   const handleShareAnalysis = (analysis) => {
-    const shareUrl = `https://yourapp.com/analysis/${analysis.title.replace(
-      /\s+/g,
-      '-'
-    )}`;
+    const shareUrl = `https://yourapp.com/analysis/${analysis.title.replace(/\s+/g, '-')}`;
     navigator.clipboard
       .writeText(shareUrl)
       .then(() => alert(`Link copied to clipboard: ${shareUrl}`))
@@ -215,9 +207,7 @@ export default function CaseAnalysis() {
     const query = searchQuery.toLowerCase();
     const inTitle = analysis.title.toLowerCase().includes(query);
     const inCaseTitle = analysis.caseTitle.toLowerCase().includes(query);
-    const inTags = analysis.tags?.some((tag) =>
-      tag.toLowerCase().includes(query)
-    );
+    const inTags = analysis.tags?.some((tag) => tag.toLowerCase().includes(query));
     return inTitle || inCaseTitle || inTags;
   });
 
@@ -376,9 +366,7 @@ export default function CaseAnalysis() {
                 </div>
 
                 <div className="mb-4">
-                  <label className="block font-medium mb-1">
-                    Analysis Details
-                  </label>
+                  <label className="block font-medium mb-1">Analysis Details</label>
                   <textarea
                     rows="5"
                     className={`w-full p-3 rounded-md shadow-sm text-sm focus:outline-none transition-colors ${
@@ -436,17 +424,17 @@ export default function CaseAnalysis() {
                       onChange={(e) => setAutoCitationsOn(e.target.checked)}
                       className="sr-only peer"
                     />
-                    <motion.div
-                      className={`block w-14 h-8 rounded-full peer-checked:bg-blue-600 ${
-                        isDarkMode
-                          ? 'bg-slate-700 peer-checked:bg-blue-600'
-                          : 'bg-gray-300 peer-checked:bg-blue-950'
-                      }`}
+                    {/* Background element */}
+                    <div
+                      className={`block w-14 h-8 rounded-full ${
+                        isDarkMode ? 'bg-slate-700' : 'bg-gray-300'
+                      } peer-checked:bg-blue-600`}
                     />
+                    {/* Knob, animated with Framer Motion */}
                     <motion.div
-                      className={`absolute top-1 left-1 bg-white w-6 h-6 rounded-full shadow-md transform peer-checked:translate-x-6 transition-transform ${
-                        isDarkMode ? 'peer-checked:bg-slate-300' : ''
-                      }`}
+                      className="absolute top-1 left-1 bg-white w-6 h-6 rounded-full shadow-md"
+                      animate={{ x: autoCitationsOn ? 24 : 0 }}
+                      transition={{ type: 'spring', stiffness: 700, damping: 30 }}
                     />
                   </div>
                 </div>
@@ -515,11 +503,7 @@ export default function CaseAnalysis() {
                             } hover:shadow-xl`}
                           >
                             <div className="flex justify-between items-center">
-                              <div
-                                onClick={() =>
-                                  setExpandedAnalysis(isExpanded ? null : idx)
-                                }
-                              >
+                              <div onClick={() => setExpandedAnalysis(isExpanded ? null : idx)}>
                                 <h3 className="text-md font-semibold mb-1">
                                   {analysis.title}
                                 </h3>
@@ -561,11 +545,9 @@ export default function CaseAnalysis() {
                                   Delete
                                 </motion.button>
 
-                                {/* Expand/Collapse Toggle Label */}
+                                {/* Expand/Collapse Toggle */}
                                 <span
-                                  onClick={() =>
-                                    setExpandedAnalysis(isExpanded ? null : idx)
-                                  }
+                                  onClick={() => setExpandedAnalysis(isExpanded ? null : idx)}
                                   className={`text-xs font-semibold cursor-pointer transition-colors ${
                                     isDarkMode
                                       ? 'text-blue-400 group-hover:text-blue-200'
@@ -611,12 +593,10 @@ export default function CaseAnalysis() {
                                   <strong>Versions:</strong>
                                   {analysis.versions?.length > 0 ? (
                                     <ul className="list-inside list-disc ml-4 mt-1">
-                                      {analysis.versions.map((v, i) => (
+                                      {analysis.versions.map((v) => (
                                         <li key={v.timestamp}>
-                                          {new Date(
-                                            v.timestamp
-                                          ).toLocaleString()}
-                                          : {simplifyText(v.details, 50)}
+                                          {new Date(v.timestamp).toLocaleString()}:{' '}
+                                          {simplifyText(v.details, 50)}
                                         </li>
                                       ))}
                                     </ul>
@@ -625,7 +605,7 @@ export default function CaseAnalysis() {
                                   )}
                                 </div>
 
-                                {/* Example: "Update" button to add version */}
+                                {/* "Update" button to add version */}
                                 <motion.button
                                   whileHover={{ scale: 1.02 }}
                                   whileTap={{ scale: 0.98 }}

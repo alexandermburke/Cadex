@@ -23,17 +23,27 @@ export async function POST(request) {
       );
     }
 
-    // Construct the verification prompt with additional context
+    // Construct the verification prompt with additional checks.
     const verificationPrompt = `
 Generate a JSON object with the following keys:
 {
   "verified": boolean,
   "explanation": string
 }
-Verify if the following case brief summary is 100% accurate based solely on the provided context.
-If the summary is fully correct, set "verified" to true and "explanation" to "Summary is fully accurate."
-If it is not fully accurate, set "verified" to false and provide a brief explanation in "explanation" as to why.
-Do not include any additional text. We do not have access to court records or case documents.
+Your task is to verify if the provided case brief summary is 100% accurate based solely on the following context.
+In addition to checking that the summary includes detailed content for:
+  1. Rule of Law
+  2. Facts
+  3. Issue
+  4. Holding
+  5. Reasoning
+  6. Dissent
+please also verify that the provided case title, decision date (year), and jurisdiction are correct and well-formatted. This includes checking for proper punctuation, spelling, grammar, and capitalization.
+
+If the summary is fully correct and all additional fields are accurate and properly formatted, set "verified" to true and "explanation" to "Summary is fully accurate." 
+If there are any issues—whether the summary is missing substantial details or if the title, date, or jurisdiction are incorrect, misspelled, or improperly formatted—set "verified" to false and provide a concise explanation stating what is wrong.
+
+Do not include any additional text.
 
 Case Title: "${caseTitle.trim()}"
 Decision Date: ${decisionDate || 'N/A'}
@@ -52,7 +62,7 @@ Summary:
       {
         role: 'system',
         content:
-          'You are an expert legal analyst. Your task is to verify the accuracy of a legal case brief summary based on the provided context and return a JSON object as instructed.',
+          'You are an expert legal analyst. Your task is to verify the accuracy of a legal case brief summary and check that the case title, decision date (year), and jurisdiction are correct and properly formatted (including punctuation, spelling, grammar, and capitalization). Return ONLY a JSON object in the exact format specified.',
       },
       {
         role: 'user',

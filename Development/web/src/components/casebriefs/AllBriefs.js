@@ -18,7 +18,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 
 // Firebase
 import { db } from '@/firebase';
-import { collection, getDocs, doc, getDoc, updateDoc } from 'firebase/firestore';
+import { collection, getDocs, doc, getDoc, updateDoc, addDoc } from 'firebase/firestore';
 
 // Auth
 import { useAuth } from '@/context/AuthContext';
@@ -31,6 +31,7 @@ export default function AllBriefs() {
   const searchParams = useSearchParams();
   const { currentUser, userDataObj } = useAuth();
   const plan = userDataObj?.billing?.plan?.toLowerCase() || 'free';
+  const isFree = plan === 'free';
   const isPro = plan === 'pro';
   const isExpert = plan === 'expert';
 
@@ -58,7 +59,7 @@ export default function AllBriefs() {
   const [favorites, setFavorites] = useState([]);
   const [isFavorited, setIsFavorited] = useState(false);
 
-  // Tabs: 'browse' or 'favorites'
+  // Tab state: 'browse', 'favorites', or 'create'
   const [activeTab, setActiveTab] = useState('browse');
 
   // Filters
@@ -68,9 +69,46 @@ export default function AllBriefs() {
   // Bullet-point or paragraph view
   const [bulletpointView, setBulletpointView] = useState(false);
 
-  // Pagination
-  const ITEMS_PER_PAGE = 18;
+  // Dynamic Items per page state (calculated based on viewport)
+  const [itemsPerPage, setItemsPerPage] = useState(18);
+
+  useEffect(() => {
+    const updateItemsPerPage = () => {
+      let numCols = 2;
+      if (window.innerWidth >= 1024) {
+        numCols = 5;
+      } else if (window.innerWidth >= 640) {
+        numCols = 3;
+      }
+      const offset = 250;
+      const availableHeight = window.innerHeight - offset;
+      const itemHeight = 220;
+      const numRows = Math.floor(availableHeight / itemHeight);
+      const newItemsPerPage = numRows * numCols;
+      setItemsPerPage(newItemsPerPage > 0 ? newItemsPerPage : 1);
+    };
+
+    updateItemsPerPage();
+    window.addEventListener('resize', updateItemsPerPage);
+    return () => window.removeEventListener('resize', updateItemsPerPage);
+  }, []);
+
   const [isLoading, setIsLoading] = useState(false);
+
+  // New case brief form state
+  const [newBriefTitle, setNewBriefTitle] = useState('');
+  const [newBriefJurisdiction, setNewBriefJurisdiction] = useState('');
+  const [newBriefDate, setNewBriefDate] = useState('');
+
+  // States for handling creation process
+  const [createLoading, setCreateLoading] = useState(false);
+  const [createError, setCreateError] = useState('');
+
+  // Helper to generate a 6-digit case number as a string
+  const generateCaseNumber = () => {
+    const num = Math.floor(Math.random() * 1000000);
+    return num.toString().padStart(6, '0');
+  };
 
   // Load favorites from user data
   useEffect(() => {
@@ -79,16 +117,15 @@ export default function AllBriefs() {
     }
   }, [userDataObj]);
 
-  // Toggle Favorite
-  const toggleFavorite = async () => {
+  const toggleFavorite = async (caseId) => {
     try {
       const userDocRef = doc(db, 'users', currentUser.uid);
       let updatedFavorites;
-      if (favorites.includes(selectedCase.id)) {
-        updatedFavorites = favorites.filter((id) => id !== selectedCase.id);
+      if (favorites.includes(caseId)) {
+        updatedFavorites = favorites.filter((id) => id !== caseId);
         setIsFavorited(false);
       } else {
-        updatedFavorites = [...favorites, selectedCase.id];
+        updatedFavorites = [...favorites, caseId];
         setIsFavorited(true);
       }
       setFavorites(updatedFavorites);
@@ -99,7 +136,6 @@ export default function AllBriefs() {
     }
   };
 
-  // Share case functionality (not used in this component)
   const shareCase = async () => {
     if (!selectedCase) return;
     const shareData = {
@@ -119,7 +155,6 @@ export default function AllBriefs() {
     }
   };
 
-  // Fetch capCases
   useEffect(() => {
     if (!currentUser) return;
     const fetchCapCases = async () => {
@@ -141,7 +176,6 @@ export default function AllBriefs() {
     fetchCapCases();
   }, [currentUser]);
 
-  // Auto-open a case if ?caseId= is in the URL
   useEffect(() => {
     const caseIdParam = searchParams.get('caseId');
     if (caseIdParam && capCases.length > 0) {
@@ -155,25 +189,14 @@ export default function AllBriefs() {
     }
   }, [searchParams, capCases]);
 
-  // Redirect if not logged in
   if (!currentUser) {
     return (
-      <div
-        className={`flex items-center justify-center h-full transition-colors ${
-          isDarkMode ? 'bg-slate-900 text-white' : 'bg-gray-50 text-gray-800'
-        }`}
-      >
+      <div className={`flex items-center justify-center h-full transition-colors ${isDarkMode ? 'bg-slate-900 text-white' : 'bg-gray-50 text-gray-800'}`}>
         <div className="p-6 bg-white dark:bg-slate-800 rounded-2xl shadow-xl text-center">
-          <p className="mb-4 text-lg font-semibold">
-            Please log in to access the case database.
-          </p>
+          <p className="mb-4 text-lg font-semibold">Please log in to access the case database.</p>
           <button
             onClick={() => router.push('/login')}
-            className={`px-4 py-2 rounded-md text-sm font-semibold transition-colors duration-300 ${
-              isDarkMode
-                ? 'bg-blue-600 hover:bg-blue-500 text-white'
-                : 'bg-blue-950 hover:bg-blue-800 text-white'
-            }`}
+            className={`px-4 py-2 rounded-md text-sm font-semibold transition-colors duration-300 ${isDarkMode ? 'bg-blue-600 hover:bg-blue-500 text-white' : 'bg-blue-950 hover:bg-blue-800 text-white'}`}
           >
             Go to Login
           </button>
@@ -182,7 +205,6 @@ export default function AllBriefs() {
     );
   }
 
-  // Filter, search & pagination
   const filteredCases = capCases.filter((item) => {
     const s = searchTerm.toLowerCase();
     const title = item.title?.toLowerCase() || '';
@@ -191,33 +213,19 @@ export default function AllBriefs() {
     const decisionDate = item.decisionDate?.toLowerCase() || '';
     const content = item.content?.toLowerCase() || '';
 
-    const matchesSearch =
-      title.includes(s) ||
-      jurisdiction.includes(s) ||
-      volume.includes(s) ||
-      decisionDate.includes(s) ||
-      content.includes(s);
-
-    const matchesDate = filterDate
-      ? decisionDate.includes(filterDate.toLowerCase())
-      : true;
-    const matchesJurisdiction = filterJurisdiction
-      ? jurisdiction.includes(filterJurisdiction.toLowerCase())
-      : true;
-
+    const matchesSearch = title.includes(s) || jurisdiction.includes(s) || volume.includes(s) || decisionDate.includes(s) || content.includes(s);
+    const matchesDate = filterDate ? decisionDate.includes(filterDate.toLowerCase()) : true;
+    const matchesJurisdiction = filterJurisdiction ? jurisdiction.includes(filterJurisdiction.toLowerCase()) : true;
     return matchesSearch && matchesDate && matchesJurisdiction;
   });
 
-  // If in Favorites tab, filter further by favorites
-  const displayCases =
-    activeTab === 'favorites'
-      ? filteredCases.filter((c) => favorites.includes(c.id))
-      : filteredCases;
-
-  const totalPages = Math.ceil(displayCases.length / ITEMS_PER_PAGE);
+  const displayCases = activeTab === 'favorites'
+    ? filteredCases.filter((c) => favorites.includes(c.id))
+    : filteredCases;
+  const totalPages = Math.ceil(displayCases.length / itemsPerPage);
   const validCurrentPage = Math.min(currentPage, totalPages || 1);
-  const startIndex = (validCurrentPage - 1) * ITEMS_PER_PAGE;
-  const endIndex = currentPage * ITEMS_PER_PAGE;
+  const startIndex = (validCurrentPage - 1) * itemsPerPage;
+  const endIndex = validCurrentPage * itemsPerPage;
   const paginatedCases = displayCases.slice(startIndex, endIndex);
 
   const goToPage = (num) => setCurrentPage(num);
@@ -228,7 +236,6 @@ export default function AllBriefs() {
     if (currentPage < totalPages) setCurrentPage(currentPage + 1);
   };
 
-  // Log recent activity
   const logCaseView = async (c) => {
     console.log(`Logging view for case ID: ${c.id}`);
     try {
@@ -256,11 +263,14 @@ export default function AllBriefs() {
     }
   };
 
-  // Re-run summary update
   const reRunSummary = async (c) => {
     setIsSummaryLoading(true);
     try {
-      const payload = { title: c.title, date: c.decisionDate || '' };
+      const payload = { 
+        title: c.title, 
+        date: c.decisionDate || '', 
+        jurisdiction: c.jurisdiction 
+      };
       console.log('Re-fetching summary from /api/casebrief-summary with:', payload);
       const res = await fetch('/api/casebrief-summary', {
         method: 'POST',
@@ -274,12 +284,9 @@ export default function AllBriefs() {
         return;
       }
       const data = await res.json();
-      await updateDoc(doc(db, 'capCases', c.id), {
-        briefSummary: { ...data, verified: false },
-      });
+      await updateDoc(doc(db, 'capCases', c.id), { briefSummary: { ...data, verified: false } });
       setCaseBrief(data);
 
-      // Verify
       const verifyRes = await fetch('/api/casebrief-verification', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -292,9 +299,7 @@ export default function AllBriefs() {
       });
       const verifyData = await verifyRes.json();
       if (verifyData.verified === true) {
-        await updateDoc(doc(db, 'capCases', c.id), {
-          'briefSummary.verified': true,
-        });
+        await updateDoc(doc(db, 'capCases', c.id), { 'briefSummary.verified': true });
         setIsVerified(true);
       } else {
         console.log('Re-verification explanation:', verifyData.explanation);
@@ -307,7 +312,6 @@ export default function AllBriefs() {
     }
   };
 
-  // Open a case (fetch summary, verify, etc.)
   const openCase = async (c) => {
     console.log(`Opening case: ${c.title} (ID: ${c.id})`);
     setSelectedCase(c);
@@ -320,7 +324,6 @@ export default function AllBriefs() {
       // Already handled by favorites state
     }
 
-    // If we already have a briefSummary
     if (c.briefSummary) {
       console.log('Using existing briefSummary from Firestore.');
       setCaseBrief(c.briefSummary);
@@ -340,9 +343,7 @@ export default function AllBriefs() {
           });
           const verifyData = await verifyRes.json();
           if (verifyData.verified === true) {
-            await updateDoc(doc(db, 'capCases', c.id), {
-              'briefSummary.verified': true,
-            });
+            await updateDoc(doc(db, 'capCases', c.id), { 'briefSummary.verified': true });
             setIsVerified(true);
           } else {
             console.log('Verification explanation:', verifyData.explanation);
@@ -356,10 +357,13 @@ export default function AllBriefs() {
       return;
     }
 
-    // Otherwise fetch a new summary
     setIsSummaryLoading(true);
     try {
-      const payload = { title: c.title, date: c.decisionDate || '' };
+      const payload = { 
+        title: c.title, 
+        date: c.decisionDate || '', 
+        jurisdiction: c.jurisdiction 
+      };
       console.log('Fetching summary from /api/casebrief-summary with:', payload);
       const res = await fetch('/api/casebrief-summary', {
         method: 'POST',
@@ -386,7 +390,6 @@ export default function AllBriefs() {
       });
       setCaseBrief(data);
 
-      // Verify
       try {
         const verifyRes = await fetch('/api/casebrief-verification', {
           method: 'POST',
@@ -400,9 +403,7 @@ export default function AllBriefs() {
         });
         const verifyData = await verifyRes.json();
         if (verifyData.verified === true) {
-          await updateDoc(doc(db, 'capCases', c.id), {
-            'briefSummary.verified': true,
-          });
+          await updateDoc(doc(db, 'capCases', c.id), { 'briefSummary.verified': true });
           setIsVerified(true);
         } else {
           console.log('Verification explanation:', verifyData.explanation);
@@ -428,10 +429,64 @@ export default function AllBriefs() {
     setIsFavorited(false);
   };
 
-  // Toggle bullet points vs. normal
   const handleBulletpointToggle = (e) => {
     setBulletpointView(e.target.checked);
     console.log(`Bulletpoint view set to: ${e.target.checked}`);
+  };
+
+  const createNewCaseBrief = async (e) => {
+    e.preventDefault();
+    setCreateError('');
+    if (!newBriefTitle.trim() || !newBriefJurisdiction.trim() || !newBriefDate.trim()) {
+      setCreateError("Please fill in all fields.");
+      return;
+    }
+    setCreateLoading(true);
+    try {
+      const payload = { 
+        title: newBriefTitle, 
+        date: newBriefDate, 
+        jurisdiction: newBriefJurisdiction 
+      };
+      const summaryRes = await fetch('/api/casebrief-summary', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      if (!summaryRes.ok) {
+        const errData = await summaryRes.json();
+        throw new Error(errData.error || 'Summary generation failed.');
+      }
+      let summaryData = await summaryRes.json();
+
+      // Use API corrections for metadata if available.
+      const correctedTitle = summaryData.corrections?.title || newBriefTitle;
+      const correctedJurisdiction = summaryData.corrections?.jurisdiction || newBriefJurisdiction;
+      const correctedDate = summaryData.corrections?.date || newBriefDate;
+
+      // Create new case brief with metadata corrected.
+      const newCase = {
+        title: correctedTitle,
+        jurisdiction: correctedJurisdiction,
+        decisionDate: correctedDate,
+        volume: '',
+        content: '',
+        briefSummary: { ...summaryData, verified: false },
+        caseNumber: generateCaseNumber(),
+      };
+      const docRef = await addDoc(collection(db, 'capCases'), newCase);
+      alert("New case brief created successfully.");
+      setCapCases([...capCases, { id: docRef.id, ...newCase }]);
+      setNewBriefTitle('');
+      setNewBriefJurisdiction('');
+      setNewBriefDate('');
+      setActiveTab('browse');
+    } catch (error) {
+      console.error("Error creating new case brief:", error);
+      setCreateError("Error creating new case brief. Please try again.");
+    } finally {
+      setCreateLoading(false);
+    }
   };
 
   return (
@@ -457,13 +512,7 @@ export default function AllBriefs() {
       </AnimatePresence>
 
       <main className="flex-1 flex flex-col px-6 relative z-200 h-screen">
-        <div
-          className={`flex-1 w-full rounded-2xl shadow-xl p-6 overflow-y-auto overflow-x-auto ${
-            isDarkMode
-              ? 'bg-gradient-to-br from-blue-950 to-slate-900 text-white'
-              : 'bg-white text-gray-800'
-          } flex flex-col items-center`}
-        >
+        <div className={`flex-1 w-full rounded-2xl shadow-xl p-6 overflow-y-auto overflow-x-auto ${isDarkMode ? 'bg-gradient-to-br from-blue-950 to-slate-900 text-white' : 'bg-white text-gray-800'} flex flex-col items-center`}>
           <div className="w-full max-w-md mx-auto mb-4 flex justify-around">
             <motion.button
               className={`px-4 py-2 font-semibold transition-colors duration-300 ${
@@ -493,137 +542,243 @@ export default function AllBriefs() {
             >
               Favorites
             </motion.button>
+            <motion.button
+              className={`px-4 py-2 font-semibold transition-colors duration-300 ${
+                activeTab === 'create'
+                  ? isDarkMode
+                    ? 'text-white border-b-2 border-blue-400'
+                    : 'text-blue-900 border-b-2 border-blue-900'
+                  : isDarkMode
+                  ? 'text-gray-400'
+                  : 'text-gray-600'
+              }`}
+              onClick={() => setActiveTab('create')}
+            >
+              Create
+            </motion.button>
           </div>
 
-          <div className="mb-6 w-full flex justify-center">
-            <div className="relative flex items-center bg-gray-50 dark:bg-white/10 rounded-full px-3 py-2 w-full max-w-md">
-              <FaSearch className="text-gray-700 dark:text-white/70 mr-2" />
-              <input
-                type="text"
-                placeholder="Search Cases..."
-                className="bg-transparent placeholder-gray-500 dark:placeholder-white/70 text-gray-500 dark:text-white/70 focus:outline-none text-sm flex-1"
-                value={searchTerm}
-                onChange={(e) => {
-                  setSearchTerm(e.target.value);
-                  setCurrentPage(1);
-                  console.log(`Search term updated: ${e.target.value}`);
-                }}
-              />
+          {(activeTab === 'browse' || activeTab === 'favorites') && (
+            <div className="mb-6 w-full flex justify-center">
+              <div className="relative flex items-center bg-gray-50 dark:bg-white/10 rounded-full px-3 py-2 w-full max-w-md">
+                <FaSearch className="text-gray-700 dark:text-white/70 mr-2" />
+                <input
+                  type="text"
+                  placeholder="Search Cases..."
+                  className="bg-transparent placeholder-gray-500 dark:placeholder-white/70 text-gray-500 dark:text-white/70 focus:outline-none text-sm flex-1"
+                  value={searchTerm}
+                  onChange={(e) => {
+                    setSearchTerm(e.target.value);
+                    setCurrentPage(1);
+                    console.log(`Search term updated: ${e.target.value}`);
+                  }}
+                />
+              </div>
             </div>
-          </div>
+          )}
 
-          {isLoading ? (
-            <div className="w-full h-1 bg-blue-500 animate-pulse" />
-          ) : (
-            <>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 w-full relative">
-                {paginatedCases.map((c) => (
-                  <div
-                    key={c.id}
-                    onClick={() => openCase(c)}
-                    className={`p-4 rounded-xl shadow-lg transition-shadow transition-transform transform hover:scale-105 cursor-pointer group flex flex-col ${
-                      isDarkMode
-                        ? 'bg-slate-800 border border-slate-700 text-white'
-                        : 'bg-white border border-gray-300 text-gray-800'
-                    } hover:shadow-xl`}
+          {activeTab === 'create' ? (
+            isFree || isPro || isExpert ? (
+              <div className="w-full flex justify-center">
+                <div className="max-w-md w-full">
+                  <form
+                    onSubmit={createNewCaseBrief}
+                    className={`${isDarkMode ? 'bg-slate-800 text-white' : 'bg-white text-gray-800'} p-6 rounded-2xl shadow-md`}
                   >
-                    <div className="flex justify-between items-center mb-2">
-                      <h3 className="text-md font-semibold line-clamp-1">{c.title}</h3>
-                      <div className="flex items-center space-x-2">
-                        <span
-                          className={`text-xs py-1 px-2 rounded-full ${
-                            isDarkMode ? 'bg-blue-200 text-blue-900' : 'bg-blue-900 text-white'
-                          }`}
-                        >
-                          {c.jurisdiction || 'Unknown'}
-                        </span>
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            toggleFavorite(c.id);
-                          }}
-                          aria-label="Toggle Favorite"
-                        >
-                          {favorites.includes(c.id) ? (
-                            <FaHeart className="text-red-500" size={16} />
-                          ) : (
-                            <FaRegHeart className="text-gray-400" size={16} />
-                          )}
-                        </button>
-                      </div>
+                    <h2 className="text-2xl font-bold mb-4 text-center">Create New Case Brief</h2>
+                    <div className="mb-4">
+                      <label className="block text-sm font-semibold mb-1">Title</label>
+                      <input
+                        type="text"
+                        value={newBriefTitle}
+                        onChange={(e) => setNewBriefTitle(e.target.value)}
+                        className={`w-full px-3 py-2 border rounded-md capitalize ${
+                          isDarkMode
+                            ? 'bg-slate-700 text-white border-slate-600 placeholder-gray-300'
+                            : 'bg-white text-gray-800 border-gray-300'
+                        }`}
+                        placeholder="Enter case title"
+                      />
                     </div>
-                    <p className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
-                      Volume: {c.volume || 'N/A'}
-                    </p>
-                    <p className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
-                      Date: {c.decisionDate || 'N/A'}
-                    </p>
-                    <p
-                      className={`text-xs mt-2 line-clamp-2 italic ${
-                        isDarkMode ? 'text-gray-200' : 'text-gray-600'
+                    <div className="mb-4">
+                      <label className="block text-sm font-semibold mb-1">Jurisdiction</label>
+                      <input
+                        type="text"
+                        value={newBriefJurisdiction}
+                        onChange={(e) => setNewBriefJurisdiction(e.target.value)}
+                        className={`w-full px-3 py-2 border rounded-md capitalize ${
+                          isDarkMode
+                            ? 'bg-slate-700 text-white border-slate-600 placeholder-gray-300'
+                            : 'bg-white text-gray-800 border-gray-300'
+                        }`}
+                        placeholder="Enter jurisdiction"
+                      />
+                    </div>
+                    <div className="mb-4">
+                      <label className="block text-sm font-semibold mb-1">Year</label>
+                      <input
+                        type="text"
+                        value={newBriefDate}
+                        onChange={(e) => setNewBriefDate(e.target.value)}
+                        maxLength="4"
+                        pattern="\d{4}"
+                        title="Enter a 4-digit year"
+                        className={`w-full px-3 py-2 border rounded-md ${
+                          isDarkMode
+                            ? 'bg-slate-700 text-white border-slate-600 placeholder-gray-300'
+                            : 'bg-white text-gray-800 border-gray-300'
+                        }`}
+                        placeholder="Enter 4-digit year"
+                      />
+                    </div>
+                    {createError && (
+                      <div className="mb-4 text-red-500 text-sm font-medium">
+                        {createError}
+                      </div>
+                    )}
+                    <button
+                      type="submit"
+                      disabled={createLoading}
+                      className={`w-full py-2 rounded-md font-semibold transition-colors duration-300 ${
+                        isDarkMode ? 'bg-blue-600 hover:bg-blue-500 text-white' : 'bg-blue-950 hover:bg-blue-800 text-white'
                       }`}
                     >
-                      {c.briefSummary?.facts?.slice(0, 100) || 'No content generated'}...
-                    </p>
+                      {createLoading ? "Creating..." : "Create Case Brief"}
+                    </button>
+                  </form>
+                </div>
+              </div>
+            ) : (
+              <div className="w-full flex justify-center">
+                <div className={`max-w-md w-full p-6 rounded-2xl shadow-md ${isDarkMode ? 'bg-slate-800 text-white' : 'bg-white text-gray-800'}`}>
+                  <h2 className="text-2xl font-bold mb-4 text-center">Upgrade Required</h2>
+                  <p className="text-center text-lg font-semibold mb-4">
+                    Please upgrade to a Pro or Expert plan to access the case brief creation feature.
+                  </p>
+                  <div className="flex justify-center">
+                    <a
+                      href="https://cadexlaw.com/admin/billing"
+                      className={`px-4 py-2 rounded-md font-semibold transition-colors duration-300 ${
+                        isDarkMode ? 'bg-blue-600 hover:bg-blue-500 text-white' : 'bg-blue-950 hover:bg-blue-800 text-white'
+                      }`}
+                    >
+                      Upgrade Now
+                    </a>
                   </div>
-                ))}
+                </div>
               </div>
-
-              <div className="mt-6 flex items-center justify-center gap-2">
-                <motion.button
-                  onClick={goToPrevPage}
-                  disabled={currentPage === 1}
-                  whileHover={{ scale: currentPage !== 1 ? 1.1 : 1 }}
-                  whileTap={{ scale: currentPage !== 1 ? 0.9 : 1 }}
-                  className={`px-4 py-2 rounded-full text-base font-semibold transition-colors duration-200 ${
-                    currentPage === 1
-                      ? 'bg-gray-300 cursor-not-allowed opacity-70'
-                      : isDarkMode
-                      ? 'bg-blue-600 hover:bg-blue-500 text-white'
-                      : 'bg-blue-950 hover:bg-blue-800 text-white'
-                  }`}
-                >
-                  <FaChevronLeft className="mr-1" /> Prev
-                </motion.button>
-                {Array.from({ length: totalPages }, (_, i) => i + 1).map((num) => (
-                  <motion.button
-                    key={num}
-                    onClick={() => goToPage(num)}
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    className={`px-4 py-2 rounded-full text-base font-semibold transition-colors duration-200 ${
-                      num === currentPage
-                        ? isDarkMode
-                          ? 'bg-blue-500 text-white'
-                          : 'bg-blue-800 text-white'
-                        : isDarkMode
-                        ? 'bg-slate-700 hover:bg-slate-600 text-white'
-                        : 'bg-gray-200 hover:bg-gray-300 text-gray-800'
-                    }`}
-                  >
-                    {num}
-                  </motion.button>
-                ))}
-                <motion.button
-                  onClick={goToNextPage}
-                  disabled={currentPage === totalPages || totalPages === 0}
-                  whileHover={{
-                    scale: currentPage === totalPages || totalPages === 0 ? 1 : 1.1,
-                  }}
-                  whileTap={{
-                    scale: currentPage === totalPages || totalPages === 0 ? 1 : 0.9,
-                  }}
-                  className={`px-4 py-2 rounded-full text-base font-semibold transition-colors duration-200 flex items-center gap-1 ${
-                    currentPage === totalPages || totalPages === 0
-                      ? 'bg-gray-300 cursor-not-allowed opacity-70'
-                      : isDarkMode
-                      ? 'bg-blue-600 hover:bg-blue-500 text-white'
-                      : 'bg-blue-950 hover:bg-blue-800 text-white'
-                  }`}
-                >
-                  Next <FaChevronRight />
-                </motion.button>
-              </div>
+            )
+          ) : (
+            <>
+              {isLoading ? (
+                <div className="w-full h-1 bg-blue-500 animate-pulse" />
+              ) : (
+                <>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 w-full relative">
+                    {paginatedCases.map((c) => (
+                      <div
+                        key={c.id}
+                        onClick={() => openCase(c)}
+                        className={`p-4 rounded-xl shadow-lg transition-transform transform hover:scale-105 cursor-pointer group flex flex-col ${
+                          isDarkMode
+                            ? 'bg-slate-800 border border-slate-700 text-white'
+                            : 'bg-white border border-gray-300 text-gray-800'
+                        }`}
+                      >
+                        <div className="flex justify-between items-center mb-2">
+                          <h3 className="text-md font-semibold line-clamp-1">{c.title}</h3>
+                          <div className="flex items-center space-x-2">
+                            <span
+                              className={`text-xs py-1 px-2 rounded-full ${
+                                isDarkMode ? 'bg-blue-200 text-blue-900' : 'bg-blue-900 text-white'
+                              }`}
+                            >
+                              {c.jurisdiction || 'Unknown'}
+                            </span>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                toggleFavorite(c.id);
+                              }}
+                              aria-label="Toggle Favorite"
+                            >
+                              {favorites.includes(c.id) ? (
+                                <FaHeart className="text-red-500" size={16} />
+                              ) : (
+                                <FaRegHeart className="text-gray-400" size={16} />
+                              )}
+                            </button>
+                          </div>
+                        </div>
+                        <p className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                          Volume: {c.volume || 'N/A'}
+                        </p>
+                        <p className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                          Date: {c.decisionDate || 'N/A'}
+                        </p>
+                        <p className={`text-xs mt-2 line-clamp-2 italic ${isDarkMode ? 'text-gray-200' : 'text-gray-600'}`}>
+                          {c.briefSummary?.facts?.slice(0, 100) || 'No content generated'}...
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="mt-6 flex items-center justify-center gap-2">
+                    <motion.button
+                      onClick={goToPrevPage}
+                      disabled={currentPage === 1}
+                      whileHover={{ scale: currentPage !== 1 ? 1.1 : 1 }}
+                      whileTap={{ scale: currentPage !== 1 ? 0.9 : 1 }}
+                      className={`px-4 py-2 font-semibold transition-colors duration-300 ${
+                        currentPage === 1
+                          ? isDarkMode
+                            ? 'text-gray-400'
+                            : 'text-gray-400'
+                          : isDarkMode
+                          ? 'text-white border-b-2 border-blue-400'
+                          : 'text-blue-900 border-b-2 border-blue-900'
+                      }`}
+                    >
+                      <FaChevronLeft />
+                    </motion.button>
+                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((num) => (
+                      <motion.button
+                        key={num}
+                        onClick={() => goToPage(num)}
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        className={`px-4 py-2 font-semibold transition-colors duration-300 ${
+                          num === currentPage
+                            ? isDarkMode
+                              ? 'text-white border-b-2 border-blue-400'
+                              : 'text-blue-900 border-b-2 border-blue-900'
+                            : isDarkMode
+                            ? 'text-gray-400'
+                            : 'text-gray-600'
+                        }`}
+                      >
+                        {num}
+                      </motion.button>
+                    ))}
+                    <motion.button
+                      onClick={goToNextPage}
+                      disabled={currentPage === totalPages || totalPages === 0}
+                      whileHover={{ scale: currentPage === totalPages || totalPages === 0 ? 1 : 1.1 }}
+                      whileTap={{ scale: currentPage === totalPages || totalPages === 0 ? 1 : 0.9 }}
+                      className={`px-4 py-2 font-semibold transition-colors duration-300 ${
+                        currentPage === totalPages || totalPages === 0
+                          ? isDarkMode
+                            ? 'text-gray-400'
+                            : 'text-gray-400'
+                          : isDarkMode
+                          ? 'text-white border-b-2 border-blue-400'
+                          : 'text-blue-900 border-b-2 border-blue-900'
+                      }`}
+                    >
+                      <FaChevronRight />
+                    </motion.button>
+                  </div>
+                </>
+              )}
             </>
           )}
         </div>
@@ -645,17 +800,11 @@ export default function AllBriefs() {
             <div className="flex justify-between items-start mb-4">
               <div>
                 <h2 className="text-2xl font-bold">{selectedCase.title}</h2>
-                <p
-                  className={`text-sm mt-1 ${
-                    isDarkMode ? 'text-gray-300' : 'text-gray-700'
-                  }`}
-                >
+                <p className={`text-sm mt-1 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                   {selectedCase.jurisdiction || 'Unknown'} | Volume: {selectedCase.volume || 'N/A'} | Date: {selectedCase.decisionDate || 'N/A'}
                 </p>
                 <div className="flex items-center text-xs mt-1">
-                  <span className="text-gray-400">
-                    Verified by LExAPI 3.0 AI assistant (Beta)
-                  </span>
+                  <span className="text-gray-400">Verified by LExAPI 3.0 AI assistant (Beta)</span>
                   {isVerified ? (
                     <motion.div
                       initial={{ opacity: 0, scale: 0 }}
@@ -688,32 +837,23 @@ export default function AllBriefs() {
                   )}
                 </div>
               </div>
-
               <button
                 onClick={closeCase}
                 className={`inline-block px-4 py-2 rounded-full font-semibold text-sm transition-colors duration-300 ${
-                  isDarkMode
-                    ? 'bg-blue-600 hover:bg-blue-500 text-white'
-                    : 'bg-blue-950 hover:bg-blue-800 text-white'
+                  isDarkMode ? 'bg-blue-600 hover:bg-blue-500 text-white' : 'bg-blue-950 hover:bg-blue-800 text-white'
                 }`}
                 aria-label="Close Brief Modal"
               >
                 <FaTimes />
               </button>
             </div>
-
-            <div
-              className={`max-h-60 overflow-auto border-b pb-3 mb-4 ${
-                isDarkMode
-                  ? 'border-gray-600 text-gray-200'
-                  : 'border-gray-300 text-gray-800'
-              }`}
-            >
+            <div className={`max-h-60 overflow-auto border-b pb-3 mb-4 ${
+              isDarkMode ? 'border-gray-600 text-gray-200' : 'border-gray-300 text-gray-800'
+            }`}>
               <p className="leading-relaxed whitespace-pre-wrap text-sm">
                 {selectedCase.content || 'No detailed content available for this case.'}
               </p>
             </div>
-
             <div className="flex items-center gap-3 mb-4">
               <label className="font-semibold text-sm">
                 {bulletpointView ? 'Bullet Points' : 'Classic View'}
@@ -726,13 +866,9 @@ export default function AllBriefs() {
                   onChange={handleBulletpointToggle}
                   className="toggle-checkbox absolute h-0 w-0 opacity-0"
                 />
-                <label
-                  htmlFor="bulletPointsToggle"
-                  className="toggle-label block overflow-hidden h-8 rounded-full bg-gray-300 cursor-pointer"
-                ></label>
+                <label htmlFor="bulletPointsToggle" className="toggle-label block overflow-hidden h-8 rounded-full bg-gray-300 cursor-pointer"></label>
               </div>
             </div>
-
             {isSummaryLoading ? (
               <div className="flex flex-col items-center justify-center space-y-3">
                 <div className="relative w-16 h-16">
@@ -741,11 +877,7 @@ export default function AllBriefs() {
                       className="text-gray-300"
                       strokeWidth="4"
                       fill="none"
-                      d="
-                        M18 2.0845
-                        a 15.9155 15.9155 0 0 1 0 31.831
-                        a 15.9155 15.9155 0 0 1 0 -31.831
-                      "
+                      d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
                     />
                     <path
                       className="text-blue-500 animate-progress"
@@ -753,14 +885,9 @@ export default function AllBriefs() {
                       strokeLinecap="round"
                       fill="none"
                       strokeDasharray="25, 100"
-                      d="
-                        M18 2.0845
-                        a 15.9155 15.9155 0 0 1 0 31.831
-                        a 15.9155 15.9155 0 0 1 0 -31.831
-                      "
+                      d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
                     />
                   </svg>
-                  <div className="absolute inset-0 flex items-center justify-center text-sm font-semibold"></div>
                 </div>
                 <div className="text-sm text-gray-400">
                   We are verifying the Case Brief please wait..
@@ -768,22 +895,10 @@ export default function AllBriefs() {
               </div>
             ) : caseBrief ? (
               caseBrief.error ? (
-                <div className="text-sm text-red-500">
-                  {caseBrief.error || 'No summary available.'}
-                </div>
+                <div className="text-sm text-red-500">{caseBrief.error || 'No summary available.'}</div>
               ) : (
-                <div
-                  className={`p-3 rounded-md ${
-                    isDarkMode
-                      ? 'bg-slate-700 border border-blue-600'
-                      : 'bg-gradient-to-br from-gray-50 to-gray-100 text-gray-900 border border-blue-200'
-                  }`}
-                >
-                  <h3
-                    className={`font-bold mb-2 ${
-                      isDarkMode ? 'text-blue-300' : 'text-blue-600'
-                    }`}
-                  >
+                <div className={`p-3 rounded-md ${isDarkMode ? 'bg-slate-700 border border-blue-600' : 'bg-gradient-to-br from-gray-50 to-gray-100 text-gray-900 border border-blue-200'}`}>
+                  <h3 className={`font-bold mb-2 ${isDarkMode ? 'text-blue-300' : 'text-blue-600'}`}>
                     Case Brief
                   </h3>
                   <div className="mb-3">
@@ -793,9 +908,7 @@ export default function AllBriefs() {
                         <li>{caseBrief.ruleOfLaw || 'Not provided.'}</li>
                       </ul>
                     ) : (
-                      <p className="text-sm mt-1">
-                        {caseBrief.ruleOfLaw || 'Not provided.'}
-                      </p>
+                      <p className="text-sm mt-1">{caseBrief.ruleOfLaw || 'Not provided.'}</p>
                     )}
                   </div>
                   <div className="mb-3">
@@ -805,9 +918,7 @@ export default function AllBriefs() {
                         <li>{caseBrief.facts || 'Not provided.'}</li>
                       </ul>
                     ) : (
-                      <p className="text-sm mt-1">
-                        {caseBrief.facts || 'Not provided.'}
-                      </p>
+                      <p className="text-sm mt-1">{caseBrief.facts || 'Not provided.'}</p>
                     )}
                   </div>
                   <div className="mb-3">
@@ -817,9 +928,7 @@ export default function AllBriefs() {
                         <li>{caseBrief.issue || 'Not provided.'}</li>
                       </ul>
                     ) : (
-                      <p className="text-sm mt-1">
-                        {caseBrief.issue || 'Not provided.'}
-                      </p>
+                      <p className="text-sm mt-1">{caseBrief.issue || 'Not provided.'}</p>
                     )}
                   </div>
                   <div className="mb-3">
@@ -829,9 +938,7 @@ export default function AllBriefs() {
                         <li>{caseBrief.holding || 'Not provided.'}</li>
                       </ul>
                     ) : (
-                      <p className="text-sm mt-1">
-                        {caseBrief.holding || 'Not provided.'}
-                      </p>
+                      <p className="text-sm mt-1">{caseBrief.holding || 'Not provided.'}</p>
                     )}
                   </div>
                   <div className="mb-3">
@@ -841,9 +948,7 @@ export default function AllBriefs() {
                         <li>{caseBrief.reasoning || 'Not provided.'}</li>
                       </ul>
                     ) : (
-                      <p className="text-sm mt-1">
-                        {caseBrief.reasoning || 'Not provided.'}
-                      </p>
+                      <p className="text-sm mt-1">{caseBrief.reasoning || 'Not provided.'}</p>
                     )}
                   </div>
                   <div>
@@ -853,9 +958,7 @@ export default function AllBriefs() {
                         <li>{caseBrief.dissent || 'Not provided.'}</li>
                       </ul>
                     ) : (
-                      <p className="text-sm mt-1">
-                        {caseBrief.dissent || 'Not provided.'}
-                      </p>
+                      <p className="text-sm mt-1">{caseBrief.dissent || 'Not provided.'}</p>
                     )}
                   </div>
                   <div className="text-xs italic text-gray-400">
@@ -879,3 +982,5 @@ export default function AllBriefs() {
     </div>
   );
 }
+
+export { AllBriefs };

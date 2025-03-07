@@ -1,10 +1,23 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
+import Head from 'next/head';
 import Link from 'next/link';
 import Sidebar from '../Sidebar';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { FaBars, FaTimes, FaDownload, FaSync, FaShareAlt } from 'react-icons/fa';
+import {
+  FaBars,
+  FaTimes,
+  FaSearch,
+  FaChevronLeft,
+  FaChevronRight,
+  FaArrowRight,
+  FaHeart,
+  FaRegHeart,
+  FaSync,
+  FaDownload,
+  FaShareAlt
+} from 'react-icons/fa';
 import { motion, AnimatePresence } from 'framer-motion';
 import { db } from '@/firebase';
 import {
@@ -16,15 +29,51 @@ import {
   where,
   limit,
   getDocs,
+  addDoc
 } from 'firebase/firestore';
 import { useAuth } from '@/context/AuthContext';
 import html2canvas from 'html2canvas';
 import { jsPDF } from 'jspdf';
 
+// Helper: truncate text
 const simplifyText = (text = '', maxLength = 400) => {
   if (!text) return 'Not provided.';
   if (text.length <= maxLength) return text;
   return text.slice(0, maxLength) + '...';
+};
+
+// Dummy citation generators – replace with your actual implementations if needed.
+const generateCitation = (caseObj, reporter = 'U.S.', page = '___') => {
+  let year = '____';
+  if (caseObj.decisionDate) {
+    const parsedDate = new Date(caseObj.decisionDate);
+    if (!isNaN(parsedDate)) {
+      year = parsedDate.getFullYear();
+    }
+  }
+  return `${caseObj.title || 'N/A'}, ${caseObj.volume || '___'} ${reporter} ${page} (${year})`;
+};
+
+const generateBluebookCitation = (caseObj, page = '___') => {
+  return `Bluebook: ${generateCitation(caseObj, 'U.S.', page)}`;
+};
+
+const saveAsPDF = async (pdfRef, title) => {
+  if (!pdfRef.current) return;
+  try {
+    const originalFontSize = pdfRef.current.style.fontSize;
+    pdfRef.current.style.fontSize = '24px';
+    const canvas = await html2canvas(pdfRef.current, { scale: 2 });
+    const imgData = canvas.toDataURL('image/png');
+    const pdf = new jsPDF('p', 'mm', 'a4');
+    const pdfWidth = pdf.internal.pageSize.getWidth();
+    const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+    pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+    pdf.save(`${title || 'case-brief'}.pdf`);
+    pdfRef.current.style.fontSize = originalFontSize;
+  } catch (error) {
+    console.error('Error generating PDF:', error);
+  }
 };
 
 export default function CaseSummaries() {
@@ -32,7 +81,8 @@ export default function CaseSummaries() {
   const searchParams = useSearchParams();
   const { currentUser, userDataObj } = useAuth();
   const plan = userDataObj?.billing?.plan?.toLowerCase() || 'free';
-  const isPro = plan === 'free'; // change to pro in production release
+  // Note: isPro is set to "free" for testing purposes as per your comment.
+  const isPro = plan === 'free';
   const isExpert = plan === 'expert';
   const isDarkMode = userDataObj?.darkMode || false;
 
@@ -40,7 +90,6 @@ export default function CaseSummaries() {
   const toggleSidebar = () => setIsSidebarVisible(!isSidebarVisible);
 
   const [capCase, setCapCase] = useState(null);
-  // caseBrief will hold either the detailedSummary or the briefSummary depending on viewMode
   const [caseBrief, setCaseBrief] = useState(null);
   const [isSummaryLoading, setIsSummaryLoading] = useState(false);
   const [reRunCount, setReRunCount] = useState(0);
@@ -49,8 +98,7 @@ export default function CaseSummaries() {
   const capCaseId = searchParams.get('caseId');
   const pdfRef = useRef(null);
 
-  // --- View Modes: 'classic', 'bulletpoint', 'simplified' ---
-  // When in simplified mode, we will show the briefSummary from Firebase.
+  // View Modes: 'classic', 'bulletpoint', 'simplified'
   const [viewMode, setViewMode] = useState('classic');
   const viewModes = [
     { label: 'Classic', value: 'classic' },
@@ -61,7 +109,7 @@ export default function CaseSummaries() {
 
   const [relatedCases, setRelatedCases] = useState([]);
 
-  // Helper functions for rendering fields according to view mode.
+  // Render helpers
   const renderFieldContent = (fieldText) => {
     if (!fieldText) return 'Not provided.';
     if (viewMode === 'bulletpoint') {
@@ -78,14 +126,10 @@ export default function CaseSummaries() {
 
   const renderFactsContent = (factsText) => {
     if (!factsText) return <p className="text-base mt-2">Not provided.</p>;
-
-    // Attempt to parse enumerated facts "1. fact", "2. fact", etc.
     const enumeratedFacts = factsText.match(/(?:\d\.\s*[^0-9]+)/g);
-
     if (viewMode === 'simplified') {
       return <p className="text-base mt-2">{simplifyText(factsText)}</p>;
     }
-
     if (enumeratedFacts && enumeratedFacts.length > 0) {
       if (viewMode === 'bulletpoint') {
         return (
@@ -117,7 +161,6 @@ export default function CaseSummaries() {
     if (!currentUser) return;
   }, [currentUser]);
 
-  // Share functionality
   const shareCase = async () => {
     if (!capCase) return;
     const shareData = {
@@ -137,7 +180,6 @@ export default function CaseSummaries() {
     }
   };
 
-  // Re-generate summary function (calls appropriate summary function based on view mode)
   const reGenerateSummary = async () => {
     if (!capCase) return;
     if (viewMode === 'simplified') {
@@ -147,11 +189,9 @@ export default function CaseSummaries() {
     }
   };
 
-  // Fetch the main case and its summary.
-  // If viewMode is 'simplified', use briefSummary; otherwise, use detailedSummary.
+  // Fetch main case and summary.
   useEffect(() => {
     if (!currentUser || !capCaseId) return;
-
     const fetchCapCaseAndSummary = async () => {
       try {
         const docRef = doc(db, 'capCases', capCaseId);
@@ -190,14 +230,11 @@ export default function CaseSummaries() {
         console.error('Error fetching the capCase:', error);
       }
     };
-
     fetchCapCaseAndSummary();
   }, [capCaseId, currentUser, viewMode]);
 
-  // Fetch related cases (e.g., by matching jurisdiction)
   useEffect(() => {
     if (!capCase) return;
-
     const fetchRelatedCases = async () => {
       try {
         const q = query(
@@ -216,11 +253,9 @@ export default function CaseSummaries() {
         console.error('Error fetching related cases:', e);
       }
     };
-
     fetchRelatedCases();
   }, [capCase]);
 
-  // Fetch a new detailed summary (for classic and bulletpoint view modes)
   const getCapCaseSummary = async (capCaseObj) => {
     setIsSummaryLoading(true);
     setCaseBrief(null);
@@ -230,7 +265,6 @@ export default function CaseSummaries() {
         date: capCaseObj.decisionDate || '',
         detailed: true,
       };
-
       const res = await fetch('/api/casebrief-detailed', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -242,10 +276,8 @@ export default function CaseSummaries() {
         setCaseBrief({ error: errorData.error || 'No summary available.' });
         return;
       }
-
       const data = await res.json();
       setCaseBrief(data);
-
       await updateDoc(doc(db, 'capCases', capCaseObj.id), {
         detailedSummary: {
           ruleOfLaw: data.ruleOfLaw || '',
@@ -257,11 +289,7 @@ export default function CaseSummaries() {
           verified: false,
         },
       });
-
-      setCapCase((prev) =>
-        prev ? { ...prev, detailedSummary: { ...data, verified: false } } : null
-      );
-
+      setCapCase((prev) => prev ? { ...prev, detailedSummary: { ...data, verified: false } } : null);
       await verifyDetailedSummary(data, capCaseObj);
     } catch (err) {
       console.error('Error fetching summary for full view:', err);
@@ -271,7 +299,6 @@ export default function CaseSummaries() {
     }
   };
 
-  // Fetch a new brief summary (for simplified view mode)
   const getCapCaseBriefSummary = async (capCaseObj) => {
     setIsSummaryLoading(true);
     setCaseBrief(null);
@@ -280,7 +307,6 @@ export default function CaseSummaries() {
         title: capCaseObj.title,
         date: capCaseObj.decisionDate || '',
       };
-
       const res = await fetch('/api/casebrief-summary', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -292,10 +318,8 @@ export default function CaseSummaries() {
         setCaseBrief({ error: errorData.error || 'No summary available.' });
         return;
       }
-
       const data = await res.json();
       setCaseBrief(data);
-
       await updateDoc(doc(db, 'capCases', capCaseObj.id), {
         briefSummary: {
           ruleOfLaw: data.ruleOfLaw || '',
@@ -307,11 +331,7 @@ export default function CaseSummaries() {
           verified: false,
         },
       });
-
-      setCapCase((prev) =>
-        prev ? { ...prev, briefSummary: { ...data, verified: false } } : null
-      );
-
+      setCapCase((prev) => prev ? { ...prev, briefSummary: { ...data, verified: false } } : null);
       await verifyBriefSummary(data, capCaseObj);
     } catch (err) {
       console.error('Error fetching brief summary for simple view:', err);
@@ -321,7 +341,6 @@ export default function CaseSummaries() {
     }
   };
 
-  // Verify the detailed summary
   const verifyDetailedSummary = async (summaryData, capCaseObj) => {
     try {
       const verifyRes = await fetch('/api/casebrief-verification', {
@@ -335,7 +354,6 @@ export default function CaseSummaries() {
         }),
       });
       const verifyData = await verifyRes.json();
-
       if (verifyData.verified === true) {
         await updateDoc(doc(db, 'capCases', capCaseObj.id), {
           'detailedSummary.verified': true,
@@ -355,7 +373,6 @@ export default function CaseSummaries() {
     }
   };
 
-  // Verify the brief summary (for simplified view)
   const verifyBriefSummary = async (summaryData, capCaseObj) => {
     try {
       const verifyRes = await fetch('/api/casebrief-verification', {
@@ -369,7 +386,6 @@ export default function CaseSummaries() {
         }),
       });
       const verifyData = await verifyRes.json();
-
       if (verifyData.verified === true) {
         await updateDoc(doc(db, 'capCases', capCaseObj.id), {
           'briefSummary.verified': true,
@@ -389,45 +405,22 @@ export default function CaseSummaries() {
     }
   };
 
-  // PDF export functionality
   const saveAsPDF = async () => {
     if (!pdfRef.current) return;
-
     try {
       const originalFontSize = pdfRef.current.style.fontSize;
       pdfRef.current.style.fontSize = '24px';
-
       const canvas = await html2canvas(pdfRef.current, { scale: 2 });
       const imgData = canvas.toDataURL('image/png');
       const pdf = new jsPDF('p', 'mm', 'a4');
-
       const pdfWidth = pdf.internal.pageSize.getWidth();
       const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-
       pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
       pdf.save(`${capCase?.title || 'case-brief'}.pdf`);
-
       pdfRef.current.style.fontSize = originalFontSize;
     } catch (error) {
       console.error('Error generating PDF:', error);
     }
-  };
-
-  // Citation generators
-  const generateCitation = (caseObj, reporter = 'U.S.', page = '___') => {
-    let year = '____';
-    if (caseObj.decisionDate) {
-      const parsedDate = new Date(caseObj.decisionDate);
-      if (!isNaN(parsedDate)) {
-        year = parsedDate.getFullYear();
-      }
-    }
-    return `${caseObj.title || 'N/A'}, ${caseObj.volume || '___'} ${reporter} ${page} (${year})`;
-  };
-
-  const generateBluebookCitation = (caseObj, page = '___') => {
-    const baseCitation = generateCitation(caseObj, 'U.S.', page);
-    return `Bluebook: ${baseCitation}`;
   };
 
   if (!currentUser) {
@@ -458,348 +451,281 @@ export default function CaseSummaries() {
     );
   }
 
+  // Structured data for Google Search Indexing.
+  const structuredData = capCase
+    ? {
+        "@context": "https://schema.org",
+        "@type": "LegalCase",
+        "name": capCase.title,
+        "datePublished": capCase.decisionDate,
+        "jurisdiction": capCase.jurisdiction,
+        "description": caseBrief ? (caseBrief.facts || caseBrief.ruleOfLaw || "") : "",
+        "url": typeof window !== "undefined" ? window.location.href : ""
+      }
+    : null;
+
   return (
-    <div
-      ref={pdfRef}
-      className={`relative flex h-screen transition-colors duration-500 ${
-        isDarkMode ? 'text-white' : 'text-gray-800'
-      }`}
-    >
-      <AnimatePresence>
-        {isSidebarVisible && (
-          <>
-            <Sidebar
-              activeLink="/casebriefs/summaries"
-              isSidebarVisible={isSidebarVisible}
-              toggleSidebar={toggleSidebar}
-              isDarkMode={isDarkMode}
-            />
-            <motion.div
-              className="fixed inset-0 bg-black bg-opacity-40 z-40 md:hidden"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 0.5 }}
-              exit={{ opacity: 0 }}
-              onClick={toggleSidebar}
-            />
-          </>
-        )}
-      </AnimatePresence>
-
-      <main className="flex-1 flex flex-col px-6 relative z-50 h-screen">
-        {/* Top Bar with Sidebar Toggle */}
-        <div className="flex items-center justify-between">
-          <button
-            onClick={toggleSidebar}
-            className="text-blue-900 dark:text-white p-2 rounded transition-colors hover:bg-black/10 focus:outline-none md:hidden"
-            aria-label={isSidebarVisible ? 'Hide Sidebar' : 'Show Sidebar'}
-          >
-            <AnimatePresence mode="wait" initial={false}>
-              {isSidebarVisible ? (
-                <motion.div
-                  key="close-icon"
-                  initial={{ rotate: 90, opacity: 0 }}
-                  animate={{ rotate: 0, opacity: 1 }}
-                  exit={{ rotate: -90, opacity: 0 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  <FaTimes size={20} />
-                </motion.div>
-              ) : (
-                <motion.div
-                  key="bars-icon"
-                  initial={{ rotate: -90, opacity: 0 }}
-                  animate={{ rotate: 0, opacity: 1 }}
-                  exit={{ rotate: 90, opacity: 0 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  <FaBars size={20} />
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </button>
-        </div>
-
-        <div
-          className={`flex-1 w-full rounded-2xl shadow-xl p-6 overflow-y-auto overflow-x-auto ${
-            isDarkMode
-              ? 'bg-gradient-to-br from-slate-900 to-blue-950 text-white'
-              : 'bg-white text-gray-800'
-          } flex flex-col items-center`}
-        >
-          <h1 className="text-2xl font-bold mb-4">
-            {viewMode === 'simplified' ? 'Case Brief (Simple)' : 'Full Case Brief (Detailed)'}
-          </h1>
-
-          {/* Case Info */}
-          <div
-            className={`p-6 rounded-xl mb-6 ${
-              isDarkMode
-                ? 'bg-slate-800 text-white border border-slate-700'
-                : 'bg-gray-100 text-gray-800 border border-gray-300'
-            }`}
-          >
-            <h2 className="text-xl font-semibold">{capCase?.title}</h2>
-            <p
-              className={`text-sm mt-1 ${
-                isDarkMode ? 'text-gray-300' : 'text-gray-700'
-              }`}
-            >
-              {capCase?.jurisdiction || 'Unknown'} | Volume: {capCase?.volume || 'N/A'} | Date:{' '}
-              {capCase?.decisionDate || 'N/A'}
-            </p>
-            <div className="flex items-center text-xs mt-1">
-              <span className="text-gray-400">
-                Verified by LExAPI 3.0 ({viewMode === 'simplified' ? 'Simple Mode' : 'Detailed Mode'})
-              </span>
-              {isVerified ? (
-                <motion.div
-                  initial={{ opacity: 0, scale: 0 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.5 }}
-                  className="ml-2 flex items-center justify-center w-6 h-6 border-2 border-emerald-500 rounded-full"
-                >
-                  <span className="text-emerald-500 font-bold text-lg">✓</span>
-                </motion.div>
-              ) : (
-                <motion.div
-                  initial={{ opacity: 0, scale: 0 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.5 }}
-                  className="ml-2 flex items-center justify-center w-6 h-6 border-2 border-red-500 rounded-full"
-                >
-                  <span className="text-red-500 font-bold text-lg">✕</span>
-                </motion.div>
-              )}
-              {(isPro || isExpert) && (
-                <motion.button
-                  onClick={reGenerateSummary}
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.9 }}
-                  className="ml-4"
-                  aria-label="Re-generate Summary"
-                >
-                  <FaSync size={16} className="text-gray-400" />
-                </motion.button>
-              )}
-              <motion.button
-                onClick={shareCase}
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
-                className="ml-4"
-                aria-label="Share Case"
-              >
-                <FaShareAlt size={16} className="text-gray-400" />
-              </motion.button>
-            </div>
-          </div>
-
-          {/* 3-Way Animated Toggle for viewMode */}
-          <div className="relative flex items-center justify-center mb-6">
-            <div
-              className={`relative flex items-center rounded-full p-1 ${
-                isDarkMode ? 'bg-slate-700' : 'bg-gray-200'
-              }`}
-              style={{ width: '240px' }}
-            >
-              <motion.div
-                className={`absolute top-0 left-0 h-full rounded-full ${
-                  isDarkMode ? 'bg-slate-600' : 'bg-white'
-                } shadow`}
-                style={{ width: '33.33%' }}
-                initial={false}
-                animate={{ x: `${selectedIndex * 100}%` }}
-                transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+    <>
+      {structuredData && (
+        <Head>
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+          />
+        </Head>
+      )}
+      <div ref={pdfRef} className={`relative flex h-screen transition-colors duration-500 ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>
+        <AnimatePresence>
+          {isSidebarVisible && (
+            <>
+              <Sidebar
+                activeLink="/casebriefs/summaries"
+                isSidebarVisible={isSidebarVisible}
+                toggleSidebar={toggleSidebar}
+                isDarkMode={isDarkMode}
               />
-              {viewModes.map((mode, i) => (
-                <button
-                  key={mode.value}
-                  onClick={() => setViewMode(mode.value)}
-                  className={`relative z-10 flex-1 text-xs sm:text-sm font-semibold py-1 transition-colors ${
-                    selectedIndex === i
-                      ? isDarkMode
-                        ? 'text-blue-300'
-                        : 'text-blue-600'
-                      : isDarkMode
-                      ? 'text-gray-200'
-                      : 'text-gray-700'
-                  }`}
-                >
-                  {mode.label}
-                </button>
-              ))}
-            </div>
-          </div>
+              <motion.div
+                className="fixed inset-0 bg-black bg-opacity-40 z-40 md:hidden"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 0.5 }}
+                exit={{ opacity: 0 }}
+                onClick={toggleSidebar}
+              />
+            </>
+          )}
+        </AnimatePresence>
 
-          {/* Summary Section */}
-          <div className="w-full">
-            {isSummaryLoading ? (
-              <div className="flex flex-col items-center justify-center space-y-3">
-                <div className="relative w-16 h-16">
-                  <svg className="transform -rotate-90" viewBox="0 0 36 36">
-                    <path
-                      className="text-gray-300"
-                      strokeWidth="4"
-                      fill="none"
-                      d="
-                        M18 2.0845
-                        a 15.9155 15.9155 0 0 1 0 31.831
-                        a 15.9155 15.9155 0 0 1 0 -31.831
-                      "
-                    />
-                    <path
-                      className="text-blue-500 animate-progress"
-                      strokeWidth="4"
-                      strokeLinecap="round"
-                      fill="none"
-                      strokeDasharray="25, 100"
-                      d="
-                        M18 2.0845
-                        a 15.9155 15.9155 0 0 1 0 31.831
-                        a 15.9155 15.9155 0 0 1 0 -31.831
-                      "
-                    />
-                  </svg>
-                </div>
-                <div className="text-sm text-gray-400">
-                  We are verifying the Case Brief, please wait...
-                </div>
-              </div>
-            ) : caseBrief ? (
-              caseBrief.error ? (
-                <div className="text-sm text-red-500">
-                  {caseBrief.error || 'No summary available.'}
-                </div>
-              ) : (
-                <div
-                  className={`p-6 rounded-xl ${
-                    isDarkMode
-                      ? 'bg-slate-800 text-white border border-blue-600'
-                      : 'bg-white text-gray-800 border border-blue-200'
-                  }`}
-                >
-                  <h3
-                    className={`font-bold mb-4 ${
-                      isDarkMode ? 'text-blue-300' : 'text-blue-700'
-                    } text-lg`}
-                  >
-                    {viewMode === 'simplified'
-                      ? 'Brief Case Summary'
-                      : 'Detailed Case Brief'}
-                  </h3>
-
-                  <div className="mb-4">
-                    <strong className="block text-lg">Rule of Law:</strong>
-                    {renderFieldContent(caseBrief.ruleOfLaw)}
-                  </div>
-
-                  <div className="mb-4">
-                    <strong className="block text-lg">Facts:</strong>
-                    {renderFactsContent(caseBrief.facts)}
-                  </div>
-
-                  <div className="mb-4">
-                    <strong className="block text-lg">Issue:</strong>
-                    {renderFieldContent(caseBrief.issue)}
-                  </div>
-
-                  <div className="mb-4">
-                    <strong className="block text-lg">Holding:</strong>
-                    {renderFieldContent(caseBrief.holding)}
-                  </div>
-
-                  <div className="mb-4">
-                    <strong className="block text-lg">Reasoning:</strong>
-                    {renderFieldContent(caseBrief.reasoning)}
-                  </div>
-
-                  <div className="mb-4">
-                    <strong className="block text-lg">Dissent:</strong>
-                    {renderFieldContent(caseBrief.dissent)}
-                  </div>
-                </div>
-              )
-            ) : (
-              <div className="text-sm text-gray-400">No summary available.</div>
-            )}
-          </div>
-
-          {/* Related Cases */}
-          <div className="w-full mt-8">
-            <h2 className="text-lg font-bold mb-2">Related Cases</h2>
-            <motion.div
-              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 w-full"
-              layout
+        <main className="flex-1 flex flex-col px-6 relative z-50 h-screen">
+          {/* Top Bar with Sidebar Toggle */}
+          <div className="flex items-center justify-between">
+            <button
+              onClick={toggleSidebar}
+              className="text-blue-900 dark:text-white p-2 rounded transition-colors hover:bg-black/10 focus:outline-none md:hidden"
+              aria-label={isSidebarVisible ? 'Hide Sidebar' : 'Show Sidebar'}
             >
-              <AnimatePresence>
-                {relatedCases && relatedCases.length > 0 ? (
-                  relatedCases.map((rcase) => (
-                    <motion.div
-                      key={rcase.id}
-                      layout
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: 20 }}
-                      transition={{ duration: 0.3 }}
-                      className={`p-4 rounded-xl shadow-lg cursor-pointer ${
-                        isDarkMode
-                          ? 'bg-slate-800 border border-slate-700 text-white'
-                          : 'bg-white border border-gray-300 text-gray-800'
-                      } hover:shadow-xl transition-shadow`}
-                      onClick={() => router.push(`/casebriefs/summaries?caseId=${rcase.id}`)}
-                    >
-                      <h3 className="text-lg font-semibold mb-2 truncate">
-                        {rcase.title}
-                      </h3>
-                      <p className="text-sm">
-                        {rcase.jurisdiction || 'Unknown'}
-                      </p>
-                      <p className="text-xs mt-1 text-gray-400">
-                        Volume: {rcase.volume || 'N/A'} | Date: {rcase.decisionDate || 'N/A'}
-                      </p>
-                    </motion.div>
-                  ))
+              <AnimatePresence mode="wait" initial={false}>
+                {isSidebarVisible ? (
+                  <motion.div
+                    key="close-icon"
+                    initial={{ rotate: 90, opacity: 0 }}
+                    animate={{ rotate: 0, opacity: 1 }}
+                    exit={{ rotate: -90, opacity: 0 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <FaTimes size={20} />
+                  </motion.div>
                 ) : (
-                  <p className="text-sm text-gray-400 col-span-full">
-                    No related cases found.
-                  </p>
+                  <motion.div
+                    key="bars-icon"
+                    initial={{ rotate: -90, opacity: 0 }}
+                    animate={{ rotate: 0, opacity: 1 }}
+                    exit={{ rotate: 90, opacity: 0 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <FaBars size={20} />
+                  </motion.div>
                 )}
               </AnimatePresence>
-            </motion.div>
+            </button>
           </div>
 
-          {/* Citation Generator */}
-          {capCase && (
-            <div className="w-full mt-8">
-              <h2 className="text-lg font-bold mb-2">Citation Generator</h2>
-              <div
-                className={`p-4 rounded-lg ${
-                  isDarkMode
-                    ? 'bg-slate-800 border border-slate-700'
-                    : 'bg-gray-100 border border-gray-300'
-                }`}
-              >
-                <p className="text-base italic">
-                  {generateCitation(capCase, 'U.S.', '113')}
-                </p>
-                <p className="text-base italic mt-2">
-                  {generateBluebookCitation(capCase, '113')}
-                </p>
+          <div
+            className={`flex-1 w-full rounded-2xl shadow-xl p-6 overflow-y-auto overflow-x-auto ${
+              isDarkMode
+                ? 'bg-gradient-to-br from-slate-900 to-blue-950 text-white'
+                : 'bg-white text-gray-800'
+            } flex flex-col items-center`}
+          >
+            <h1 className="text-2xl font-bold mb-4">
+              {viewMode === 'simplified'
+                ? 'Case Brief (Simple)'
+                : 'Full Case Brief (Detailed)'}
+            </h1>
+
+            {/* Case Info */}
+            <div className={`p-6 rounded-xl mb-6 ${isDarkMode ? 'bg-slate-800 text-white border border-slate-700' : 'bg-gray-100 text-gray-800 border border-gray-300'}`}>
+              <h2 className="text-xl font-semibold">{capCase?.title}</h2>
+              <p className={`text-sm mt-1 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                {capCase?.jurisdiction || 'Unknown'} | Volume: {capCase?.volume || 'N/A'} | Date: {capCase?.decisionDate || 'N/A'}
+              </p>
+              <div className="flex items-center text-xs mt-1">
+                <span className="text-gray-400">
+                  Verified by LExAPI 3.0 ({viewMode === 'simplified' ? 'Simple Mode' : 'Detailed Mode'})
+                </span>
+                {isVerified ? (
+                  <motion.div initial={{ opacity: 0, scale: 0 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.5 }} className="ml-2 flex items-center justify-center w-6 h-6 border-2 border-emerald-500 rounded-full">
+                    <span className="text-emerald-500 font-bold text-lg">✓</span>
+                  </motion.div>
+                ) : (
+                  <motion.div initial={{ opacity: 0, scale: 0 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.5 }} className="ml-2 flex items-center justify-center w-6 h-6 border-2 border-red-500 rounded-full">
+                    <span className="text-red-500 font-bold text-lg">✕</span>
+                  </motion.div>
+                )}
+                {(isPro || isExpert) && (
+                  <motion.button onClick={reGenerateSummary} whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }} className="ml-4" aria-label="Re-generate Summary">
+                    <FaSync size={16} className="text-gray-400" />
+                  </motion.button>
+                )}
+                <motion.button onClick={shareCase} whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }} className="ml-4" aria-label="Share Case">
+                  <FaShareAlt size={16} className="text-gray-400" />
+                </motion.button>
               </div>
             </div>
-          )}
 
-          {/* PDF Save Button */}
-          <motion.button
-            onClick={saveAsPDF}
-            whileHover={{ scale: 1.1, rotate: 5 }}
-            whileTap={{ scale: 0.9, rotate: -5 }}
-            className="mt-6 p-3 rounded-full bg-blue-600 text-white shadow-lg"
-            aria-label="Save as PDF"
-          >
-            <FaDownload size={24} />
-          </motion.button>
-        </div>
-      </main>
-    </div>
+            {/* 3-Way Animated Toggle for viewMode */}
+            <div className="relative flex items-center justify-center mb-6">
+              <div className={`relative flex items-center rounded-full p-1 ${isDarkMode ? 'bg-slate-700' : 'bg-gray-200'}`} style={{ width: '240px' }}>
+                <motion.div
+                  className={`absolute top-0 left-0 h-full rounded-full ${isDarkMode ? 'bg-slate-600' : 'bg-white'} shadow`}
+                  style={{ width: '33.33%' }}
+                  initial={false}
+                  animate={{ x: `${selectedIndex * 100}%` }}
+                  transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+                />
+                {viewModes.map((mode, i) => (
+                  <button
+                    key={mode.value}
+                    onClick={() => setViewMode(mode.value)}
+                    className={`relative z-10 flex-1 text-xs sm:text-sm font-semibold py-1 transition-colors ${
+                      selectedIndex === i ? (isDarkMode ? 'text-blue-300' : 'text-blue-600') : (isDarkMode ? 'text-gray-200' : 'text-gray-700')
+                    }`}
+                  >
+                    {mode.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Summary Section */}
+            <div className="w-full">
+              {isSummaryLoading ? (
+                <div className="flex flex-col items-center justify-center space-y-3">
+                  <div className="relative w-16 h-16">
+                    <svg className="transform -rotate-90" viewBox="0 0 36 36">
+                      <path className="text-gray-300" strokeWidth="4" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                      <path className="text-blue-500 animate-progress" strokeWidth="4" strokeLinecap="round" fill="none" strokeDasharray="25, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                    </svg>
+                  </div>
+                  <div className="text-sm text-gray-400">
+                    We are verifying the Case Brief, please wait...
+                  </div>
+                </div>
+              ) : caseBrief ? (
+                caseBrief.error ? (
+                  <div className="text-sm text-red-500">{caseBrief.error || 'No summary available.'}</div>
+                ) : (
+                  <div className={`p-6 rounded-xl ${isDarkMode ? 'bg-slate-800 text-white border border-blue-600' : 'bg-white text-gray-800 border border-blue-200'}`}>
+                    <h3 className={`font-bold mb-4 ${isDarkMode ? 'text-blue-300' : 'text-blue-700'} text-lg`}>
+                      {viewMode === 'simplified' ? 'Brief Case Summary' : 'Detailed Case Brief'}
+                    </h3>
+
+                    <div className="mb-4">
+                      <strong className="block text-lg">Rule of Law:</strong>
+                      {caseBrief.ruleOfLaw && <p className="text-base mt-2">{caseBrief.ruleOfLaw}</p>}
+                    </div>
+
+                    <div className="mb-4">
+                      <strong className="block text-lg">Facts:</strong>
+                      {caseBrief.facts && <p className="text-base mt-2">{simplifyText(caseBrief.facts)}</p>}
+                    </div>
+
+                    <div className="mb-4">
+                      <strong className="block text-lg">Issue:</strong>
+                      {caseBrief.issue && <p className="text-base mt-2">{caseBrief.issue}</p>}
+                    </div>
+
+                    <div className="mb-4">
+                      <strong className="block text-lg">Holding:</strong>
+                      {caseBrief.holding && <p className="text-base mt-2">{caseBrief.holding}</p>}
+                    </div>
+
+                    <div className="mb-4">
+                      <strong className="block text-lg">Reasoning:</strong>
+                      {caseBrief.reasoning && <p className="text-base mt-2">{caseBrief.reasoning}</p>}
+                    </div>
+
+                    <div className="mb-4">
+                      <strong className="block text-lg">Dissent:</strong>
+                      {caseBrief.dissent && <p className="text-base mt-2">{caseBrief.dissent}</p>}
+                    </div>
+                  </div>
+                )
+              ) : (
+                <div className="text-sm text-gray-400">No summary available.</div>
+              )}
+            </div>
+
+            {/* Related Cases */}
+            <div className="w-full mt-8">
+              <h2 className="text-lg font-bold mb-2">Related Cases</h2>
+              <motion.div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 w-full" layout>
+                <AnimatePresence>
+                  {relatedCases && relatedCases.length > 0 ? (
+                    relatedCases.map((rcase) => (
+                      <motion.div
+                        key={rcase.id}
+                        layout
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: 20 }}
+                        transition={{ duration: 0.3 }}
+                        className={`p-4 rounded-xl shadow-lg cursor-pointer ${
+                          isDarkMode
+                            ? 'bg-slate-800 border border-slate-700 text-white'
+                            : 'bg-white border border-gray-300 text-gray-800'
+                        } hover:shadow-xl transition-shadow`}
+                        onClick={() => router.push(`/casebriefs/summaries?caseId=${rcase.id}`)}
+                      >
+                        <h3 className="text-lg font-semibold mb-2 truncate">
+                          {rcase.title}
+                        </h3>
+                        <p className="text-sm">{rcase.jurisdiction || 'Unknown'}</p>
+                        <p className="text-xs mt-1 text-gray-400">
+                          Volume: {rcase.volume || 'N/A'} | Date: {rcase.decisionDate || 'N/A'}
+                        </p>
+                      </motion.div>
+                    ))
+                  ) : (
+                    <p className="text-sm text-gray-400 col-span-full">
+                      No related cases found.
+                    </p>
+                  )}
+                </AnimatePresence>
+              </motion.div>
+            </div>
+
+            {/* Citation Generator */}
+            {capCase && (
+              <div className="w-full mt-8">
+                <h2 className="text-lg font-bold mb-2">Citation Generator</h2>
+                <div
+                  className={`p-4 rounded-lg ${
+                    isDarkMode ? 'bg-slate-800 border border-slate-700' : 'bg-gray-100 border border-gray-300'
+                  }`}
+                >
+                  <p className="text-base italic">
+                    {generateCitation(capCase, 'U.S.', '113')}
+                  </p>
+                  <p className="text-base italic mt-2">
+                    {generateBluebookCitation(capCase, '113')}
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {/* PDF Save Button */}
+            <motion.button
+              onClick={() => saveAsPDF(pdfRef, capCase?.title)}
+              whileHover={{ scale: 1.1, rotate: 5 }}
+              whileTap={{ scale: 0.9, rotate: -5 }}
+              className="mt-6 p-3 rounded-full bg-blue-600 text-white shadow-lg"
+              aria-label="Save as PDF"
+            >
+              <FaDownload size={24} />
+            </motion.button>
+          </div>
+        </main>
+      </div>
+    </>
   );
 }
