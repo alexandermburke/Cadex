@@ -55,6 +55,10 @@ export default function AllBriefs() {
   const [itemsPerPage, setItemsPerPage] = useState(18);
   const [isLoading, setIsLoading] = useState(false);
 
+  // For pagination truncation
+  const [showGotoInput, setShowGotoInput] = useState(false);
+  const [gotoValue, setGotoValue] = useState('');
+
   // New case brief form state
   const [newBriefTitle, setNewBriefTitle] = useState('');
   const [newBriefJurisdiction, setNewBriefJurisdiction] = useState('');
@@ -237,12 +241,30 @@ export default function AllBriefs() {
   const endIndex = validCurrentPage * itemsPerPage;
   const paginatedCases = displayCases.slice(startIndex, endIndex);
 
-  const goToPage = (num) => setCurrentPage(num);
+  const goToPage = (num) => {
+    if (num >= 1 && num <= totalPages) {
+      setCurrentPage(num);
+      setShowGotoInput(false);
+      setGotoValue('');
+    }
+  };
   const goToPrevPage = () => {
     if (currentPage > 1) setCurrentPage(currentPage - 1);
   };
   const goToNextPage = () => {
     if (currentPage < totalPages) setCurrentPage(currentPage + 1);
+  };
+
+  // "Go to page" form submission
+  const handleGotoSubmit = (e) => {
+    e.preventDefault();
+    const page = parseInt(gotoValue, 10);
+    if (!isNaN(page)) {
+      goToPage(page);
+    } else {
+      setGotoValue('');
+      setShowGotoInput(false);
+    }
   };
 
   // Log user activity
@@ -788,22 +810,29 @@ export default function AllBriefs() {
                             isDarkMode ? 'text-gray-300' : 'text-gray-600'
                           }`}
                         >
-                          Volume: {c.volume || 'N/A'}
+                          Date: {c.decisionDate || 'N/A'}
                         </p>
                         <p
                           className={`text-sm ${
                             isDarkMode ? 'text-gray-300' : 'text-gray-600'
                           }`}
                         >
-                          Date: {c.decisionDate || 'N/A'}
+                          Citation: {c.citation || 'N/A'}
                         </p>
-                        <p className={`text-xs mt-2 line-clamp-2 italic ${isDarkMode ? 'text-gray-200' : 'text-gray-600'}`}>
-                          {c.briefSummary?.facts?.slice(0, 100) || 'No content generated'}...
+                        <p
+                          className={`text-xs mt-2 line-clamp-2 italic ${
+                            isDarkMode ? 'text-gray-200' : 'text-gray-600'
+                          }`}
+                        >
+                          {c.briefSummary?.facts?.slice(0, 100) || 'no description available'}...
                         </p>
                       </div>
                     ))}
                   </div>
+
+                  {/* PAGINATION */}
                   <div className="mt-6 flex items-center justify-center gap-2">
+                    {/* Previous Button */}
                     <motion.button
                       onClick={goToPrevPage}
                       disabled={currentPage === 1}
@@ -821,7 +850,9 @@ export default function AllBriefs() {
                     >
                       <FaChevronLeft />
                     </motion.button>
-                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((num) => (
+
+                    {/* Page Buttons (truncate to 5 max) */}
+                    {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => i + 1).map((num) => (
                       <motion.button
                         key={num}
                         onClick={() => goToPage(num)}
@@ -840,6 +871,49 @@ export default function AllBriefs() {
                         {num}
                       </motion.button>
                     ))}
+
+                    {/* Ellipsis + Goto if totalPages > 5 */}
+                    {totalPages > 5 && (
+                      <motion.button
+                        onClick={() => setShowGotoInput(!showGotoInput)}
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.9 }}
+                        className={`px-2 py-2 font-semibold transition-colors duration-300 ${
+                          isDarkMode ? 'text-gray-200' : 'text-gray-800'
+                        }`}
+                      >
+                        ...
+                      </motion.button>
+                    )}
+
+                    {/* Goto Input (if user clicked "...") */}
+                    {showGotoInput && (
+                      <form onSubmit={handleGotoSubmit} className="flex items-center space-x-2">
+                        <input
+                          type="number"
+                          className={`w-16 px-2 py-1 border rounded-md ${
+                            isDarkMode
+                              ? 'bg-slate-700 text-white border-slate-600'
+                              : 'bg-white text-gray-800 border-gray-300'
+                          }`}
+                          value={gotoValue}
+                          onChange={(e) => setGotoValue(e.target.value)}
+                          placeholder="Page #"
+                        />
+                        <button
+                          type="submit"
+                          className={`px-3 py-1 rounded-md font-semibold transition-colors duration-300 ${
+                            isDarkMode
+                              ? 'bg-blue-600 hover:bg-blue-500 text-white'
+                              : 'bg-blue-950 hover:bg-blue-800 text-white'
+                          }`}
+                        >
+                          Go
+                        </button>
+                      </form>
+                    )}
+
+                    {/* Next Button */}
                     <motion.button
                       onClick={goToNextPage}
                       disabled={currentPage === totalPages || totalPages === 0}
@@ -900,7 +974,8 @@ export default function AllBriefs() {
                     isDarkMode ? 'text-gray-200' : 'text-gray-800'
                   }`}
                 >
-                  Citation:  <span className="font-normal">{selectedCase.citation || 'N/A'}</span>
+                  Citation:{' '}
+                  <span className="font-normal">{selectedCase.citation || 'N/A'}</span>
                 </p>
 
                 <div className="flex items-center text-xs mt-1">

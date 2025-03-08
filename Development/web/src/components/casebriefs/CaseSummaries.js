@@ -63,13 +63,16 @@ const saveAsPDF = async (pdfRef, title) => {
   try {
     const originalFontSize = pdfRef.current.style.fontSize;
     pdfRef.current.style.fontSize = '24px';
+
     const canvas = await html2canvas(pdfRef.current, { scale: 2 });
     const imgData = canvas.toDataURL('image/png');
     const pdf = new jsPDF('p', 'mm', 'a4');
     const pdfWidth = pdf.internal.pageSize.getWidth();
     const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+
     pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
     pdf.save(`${title || 'case-brief'}.pdf`);
+
     pdfRef.current.style.fontSize = originalFontSize;
   } catch (error) {
     console.error('Error generating PDF:', error);
@@ -367,10 +370,10 @@ export default function CaseSummaries() {
         console.log('Verification explanation:', verifyData.explanation);
         setIsVerified(false);
         if (reRunCount < 5) {
-          setReRunCount(prev => prev + 1);
+          setReRunCount((prev) => prev + 1);
           await getCapCaseSummary(capCaseObj);
         } else {
-          setCaseBrief({ error: "Verification failed after 5 attempts. Please try again later." });
+          setCaseBrief({ error: 'Verification failed after 5 attempts. Please try again later.' });
         }
       }
     } catch (verifyError) {
@@ -401,10 +404,10 @@ export default function CaseSummaries() {
         console.log('Verification explanation:', verifyData.explanation);
         setIsVerified(false);
         if (reRunCount < 5) {
-          setReRunCount(prev => prev + 1);
+          setReRunCount((prev) => prev + 1);
           await getCapCaseBriefSummary(capCaseObj);
         } else {
-          setCaseBrief({ error: "Verification failed after 5 attempts. Please try again later." });
+          setCaseBrief({ error: 'Verification failed after 5 attempts. Please try again later.' });
         }
       }
     } catch (verifyError) {
@@ -427,9 +430,7 @@ export default function CaseSummaries() {
         }`}
       >
         <div className="p-6 bg-white dark:bg-slate-800 rounded-2xl shadow-xl text-center">
-          <p className="mb-4 text-lg font-semibold">
-            Please log in to access your Case Summaries.
-          </p>
+          <p className="mb-4 text-lg font-semibold">Please log in to access your Case Summaries.</p>
           <button
             onClick={() => router.push('/login')}
             className={`px-4 py-2 rounded-md text-sm font-semibold transition-colors duration-300 ${
@@ -448,13 +449,13 @@ export default function CaseSummaries() {
   // Structured data for Google Search Indexing.
   const structuredData = capCase
     ? {
-        "@context": "https://schema.org",
-        "@type": "LegalCase",
-        "name": capCase.title,
-        "datePublished": capCase.decisionDate,
-        "jurisdiction": capCase.jurisdiction,
-        "description": caseBrief ? (caseBrief.facts || caseBrief.ruleOfLaw || "") : "",
-        "url": typeof window !== "undefined" ? window.location.href : ""
+        '@context': 'https://schema.org',
+        '@type': 'LegalCase',
+        name: capCase.title,
+        datePublished: capCase.decisionDate,
+        jurisdiction: capCase.jurisdiction,
+        description: caseBrief ? caseBrief.facts || caseBrief.ruleOfLaw || '' : '',
+        url: typeof window !== 'undefined' ? window.location.href : ''
       }
     : null;
 
@@ -468,7 +469,12 @@ export default function CaseSummaries() {
           />
         </Head>
       )}
-      <div ref={pdfRef} className={`relative flex h-screen transition-colors duration-500 ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>
+      <div
+        ref={pdfRef}
+        className={`relative flex h-screen transition-colors duration-500 ${
+          isDarkMode ? 'text-white' : 'text-gray-800'
+        }`}
+      >
         <AnimatePresence>
           {isSidebarVisible && (
             <>
@@ -531,36 +537,72 @@ export default function CaseSummaries() {
             } flex flex-col items-center`}
           >
             <h1 className="text-2xl font-bold mb-4">
-              {viewMode === 'simplified'
-                ? 'Case Brief (Simple)'
-                : 'Full Case Brief (Detailed)'}
+              {viewMode === 'simplified' ? 'Case Brief (Simple)' : 'Full Case Brief (Detailed)'}
             </h1>
 
             {/* Case Info */}
-            <div className={`p-6 rounded-xl mb-6 ${isDarkMode ? 'bg-slate-800 text-white border border-slate-700' : 'bg-gray-100 text-gray-800 border border-gray-300'}`}>
+            <div
+              className={`p-6 rounded-xl mb-6 ${
+                isDarkMode
+                  ? 'bg-slate-800 text-white border border-slate-700'
+                  : 'bg-gray-100 text-gray-800 border border-gray-300'
+              }`}
+            >
               <h2 className="text-xl font-semibold">{capCase?.title}</h2>
               <p className={`text-sm mt-1 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                {capCase?.jurisdiction || 'Unknown'} | Volume: {capCase?.volume || 'N/A'} | Date: {capCase?.decisionDate || 'N/A'}
+                {capCase?.jurisdiction || 'Unknown'} | Volume: {capCase?.volume || 'N/A'} | Date:{' '}
+                {capCase?.decisionDate || 'N/A'}
+              </p>
+              {/* ADDING CITATION LINE HERE */}
+              <p
+                className={`text-sm mt-1 font-semibold ${
+                  isDarkMode ? 'text-gray-200' : 'text-gray-800'
+                }`}
+              >
+                Citation:{' '}
+                <span className="font-normal">{capCase?.citation || 'N/A'}</span>
               </p>
               <div className="flex items-center text-xs mt-1">
                 <span className="text-gray-400">
                   Verified by LExAPI 3.0 ({viewMode === 'simplified' ? 'Simple Mode' : 'Detailed Mode'})
                 </span>
                 {isVerified ? (
-                  <motion.div initial={{ opacity: 0, scale: 0 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.5 }} className="ml-2 flex items-center justify-center w-6 h-6 border-2 border-emerald-500 rounded-full">
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 0.5 }}
+                    className="ml-2 flex items-center justify-center w-6 h-6 border-2 border-emerald-500 rounded-full"
+                  >
                     <span className="text-emerald-500 font-bold text-lg">✓</span>
                   </motion.div>
                 ) : (
-                  <motion.div initial={{ opacity: 0, scale: 0 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.5 }} className="ml-2 flex items-center justify-center w-6 h-6 border-2 border-red-500 rounded-full">
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 0.5 }}
+                    className="ml-2 flex items-center justify-center w-6 h-6 border-2 border-red-500 rounded-full"
+                  >
                     <span className="text-red-500 font-bold text-lg">✕</span>
                   </motion.div>
                 )}
                 {(isPro || isExpert) && (
-                  <motion.button onClick={reGenerateSummary} whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }} className="ml-4" aria-label="Re-generate Summary">
+                  <motion.button
+                    onClick={reGenerateSummary}
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
+                    className="ml-4"
+                    aria-label="Re-generate Summary"
+                  >
                     <FaSync size={16} className="text-gray-400" />
                   </motion.button>
                 )}
-                <motion.button onClick={shareCase} whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }} className="ml-4" aria-label="Share Case">
+                <motion.button
+                  onClick={shareCase}
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                  className="ml-4"
+                  aria-label="Share Case"
+                >
                   <FaShareAlt size={16} className="text-gray-400" />
                 </motion.button>
               </div>
@@ -568,9 +610,16 @@ export default function CaseSummaries() {
 
             {/* 3-Way Animated Toggle for viewMode */}
             <div className="relative flex items-center justify-center mb-6">
-              <div className={`relative flex items-center rounded-full p-1 ${isDarkMode ? 'bg-slate-700' : 'bg-gray-200'}`} style={{ width: '240px' }}>
+              <div
+                className={`relative flex items-center rounded-full p-1 ${
+                  isDarkMode ? 'bg-slate-700' : 'bg-gray-200'
+                }`}
+                style={{ width: '240px' }}
+              >
                 <motion.div
-                  className={`absolute top-0 left-0 h-full rounded-full ${isDarkMode ? 'bg-slate-600' : 'bg-white'} shadow`}
+                  className={`absolute top-0 left-0 h-full rounded-full ${
+                    isDarkMode ? 'bg-slate-600' : 'bg-white'
+                  } shadow`}
                   style={{ width: '33.33%' }}
                   initial={false}
                   animate={{ x: `${selectedIndex * 100}%` }}
@@ -581,7 +630,13 @@ export default function CaseSummaries() {
                     key={mode.value}
                     onClick={() => setViewMode(mode.value)}
                     className={`relative z-10 flex-1 text-xs sm:text-sm font-semibold py-1 transition-colors ${
-                      selectedIndex === i ? (isDarkMode ? 'text-blue-300' : 'text-blue-600') : (isDarkMode ? 'text-gray-200' : 'text-gray-700')
+                      selectedIndex === i
+                        ? isDarkMode
+                          ? 'text-blue-300'
+                          : 'text-blue-600'
+                        : isDarkMode
+                        ? 'text-gray-200'
+                        : 'text-gray-700'
                     }`}
                   >
                     {mode.label}
@@ -596,8 +651,20 @@ export default function CaseSummaries() {
                 <div className="flex flex-col items-center justify-center space-y-3">
                   <div className="relative w-16 h-16">
                     <svg className="transform -rotate-90" viewBox="0 0 36 36">
-                      <path className="text-gray-300" strokeWidth="4" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-                      <path className="text-blue-500 animate-progress" strokeWidth="4" strokeLinecap="round" fill="none" strokeDasharray="25, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                      <path
+                        className="text-gray-300"
+                        strokeWidth="4"
+                        fill="none"
+                        d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                      />
+                      <path
+                        className="text-blue-500 animate-progress"
+                        strokeWidth="4"
+                        strokeLinecap="round"
+                        fill="none"
+                        strokeDasharray="25, 100"
+                        d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                      />
                     </svg>
                   </div>
                   <div className="text-sm text-gray-400">
@@ -606,10 +673,22 @@ export default function CaseSummaries() {
                 </div>
               ) : caseBrief ? (
                 caseBrief.error ? (
-                  <div className="text-sm text-red-500">{caseBrief.error || 'No summary available.'}</div>
+                  <div className="text-sm text-red-500">
+                    {caseBrief.error || 'No summary available.'}
+                  </div>
                 ) : (
-                  <div className={`p-6 rounded-xl ${isDarkMode ? 'bg-slate-800 text-white border border-blue-600' : 'bg-white text-gray-800 border border-blue-200'}`}>
-                    <h3 className={`font-bold mb-4 ${isDarkMode ? 'text-blue-300' : 'text-blue-700'} text-lg`}>
+                  <div
+                    className={`p-6 rounded-xl ${
+                      isDarkMode
+                        ? 'bg-slate-800 text-white border border-blue-600'
+                        : 'bg-white text-gray-800 border border-blue-200'
+                    }`}
+                  >
+                    <h3
+                      className={`font-bold mb-4 ${
+                        isDarkMode ? 'text-blue-300' : 'text-blue-700'
+                      } text-lg`}
+                    >
                       {viewMode === 'simplified' ? 'Brief Case Summary' : 'Detailed Case Brief'}
                     </h3>
 
@@ -670,9 +749,7 @@ export default function CaseSummaries() {
                         } hover:shadow-xl transition-shadow`}
                         onClick={() => router.push(`/casebriefs/summaries?caseId=${rcase.id}`)}
                       >
-                        <h3 className="text-lg font-semibold mb-2 truncate">
-                          {rcase.title}
-                        </h3>
+                        <h3 className="text-lg font-semibold mb-2 truncate">{rcase.title}</h3>
                         <p className="text-sm">{rcase.jurisdiction || 'Unknown'}</p>
                         <p className="text-xs mt-1 text-gray-400">
                           Volume: {rcase.volume || 'N/A'} | Date: {rcase.decisionDate || 'N/A'}
@@ -680,9 +757,7 @@ export default function CaseSummaries() {
                       </motion.div>
                     ))
                   ) : (
-                    <p className="text-sm text-gray-400 col-span-full">
-                      No related cases found.
-                    </p>
+                    <p className="text-sm text-gray-400 col-span-full">No related cases found.</p>
                   )}
                 </AnimatePresence>
               </motion.div>
@@ -697,12 +772,8 @@ export default function CaseSummaries() {
                     isDarkMode ? 'bg-slate-800 border border-slate-700' : 'bg-gray-100 border border-gray-300'
                   }`}
                 >
-                  <p className="text-base italic">
-                    {generateCitation(capCase, 'U.S.', '113')}
-                  </p>
-                  <p className="text-base italic mt-2">
-                    {generateBluebookCitation(capCase, '113')}
-                  </p>
+                  <p className="text-base italic">{generateCitation(capCase, 'U.S.', '113')}</p>
+                  <p className="text-base italic mt-2">{generateBluebookCitation(capCase, '113')}</p>
                 </div>
               </div>
             )}
