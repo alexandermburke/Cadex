@@ -21,7 +21,7 @@ export async function POST(request) {
 Generate a very detailed case summary based on the following case title. The summary should include:
 1. Rule of Law: Provide at least four sentences explaining the general legal principles, including relevant statutory or case law.
 2. Facts: List at least three key facts or events that are crucial to understanding the case.
-3. Issue: Describe the primary legal question(s) in at least two sentences, ideally more
+3. Issue: Describe the primary legal question(s) in at least two sentences, ideally more.
 4. Holding: Summarize the court's decision in one to two sentences.
 5. Reasoning: Explain the rationale behind the decision in detail, using at least three sentences.
 6. Dissent: If applicable, provide a brief summary of any dissenting opinions in at least one sentence; otherwise state "None."
@@ -85,7 +85,13 @@ Case Title:
       temperature: 0.7,
     });
 
-    if (!response || !response.choices || !Array.isArray(response.choices) || response.choices.length === 0 || !response.choices[0].message) {
+    if (
+      !response ||
+      !response.choices ||
+      !Array.isArray(response.choices) ||
+      response.choices.length === 0 ||
+      !response.choices[0].message
+    ) {
       console.error('Invalid response structure from OpenAI:', response);
       throw new Error('Invalid OpenAI response structure.');
     }

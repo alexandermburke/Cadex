@@ -289,7 +289,9 @@ export default function CaseSummaries() {
           verified: false,
         },
       });
-      setCapCase((prev) => prev ? { ...prev, detailedSummary: { ...data, verified: false } } : null);
+      setCapCase((prev) =>
+        prev ? { ...prev, detailedSummary: { ...data, verified: false } } : null
+      );
       await verifyDetailedSummary(data, capCaseObj);
     } catch (err) {
       console.error('Error fetching summary for full view:', err);
@@ -331,7 +333,9 @@ export default function CaseSummaries() {
           verified: false,
         },
       });
-      setCapCase((prev) => prev ? { ...prev, briefSummary: { ...data, verified: false } } : null);
+      setCapCase((prev) =>
+        prev ? { ...prev, briefSummary: { ...data, verified: false } } : null
+      );
       await verifyBriefSummary(data, capCaseObj);
     } catch (err) {
       console.error('Error fetching brief summary for simple view:', err);
@@ -362,9 +366,11 @@ export default function CaseSummaries() {
       } else {
         console.log('Verification explanation:', verifyData.explanation);
         setIsVerified(false);
-        if (reRunCount < 1) {
-          setReRunCount(reRunCount + 1);
+        if (reRunCount < 5) {
+          setReRunCount(prev => prev + 1);
           await getCapCaseSummary(capCaseObj);
+        } else {
+          setCaseBrief({ error: "Verification failed after 5 attempts. Please try again later." });
         }
       }
     } catch (verifyError) {
@@ -394,9 +400,11 @@ export default function CaseSummaries() {
       } else {
         console.log('Verification explanation:', verifyData.explanation);
         setIsVerified(false);
-        if (reRunCount < 1) {
-          setReRunCount(reRunCount + 1);
+        if (reRunCount < 5) {
+          setReRunCount(prev => prev + 1);
           await getCapCaseBriefSummary(capCaseObj);
+        } else {
+          setCaseBrief({ error: "Verification failed after 5 attempts. Please try again later." });
         }
       }
     } catch (verifyError) {
@@ -405,22 +413,8 @@ export default function CaseSummaries() {
     }
   };
 
-  const saveAsPDF = async () => {
-    if (!pdfRef.current) return;
-    try {
-      const originalFontSize = pdfRef.current.style.fontSize;
-      pdfRef.current.style.fontSize = '24px';
-      const canvas = await html2canvas(pdfRef.current, { scale: 2 });
-      const imgData = canvas.toDataURL('image/png');
-      const pdf = new jsPDF('p', 'mm', 'a4');
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-      pdf.save(`${capCase?.title || 'case-brief'}.pdf`);
-      pdfRef.current.style.fontSize = originalFontSize;
-    } catch (error) {
-      console.error('Error generating PDF:', error);
-    }
+  const saveAsPDFHandler = async () => {
+    await saveAsPDF(pdfRef, capCase?.title);
   };
 
   if (!currentUser) {
@@ -626,7 +620,7 @@ export default function CaseSummaries() {
 
                     <div className="mb-4">
                       <strong className="block text-lg">Facts:</strong>
-                      {caseBrief.facts && <p className="text-base mt-2">{simplifyText(caseBrief.facts)}</p>}
+                      {caseBrief.facts ? renderFactsContent(caseBrief.facts) : <p className="text-base mt-2">Not provided.</p>}
                     </div>
 
                     <div className="mb-4">
@@ -715,7 +709,7 @@ export default function CaseSummaries() {
 
             {/* PDF Save Button */}
             <motion.button
-              onClick={() => saveAsPDF(pdfRef, capCase?.title)}
+              onClick={saveAsPDFHandler}
               whileHover={{ scale: 1.1, rotate: 5 }}
               whileTap={{ scale: 0.9, rotate: -5 }}
               className="mt-6 p-3 rounded-full bg-blue-600 text-white shadow-lg"

@@ -32,44 +32,25 @@ export default function AllBriefs() {
   const { currentUser, userDataObj } = useAuth();
   const plan = userDataObj?.billing?.plan?.toLowerCase() || 'free';
   const isFree = plan === 'free';
-  const isPro = plan === 'pro';
+  const isPro = plan === 'free'; // free for testing purposes
   const isExpert = plan === 'expert';
 
-  // Dark mode preference
   const isDarkMode = userDataObj?.darkMode || false;
-
-  // Sidebar visibility
   const [isSidebarVisible, setIsSidebarVisible] = useState(true);
   const toggleSidebar = () => setIsSidebarVisible(!isSidebarVisible);
-
-  // Collection data
   const [capCases, setCapCases] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
-
-  // Selected case and AI-generated brief
   const [selectedCase, setSelectedCase] = useState(null);
   const [caseBrief, setCaseBrief] = useState(null);
   const [isSummaryLoading, setIsSummaryLoading] = useState(false);
-
-  // Verification state for the brief summary
   const [isVerified, setIsVerified] = useState(false);
-
-  // Favorites
   const [favorites, setFavorites] = useState([]);
   const [isFavorited, setIsFavorited] = useState(false);
-
-  // Tab state: 'browse', 'favorites', or 'create'
   const [activeTab, setActiveTab] = useState('browse');
-
-  // Filters
   const [filterDate, setFilterDate] = useState('');
   const [filterJurisdiction, setFilterJurisdiction] = useState('');
-
-  // Bullet-point or paragraph view
   const [bulletpointView, setBulletpointView] = useState(false);
-
-  // Dynamic Items per page state (calculated based on viewport)
   const [itemsPerPage, setItemsPerPage] = useState(18);
 
   useEffect(() => {
@@ -99,6 +80,9 @@ export default function AllBriefs() {
   const [newBriefTitle, setNewBriefTitle] = useState('');
   const [newBriefJurisdiction, setNewBriefJurisdiction] = useState('');
   const [newBriefDate, setNewBriefDate] = useState('');
+
+  // New state for verification reply from API/casebrief-verification
+  const [verificationReply, setVerificationReply] = useState('');
 
   // States for handling creation process
   const [createLoading, setCreateLoading] = useState(false);
@@ -437,6 +421,8 @@ export default function AllBriefs() {
   const createNewCaseBrief = async (e) => {
     e.preventDefault();
     setCreateError('');
+    // Clear any previous verification reply.
+    setVerificationReply('');
     if (!newBriefTitle.trim() || !newBriefJurisdiction.trim() || !newBriefDate.trim()) {
       setCreateError("Please fill in all fields.");
       return;
@@ -458,6 +444,29 @@ export default function AllBriefs() {
         throw new Error(errData.error || 'Summary generation failed.');
       }
       let summaryData = await summaryRes.json();
+
+      // Call verification API to check the generated summary.
+      try {
+        const verifyRes = await fetch('/api/casebrief-verification', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            briefSummary: summaryData,
+            caseTitle: newBriefTitle,
+            decisionDate: newBriefDate,
+            jurisdiction: newBriefJurisdiction,
+          }),
+        });
+        const verifyData = await verifyRes.json();
+        if (!verifyData.verified) {
+          setVerificationReply(verifyData.explanation || "Verification failed without explanation.");
+        } else {
+          setVerificationReply('');
+        }
+      } catch (verifyError) {
+        console.error("Error verifying new case brief:", verifyError);
+        setVerificationReply("Error during verification.");
+      }
 
       // Use API corrections for metadata if available.
       const correctedTitle = summaryData.corrections?.title || newBriefTitle;
@@ -483,7 +492,7 @@ export default function AllBriefs() {
       setActiveTab('browse');
     } catch (error) {
       console.error("Error creating new case brief:", error);
-      setCreateError("Error creating new case brief. Please try again.");
+      setCreateError("Error creating new case brief. Please check spelling & Capitalization then try again.");
     } finally {
       setCreateLoading(false);
     }
@@ -592,7 +601,7 @@ export default function AllBriefs() {
                         type="text"
                         value={newBriefTitle}
                         onChange={(e) => setNewBriefTitle(e.target.value)}
-                        className={`w-full px-3 py-2 border rounded-md capitalize ${
+                        className={`w-full px-3 py-2 border rounded-md ${
                           isDarkMode
                             ? 'bg-slate-700 text-white border-slate-600 placeholder-gray-300'
                             : 'bg-white text-gray-800 border-gray-300'
@@ -606,7 +615,7 @@ export default function AllBriefs() {
                         type="text"
                         value={newBriefJurisdiction}
                         onChange={(e) => setNewBriefJurisdiction(e.target.value)}
-                        className={`w-full px-3 py-2 border rounded-md capitalize ${
+                        className={`w-full px-3 py-2 border rounded-md ${
                           isDarkMode
                             ? 'bg-slate-700 text-white border-slate-600 placeholder-gray-300'
                             : 'bg-white text-gray-800 border-gray-300'
@@ -636,6 +645,11 @@ export default function AllBriefs() {
                         {createError}
                       </div>
                     )}
+                    {verificationReply && (
+                      <div className="mb-4 p-2 bg-white text-red-500 font-mono text-sm rounded">
+                        {verificationReply}
+                      </div>
+                    )}
                     <button
                       type="submit"
                       disabled={createLoading}
@@ -658,9 +672,7 @@ export default function AllBriefs() {
                   <div className="flex justify-center">
                     <a
                       href="https://cadexlaw.com/admin/billing"
-                      className={`px-4 py-2 rounded-md font-semibold transition-colors duration-300 ${
-                        isDarkMode ? 'bg-blue-600 hover:bg-blue-500 text-white' : 'bg-blue-950 hover:bg-blue-800 text-white'
-                      }`}
+                      className={`px-4 py-2 rounded-md font-semibold transition-colors duration-300 ${isDarkMode ? 'bg-blue-600 hover:bg-blue-500 text-white' : 'bg-blue-950 hover:bg-blue-800 text-white'}`}
                     >
                       Upgrade Now
                     </a>

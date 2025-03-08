@@ -23,7 +23,7 @@ export async function POST(request) {
       );
     }
 
-    // Construct the verification prompt with additional checks.
+    // Construct the verification prompt without checking for dissent.
     const verificationPrompt = `
 Generate a JSON object with the following keys:
 {
@@ -37,7 +37,6 @@ In addition to checking that the summary includes detailed content for:
   3. Issue
   4. Holding
   5. Reasoning
-  6. Dissent
 please also verify that the provided case title, decision date (year), and jurisdiction are correct and well-formatted. This includes checking for proper punctuation, spelling, grammar, and capitalization.
 
 If the summary is fully correct and all additional fields are accurate and properly formatted, set "verified" to true and "explanation" to "Summary is fully accurate." 
@@ -55,7 +54,6 @@ Summary:
 3. Issue: ${briefSummary.issue || 'N/A'}
 4. Holding: ${briefSummary.holding || 'N/A'}
 5. Reasoning: ${briefSummary.reasoning || 'N/A'}
-6. Dissent: ${briefSummary.dissent || 'N/A'}
     `;
 
     const messages = [
@@ -109,17 +107,11 @@ Summary:
           console.log('Successfully parsed JSON substring:', jsonSubstring);
         } catch (innerErr) {
           console.error('Failed to parse JSON substring:', jsonSubstring);
-          return NextResponse.json(
-            { error: 'Could not parse JSON from GPT.' },
-            { status: 500 }
-          );
+          return NextResponse.json({ error: 'Could not parse JSON from GPT.' }, { status: 500 });
         }
       } else {
         console.error('No JSON object found in GPT response:', rawOutput);
-        return NextResponse.json(
-          { error: 'Could not parse JSON from GPT.' },
-          { status: 500 }
-        );
+        return NextResponse.json({ error: 'Could not parse JSON from GPT.' }, { status: 500 });
       }
     }
 
@@ -132,9 +124,6 @@ Summary:
     return NextResponse.json(result, { status: 200 });
   } catch (err) {
     console.error('Error in /api/casebrief-verification:', err);
-    return NextResponse.json(
-      { error: 'Error verifying case brief.' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Error verifying case brief.' }, { status: 500 });
   }
 }
