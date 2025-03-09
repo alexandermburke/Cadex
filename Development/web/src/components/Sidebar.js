@@ -104,8 +104,8 @@ export default function Sidebar({
   const plan = userDataObj?.billing?.plan?.toLowerCase() || 'free';
   const isFree = plan === 'free';
   const isBasic = plan === 'basic'; // Changed to free for testing purposes; testing enviornment
-  const isPro = plan === 'free';
-  const isExpert = plan === 'free'; 
+  const isPro = plan === 'pro';
+  const isExpert = plan === 'expert'; 
   const isDarkMode = userDataObj?.darkMode || false;
 
   const [isCaseBriefBankOpen, setIsCaseBriefBankOpen] = useState(false);
@@ -361,7 +361,7 @@ export default function Sidebar({
                 label="Lecture Summaries"
                 active={activeLink === '/lawtools/lecturesummaries'}
               />
-              <LockedNavLink
+              <NavLink
                 href="/ailawtools/flashcards"
                 icon={<FaStickyNote className="text-sm" />}
                 label="Flashcards & Outlines"

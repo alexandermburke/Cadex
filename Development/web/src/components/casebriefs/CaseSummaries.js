@@ -85,7 +85,7 @@ export default function CaseSummaries() {
   const { currentUser, userDataObj } = useAuth();
   const plan = userDataObj?.billing?.plan?.toLowerCase() || 'free';
   // Note: isPro is set to "free" for testing purposes as per your comment.
-  const isPro = plan === 'free';
+  const isPro = plan === 'pro';
   const isExpert = plan === 'expert';
   const isDarkMode = userDataObj?.darkMode || false;
 

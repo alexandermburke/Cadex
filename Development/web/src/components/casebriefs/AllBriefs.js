@@ -34,7 +34,7 @@ export default function AllBriefs() {
   const { currentUser, userDataObj } = useAuth();
   const plan = userDataObj?.billing?.plan?.toLowerCase() || 'free';
   const isFree = plan === 'free';
-  const isPro = plan === 'free'; // free for testing
+  const isPro = plan === 'pro'; // free for testing
   const isExpert = plan === 'expert';
 
   const isDarkMode = userDataObj?.darkMode || false;

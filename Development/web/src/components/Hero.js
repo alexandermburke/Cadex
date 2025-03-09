@@ -110,7 +110,7 @@ export default function Hero() {
       ),
       title: '5,000+ Case Briefs',
       description:
-        'Browse a comprehensive bank of case briefs, summaries, and analyses—including All Briefs—to grasp key rulings fast.',
+        'Explore our detailed database of case briefs, summaries, and analyses to learn essential rulings quickly.',
     },
     {
       icon: (
@@ -118,15 +118,15 @@ export default function Hero() {
       ),
       title: 'Study Tools',
       description:
-        'Utilize a legal dictionary, lecture summaries, flashcards, outlines, and IRAC drafting guides to enhance your learning.',
+        'Use our legal dictionary, lecture summaries, flashcards, outlines, and IRAC drafting guides to strengthen your understanding.',
     },
     {
       icon: (
         <FaRobot className={`${isDarkMode ? 'text-white' : 'text-blue-950'} text-4xl mb-4`} />
       ),
-      title: 'Exam Prep & AI-Powered Exam Prep',
+      title: 'AI-Enhanced Exam Prep',
       description:
-        'Access practice exams, time management tools, exam insights, MBE practice, and LExAPI Tutor—with extensive configuration to tailor your prep.',
+        'Access practice exams, time management resources, MBE exercises, and the LExAPI Tutor. Tailor your preparation with a variety of settings.',
     },
     {
       icon: (
@@ -134,7 +134,7 @@ export default function Hero() {
       ),
       title: 'Subject Guides',
       description:
-        'Get in-depth guides on Contracts, Torts, Criminal Law, Property, and Constitutional Law to master core subjects.',
+        'Learn through comprehensive guides on Contracts, Torts, Criminal Law, Property, and Constitutional Law.',
     },
     {
       icon: (
@@ -142,7 +142,7 @@ export default function Hero() {
       ),
       title: 'Video Lessons',
       description:
-        'Learn through engaging video lessons—with a comprehensive directory coming soon.',
+        'Watch engaging lessons and boost your knowledge. A full video directory will be available soon.',
     },
     {
       icon: (
@@ -150,7 +150,7 @@ export default function Hero() {
       ),
       title: 'Career & Internship Resources',
       description:
-        'Enhance your resume with our reviewer, prepare for interviews, and discover networking opportunities to jumpstart your career.',
+        'Review your resume, prepare for interviews, and find networking opportunities to advance your professional goals.',
     },
   ];
 
@@ -162,7 +162,7 @@ export default function Hero() {
       ),
       title: 'Sign Up & Customize',
       description:
-        'Create your account, set your legal study and career goals, and personalize your experience.',
+        'Create an account, set your study objectives, and personalize your user experience.',
     },
     {
       icon: (
@@ -170,23 +170,23 @@ export default function Hero() {
       ),
       title: 'Discover Resources',
       description:
-        'Explore our extensive library—from case briefs to study tools, exam prep modules, and subject guides.',
+        'Browse our extensive library of briefs, study tools, exam prep content, and subject-specific guides.',
     },
     {
       icon: (
         <FaCogs className={`${isDarkMode ? 'text-white' : 'text-blue-950'} text-4xl mb-4`} />
       ),
-      title: 'Leverage Advanced Tools',
+      title: 'Use Advanced Tools',
       description:
-        'Utilize AI-powered exam prep, interactive learning, and highly configurable study modules tailored to your needs.',
+        'Engage with AI-driven exam prep, interactive learning options, and adaptable study modules that suit your preferences.',
     },
     {
       icon: (
         <FaComment className={`${isDarkMode ? 'text-white' : 'text-blue-950'} text-4xl mb-4`} />
       ),
-      title: 'Achieve Success & Connect',
+      title: 'Connect & Achieve',
       description:
-        'Track your progress, gain expert feedback, and engage with a supportive community of legal professionals.',
+        'Track your progress, get expert feedback, and collaborate with a supportive community of peers and legal professionals.',
     },
   ];
 
