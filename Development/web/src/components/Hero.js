@@ -100,7 +100,7 @@ export default function Hero() {
     localStorage.setItem('hasSeenDisclaimer', 'true');
   };
 
-  const animatedWord = 'Odyssey';
+  const animatedWord = 'Future';
 
   // Tailored Features for CadexLaw.com
   const features = [
@@ -287,7 +287,7 @@ export default function Hero() {
             } ${poppins.className}`}
           >
             <span className="block mb-5">
-              Your Dream School{' '}
+              Welcome to the {' '}
               <span
                 className="relative inline-block"
                 key={animationTrigger}
@@ -307,10 +307,10 @@ export default function Hero() {
                   );
                 })}
               </span>{' '}
-              Awaits.
+              of Legal Education
             </span>
             <span className="sr-only">
-              Your Dream School Odyssey Awaits.
+             Welcome to the future of Legal Education
             </span>
           </h2>
 

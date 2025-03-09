@@ -704,7 +704,7 @@ export default function AllBriefs() {
                     exit={{ opacity: 0, height: 0 }}
                     transition={{ duration: 0.3 }}
                   >
-                    <div className="bg-gray-100 dark:bg-gray-800 p-4 rounded-2xl shadow-md flex flex-col space-y-4 w-full max-w-md">
+                    <div className="bg-transparent p-4 rounded-2xl shadow-md flex flex-col space-y-4 w-full max-w-md">
                       <div className="flex flex-col">
                         <select
                           value={sortBy}
