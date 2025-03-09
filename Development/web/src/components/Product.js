@@ -52,14 +52,14 @@ export default function FAQ() {
 
           {/* Question 4 */}
           <div className="border-l-4 border-blue-300 pl-4 py-2 transition transform hover:scale-[1.02]">
-            <h2 className="font-semibold text-lg sm:text-xl mb-2 text-white">
-              Do you offer personal support?
-            </h2>
-            <p className="text-sm sm:text-base text-gray-100">
-              Yes. Our support team is here to help, and our community forums let you
-              connect with peers, share experiences, and get feedback on complex issues.
-            </p>
-          </div>
+  <h2 className="font-semibold text-lg sm:text-xl mb-2 text-white">
+    Do you offer support for legal systems outside of the U.S.?
+  </h2>
+  <p className="text-sm sm:text-base text-gray-100">
+    No, at this time we’re focused exclusively on the U.S. legal system. However, we do have plans to expand our support services internationally in the future.
+  </p>
+</div>
+
         </div>
       </div>
     </div>
