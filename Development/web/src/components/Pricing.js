@@ -17,13 +17,6 @@ const poppins = Poppins({
   weight: ['400', '500', '600', '700'],
 });
 
-/**
- * Updated pricing model:
- *  - Basic: $10
- *  - Pro: $20
- *  - Expert: $30
- * (All well below Quimbee's $19-$29 range)
- */
 const plans = [
   {
     name: 'Basic',

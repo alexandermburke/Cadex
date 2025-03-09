@@ -10,8 +10,9 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
 
 
 const priceIds = {
-    Basic: 'price_1QOUDFP6GBvKc5e8upbY4YVR',
-    Pro: 'price_1QOUEtP6GBvKc5e8U1TuUVLm',
+    Basic: 'price_1R0WZkP6GBvKc5e89itgiFsO',
+    Pro: 'price_1R0WZyP6GBvKc5e8P8ek4upz',
+    Expert: 'price_1R0Wa9P6GBvKc5e8hvECp6BP',
 };
 
 export async function POST(request) {

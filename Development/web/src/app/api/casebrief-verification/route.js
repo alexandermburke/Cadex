@@ -72,6 +72,16 @@ Summary:
       apiKey: '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',
     });
 
+    globalThis.apiCallAttempts = globalThis.apiCallAttempts || 0;
+    if (globalThis.apiCallAttempts >= 10) {
+      console.warn('Maximum API call attempts reached. Not making API call.');
+      return NextResponse.json(
+        { error: 'Maximum API call attempts reached. Please try again later.' },
+        { status: 429 }
+      );
+    }
+    globalThis.apiCallAttempts++;
+
     const response = await openai.chat.completions.create({
       model: 'gpt-4-turbo',
       messages: messages,
