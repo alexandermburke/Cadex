@@ -23,7 +23,7 @@ export async function POST(request) {
       );
     }
 
-    // Construct the verification prompt without checking for dissent.
+    // Construct the verification prompt with additional checks.
     const verificationPrompt = `
 Generate a JSON object with the following keys:
 {
@@ -37,11 +37,12 @@ In addition to checking that the summary includes detailed content for:
   3. Issue
   4. Holding
   5. Reasoning
+  6. Dissent
 please also verify that the provided case title, decision date (year), and jurisdiction are correct and well-formatted. This includes checking for proper punctuation, spelling, grammar, and capitalization.
 
 If the summary is fully correct and all additional fields are accurate and properly formatted, set "verified" to true and "explanation" to "Summary is fully accurate." 
 If there are any issues—whether the summary is missing substantial details or if the title, date, or jurisdiction are incorrect, misspelled, or improperly formatted—set "verified" to false and provide a concise explanation stating what is wrong.
-
+If there is no Dissent provided, the summary can still be 100% accurate as it might not be possible to generate.
 Do not include any additional text.
 
 Case Title: "${caseTitle.trim()}"
@@ -54,6 +55,7 @@ Summary:
 3. Issue: ${briefSummary.issue || 'N/A'}
 4. Holding: ${briefSummary.holding || 'N/A'}
 5. Reasoning: ${briefSummary.reasoning || 'N/A'}
+6. Dissent: ${briefSummary.dissent || 'N/A'}
     `;
 
     const messages = [
@@ -71,16 +73,6 @@ Summary:
     const openai = new OpenAI({
       apiKey: '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',
     });
-
-    globalThis.apiCallAttempts = globalThis.apiCallAttempts || 0;
-    if (globalThis.apiCallAttempts >= 10) {
-      console.warn('Maximum API call attempts reached. Not making API call.');
-      return NextResponse.json(
-        { error: 'Maximum API call attempts reached. Please try again later.' },
-        { status: 429 }
-      );
-    }
-    globalThis.apiCallAttempts++;
 
     const response = await openai.chat.completions.create({
       model: 'gpt-4-turbo',
@@ -117,11 +109,17 @@ Summary:
           console.log('Successfully parsed JSON substring:', jsonSubstring);
         } catch (innerErr) {
           console.error('Failed to parse JSON substring:', jsonSubstring);
-          return NextResponse.json({ error: 'Could not parse JSON from GPT.' }, { status: 500 });
+          return NextResponse.json(
+            { error: 'Could not parse JSON from GPT.' },
+            { status: 500 }
+          );
         }
       } else {
         console.error('No JSON object found in GPT response:', rawOutput);
-        return NextResponse.json({ error: 'Could not parse JSON from GPT.' }, { status: 500 });
+        return NextResponse.json(
+          { error: 'Could not parse JSON from GPT.' },
+          { status: 500 }
+        );
       }
     }
 
@@ -134,6 +132,9 @@ Summary:
     return NextResponse.json(result, { status: 200 });
   } catch (err) {
     console.error('Error in /api/casebrief-verification:', err);
-    return NextResponse.json({ error: 'Error verifying case brief.' }, { status: 500 });
+    return NextResponse.json(
+      { error: 'Error verifying case brief.' },
+      { status: 500 }
+    );
   }
 }

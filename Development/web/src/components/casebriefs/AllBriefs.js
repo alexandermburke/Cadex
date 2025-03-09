@@ -69,6 +69,8 @@ export default function AllBriefs() {
   const [newBriefTitle, setNewBriefTitle] = useState('');
   const [newBriefJurisdiction, setNewBriefJurisdiction] = useState('');
   const [newBriefDate, setNewBriefDate] = useState('');
+  // (NEW) Additional field for citation
+  const [newBriefCitation, setNewBriefCitation] = useState('');
 
   // For verification API reply
   const [verificationReply, setVerificationReply] = useState('');
@@ -507,6 +509,16 @@ export default function AllBriefs() {
     e.preventDefault();
     setCreateError('');
     setVerificationReply('');
+
+    // (NEW) Check if case with same title already exists
+    const existingCase = capCases.find(
+      (c) => c.title?.toLowerCase() === newBriefTitle.trim().toLowerCase()
+    );
+    if (existingCase) {
+      setCreateError('A case with this title already exists in the database.');
+      return;
+    }
+
     if (!newBriefTitle.trim() || !newBriefJurisdiction.trim() || !newBriefDate.trim()) {
       setCreateError('Please fill in all fields.');
       return;
@@ -561,7 +573,8 @@ export default function AllBriefs() {
         decisionDate: correctedDate,
         volume: '',
         content: '',
-        citation: 'N/A',
+        // (NEW) Use user's citation if provided; otherwise 'N/A'
+        citation: newBriefCitation.trim() || 'N/A',
         briefSummary: { ...summaryData, verified: false },
         caseNumber: generateCaseNumber(),
       };
@@ -571,6 +584,7 @@ export default function AllBriefs() {
       setNewBriefTitle('');
       setNewBriefJurisdiction('');
       setNewBriefDate('');
+      setNewBriefCitation(''); // reset citation
       setActiveTab('browse');
     } catch (error) {
       console.error('Error creating new case brief:', error);
@@ -766,6 +780,23 @@ export default function AllBriefs() {
                         placeholder="Enter 4-digit year"
                       />
                     </div>
+
+                    {/* (NEW) Citation field */}
+                    <div className="mb-4">
+                      <label className="block text-sm font-semibold mb-1">Citation</label>
+                      <input
+                        type="text"
+                        value={newBriefCitation}
+                        onChange={(e) => setNewBriefCitation(e.target.value)}
+                        className={`w-full px-3 py-2 border rounded-md ${
+                          isDarkMode
+                            ? 'bg-slate-700 text-white border-slate-600 placeholder-gray-300'
+                            : 'bg-white text-gray-800 border-gray-300'
+                        }`}
+                        placeholder="Enter case citation (optional)"
+                      />
+                    </div>
+
                     {createError && (
                       <div className="mb-4 text-red-500 text-sm font-medium">{createError}</div>
                     )}

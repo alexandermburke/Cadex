@@ -103,7 +103,7 @@ export default function Sidebar({
   const { currentUser, userDataObj } = useAuth();
   const plan = userDataObj?.billing?.plan?.toLowerCase() || 'free';
   const isFree = plan === 'free';
-  const isBasic = plan === 'basic'; // Changed to free for testing purposes; testing enviornment
+  const isBasic = plan === 'free'; // Changed to free for testing purposes; testing enviornment
   const isPro = plan === 'pro';
   const isExpert = plan === 'expert'; 
   const isDarkMode = userDataObj?.darkMode || false;

@@ -3,6 +3,7 @@ import OpenAI from 'openai';
 
 export async function POST(request) {
   console.log('Received request to /api/casebrief-detailed');
+
   try {
     const { title, detailed } = await request.json();
     if (!title || typeof title !== 'string' || !title.trim()) {
@@ -12,9 +13,10 @@ export async function POST(request) {
         { status: 400 }
       );
     }
+
     const inputTitle = title.trim();
     console.log(`Generating ${detailed ? 'detailed' : 'brief'} summary for: "${inputTitle}"`);
-    
+
     let prompt;
     if (detailed) {
       prompt = `
@@ -78,57 +80,82 @@ Case Title:
       apiKey: process.env.OPENAI_API_KEY,
     });
 
-    const response = await openai.chat.completions.create({
-      model: 'gpt-3.5-turbo',
-      messages: messages,
-      max_tokens: detailed ? 2000 : 1500,
-      temperature: 0.7,
-    });
+    // We’ll attempt up to 10 times in case the response is invalid or the call fails.
+    let attemptCount = 0;
+    let parsedResponse = null;
 
-    if (
-      !response ||
-      !response.choices ||
-      !Array.isArray(response.choices) ||
-      response.choices.length === 0 ||
-      !response.choices[0].message
-    ) {
-      console.error('Invalid response structure from OpenAI:', response);
-      throw new Error('Invalid OpenAI response structure.');
-    }
+    while (attemptCount < 10) {
+      attemptCount++;
 
-    let rawContent = response.choices[0].message.content.trim();
-    console.log('RAW GPT CONTENT =>', rawContent);
+      try {
+        // Make the OpenAI API call
+        const response = await openai.chat.completions.create({
+          model: 'gpt-3.5-turbo',
+          messages,
+          max_tokens: detailed ? 2000 : 1500,
+          temperature: 0.7,
+        });
 
-    let parsed;
-    try {
-      parsed = JSON.parse(rawContent);
-    } catch (err) {
-      console.warn('Direct JSON parse failed. Attempting substring extraction...');
-      const firstCurly = rawContent.indexOf('{');
-      const lastCurly = rawContent.lastIndexOf('}');
-      if (firstCurly !== -1 && lastCurly !== -1) {
-        const jsonSubstring = rawContent.substring(firstCurly, lastCurly + 1);
-        try {
-          parsed = JSON.parse(jsonSubstring);
-          console.log('Successfully parsed JSON substring:', jsonSubstring);
-        } catch (innerErr) {
-          console.error('Failed to parse JSON substring:', jsonSubstring);
-          return NextResponse.json({ error: 'Could not parse JSON from GPT.' }, { status: 500 });
+        if (
+          !response ||
+          !response.choices ||
+          !Array.isArray(response.choices) ||
+          response.choices.length === 0 ||
+          !response.choices[0].message
+        ) {
+          console.error('Invalid response structure from OpenAI:', response);
+          throw new Error('Invalid OpenAI response structure.');
         }
-      } else {
-        console.error('No JSON object found in GPT response:', rawContent);
-        return NextResponse.json({ error: 'Could not parse JSON from GPT.' }, { status: 500 });
+
+        let rawContent = response.choices[0].message.content.trim();
+        console.log('RAW GPT CONTENT =>', rawContent);
+
+        // Attempt to parse JSON directly
+        try {
+          parsedResponse = JSON.parse(rawContent);
+        } catch (err) {
+          console.warn('Direct JSON parse failed. Attempting substring extraction...');
+          // Substring extraction for the first and last curly braces
+          const firstCurly = rawContent.indexOf('{');
+          const lastCurly = rawContent.lastIndexOf('}');
+          if (firstCurly !== -1 && lastCurly !== -1) {
+            const jsonSubstring = rawContent.substring(firstCurly, lastCurly + 1);
+            try {
+              parsedResponse = JSON.parse(jsonSubstring);
+              console.log('Successfully parsed JSON substring:', jsonSubstring);
+            } catch (innerErr) {
+              console.error('Failed to parse JSON substring:', jsonSubstring);
+              throw new Error('Could not parse JSON from GPT.');
+            }
+          } else {
+            console.error('No JSON object found in GPT response:', rawContent);
+            throw new Error('Could not parse JSON from GPT.');
+          }
+        }
+
+        // If we made it this far, parsing was successful -> break out of the loop
+        break;
+      } catch (err) {
+        console.error(`Attempt ${attemptCount} failed:`, err);
+        if (attemptCount >= 10) {
+          // Return error response if we have tried 10 times
+          return NextResponse.json(
+            { error: 'Failed to retrieve and parse a valid GPT response after 10 attempts.' },
+            { status: 500 }
+          );
+        }
       }
     }
 
+    // If parsing succeeded, fill out our final result structure
     const result = {
-      ruleOfLaw: parsed.ruleOfLaw || '',
-      facts: parsed.facts || '',
-      issue: parsed.issue || '',
-      holding: parsed.holding || '',
-      reasoning: parsed.reasoning || '',
-      dissent: parsed.dissent || '',
-      verified: false
+      ruleOfLaw: parsedResponse.ruleOfLaw || '',
+      facts: parsedResponse.facts || '',
+      issue: parsedResponse.issue || '',
+      holding: parsedResponse.holding || '',
+      reasoning: parsedResponse.reasoning || '',
+      dissent: parsedResponse.dissent || '',
+      verified: false,
     };
 
     console.log('FINAL PARSED RESULT =>', result);
