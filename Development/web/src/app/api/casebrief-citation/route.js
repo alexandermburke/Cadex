@@ -62,13 +62,13 @@ in a valid JSON object with the key "citation". Do NOT include the case name or 
       }
     ];
 
-    const openai = new OpenAI({
-      apiKey: process.env.OPENAI_API_KEY,
-    });
-
-    const response = await openai.chat.completions.create({
-      model: 'gpt-3.5-turbo',
-      messages,
+       const openai = new OpenAI({
+         apiKey: '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',
+       });
+   
+       const response = await openai.chat.completions.create({
+         model: 'gpt-4-turbo',
+         messages: messages,
       max_tokens: 200,
       temperature: 0.5,
     });

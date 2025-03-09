@@ -124,7 +124,7 @@ export default function Hero() {
       icon: (
         <FaRobot className={`${isDarkMode ? 'text-white' : 'text-blue-950'} text-4xl mb-4`} />
       ),
-      title: 'AI-Enhanced Exam Prep',
+      title: 'Infinitely Variable Exam Prep',
       description:
         'Access practice exams, time management resources, MBE exercises, and the LExAPI Tutor. Tailor your preparation with a variety of settings.',
     },
