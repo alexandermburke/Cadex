@@ -57,15 +57,14 @@ export default function Header() {
                 <p></p>
             </Link>
             <Link 
-  href="mailto:alexander.burke88@gmail.com" 
-  className="mx-2 ml-4 duration-200 overflow-hidden p-0.5 rounded-lg relative"
->
-  <div className="absolute inset-0"></div>
-  <div className="p-2 grid place-items-center relative z-10 bg-transparent rounded duration-200 text-white before:ease h-10 w-40 overflow-hidden bg-gradient-to-r from-blue-500 to-blue-500 shadow-2xl transition-all before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-40">
-    <p>Get in Contact</p>
-  </div>
-</Link>
-
+                href="mailto:alexander.burke88@gmail.com" 
+                className="mx-2 ml-4 duration-200 overflow-hidden p-0.5 rounded-lg relative"
+            >
+                <div className="absolute inset-0"></div>
+                <div className="p-2 grid place-items-center relative z-10 bg-transparent rounded duration-200 text-white before:ease h-10 w-40 overflow-hidden bg-gradient-to-r from-blue-500 to-blue-500 shadow-2xl transition-all before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-40">
+                    <p>Get in Contact</p>
+                </div>
+            </Link>
         </nav>
     );
 
@@ -174,15 +173,17 @@ export default function Header() {
             <div className='flex items-center justify-between gap-4 max-w-[1400px] mx-auto w-full overflow-hidden p-2 drop-shadow-sm'>
                 <Link href={'/'}>
                     <div className='flex items-center gap-2'>
-                        <Image 
-                              src="/header.avif"
-                            alt="Cadex Law Logo" 
-                            width={44} 
-                            height={44} 
-                            className={`${logoLoaded ? 'logo-animation' : ''}`} 
-                        />
                         <h1 className={'text-xl sm:text-2xl goldGradient font-medium ' + poppins.className}>
-                            CadexLaw | Investors
+                            CadexLaw
+                            <Image 
+                                src="/header.avif"
+                                alt="Cadex Law Logo" 
+                                width={44} 
+                                height={44} 
+                                unoptimized={true}
+                                className={`${logoLoaded ? 'logo-animation' : ''} inline-block mx-2`}
+                            />
+                            Investors
                         </h1>
                     </div>
                 </Link>

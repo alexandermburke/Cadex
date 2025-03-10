@@ -149,6 +149,7 @@ export default function InvestorSplashPage() {
             alt="Cadex Investor Header"
             width={100}
             height={100}
+            unoptimized={true}
             className="mx-auto mb-8"
             priority
           />
