@@ -73,7 +73,7 @@ const plans = [
         info: 'Adaptive flashcards to focus on areas needing improvement.',
       },
       {
-        text: 'Ability to Re-Generate Briefs',
+        text: 'Ability to Create Briefs',
         info: 'Faster response times for technical and content-related questions.',
       },
       {
