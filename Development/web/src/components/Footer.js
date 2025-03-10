@@ -12,7 +12,7 @@ const poppins = Poppins({
 
 export default function Footer() {
   // You can set your version number here
-  const versionNumber = '0.9.2';
+  const versionNumber = '0.9.2-1';
 
   return (
     <footer className="flex flex-col bg-gradient-to-r from-blue-950 to-slate-950 text-white py-4">
