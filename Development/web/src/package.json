@@ -12,8 +12,8 @@
   "dependencies": {
     "@headlessui/react": "^2.0.4",
     "@heroicons/react": "^1.0.6",
-    "@next/swc-darwin-x64": "^15.0.3",
-    "ai": "^2.2.36",
+    "@vercel/analytics": "^1.5.0",
+    "ai": "^4.1.54",
     "axios": "^1.7.4",
     "chart.js": "^4.4.4",
     "dotenv": "^16.4.5",

@@ -12,20 +12,20 @@ const poppins = Poppins({
 
 export default function Footer() {
   // You can set your version number here
-  const versionNumber = '0.6.3';
+  const versionNumber = '0.9.2';
 
   return (
-    <footer className="flex flex-col bg-gradient-to-r from-blue-950 to-slate-800 text-white py-4">
+    <footer className="flex flex-col bg-gradient-to-r from-blue-950 to-slate-950 text-white py-4">
       <div className="flex flex-col sm:flex-row items-center justify-center flex-wrap gap-6 sm:gap-8 md:gap-10 mx-auto py-4 px-8 text-sm">
         <div className="flex flex-col w-fit shrink-0 gap-2 whitespace-nowrap text-center">
           <div className="flex flex-col mx-auto w-fit">
             <Link href={'/'}>
               <h1 className={'text-lg px-3 sm:text-xl sm:px-4 ' + poppins.className}>
-                Cadex Law Simulation
+                CadexLaw
               </h1>
             </Link>
           </div>
-          <p className="mx-auto text-xs">© 2024 Alexander Burke</p>
+          <p className="mx-auto text-xs">© 2025 Cadex Software</p>
           {/* Version Number and Development Build */}
           <p className="mx-auto text-xs font-semibold">
             Version {versionNumber} - Development Build
@@ -36,13 +36,13 @@ export default function Footer() {
           <div className="flex flex-col gap-2 w-fit">
             <h3 className="font-bold">Navigation</h3>
             <div className="flex flex-col gap-1 text-sm">
-              <Link className="relative w-fit overflow-hidden hover:underline" href={'/practice'}>
+              <Link className="relative w-fit overflow-hidden hover:underline" href={'https://www.cadexlaw.com/ailawtools/splash'}>
                 <p>Practice</p>
               </Link>
-              <Link className="relative w-fit overflow-hidden hover:underline" href={'/admin'}>
+              <Link className="relative w-fit overflow-hidden hover:underline" href={'https://www.cadexlaw.com/ailawtools/splash'}>
                 <p>Login</p>
               </Link>
-              <Link className="relative w-fit overflow-hidden hover:underline" href={'/register'}>
+              <Link className="relative w-fit overflow-hidden hover:underline" href={'https://www.cadexlaw.com/ailawtools/splash'}>
                 <p>Join</p>
               </Link>
             </div>
@@ -66,7 +66,7 @@ export default function Footer() {
               </div>
               <div className="flex items-center gap-2 relative w-fit overflow-hidden">
                 <i className="fa-solid fa-house"></i>
-                <p>2001 N Scottsdale Road Scottsdale, AZ 85257</p>
+                <p>Scottsdale, Arizona</p>
               </div>
             </div>
           </div>
@@ -74,10 +74,10 @@ export default function Footer() {
           <div className="flex flex-col gap-2 w-fit">
             <h3 className="font-bold">Legal</h3>
             <div className="flex flex-col gap-1 text-sm">
-              <Link className="relative w-fit overflow-hidden hover:underline" href={'/privacy'}>
+              <Link className="relative w-fit overflow-hidden hover:underline" href={'/privacypolicy'}>
                 <p>Privacy Policy</p>
               </Link>
-              <Link className="relative w-fit overflow-hidden hover:underline" href={'/legal'}>
+              <Link className="relative w-fit overflow-hidden hover:underline" href={'/termsandconditions'}>
                 <p>Terms & Agreements</p>
               </Link>
             </div>

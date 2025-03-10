@@ -24,7 +24,7 @@ export default function Careers() {
             <div className='flex flex-col items-center gap-8 text-center w-full lg:max-w-2xl'>
                 <div className='flex flex-col items-center'>
                     <Image
-                        src="/header.png" 
+                             src="/header.avif"
                         alt="Cadex Law Logo"
                         width={96} // Adjust the width
                         height={96} // Adjust the height

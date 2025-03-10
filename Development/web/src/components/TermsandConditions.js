@@ -1,7 +1,7 @@
 'use client';
 import { Poppins } from 'next/font/google';
 import React from 'react';
-import Image from 'next/image'; // Import Image from next/image
+import Image from 'next/image';
 
 const poppins = Poppins({
   subsets: ['latin'],
@@ -10,10 +10,10 @@ const poppins = Poppins({
 
 export default function Legal() {
   return (
-    <div className={'flex flex-col gap-6 p-6 ' + poppins.className}>
+    <div className={'flex flex-col gap-6 p-6 text-white ' + poppins.className}>
       {/* Add the header image */}
       <Image
-        src="/header.png"
+        src="/header.avif"
         alt="Header"
         width={100}
         height={100}
@@ -111,7 +111,7 @@ export default function Legal() {
       <h2 className="text-2xl font-semibold mt-4">Contact Us</h2>
       <p>
         If you have any questions or concerns about these Terms & Conditions, please contact us at{' '}
-        <a href="mailto:support@cadexlaw.com" className="text-blue-600 underline">
+        <a href="mailto:support@cadexlaw.com" className="underline text-white">
           support@cadexlaw.com
         </a>
         .

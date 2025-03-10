@@ -145,7 +145,7 @@ export default function InvestorSplashPage() {
         >
           {/* Header Image */}
           <Image
-            src="/header.png"
+            src="/header.avif"
             alt="Cadex Investor Header"
             width={100}
             height={100}
@@ -218,7 +218,7 @@ export default function InvestorSplashPage() {
                   {index % 2 !== 0 && (
                     <div className=""></div>
                   )}
-                  <div className="bg-blue-950 p-6 rounded-lg shadow-md">
+                  <div className="p-6 rounded-lg">
                     <div className="flex flex-col items-center">
                       {milestone.icon}
                       <h3 className="text-xl font-semibold text-white mb-2 text-center">{milestone.title}</h3>
@@ -257,7 +257,7 @@ export default function InvestorSplashPage() {
             {investorBenefits.map((benefit, index) => (
               <motion.div
                 key={index}
-                className="flex flex-col items-center p-6 bg-blue-950 rounded shadow-md hover:shadow-xl transition-shadow"
+                className="flex flex-col items-center p-6 rounded hover:shadow-xl transition-shadow"
                 variants={childVariants}
               >
                 {benefit.icon}
@@ -294,7 +294,7 @@ export default function InvestorSplashPage() {
             {faqData.map((faq, index) => (
               <motion.div
                 key={index}
-                className="bg-blue-950 rounded shadow-md p-6"
+                className=" rounded p-6"
                 variants={childVariants}
               >
                 <h3 className="text-lg font-semibold text-white mb-2">{faq.question}</h3>

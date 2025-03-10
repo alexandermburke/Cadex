@@ -39,7 +39,7 @@ export default function Login() {
     <>
       <div className="flex flex-col gap-6 items-center sm:flex-row sm:justify-center sm:items-center py-10">
         <Image
-          src="/header.png"
+          src="/header.avif"
           alt="Cadex Law Logo"
           width={96}
           height={96}
