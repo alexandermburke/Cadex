@@ -120,7 +120,7 @@ export default function Plans() {
   const [billingCycle, setBillingCycle] = useState('monthly'); 
   const [holidaySale, setHolidaySale] = useState(false); 
 
-  // New billing toggle options (using the same style as the sidebar toggle)
+  // New billing toggle options
   const billingOptions = [
     { label: 'Pay monthly', value: 'monthly' },
     { label: 'Pay yearly', value: 'yearly' },
@@ -167,30 +167,8 @@ export default function Plans() {
   }
 
   async function handleUpdatePlan() {
-    if (!selectedPlan) return;
-
-    const billing = { plan: selectedPlan };
-    const userRef = doc(db, 'users', currentUser.uid);
-
-    await setDoc(userRef, { billing }, { merge: true });
-
-    const options = {
-      method: 'POST',
-      headers: {
-        'Content-type': 'application/json',
-      },
-      body: JSON.stringify({
-        customerId: userDataObj?.billing?.stripeCustomerId,
-        userId: currentUser.uid,
-        email: currentUser.email,
-        plan: selectedPlan,
-        billingCycle, 
-      }),
-    };
-
-    const response = await fetch('/api/checkout', options);
-    const data = await response.json();
-    router.push(data.url);
+    // Instead of processing a checkout, just redirect to the registration page.
+    window.location.href = 'https://www.cadexlaw.com/register';
   }
 
   return (
@@ -289,14 +267,12 @@ export default function Plans() {
                 : 'border-white bg-white'
             }`}
           >
-            {/* Promotion Badge for Basic Plan (optional) */}
             {plan.promotion && (
               <div className="absolute top-0 left-0 transform -translate-y-1/2 px-4 py-1 goldBackgroundAlt text-gray-800 text-sm font-semibold rounded-full shadow-md">
                 {plan.promotion}
               </div>
             )}
 
-            {/* Coming Soon Badge for Expert Tier */}
             {plan.comingSoon && (
               <motion.div
                 initial={{ opacity: 0, scale: 0.8, y: -10 }}
@@ -308,7 +284,6 @@ export default function Plans() {
               </motion.div>
             )}
 
-            {/* Plan Header */}
             <div className="flex items-center justify-between mb-4">
               <h3
                 className={`text-2xl sm:text-3xl font-bold ${
@@ -328,7 +303,6 @@ export default function Plans() {
               )}
             </div>
 
-            {/* Plan Price and Interval */}
             <div className="flex flex-col items-start mb-4">
               <p className={`text-3xl sm:text-4xl font-semibold ${poppins.className}`}>
                 {formatPrice(plan.price)}
@@ -340,7 +314,6 @@ export default function Plans() {
 
             <hr className="border-gray-300 mb-4" />
 
-            {/* Plan Description */}
             <p
               className={`text-md sm:text-lg font-medium mb-4 ${
                 isDarkMode ? 'text-gray-300' : 'text-gray-700'
@@ -349,7 +322,6 @@ export default function Plans() {
               {plan.description}
             </p>
 
-            {/* Plan Features */}
             <ul className="flex flex-col gap-2 mb-4 relative">
               {plan.features.map((feature, featureIndex) => (
                 <li key={featureIndex} className="flex items-start gap-2 group">
@@ -368,7 +340,6 @@ export default function Plans() {
                   {feature.info && (
                     <div className="relative flex-shrink-0">
                       <FaInfoCircle className="text-gray-400 hover:text-gray-600 cursor-pointer" />
-                      {/* Tooltip */}
                       <div className="absolute -top-12 left-1/2 transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-gray-700 text-white text-xs rounded py-1 px-2 w-48 z-50">
                         {feature.info}
                       </div>
@@ -385,14 +356,13 @@ export default function Plans() {
       {selectedPlan && (
         <div className="flex flex-col items-center w-full max-w-md mx-auto">
           <Button
-            text={`Start 7 Day free trial`}
+            text="Register to Complete Purchase"
             clickHandler={handleUpdatePlan}
             additionalClasses="w-full sm:w-56 h-12 text-lg"
           />
         </div>
       )}
 
-      {/* Message when no plans are available */}
       {filteredPlans.length === 0 && (
         <div className="flex flex-col items-center mt-8">
           <p
@@ -441,7 +411,7 @@ export default function Plans() {
               How do I upgrade my plan?
             </h3>
             <p className={isDarkMode ? 'text-gray-300' : 'text-gray-700'}>
-              Select the desired plan from the options above. Once you click “Get Plan,” you’ll be taken through a secure checkout flow handled by Stripe. After completion, your account will instantly upgrade.
+              Select the desired plan from the options above. Once you click “Register to Complete Purchase,” you’ll be redirected to our registration page.
             </p>
           </div>
 

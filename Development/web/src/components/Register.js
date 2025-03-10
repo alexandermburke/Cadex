@@ -20,7 +20,7 @@ export default function Register(props) {
         <>
             <div className='flex flex-col gap-6'>
                 <h2 className={'text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-semibold text-center  ' + poppins.className}>Join <span className='goldSolid'>CadexLaw.com</span></h2>
-                <p className='text-center'>Sign up for free, must have an email with a supported College or University. </p>
+                <p className='text-center'>Sign up for free, discounted users must have an email with a supported College or University. </p>
             </div>
             <div className='flex flex-col gap-4 text-base sm:text-lg'>
                 {error && (<AuthError errMessage={error} />)}
