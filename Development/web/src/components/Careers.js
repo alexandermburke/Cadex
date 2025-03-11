@@ -20,7 +20,32 @@ export default function Careers() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setMessage('Your application has been submitted successfully!');
+        setMessage('');
+        if (!email || !resume) {
+            setMessage('Please provide both your email and resume.');
+            return;
+        }
+        // Create a FormData object to send the email and resume
+        const formData = new FormData();
+        formData.append('applicantEmail', email);
+        // Hard-code recipient email to alexander.burke88@gmail.com
+        formData.append('recipientEmail', 'alexander.burke88@gmail.com');
+        formData.append('resume', resume);
+
+        try {
+            const response = await fetch('/api/careers', {
+                method: 'POST',
+                body: formData,
+            });
+            if (response.ok) {
+                setMessage('Your application has been submitted successfully!');
+            } else {
+                setMessage('There was an error submitting your application. Please try again later.');
+            }
+        } catch (error) {
+            console.error(error);
+            setMessage('There was an error submitting your application. Please try again later.');
+        }
     };
 
     return (
