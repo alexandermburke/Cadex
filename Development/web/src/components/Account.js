@@ -8,7 +8,7 @@ import { useAuth } from '@/context/AuthContext';
 import LogoFiller from './LogoFiller';
 import { doc, updateDoc } from 'firebase/firestore';
 import { db } from '@/firebase';
-
+import { sendEmailVerification } from 'firebase/auth';
 
 export default function Account() {
   const { currentUser, userDataObj, refreshUserData } = useAuth();
@@ -169,6 +169,23 @@ export default function Account() {
     }
   })();
 
+  // --------------------------
+  // Handle Verify Email
+  // --------------------------
+  const handleSendVerificationEmail = async () => {
+    if (!currentUser) {
+      alert('No user is logged in.');
+      return;
+    }
+    try {
+      await sendEmailVerification(currentUser);
+      alert('Verification email sent. Please check your inbox.');
+    } catch (err) {
+      console.error('Error sending verification email:', err);
+      alert('Failed to send verification email. Please try again later.');
+    }
+  };
+
   return (
     <div
       className={`flex flex-col w-full gap-8 ${
@@ -318,6 +335,21 @@ export default function Account() {
               ></label>
             </div>
           </div>
+
+          {/* Verify Email Option (inside settings) */}
+          {currentUser && !currentUser.emailVerified && (
+            <div className="mt-4 flex justify-center">
+              <button
+                onClick={handleSendVerificationEmail}
+                className="group relative h-12 w-full sm:w-56 overflow-hidden rounded bg-gradient-to-r from-blue-600 to-blue-800 text-white text-sm sm:text-base shadow hover:opacity-90 transition-all duration-200 flex items-center justify-center"
+              >
+                <span className="font-semibold flex items-center">
+                  <i className="fa-solid fa-triangle-exclamation mr-2"></i>
+                  Verify Email
+                </span>
+              </button>
+            </div>
+          )}
         </section>
 
         {/* Quick Stats / Additional Info Card */}

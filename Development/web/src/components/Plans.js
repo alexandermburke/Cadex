@@ -125,6 +125,7 @@ export default function Plans() {
 
   const [billingCycle, setBillingCycle] = useState('monthly'); 
   const [holidaySale, setHolidaySale] = useState(false); 
+  const [showExpertModal, setShowExpertModal] = useState(false);
 
   // New billing toggle options (using the same style as the sidebar toggle)
   const billingOptions = [
@@ -174,6 +175,10 @@ export default function Plans() {
 
   async function handleUpdatePlan() {
     if (!selectedPlan) return;
+    if (selectedPlan === 'Expert') {
+      setShowExpertModal(true);
+      return;
+    }
 
     const billing = { plan: selectedPlan };
     const userRef = doc(db, 'users', currentUser.uid);
@@ -505,6 +510,23 @@ export default function Plans() {
           </p>
         </div>
       </div>
+
+      {/* Expert Plan Unavailability Modal */}
+      {showExpertModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white dark:bg-slate-800 p-6 rounded-lg max-w-md w-full text-center">
+            <h3 className="text-2xl font-semibold mb-4">Option Unavailable</h3>
+            <p className="mb-4">
+              The Expert plan is currently under development and is not available for purchase. Please select a different plan.
+            </p>
+            <Button
+              text="Close"
+              clickHandler={() => setShowExpertModal(false)}
+              additionalClasses="w-full sm:w-56 h-12 text-lg"
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }
