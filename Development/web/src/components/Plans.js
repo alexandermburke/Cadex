@@ -515,7 +515,7 @@ export default function Plans() {
       {showExpertModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
           <div className="bg-white dark:bg-slate-800 p-6 rounded-lg max-w-md w-full text-center">
-            <h3 className="text-2xl font-semibold mb-4">Option Unavailable</h3>
+            <h3 className="text-2xl font-semibold mb-4">Plan Coming Soon</h3>
             <p className="mb-4">
               The Expert plan is currently under development and is not available for purchase. Please select a different plan.
             </p>
