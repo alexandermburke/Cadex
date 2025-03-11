@@ -1,5 +1,4 @@
 'use client';
-
 import React, { useState, useEffect } from 'react';
 import Sidebar from '../Sidebar';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -14,7 +13,8 @@ import {
   FaRegHeart,
   FaSync,
   FaChevronUp,
-  FaChevronDown
+  FaChevronDown,
+  FaTimes as FaClose
 } from 'react-icons/fa';
 import { useRouter, useSearchParams } from 'next/navigation';
 
@@ -36,7 +36,6 @@ export default function AllBriefs() {
   const isFree = plan === 'free';
   const isPro = plan === 'pro'; // free for testing
   const isExpert = plan === 'expert';
-
   const isDarkMode = userDataObj?.darkMode || false;
   const [isSidebarVisible, setIsSidebarVisible] = useState(true);
   const toggleSidebar = () => setIsSidebarVisible(!isSidebarVisible);
@@ -1059,9 +1058,11 @@ export default function AllBriefs() {
                       </span>
                     </p>
                     <div className="flex items-center text-xs mt-1">
-                      <span className="text-gray-400">
-                        Verified by LExAPI 3.0 AI assistant (Beta)
-                      </span>
+                      {isExpert ? (
+                        <span className="verified-by text-gray-400 text-sm">Verified by <span className="verified-by goldSolid font-semibold">LExAPI 4.0</span> (Beta)</span>
+                      ) : (
+                        <span className="verified-by text-gray-400 text-sm">Verified by LExAPI 3.0</span>
+                      )}
                       {isVerified ? (
                         <motion.div
                           initial={{ opacity: 0, scale: 0 }}
@@ -1103,7 +1104,7 @@ export default function AllBriefs() {
                     }`}
                     aria-label="Close Brief Modal"
                   >
-                    <FaTimes />
+                    <FaClose />
                   </button>
                 </div>
                 <div

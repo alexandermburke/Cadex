@@ -31,7 +31,8 @@ export async function POST(request) {
     const promptContent = `
 Based on the following case details, generate only the reporter citation string,
 which should include the volume number, reporter abbreviation, and page number.
-Do NOT include the case name or the year.
+Do NOT include the case name or the year. If the citation either doesn't exist,
+or isn't publicly available, the answer must be "N/A"
 
 Case Details:
 Title: "${cleanTitle}"

@@ -221,13 +221,13 @@ export default function Sidebar({
   });
 
   const planBadgeStyle = (() => {
-    if (isPro) {
+    if (isExpert) {
       return 'bg-gradient-to-r from-blue-400 to-blue-600 text-white';
     }
     if (isBasic) {
       return 'bg-gradient-to-r from-emerald-400 to-emerald-600 text-white';
     }
-    if (isExpert) {
+    if (isPro) { // Return to isExpert when ready
       return 'goldBackground text-white';
     }
     return 'bg-gradient-to-r from-gray-400 to-gray-400 text-white';

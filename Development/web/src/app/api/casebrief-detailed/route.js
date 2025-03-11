@@ -77,7 +77,7 @@ Case Title:
     ];
 
     const openai = new OpenAI({
-      apiKey: process.env.OPENAI_API_KEY,
+      apiKey: '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',
     });
 
     // We’ll attempt up to 10 times in case the response is invalid or the call fails.
@@ -90,7 +90,7 @@ Case Title:
       try {
         // Make the OpenAI API call
         const response = await openai.chat.completions.create({
-          model: 'gpt-3.5-turbo',
+          model: 'gpt-4',
           messages,
           max_tokens: detailed ? 2000 : 1500,
           temperature: 0.7,
