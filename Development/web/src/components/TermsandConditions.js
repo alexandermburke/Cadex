@@ -12,7 +12,7 @@ const poppins = Poppins({
 export default function Legal() {
   const { currentUser, userDataObj } = useAuth();
   const isDarkMode = userDataObj?.darkMode || false;
-  const lastUpdated = new Date().toLocaleString();
+  const lastUpdated = "3/10/2025, 6:12:43 PM";
 
   return (
     <div className={`flex flex-col gap-6 p-6 ${poppins.className}`}>
