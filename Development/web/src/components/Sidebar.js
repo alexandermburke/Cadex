@@ -102,10 +102,11 @@ export default function Sidebar({
   const router = useRouter();
   const { currentUser, userDataObj } = useAuth();
   const plan = userDataObj?.billing?.plan?.toLowerCase() || 'free';
+ 
   const isFree = plan === 'free';
-  const isBasic = plan === 'basic'; // Changed to free for testing purposes; testing enviornment
-  const isPro = plan === 'pro' || 'expert';
-  const isExpert = plan === ''; // Expert disabled because it's not ready
+  const isBasic = plan === 'basic'; 
+  const isPro = plan === 'pro' || plan === 'expert';
+  const isExpert = false;  // Expert is disabled because it's not ready.
   const isDarkMode = userDataObj?.darkMode || false;
 
   const [isCaseBriefBankOpen, setIsCaseBriefBankOpen] = useState(false);
@@ -467,7 +468,7 @@ export default function Sidebar({
           title="Subject Guides"
           icon={<FaBookReader className="text-lg" />}
         >
-          {isPro || isExpert ? (
+          {isExpert ? (
             <>
               <NavLink
                 href="/subjects/contracts"
@@ -553,7 +554,7 @@ export default function Sidebar({
           title="Career & Internship Resources"
           icon={<FaChalkboardTeacher className="text-lg" />}
         >
-          {isExpert ? (
+          {isPro || isExpert ? (
             <>
               <NavLink
                 href="/lawtools/careerresources"
