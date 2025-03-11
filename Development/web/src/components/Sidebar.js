@@ -222,13 +222,13 @@ export default function Sidebar({
 
   const planBadgeStyle = (() => {
     if (isPro) {
-      return 'bg-gradient-to-r from-emerald-400 to-emerald-600 text-white';
-    }
-    if (isBasic) {
       return 'bg-gradient-to-r from-blue-400 to-blue-600 text-white';
     }
+    if (isBasic) {
+      return 'bg-gradient-to-r from-emerald-400 to-emerald-600 text-white';
+    }
     if (isExpert) {
-      return 'bg-gradient-to-r from-teal-400 to-teal-500 text-white';
+      return 'goldBackground text-white';
     }
     return 'bg-gradient-to-r from-gray-400 to-gray-400 text-white';
   })();

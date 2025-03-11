@@ -4,7 +4,7 @@ import CoolLayout from '@/components/CoolLayout'
 import Main from '@/components/Main'
 
 export const metadata = {
-    title: "CadexLaw ⋅ Legal",
+    title: "CadexLaw ⋅ Forgot Password",
 };
 
 export default function BrowsePage() {
