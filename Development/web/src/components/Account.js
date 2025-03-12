@@ -345,7 +345,7 @@ export default function Account() {
               >
                 <span className="font-semibold flex items-center">
                   <i className="fa-solid fa-triangle-exclamation mr-2"></i>
-                  Verify Email
+                  Verify Email!
                 </span>
               </button>
             </div>

@@ -1,5 +1,3 @@
-// app/api/checkout/route.js
-
 import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { adminDB } from '@/firebaseAdmin'; // Ensure this path is correct
@@ -51,6 +49,7 @@ export async function POST(request) {
             throw new Error('Invalid plan selected.');
         }
 
+        // Create checkout session with plan info in both session metadata and subscription_data.metadata.
         const session = await stripe.checkout.sessions.create({
             payment_method_types: ['card'],
             mode: 'subscription',
@@ -63,12 +62,16 @@ export async function POST(request) {
             ],
             subscription_data: {
                 trial_period_days: 7,
+                metadata: {
+                    userId,
+                    plan, // Ensure plan is attached to the subscription object.
+                },
             },
             success_url: `https://www.cadexlaw.com/admin/success?session_id={CHECKOUT_SESSION_ID}`,
             cancel_url: `https://www.cadexlaw.com/admin/account`,
             metadata: { 
                 userId,
-                plan  // Include the plan in metadata so the webhook can update it
+                plan, // Also attach plan at the session level.
             },
         });
 
