@@ -239,7 +239,7 @@ export default function Account() {
             )}
             {subscriptionData.amountDue && subscriptionData.currency && (
               <p className="text-sm">
-                Amount Due: <strong>{amountDueDisplay}</strong>
+                Amount Due: <strong>${amountDueDisplay}</strong>
               </p>
             )}
           </div>
@@ -336,17 +336,20 @@ export default function Account() {
             </div>
           </div>
 
-          {/* Verify Email Option (inside settings) */}
+          {/* Verify Email Banner */}
           {currentUser && !currentUser.emailVerified && (
-            <div className="mt-4 flex justify-center">
+            <div className="mt-4 p-4 rounded-lg bg-blue-100 border border-blue-400 flex items-center justify-between">
+              <div className="flex items-center">
+                <i className="fa-solid fa-triangle-exclamation text-blue-600 mr-2"></i>
+                <span className="text-blue-800 font-semibold">
+                  Your email is not verified. Please verify your email to secure your account.
+                </span>
+              </div>
               <button
                 onClick={handleSendVerificationEmail}
-                className="group relative h-12 w-full sm:w-56 overflow-hidden rounded bg-gradient-to-r from-blue-600 to-blue-800 text-white text-sm sm:text-base shadow hover:opacity-90 transition-all duration-200 flex items-center justify-center"
+                className="ml-4 px-4 py-2 rounded bg-transparent text-blue-600 font-bold hover:text-opacity-50 transition-colors duration-200"
               >
-                <span className="font-semibold flex items-center">
-                  <i className="fa-solid fa-triangle-exclamation mr-2"></i>
-                  Verify Email!
-                </span>
+                Verify Email
               </button>
             </div>
           )}

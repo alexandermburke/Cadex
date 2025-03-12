@@ -28,8 +28,7 @@ export default function Careers() {
         // Create a FormData object to send the email and resume
         const formData = new FormData();
         formData.append('applicantEmail', email);
-        // Hard-code recipient email to alexander.burke88@gmail.com
-        formData.append('recipientEmail', 'alexander.burke88@gmail.com');
+        formData.append('recipientEmail', 'alex@cadexlaw.com');
         formData.append('resume', resume);
 
         try {

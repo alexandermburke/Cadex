@@ -305,11 +305,11 @@ export default function Sidebar({
         >
           {isBasic || isPro || isExpert ? (
             <>
-              <NavLink
-                href="/casebriefs/summaries"
-                icon={<FaBookOpen className="text-sm" />}
-                label="Case Summaries"
-                active={activeLink === '/casebriefs/summaries'}
+            <NavLink
+                href="/casebriefs/allbriefs"
+                icon={<FaListAlt className="text-sm" />}
+                label="All Briefs"
+                active={activeLink === '/casebriefs/allbriefs'}
               />
               <NavLink
                 href="/casebriefs/analysis"
@@ -318,10 +318,10 @@ export default function Sidebar({
                 active={activeLink === '/casebriefs/analysis'}
               />
               <NavLink
-                href="/casebriefs/allbriefs"
-                icon={<FaListAlt className="text-sm" />}
-                label="All Briefs"
-                active={activeLink === '/casebriefs/allbriefs'}
+                href="/casebriefs/summaries"
+                icon={<FaBookOpen className="text-sm" />}
+                label="Case Summaries"
+                active={activeLink === '/casebriefs/summaries'}
               />
             </>
           ) : showAllApps ? (
@@ -357,12 +357,6 @@ export default function Sidebar({
                 active={activeLink === '/lawtools/dictionary'}
               />
               <NavLink
-                href="/lawtools/lecturesummaries"
-                icon={<FaGraduationCap className="text-sm" />}
-                label="Lecture Summaries"
-                active={activeLink === '/lawtools/lecturesummaries'}
-              />
-              <NavLink
                 href="/ailawtools/flashcards"
                 icon={<FaStickyNote className="text-sm" />}
                 label="Flashcards & Outlines"
@@ -380,10 +374,6 @@ export default function Sidebar({
               <LockedNavLink
                 icon={<FaBook className="text-sm" />}
                 label="Legal Dictionary"
-              />
-              <LockedNavLink
-                icon={<FaGraduationCap className="text-sm" />}
-                label="Lecture Summaries"
               />
               <LockedNavLink
                 icon={<FaStickyNote className="text-sm" />}

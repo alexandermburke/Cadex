@@ -7,7 +7,8 @@ import Image from 'next/image';
 import {
   FaGavel,
   FaGraduationCap,
-} from 'react-icons/fa'; // (You can import other icons if needed)
+  FaUniversity,
+} from 'react-icons/fa'; // Now using three unique icons
 import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css';
 import { Autoplay } from 'swiper/modules';
@@ -173,7 +174,7 @@ export default function Home() {
               {/* Slide 2 */}
               <SwiperSlide style={{ width: '220px', height: '250px' }}>
                 <div className="w-full h-full flex flex-col items-center justify-center p-4 bg-transparent rounded shadow-lg hover:shadow-xl transition-shadow">
-                  <FaGraduationCap
+                  <FaUniversity
                     className={`${isDarkMode ? 'text-white' : 'text-blue-950'} text-4xl mb-4`}
                   />
                   <h4

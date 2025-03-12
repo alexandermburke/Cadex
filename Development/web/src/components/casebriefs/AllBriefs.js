@@ -585,6 +585,9 @@ export default function AllBriefs() {
       setNewBriefDate('');
       setNewBriefCitation(''); // reset citation
       setActiveTab('browse');
+
+      // (NEW) REDIRECT USER TO THE CASEBRIEF
+      router.push(`/casebriefs/summaries?caseId=${docRef.id}`);
     } catch (error) {
       console.error('Error creating new case brief:', error);
       setCreateError('Error creating new case brief. Please check spelling & try again.');

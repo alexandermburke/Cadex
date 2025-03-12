@@ -42,6 +42,7 @@ const webhookHandlers = {
 
             const userData = userDoc.data();
             const existingStripeCustomerId = userData.billing?.stripeCustomerId;
+            const existingSubscriptionId = userData.billing?.subscriptionId || null;
 
             // Validate stripeCustomerId consistency
             if (existingStripeCustomerId && existingStripeCustomerId !== stripeCustomerId) {
@@ -57,7 +58,17 @@ const webhookHandlers = {
                 }, { merge: true });
             }
 
-            // Update user's billing info using the subscription details
+            // If there's an existing subscription ID and it's different from the new one, cancel the old subscription
+            if (existingSubscriptionId && existingSubscriptionId !== subscription.id) {
+                try {
+                    await stripe.subscriptions.del(existingSubscriptionId);
+                    console.log(`Canceled old subscription: ${existingSubscriptionId}`);
+                } catch (cancelErr) {
+                    console.error(`Error canceling old subscription: ${cancelErr.message}`);
+                }
+            }
+
+            // Update user's billing info using the subscription details and store the new subscription ID
             const nextPaymentDue = subscription.current_period_end; // Unix timestamp
             const amountDue = subscription.items.data[0]?.price?.unit_amount; // in cents
             const currency = subscription.items.data[0]?.price?.currency?.toUpperCase();
@@ -70,6 +81,7 @@ const webhookHandlers = {
                     nextPaymentDue,
                     amountDue,
                     currency,
+                    subscriptionId: subscription.id,
                 },
             }, { merge: true });
 
@@ -81,7 +93,6 @@ const webhookHandlers = {
         }
     },
 
-    // Existing checkout.session.completed handler (if used)
     'checkout.session.completed': async (session, eventId) => {
         try {
             console.log('Received checkout.session.completed event with metadata:', JSON.stringify(session.metadata, null, 2));
@@ -111,6 +122,7 @@ const webhookHandlers = {
 
             const userData = userDoc.data();
             const existingStripeCustomerId = userData.billing?.stripeCustomerId;
+            const existingSubscriptionId = userData.billing?.subscriptionId || null;
 
             if (existingStripeCustomerId && existingStripeCustomerId !== stripeCustomerId) {
                 console.error(`Mismatch in stripeCustomerId for user ${userId}. Existing: ${existingStripeCustomerId}, New: ${stripeCustomerId}`);
@@ -123,6 +135,16 @@ const webhookHandlers = {
                         stripeCustomerId: stripeCustomerId,
                     },
                 }, { merge: true });
+            }
+
+            // Cancel previous subscription if it exists and is different from the new one.
+            if (existingSubscriptionId && existingSubscriptionId !== session.subscription) {
+                try {
+                    await stripe.subscriptions.del(existingSubscriptionId);
+                    console.log(`Canceled old subscription: ${existingSubscriptionId}`);
+                } catch (cancelErr) {
+                    console.error(`Error canceling old subscription: ${cancelErr.message}`);
+                }
             }
 
             const subscriptionData = await stripe.subscriptions.retrieve(session.subscription);
@@ -138,6 +160,7 @@ const webhookHandlers = {
                     nextPaymentDue,
                     amountDue,
                     currency,
+                    subscriptionId: session.subscription,
                 },
             }, { merge: true });
 

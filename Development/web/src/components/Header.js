@@ -99,11 +99,11 @@ export default function Header() {
             <>
                 <div className='hidden items-stretch md:flex'>
                     <Link 
-                        href={'/admin'} 
+                        href={'/casebriefs/allbriefs'} 
                         className={`border border-solid duration-200 border-transparent px-4 grid place-items-center rounded
                         ${isDarkMode ? 'hover:text-slate-500' : 'hover:text-slate-200'} text-${isDarkMode ? 'white' : 'black'}`}
                     >
-                        <p>Pro</p>
+                        <p>Case Briefs</p>
                     </Link>
                     <Link 
                         href={'/ailawtools/splash'} 
@@ -146,11 +146,11 @@ export default function Header() {
                     </div>
                 </Link>
                 <Link 
-                    href={'/admin'} 
+                    href={'/casebriefs/allbriefs'} 
                     className={`p-2 rounded-lg border-solid border duration-200 text-lg border-blue-950 border-x-4 border-y-4
                     ${isDarkMode ? 'hover:text-slate-500 hover:bg-blue-950 text-white' : 'hover:text-slate-500 hover:bg-blue-950 text-black'}`}
                 >
-                    <p>Pro</p>
+                    <p>Case Briefs</p>
                 </Link>
                 <Link 
                     href={'/admin/account'} 

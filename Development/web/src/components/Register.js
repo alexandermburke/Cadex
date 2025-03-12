@@ -18,6 +18,42 @@ export default function Register(props) {
     }, [searchParams, setUsername]);
 
     const [showPassword, setShowPassword] = useState(false);
+    
+    // State to store email errors
+    const [emailError, setEmailError] = useState("");
+
+    // List of allowed email domains
+    const allowedEmailDomains = [
+        "gmail.com",
+        "outlook.com",
+        "asu.edu",
+        "nau.edu",
+        "uofa.edu",
+        "yahoo.com",
+        "hotmail.com",
+        "live.com",
+        "icloud.com",
+        "aol.com",
+        "msn.com",
+        "cadexlaw.com"
+    ];
+
+    // Custom email change handler that only allows emails from allowed domains
+    const handleEmailChange = (e) => {
+        const value = e.target.value;
+        setEmail(value);
+        const parts = value.split('@');
+        if (parts.length === 2) {
+            const domain = parts[1].toLowerCase();
+            if (!allowedEmailDomains.includes(domain)) {
+                setEmailError("Please use an email address from an allowed provider.");
+            } else {
+                setEmailError("");
+            }
+        } else {
+            setEmailError("");
+        }
+    };
 
     return (
         <>
@@ -54,10 +90,13 @@ export default function Register(props) {
                         <input 
                             value={email} 
                             type='email' 
-                            onChange={(e) => setEmail(e.target.value)} 
+                            onChange={handleEmailChange} 
                             className='flex-1 bg-white border border-solid border-white rounded-full max-w-[600px] mx-auto w-full outline-none p-4' 
                             placeholder='Email' 
                         />
+                        {emailError && (
+                            <p className="text-red-500 text-sm text-center">{emailError}</p>
+                        )}
                     </>
                 ) : (
                     <>

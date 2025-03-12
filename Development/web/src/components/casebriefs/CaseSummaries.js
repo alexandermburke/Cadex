@@ -42,7 +42,8 @@ const simplifyText = (text = '', maxLength = 400) => {
   return text.slice(0, maxLength) + '...';
 };
 
-// Dummy citation generators – replace with your actual implementations if needed.
+// Dummy citation generators – placeholders for demonstration
+// Replace with your actual logic if needed.
 const generateCitation = (caseObj, reporter = 'U.S.', page = '___') => {
   let year = '____';
   if (caseObj.decisionDate) {
@@ -56,6 +57,27 @@ const generateCitation = (caseObj, reporter = 'U.S.', page = '___') => {
 
 const generateBluebookCitation = (caseObj, page = '___') => {
   return `Bluebook: ${generateCitation(caseObj, 'U.S.', page)}`;
+};
+
+// New placeholders for IEEE, APA, MLA, Chicago & AMA
+const generateCitationIEEE = (caseObj, page = '___') => {
+  return `IEEE: ${caseObj.title || 'N/A'}, ${caseObj.volume || '___'} U.S. ${page}, ${caseObj.decisionDate || '____'}.`;
+};
+
+const generateCitationAPA = (caseObj, page = '___') => {
+  return `APA: ${caseObj.title || 'N/A'} (${caseObj.decisionDate || '____'}). ${caseObj.volume || '___'} U.S. ${page}.`;
+};
+
+const generateCitationMLA = (caseObj, page = '___') => {
+  return `MLA: "${caseObj.title || 'N/A'}." ${caseObj.volume || '___'} U.S. ${page} (${caseObj.decisionDate || '____'}).`;
+};
+
+const generateCitationChicago = (caseObj, page = '___') => {
+  return `Chicago: ${caseObj.title || 'N/A'}, ${caseObj.volume || '___'} U.S. ${page} (${caseObj.decisionDate || '____'}).`;
+};
+
+const generateCitationAMA = (caseObj, page = '___') => {
+  return `AMA: ${caseObj.title || 'N/A'}. ${caseObj.volume || '___'} U.S. ${page} (${caseObj.decisionDate || '____'}).`;
 };
 
 const saveAsPDF = async (pdfRef, title) => {
@@ -98,7 +120,10 @@ export default function CaseSummaries() {
   const [reRunCount, setReRunCount] = useState(0);
   const [isVerified, setIsVerified] = useState(false);
 
-  const capCaseId = searchParams.get('caseId');
+  // If no query param exists, fallback to the last stored case id.
+  const queryCaseId = searchParams.get('caseId');
+  const capCaseId = queryCaseId || localStorage.getItem('lastCapCaseId');
+
   const pdfRef = useRef(null);
 
   // View Modes: 'classic', 'bulletpoint', 'simplified'
@@ -111,6 +136,90 @@ export default function CaseSummaries() {
   const selectedIndex = viewModes.findIndex((m) => m.value === viewMode);
 
   const [relatedCases, setRelatedCases] = useState([]);
+
+  // New state: favorites from userDataObj.favorites
+  const [favoriteCases, setFavoriteCases] = useState([]);
+  const [selectedFavorite, setSelectedFavorite] = useState(null);
+
+  // Persist the current case brief in localStorage so it remains open on tab change.
+  useEffect(() => {
+    if (capCaseId && caseBrief) {
+      localStorage.setItem(`caseBrief_${capCaseId}`, JSON.stringify(caseBrief));
+      localStorage.setItem('lastCapCaseId', capCaseId);
+    }
+  }, [caseBrief, capCaseId]);
+
+  // Load saved case brief from localStorage when capCaseId changes.
+  useEffect(() => {
+    if (capCaseId) {
+      const savedBrief = localStorage.getItem(`caseBrief_${capCaseId}`);
+      if (savedBrief) {
+        setCaseBrief(JSON.parse(savedBrief));
+      }
+    }
+  }, [capCaseId]);
+
+  // Fetch favorites from userDataObj
+  useEffect(() => {
+    if (!userDataObj) return;
+    if (Array.isArray(userDataObj.favorites)) {
+      const fetchFavorites = async () => {
+        let favs = [];
+        for (const favId of userDataObj.favorites) {
+          try {
+            const favDoc = await getDoc(doc(db, 'capCases', favId));
+            if (favDoc.exists()) {
+              favs.push({ id: favDoc.id, ...favDoc.data() });
+            }
+          } catch (error) {
+            console.error('Error fetching favorite case:', error);
+          }
+        }
+        setFavoriteCases(favs);
+      };
+      fetchFavorites();
+    }
+  }, [userDataObj]);
+
+  // Load saved selected favorite from localStorage if available
+  useEffect(() => {
+    if (favoriteCases.length > 0) {
+      const savedFavId = localStorage.getItem("selectedFavoriteForSummary");
+      if (savedFavId) {
+        const fav = favoriteCases.find((c) => c.id === savedFavId);
+        if (fav) setSelectedFavorite(fav);
+      }
+    }
+  }, [favoriteCases]);
+
+  // New function: fetch favorite case summary from Firebase (for favorites only)
+  const fetchFavoriteCaseSummary = async (fav) => {
+    try {
+      const favDoc = await getDoc(doc(db, 'capCases', fav.id));
+      if (favDoc.exists()) {
+        const fetchedCase = { id: favDoc.id, ...favDoc.data() };
+        setCapCase(fetchedCase);
+        if (viewMode === 'simplified') {
+          if (fetchedCase.briefSummary) {
+            setCaseBrief(fetchedCase.briefSummary);
+          } else {
+            setCaseBrief({ error: 'No summary available from favorite case.' });
+          }
+        } else {
+          if (fetchedCase.detailedSummary) {
+            setCaseBrief(fetchedCase.detailedSummary);
+          } else {
+            setCaseBrief({ error: 'No summary available from favorite case.' });
+          }
+        }
+      } else {
+        setCaseBrief({ error: 'Favorite case not found in database.' });
+      }
+    } catch (error) {
+      console.error('Error fetching favorite case summary:', error);
+      setCaseBrief({ error: 'Error fetching favorite case summary.' });
+    }
+  };
 
   // Render helpers
   const renderFieldContent = (fieldText) => {
@@ -724,13 +833,36 @@ export default function CaseSummaries() {
                   </div>
                 )
               ) : (
-                <div className="text-sm text-gray-400">No summary available.</div>
+                // When no summary available, show a dropdown of favorite cases centered.
+                <div className="w-full flex flex-col items-center">
+                  <p className="text-sm text-gray-400 mb-2">View All Briefs to Select a Case Brief.</p>
+                  <select
+                    className="p-2 rounded-md border border-gray-300 max-w-md"
+                    onChange={(e) => {
+                      const fav = favoriteCases.find((c) => c.id === e.target.value);
+                      setSelectedFavorite(fav);
+                      localStorage.setItem("selectedFavoriteForSummary", e.target.value);
+                      if (fav) {
+                        // For favorites, pull from Firebase first instead of generating a new summary.
+                        fetchFavoriteCaseSummary(fav);
+                      }
+                    }}
+                    value={selectedFavorite ? selectedFavorite.id : ""}
+                  >
+                    <option value="">Select a favorite case</option>
+                    {favoriteCases.map((fav) => (
+                      <option key={fav.id} value={fav.id}>
+                        {fav.title} ({fav.jurisdiction || 'Unknown'})
+                      </option>
+                    ))}
+                  </select>
+                </div>
               )}
             </div>
 
             {/* Related Cases */}
             <div className="w-full mt-8">
-              <h2 className="text-lg font-bold mb-2">Related Cases</h2>
+              <h2 className="text-lg font-bold mb-2 text-center">Related Cases</h2>
               <motion.div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 w-full" layout>
                 <AnimatePresence>
                   {relatedCases && relatedCases.length > 0 ? (
@@ -757,7 +889,7 @@ export default function CaseSummaries() {
                       </motion.div>
                     ))
                   ) : (
-                    <p className="text-sm text-gray-400 col-span-full">No related cases found.</p>
+                    <p className="text-sm text-gray-400 col-span-full text-center">No related cases found.</p>
                   )}
                 </AnimatePresence>
               </motion.div>
@@ -772,8 +904,16 @@ export default function CaseSummaries() {
                     isDarkMode ? 'bg-slate-800 border border-slate-700' : 'bg-gray-100 border border-gray-300'
                   }`}
                 >
+                  {/* Original: "Standard" and "Bluebook" */}
                   <p className="text-base italic">{generateCitation(capCase, 'U.S.', '113')}</p>
                   <p className="text-base italic mt-2">{generateBluebookCitation(capCase, '113')}</p>
+
+                  {/* Newly added: IEEE, APA, MLA, Chicago, AMA */}
+                  <p className="text-base italic mt-4">{generateCitationIEEE(capCase, '113')}</p>
+                  <p className="text-base italic mt-2">{generateCitationAPA(capCase, '113')}</p>
+                  <p className="text-base italic mt-2">{generateCitationMLA(capCase, '113')}</p>
+                  <p className="text-base italic mt-2">{generateCitationChicago(capCase, '113')}</p>
+                  <p className="text-base italic mt-2">{generateCitationAMA(capCase, '113')}</p>
                 </div>
               </div>
             )}
