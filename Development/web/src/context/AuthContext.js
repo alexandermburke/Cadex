@@ -1,5 +1,3 @@
-// context/AuthContext.js
-
 'use client';
 import React, { useContext, useState, useEffect } from 'react';
 import {
@@ -10,7 +8,7 @@ import {
     updateProfile,
 } from 'firebase/auth';
 import { auth, db } from '@/firebase';
-import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
+import { doc, getDoc, setDoc, serverTimestamp, onSnapshot } from 'firebase/firestore';
 
 const AuthContext = React.createContext();
 
@@ -23,8 +21,11 @@ export function AuthProvider({ children }) {
     const [userDataObj, setUserDataObj] = useState({});
     const [loading, setLoading] = useState(true);
 
+    // Updated: Factor in Basic, Pro & Expert as paid tiers.
+    const paidTiers = ['basic', 'Pro', 'expert'];
     const isPaid =
-        userDataObj?.billing?.plan === 'Pro' && userDataObj?.billing?.status;
+        paidTiers.includes(userDataObj?.billing?.plan?.toLowerCase()) &&
+        userDataObj?.billing?.status;
 
     // Sign up a new user
     function signup(email, password) {
@@ -52,7 +53,7 @@ export function AuthProvider({ children }) {
             },
             { merge: true }
         );
-        
+
         // 2) Write to "users" collection
         await setDoc(
             doc(db, 'users', user.uid),
@@ -73,7 +74,7 @@ export function AuthProvider({ children }) {
         return signOut(auth);
     }
 
-    // Refresh user data from Firestore
+    // Refresh user data from Firestore (manual refresh)
     const refreshUserData = async () => {
         if (!currentUser) return;
         try {
@@ -108,51 +109,23 @@ export function AuthProvider({ children }) {
                     return;
                 }
 
-                let localUserData = localStorage.getItem('hyr');
-                if (!localUserData) {
-                    await fetchUserData();
-                    return;
-                }
-
-                localUserData = JSON.parse(localUserData);
-                if (
-                    user?.metadata?.lastLoginAt === localUserData?.metadata?.lastLoginAt
-                ) {
-                    // Use local storage data if last login matches
-                    console.log('Used local data');
-                    setUserDataObj(localUserData);
-                    return;
-                }
-
-                // Otherwise, fetch from Firestore
-                await fetchUserData();
-
-                async function fetchUserData() {
-                    try {
-                        const docRef = doc(db, 'users', user.uid);
-                        const docSnap = await getDoc(docRef);
-                        console.log('Fetching user data');
-                        let firebaseData = {};
-                        if (docSnap.exists()) {
-                            console.log('Found user data');
-                            firebaseData = docSnap.data();
-                            setUserDataObj(firebaseData);
-                            localStorage.setItem(
-                                'hyr',
-                                JSON.stringify({
-                                    ...firebaseData,
-                                    metadata: user.metadata,
-                                })
-                            );
-                        } else {
-                            console.warn(
-                                'No user data found in Firestore for user:',
-                                user.uid
-                            );
-                        }
-                    } catch (err) {
-                        console.log('Failed to fetch data:', err.message);
-                    }
+                // Always fetch fresh data when the auth state changes
+                const docRef = doc(db, 'users', user.uid);
+                const docSnap = await getDoc(docRef);
+                console.log('Fetching user data');
+                if (docSnap.exists()) {
+                    const firebaseData = docSnap.data();
+                    console.log('Found user data');
+                    setUserDataObj(firebaseData);
+                    localStorage.setItem(
+                        'hyr',
+                        JSON.stringify({
+                            ...firebaseData,
+                            metadata: user.metadata,
+                        })
+                    );
+                } else {
+                    console.warn('No user data found in Firestore for user:', user.uid);
                 }
             } catch (err) {
                 console.log(err.message);
@@ -162,6 +135,24 @@ export function AuthProvider({ children }) {
         });
         return unsubscribe;
     }, []);
+
+    // Listen for real-time changes to the user's Firestore document.
+    useEffect(() => {
+        if (!currentUser) return;
+        const userDocRef = doc(db, 'users', currentUser.uid);
+        const unsubscribeDoc = onSnapshot(userDocRef, (docSnap) => {
+            if (docSnap.exists()) {
+                const data = docSnap.data();
+                setUserDataObj(data);
+                localStorage.setItem(
+                    'hyr',
+                    JSON.stringify({ ...data, metadata: currentUser.metadata })
+                );
+                console.log('Real-time update received:', data);
+            }
+        });
+        return unsubscribeDoc;
+    }, [currentUser]);
 
     const value = {
         currentUser,

@@ -16,12 +16,13 @@ const webhookHandlers = {
         try {
             const { customer: stripeCustomerId, metadata, subscription } = session;
 
-            if (!metadata || !metadata.userId) {
-                console.error('Session metadata missing userId:', JSON.stringify(session, null, 2));
-                throw new Error('Missing userId in session metadata.');
+            if (!metadata || !metadata.userId || !metadata.plan) {
+                console.error('Session metadata missing userId or plan:', JSON.stringify(session, null, 2));
+                throw new Error('Missing userId or plan in session metadata.');
             }
 
             const userId = metadata.userId;
+            const selectedPlan = metadata.plan; // Dynamically use the passed plan
 
             console.log(`Processing checkout.session.completed for userId: ${userId}, stripeCustomerId: ${stripeCustomerId}`);
 
@@ -68,10 +69,10 @@ const webhookHandlers = {
             const currency = subscriptionData.items.data[0].price.currency.toUpperCase();
             const status = subscriptionData.status;
 
-            // Update user's billing information in Firestore
+            // Update user's billing information in Firestore using selectedPlan from metadata
             await userDocRef.set({
                 billing: {
-                    plan: 'Pro', // Adjust based on the plan logic
+                    plan: selectedPlan,
                     status,
                     nextPaymentDue,
                     amountDue,
@@ -82,7 +83,7 @@ const webhookHandlers = {
             // Mark the event as processed
             await eventRef.set({ processed: true });
 
-            console.log(`User ${userId} successfully upgraded to Pro plan.`);
+            console.log(`User ${userId} successfully upgraded to ${selectedPlan} plan.`);
         } catch (err) {
             console.error(`Error handling checkout.session.completed: ${err.message}`);
             throw err;

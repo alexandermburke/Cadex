@@ -180,11 +180,8 @@ export default function Plans() {
       return;
     }
 
-    const billing = { plan: selectedPlan };
-    const userRef = doc(db, 'users', currentUser.uid);
-
-    await setDoc(userRef, { billing }, { merge: true });
-
+    // Removed immediate Firestore update.
+    // Pass the selected plan and other details to Stripe via your backend
     const options = {
       method: 'POST',
       headers: {
@@ -194,7 +191,7 @@ export default function Plans() {
         customerId: userDataObj?.billing?.stripeCustomerId,
         userId: currentUser.uid,
         email: currentUser.email,
-        plan: selectedPlan,
+        plan: selectedPlan, // Pass the plan here for metadata
         billingCycle, 
       }),
     };
@@ -492,7 +489,7 @@ export default function Plans() {
               Is this cheaper than other services?
             </h3>
             <p className={isDarkMode ? 'text-gray-300' : 'text-gray-700'}>
-              Absolutely. Our plans range from $10 to $30 per month, which is significantly lower than Quimbee&apos;s $19–$29 tiers. We aim to provide high-quality, AI-driven study tools at an even more affordable rate.
+              Absolutely. Our plans range from $8 to $30 per month, which is significantly lower than competitor tiers. We aim to provide high-quality, AI-driven study tools at an even more affordable rate.
             </p>
           </div>
         </div>
