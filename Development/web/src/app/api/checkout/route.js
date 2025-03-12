@@ -8,7 +8,6 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
     apiVersion: '2023-10-16',
 });
 
-
 const priceIds = {
     Basic: 'price_1R0WZkP6GBvKc5e89itgiFsO',
     Pro: 'price_1R0WZyP6GBvKc5e8P8ek4upz',
@@ -23,7 +22,6 @@ export async function POST(request) {
     }
 
     try {
-        
         const userDocRef = adminDB.collection('users').doc(userId);
         const userDoc = await userDocRef.get();
 
@@ -49,12 +47,10 @@ export async function POST(request) {
             }, { merge: true });
         }
 
-       
         if (!priceIds[plan]) {
             throw new Error('Invalid plan selected.');
         }
 
-     
         const session = await stripe.checkout.sessions.create({
             payment_method_types: ['card'],
             mode: 'subscription',
@@ -70,7 +66,10 @@ export async function POST(request) {
             },
             success_url: `https://www.cadexlaw.com/admin/success?session_id={CHECKOUT_SESSION_ID}`,
             cancel_url: `https://www.cadexlaw.com/admin/account`,
-            metadata: { userId }, 
+            metadata: { 
+                userId,
+                plan  // Include the plan in metadata so the webhook can update it
+            },
         });
 
         return NextResponse.json({ url: session.url }, { status: 201 });
