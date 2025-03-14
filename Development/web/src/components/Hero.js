@@ -143,19 +143,10 @@ export default function InvestorSplashPage() {
           initial="hidden"
           animate="visible"
         >
-          {/* Header Image */}
-          <Image
-            src="/header.avif"
-            alt="Cadex Investor Header"
-            width={100}
-            height={100}
-            unoptimized={true}
-            className="mx-auto mb-8"
-            priority
-          />
+          
 
           <motion.h1
-            className={'text-5xl sm:text-7xl font-bold mb-6 text-gray-200 ' + poppins.className}
+            className={'text-5xl sm:text-7xl font-bold mb-6 text-gray-50 ' + poppins.className}
             variants={childVariants}
           >
             Invest in the Future of Legal Tech
@@ -323,7 +314,7 @@ export default function InvestorSplashPage() {
             variants={childVariants}
           >
             <Link
-              href="/contact"
+               href="mailto:alex@cadexlaw.com" 
               className="group before:ease relative h-12 w-56 overflow-hidden rounded bg-gradient-to-r from-gray-950 to-gray-700 text-white shadow-2xl transition-all before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 before:rotate-6 before:bg-gray before:opacity-20 before:duration-700 hover:before:-translate-x-56"
             >
               <div className="flex items-center justify-center h-full">

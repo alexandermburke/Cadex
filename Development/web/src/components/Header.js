@@ -57,11 +57,11 @@ export default function Header() {
                 <p></p>
             </Link>
             <Link 
-                href="mailto:alexander.burke88@gmail.com" 
+                href="mailto:alex@cadexlaw.com" 
                 className="mx-2 ml-4 duration-200 overflow-hidden p-0.5 rounded-lg relative"
             >
                 <div className="absolute inset-0"></div>
-                <div className="p-2 grid place-items-center relative z-10 bg-transparent rounded duration-200 text-white before:ease h-10 w-40 overflow-hidden bg-gradient-to-r from-blue-500 to-blue-500 shadow-2xl transition-all before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-40">
+                <div className="p-2 grid place-items-center relative z-10 bg-transparent rounded-full duration-200 text-white before:ease h-10 w-40 overflow-hidden bg-gradient-to-r from-blue-500 to-blue-500 shadow-2xl transition-all before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-40">
                     <p>Get in Contact</p>
                 </div>
             </Link>
