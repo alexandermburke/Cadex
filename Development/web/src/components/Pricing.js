@@ -71,11 +71,11 @@ const plans = [
       },
       {
         text: 'Upgraded LExAPI 3.0 Access',
-        info: 'Accurate AI-based research, writing, and exam prep.',
+        info: 'Accurate AI based research, writing, and exam prep.',
       },
       {
         text: 'Early Access to Beta Features',
-        info: 'Accurate AI-based research, writing, and exam prep.',
+        info: 'Accurate AI based research, writing, and exam prep.',
       },
     ],
     recommended: true,
@@ -89,7 +89,7 @@ const plans = [
       { text: 'All Pro Plan Features' },
       {
         text: 'Upgraded LExAPI 4.0 Access',
-        info: 'Even more accurate AI-based research, writing, and exam prep.',
+        info: 'Even more accurate AI based research, writing, and exam prep.',
       },
       {
         text: 'Advanced Analytics & Reports',
@@ -101,7 +101,7 @@ const plans = [
       },
       {
         text: 'Access to Career & Internship Resources',
-        info: 'Schedule 1:1 AI-assisted sessions to refine study strategy and address weak areas.',
+        info: 'Schedule 1:1 AI assisted sessions to refine study strategy and address weak areas.',
       },
     ],
     recommended: false,
@@ -398,7 +398,7 @@ export default function Plans() {
               Which plan should I choose?
             </h3>
             <p className={isDarkMode ? 'text-gray-300' : 'text-gray-700'}>
-              Basic is great if you want essential AI-powered tools and case simulations at a low cost. Pro is ideal for students who need advanced features like IRAC generation and deeper analytics. Expert is for those aiming for top class performance, offering the highest level of AI assistance and exclusive study communities.
+              Basic is great if you want essential AI powered tools and case simulations at a low cost. Pro is ideal for students who need advanced features like IRAC generation and deeper analytics. Expert is for those aiming for top class performance, offering the highest level of AI assistance and exclusive study communities.
             </p>
           </div>
 
@@ -437,7 +437,7 @@ export default function Plans() {
               Is there a free trial available?
             </h3>
             <p className={isDarkMode ? 'text-gray-300' : 'text-gray-700'}>
-              Yes. All plans include a 7-day free trial for new users. You can cancel at any time before the trial ends without being charged.
+              Yes. All plans include a 7-day free trial for new users. You can cancel at any time before the trial ends without being charged. Abuse of this promotion will result in the individual(s) being banned from this platform.
             </p>
           </div>
 
@@ -463,7 +463,7 @@ export default function Plans() {
               Is this cheaper than other services?
             </h3>
             <p className={isDarkMode ? 'text-gray-300' : 'text-gray-700'}>
-              Absolutely. Our plans range from $10 to $30 per month, which is significantly lower than Quimbee&apos;s $19–$29 tiers. We aim to provide high-quality, AI-driven study tools at an even more affordable rate.
+              Absolutely. Our plans range from $8 to $30 per month, which is significantly lower than our competitor&apos;s average of $19–$29 tiers. We aim to provide high-quality, AI driven study tools at an even more affordable rate.
             </p>
           </div>
         </div>
