@@ -42,6 +42,20 @@ export default function Header() {
         </div>
     );
 
+    const carouselItems = [
+      { href: '/casebriefs/allbriefs', label: 'All Briefs' },
+      { href: '/casebriefs/analysis', label: 'Case Analysis' },
+      { href: '/casebriefs/summaries', label: 'Case Summaries' }
+    ];
+    const [carouselIndex, setCarouselIndex] = useState(0);
+
+    useEffect(() => {
+      const interval = setInterval(() => {
+        setCarouselIndex((prevIndex) => (prevIndex + 1) % carouselItems.length);
+      }, 2000);
+      return () => clearInterval(interval);
+    }, []);
+
     let navActions = (
         <nav className='hidden items-stretch md:flex'>
             <Link 
@@ -98,12 +112,19 @@ export default function Header() {
         navActions = (
             <>
                 <div className='hidden items-stretch md:flex'>
-                    <Link 
-                        href={'/casebriefs/allbriefs'} 
-                        className={`border border-solid duration-200 border-transparent px-4 grid place-items-center rounded
-                        ${isDarkMode ? 'hover:text-slate-500' : 'hover:text-slate-200'} text-${isDarkMode ? 'white' : 'black'}`}
-                    >
-                        <p>Case Briefs</p>
+                    {/* Replace the "Case Briefs" link with a carousel */}
+                    <Link href={carouselItems[carouselIndex].href} className={`border border-solid duration-200 border-transparent px-4 grid place-items-center rounded ${isDarkMode ? 'hover:text-slate-500' : 'hover:text-slate-200'} text-${isDarkMode ? 'white' : 'black'}`}>
+                        <AnimatePresence mode="wait">
+                          <motion.div
+                            key={carouselItems[carouselIndex].label}
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0, transition: { duration: 0.5 } }}
+                            exit={{ opacity: 0, y: -20, transition: { duration: 0.5, delay: 3 } }}
+                            className="flex items-center"
+                          >
+                            <span>{carouselItems[carouselIndex].label}</span>
+                          </motion.div>
+                        </AnimatePresence>
                     </Link>
                     <Link 
                         href={'/ailawtools/splash'} 

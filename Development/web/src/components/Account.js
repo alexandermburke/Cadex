@@ -9,6 +9,7 @@ import LogoFiller from './LogoFiller';
 import { doc, updateDoc } from 'firebase/firestore';
 import { db } from '@/firebase';
 import { sendEmailVerification } from 'firebase/auth';
+import { motion } from 'framer-motion';
 
 export default function Account() {
   const { currentUser, userDataObj, refreshUserData } = useAuth();
@@ -32,6 +33,8 @@ export default function Account() {
 
   // NEW: State to control Update Log modal visibility
   const [showUpdateLog, setShowUpdateLog] = useState(false);
+  // NEW: State to control Change Password modal visibility
+  const [showChangePasswordModal, setShowChangePasswordModal] = useState(false);
 
   // Grab the subscription plan
   const plan = subscriptionData.plan || 'Free';
@@ -186,6 +189,11 @@ export default function Account() {
     }
   };
 
+  // NEW: Handle Change Password - open modal instead of routing.
+  const handleChangePassword = () => {
+    setShowChangePasswordModal(true);
+  };
+
   return (
     <div
       className={`flex flex-col w-full gap-8 ${
@@ -234,12 +242,12 @@ export default function Account() {
             </span>
             {subscriptionData.nextPaymentDue && (
               <p className="text-sm">
-                Next Payment Due: <strong>{paymentDueDisplay}</strong>
+                Next Payment Due: <strong>{new Date(subscriptionData.nextPaymentDue * 1000).toLocaleDateString()}</strong>
               </p>
             )}
             {subscriptionData.amountDue && subscriptionData.currency && (
               <p className="text-sm">
-                Amount Due: <strong>${amountDueDisplay}</strong>
+                Amount Due: <strong>${subscriptionData.amountDue}</strong>
               </p>
             )}
           </div>
@@ -256,7 +264,7 @@ export default function Account() {
         >
           <h2 className="text-xl font-bold mb-4">Subscription &amp; Billing</h2>
           <div className="flex flex-col gap-2">
-            {(plan === 'Basic' || plan === 'Free') && (
+            {(currentPlan === 'Basic' || currentPlan === 'Free') && (
               <Link
                 href="/admin/billing"
                 className={`
@@ -269,7 +277,7 @@ export default function Account() {
                 <i className="ml-2 fa-solid fa-arrow-right transition-transform duration-300 group-hover:translate-x-1"></i>
               </Link>
             )}
-            {(plan === 'Pro' || plan === 'Basic' || plan === 'Developer') && (
+            {(currentPlan === 'Pro' || currentPlan === 'Basic' || currentPlan === 'Developer') && (
               <a
                 href="https://billing.stripe.com/p/login/4gwaH17kt3TRbZu5kk"
                 target="_blank"
@@ -336,6 +344,19 @@ export default function Account() {
             </div>
           </div>
 
+          {/* Change Password Button */}
+          <div className="mt-4">
+            <motion.button
+              onClick={handleChangePassword}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+              className="w-full px-4 py-2 rounded-md text-sm font-semibold bg-gradient-to-r from-blue-600 to-blue-500 text-white shadow-lg"
+            >
+              Change Password
+            </motion.button>
+          </div>
+
           {/* Verify Email Banner */}
           {currentUser && !currentUser.emailVerified && (
             <div className="mt-4 p-4 rounded-lg bg-blue-100 border border-blue-400 flex items-center justify-between">
@@ -380,6 +401,20 @@ export default function Account() {
               ) : (
                 vals.link
               )}
+            </p>
+            <p>
+              <strong>Favorites:</strong> {userDataObj?.favorites ? userDataObj.favorites.length : 0}
+            </p>
+            <p>
+              <strong>Last Login:</strong>{' '}
+              {currentUser?.metadata?.lastSignInTime ? new Date(currentUser.metadata.lastSignInTime).toLocaleString() : 'N/A'}
+            </p>
+            <p>
+              <strong>Account Created:</strong>{' '}
+              {currentUser?.metadata?.creationTime ? new Date(currentUser.metadata.creationTime).toLocaleString() : 'N/A'}
+            </p>
+            <p>
+              <strong>Email Verified:</strong> {currentUser?.emailVerified ? "Yes" : "No"}
             </p>
           </div>
         </section>
@@ -466,6 +501,24 @@ export default function Account() {
                 </ul>
               </div>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Change Password Modal */}
+      {showChangePasswordModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+          <div className={`max-w-lg w-full p-6 rounded-lg shadow-lg ${isDarkMode ? 'bg-gray-800 text-white' : 'bg-white text-blue-950'}`}>
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-2xl font-bold">Change Password</h3>
+              <button onClick={() => setShowChangePasswordModal(false)} className="text-xl font-bold">
+                &times;
+              </button>
+            </div>
+            <p className="text-lg">Coming Soon</p>
+            <p className="mt-2 text-sm">
+              Our team is currently working on this feature to ensure a secure and robust experience. Please check back soon for updates.
+            </p>
           </div>
         </div>
       )}

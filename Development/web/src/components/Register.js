@@ -35,9 +35,23 @@ export default function Register(props) {
         "icloud.com",
         "aol.com",
         "msn.com",
-        "cadexlaw.com"
-    ];
-
+        "cadexlaw.com",
+        "harvard.edu",
+        "stanford.edu",
+        "yale.edu",
+        "columbia.edu",
+        "nyu.edu",
+        "upenn.edu",
+        "georgetown.edu",
+        "northwestern.edu",
+        "berkeley.edu",
+        "cornell.edu",
+        "duke.edu",
+        "virginia.edu",
+        "syr.edu",
+        "unc.edu"
+      ];
+      
     // Custom email change handler that only allows emails from allowed domains
     const handleEmailChange = (e) => {
         const value = e.target.value;
@@ -46,7 +60,8 @@ export default function Register(props) {
         if (parts.length === 2) {
             const domain = parts[1].toLowerCase();
             if (!allowedEmailDomains.includes(domain)) {
-                setEmailError("Please use an email address from an allowed provider.");
+                setEmailError("Please use an email address from an approved provider. If you believe your domain should be included, contact support@cadexlaw.com for assistance.");
+
             } else {
                 setEmailError("");
             }
@@ -62,7 +77,7 @@ export default function Register(props) {
                     Join <span className='goldSolid'>CadexLaw.com</span>
                 </h2>
                 <p className='text-center'>
-                    Sign up for free, discounted users must have an email with a supported College or University.
+                    Sign up for free, affiliated users must have an email with a supported College or University.
                 </p>
             </div>
             <div className='flex flex-col gap-4 text-base sm:text-lg'>
