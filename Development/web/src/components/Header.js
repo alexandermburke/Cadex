@@ -61,7 +61,7 @@ export default function Header() {
     let navActions = (
         <nav className='hidden items-stretch md:flex'>
             <Link 
-                href={'/ailawtools/splash'} 
+                href={'https://www.cadexlaw.com/ailawtools/splash'} 
                 className={`border border-solid duration-200 border-transparent px-4 grid place-items-center rounded 
                 ${isDarkMode ? 'hover:text-slate-500' : 'hover:text-slate-200'} text-${isDarkMode ? 'white' : 'black'}`}
             >

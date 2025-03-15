@@ -17,13 +17,9 @@ export default function Login() {
   const router = useRouter();
   const [authenticating, setAuthenticating] = useState(false);
   const [error, setError] = useState(null);
-
-  const { demoLogin } = useAuth();
-
-  // ---------------------------------------
-  // Disclaimer logic
-  // ---------------------------------------
   const [showDisclaimer, setShowDisclaimer] = useState(false);
+  const [showClosedModal, setShowClosedModal] = useState(false);
+  const { demoLogin } = useAuth();
 
   useEffect(() => {
     const hasSeenDisclaimer = localStorage.getItem('hasSeenDisclaimer');
@@ -37,24 +33,12 @@ export default function Login() {
     localStorage.setItem('hasSeenDisclaimer', 'true');
   };
 
-  // ---------------------------------------
-  // Handle Demo Login Submission
-  // ---------------------------------------
   async function handleBegin() {
     if (authenticating) return;
     setError(null);
     setAuthenticating(true);
-
-    try {
-      // No code required. Demo login defaults to demo rank and default@default.com
-      await demoLogin();
-      router.push('/ailawtools/splash'); // Redirect after successful login
-    } catch (err) {
-      console.error(err.message);
-      setError(err.message);
-    } finally {
-      setAuthenticating(false);
-    }
+    setShowClosedModal(true);
+    setAuthenticating(false);
   }
 
   return (
@@ -83,6 +67,32 @@ export default function Login() {
                 <div className="flex items-center justify-center h-full">
                   I Understand
                   <i className="ml-8 fa-solid fa-arrow-right opacity-0 group-hover:opacity-100 transition-opacity duration-200"></i>
+                </div>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Demo Closed Modal */}
+      {showClosedModal && (
+        <div className="fixed inset-0 z-[160] flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-md mx-auto">
+            <h2 className="text-2xl font-semibold mb-4 text-gray-900 dark:text-white">
+              Demo Access Unavailable
+            </h2>
+            <p className="text-gray-700 dark:text-gray-300 mb-4">
+              We appreciate your interest in our demo. Unfortunately, the public demo is
+              currently closed. Please check back later or contact us for more
+              information.
+            </p>
+            <div className="text-right">
+              <button
+                onClick={() => setShowClosedModal(false)}
+                className="group before:ease relative h-10 w-36 overflow-hidden rounded bg-blue-950 text-white shadow-2xl transition-all before:absolute before:right-0 before:top-0 before:h-10 before:w-4 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-56"
+              >
+                <div className="flex items-center justify-center h-full">
+                  Close
                 </div>
               </button>
             </div>
