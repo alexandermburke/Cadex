@@ -341,19 +341,15 @@ export default function Irac() {
   };
 
   const handleImportBrief = (brief) => {
-    // 'brief' is the 'briefSummary' object from a capCase
-    // Map the fields to IRAC:
-    // Example: IRAC issue = brief.issue, IRAC rule = brief.ruleOfLaw, etc.
+    // Map the fields from the favorite brief to the IRAC fields.
     setIrac({
       issue: brief.issue || '',
       rule: brief.ruleOfLaw || '',
       analysis: brief.reasoning || '',
       conclusion: brief.holding || '',
     });
-
-    // For sub-issues, sources, counterAnalysis, etc., adapt to your preference
     setSubIssues(brief.facts || '');
-    setSources(''); // or some other field if you like
+    setSources(''); // Adjust if you want a different mapping
     setCounterAnalysis(brief.dissent || '');
 
     // Close the modal
@@ -449,7 +445,7 @@ export default function Irac() {
           initial="hidden"
           animate="visible"
         >
-          {/* Right-side Icon Buttons: Load, Save, Configure, IMPORT */}
+          {/* Top row: Right-side Icon Buttons */}
           <div className="w-full flex items-center justify-end mb-4 gap-4">
             {/* Load Progress */}
             <button
@@ -461,10 +457,7 @@ export default function Irac() {
               )}
               aria-label="Load IRAC Progress"
             >
-              <motion.div
-                whileHover={{ scale: 1.2, rotate: 360 }}
-                transition={{ duration: 0.5 }}
-              >
+              <motion.div whileHover={{ scale: 1.2, rotate: 360 }} transition={{ duration: 0.5 }}>
                 <FaSyncAlt size={20} />
               </motion.div>
             </button>
@@ -479,46 +472,31 @@ export default function Irac() {
               )}
               aria-label="Save IRAC Progress"
             >
-              <motion.div
-                whileHover={{ scale: 1.2, rotate: 360 }}
-                transition={{ duration: 0.5 }}
-              >
+              <motion.div whileHover={{ scale: 1.2, rotate: 360 }} transition={{ duration: 0.5 }}>
                 <FaSave size={20} />
               </motion.div>
             </button>
 
-            {/* Import from Favorites Button */}
+            {/* Import Case Brief Button – Updated to Flashcards UI style */}
             <button
               onClick={openImportModal}
-              className={clsx(
-                'group relative h-10 sm:h-12 px-4 sm:px-6 overflow-hidden rounded-md text-white duration-200',
-                isDarkMode ? 'bg-blue-700' : 'bg-blue-950',
-                'before:absolute before:right-0 before:top-0 before:h-full before:w-5 ' +
-                  'before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 ' +
-                  'before:duration-700 hover:before:-translate-x-56 text-xs sm:text-base shadow-md'
-              )}
+              className="group relative h-12 w-full sm:w-56 overflow-hidden rounded bg-gradient-to-r from-blue-600 to-blue-800 text-white text-sm sm:text-base shadow hover:opacity-90 transition-all duration-200 flex items-center justify-center gradientShadowHoverBlue"
               aria-label="Import Case Brief"
             >
               Import Case Brief
             </button>
 
-            {/* Configure Button */}
+            {/* Configure Button – Updated to Flashcards UI style */}
             <button
               onClick={openConfigModal}
-              className={clsx(
-                'group relative h-10 sm:h-12 px-4 sm:px-6 overflow-hidden rounded-md text-white duration-200',
-                isDarkMode ? 'bg-blue-700' : 'bg-blue-950',
-                'before:absolute before:right-0 before:top-0 before:h-full before:w-5 ' +
-                  'before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 ' +
-                  'before:duration-700 hover:before:-translate-x-56 text-xs sm:text-base shadow-md'
-              )}
+              className="group relative h-12 w-full sm:w-56 overflow-hidden rounded bg-gradient-to-r from-blue-600 to-blue-800 text-white text-sm sm:text-base shadow hover:opacity-90 transition-all duration-200 flex items-center justify-center gradientShadowHoverBlue"
               aria-label="Configure IRAC"
             >
               Configure
             </button>
           </div>
 
-          {/* IRAC Form or "Click Configure" Message */}
+          {/* IRAC Form or "Click Configure/Import" Message */}
           {(!irac.issue.trim() &&
             !irac.rule.trim() &&
             !irac.analysis.trim() &&
@@ -532,23 +510,12 @@ export default function Irac() {
                 isDarkMode ? 'bg-slate-700 text-white' : 'bg-white text-black'
               )}
             >
-              <p
-                className={clsx(
-                  'mb-4',
-                  isDarkMode ? 'text-gray-300' : 'text-gray-600'
-                )}
-              >
+              <p className={clsx('mb-4', isDarkMode ? 'text-gray-300' : 'text-gray-600')}>
                 Click <span className="font-semibold">Configure</span> or{' '}
                 <span className="font-semibold">Import Case Brief</span> to generate your IRAC.
               </p>
-              <p
-                className={clsx(
-                  'text-sm',
-                  isDarkMode ? 'text-gray-400' : 'text-gray-500'
-                )}
-              >
-                <strong>Note:</strong> This is intended for law students to practice
-                drafting IRAC analyses.
+              <p className={clsx('text-sm', isDarkMode ? 'text-gray-400' : 'text-gray-500')}>
+                <strong>Note:</strong> This is intended for law students to practice drafting IRAC analyses.
               </p>
             </div>
           ) : (
@@ -559,10 +526,7 @@ export default function Irac() {
                 <div>
                   <label
                     htmlFor="issue"
-                    className={clsx(
-                      'block text-lg font-semibold mb-1',
-                      isDarkMode ? 'text-gray-100' : 'text-gray-700'
-                    )}
+                    className={clsx('block text-lg font-semibold mb-1', isDarkMode ? 'text-gray-100' : 'text-gray-700')}
                   >
                     Issue
                   </label>
@@ -574,9 +538,7 @@ export default function Irac() {
                     rows={3}
                     className={clsx(
                       'w-full p-3 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500',
-                      isDarkMode
-                        ? 'bg-slate-700 text-white border-gray-600'
-                        : 'bg-white text-gray-700 border-gray-300'
+                      isDarkMode ? 'bg-slate-700 text-white border-gray-600' : 'bg-white text-gray-700 border-gray-300'
                     )}
                     placeholder="State the primary legal issue(s) in question..."
                   />
@@ -586,10 +548,7 @@ export default function Irac() {
                 <div>
                   <label
                     htmlFor="subIssues"
-                    className={clsx(
-                      'block text-lg font-semibold mb-1',
-                      isDarkMode ? 'text-gray-100' : 'text-gray-700'
-                    )}
+                    className={clsx('block text-lg font-semibold mb-1', isDarkMode ? 'text-gray-100' : 'text-gray-700')}
                   >
                     Sub-Issues or Additional Concerns
                   </label>
@@ -601,9 +560,7 @@ export default function Irac() {
                     rows={3}
                     className={clsx(
                       'w-full p-3 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500',
-                      isDarkMode
-                        ? 'bg-slate-700 text-white border-gray-600'
-                        : 'bg-white text-gray-700 border-gray-300'
+                      isDarkMode ? 'bg-slate-700 text-white border-gray-600' : 'bg-white text-gray-700 border-gray-300'
                     )}
                     placeholder="List any sub-issues, defenses, or special considerations..."
                   />
@@ -613,10 +570,7 @@ export default function Irac() {
                 <div>
                   <label
                     htmlFor="rule"
-                    className={clsx(
-                      'block text-lg font-semibold mb-1',
-                      isDarkMode ? 'text-gray-100' : 'text-gray-700'
-                    )}
+                    className={clsx('block text-lg font-semibold mb-1', isDarkMode ? 'text-gray-100' : 'text-gray-700')}
                   >
                     Rule
                   </label>
@@ -628,9 +582,7 @@ export default function Irac() {
                     rows={3}
                     className={clsx(
                       'w-full p-3 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500',
-                      isDarkMode
-                        ? 'bg-slate-700 text-white border-gray-600'
-                        : 'bg-white text-gray-700 border-gray-300'
+                      isDarkMode ? 'bg-slate-700 text-white border-gray-600' : 'bg-white text-gray-700 border-gray-300'
                     )}
                     placeholder="Outline the governing legal rules or principles..."
                   />
@@ -640,10 +592,7 @@ export default function Irac() {
                 <div>
                   <label
                     htmlFor="sources"
-                    className={clsx(
-                      'block text-lg font-semibold mb-1',
-                      isDarkMode ? 'text-gray-100' : 'text-gray-700'
-                    )}
+                    className={clsx('block text-lg font-semibold mb-1', isDarkMode ? 'text-gray-100' : 'text-gray-700')}
                   >
                     Key Sources / Authority
                   </label>
@@ -655,9 +604,7 @@ export default function Irac() {
                     rows={3}
                     className={clsx(
                       'w-full p-3 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500',
-                      isDarkMode
-                        ? 'bg-slate-700 text-white border-gray-600'
-                        : 'bg-white text-gray-700 border-gray-300'
+                      isDarkMode ? 'bg-slate-700 text-white border-gray-600' : 'bg-white text-gray-700 border-gray-300'
                     )}
                     placeholder="Mention relevant cases, statutes, or regulations..."
                   />
@@ -667,10 +614,7 @@ export default function Irac() {
                 <div>
                   <label
                     htmlFor="analysis"
-                    className={clsx(
-                      'block text-lg font-semibold mb-1',
-                      isDarkMode ? 'text-gray-100' : 'text-gray-700'
-                    )}
+                    className={clsx('block text-lg font-semibold mb-1', isDarkMode ? 'text-gray-100' : 'text-gray-700')}
                   >
                     Analysis
                   </label>
@@ -682,9 +626,7 @@ export default function Irac() {
                     rows={6}
                     className={clsx(
                       'w-full p-3 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500',
-                      isDarkMode
-                        ? 'bg-slate-700 text-white border-gray-600'
-                        : 'bg-white text-gray-700 border-gray-300'
+                      isDarkMode ? 'bg-slate-700 text-white border-gray-600' : 'bg-white text-gray-700 border-gray-300'
                     )}
                     placeholder="Apply the rule to the facts..."
                   />
@@ -695,10 +637,7 @@ export default function Irac() {
                   <div>
                     <label
                       htmlFor="counterAnalysis"
-                      className={clsx(
-                        'block text-lg font-semibold mb-1',
-                        isDarkMode ? 'text-gray-100' : 'text-gray-700'
-                      )}
+                      className={clsx('block text-lg font-semibold mb-1', isDarkMode ? 'text-gray-100' : 'text-gray-700')}
                     >
                       Counter-Analysis or Opposing Arguments
                     </label>
@@ -710,9 +649,7 @@ export default function Irac() {
                       rows={4}
                       className={clsx(
                         'w-full p-3 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500',
-                        isDarkMode
-                          ? 'bg-slate-700 text-white border-gray-600'
-                          : 'bg-white text-gray-700 border-gray-300'
+                        isDarkMode ? 'bg-slate-700 text-white border-gray-600' : 'bg-white text-gray-700 border-gray-300'
                       )}
                       placeholder="Explore potential arguments the opposing side might raise..."
                     />
@@ -723,10 +660,7 @@ export default function Irac() {
                 <div>
                   <label
                     htmlFor="conclusion"
-                    className={clsx(
-                      'block text-lg font-semibold mb-1',
-                      isDarkMode ? 'text-gray-100' : 'text-gray-700'
-                    )}
+                    className={clsx('block text-lg font-semibold mb-1', isDarkMode ? 'text-gray-100' : 'text-gray-700')}
                   >
                     Conclusion
                   </label>
@@ -738,9 +672,7 @@ export default function Irac() {
                     rows={3}
                     className={clsx(
                       'w-full p-3 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500',
-                      isDarkMode
-                        ? 'bg-slate-700 text-white border-gray-600'
-                        : 'bg-white text-gray-700 border-gray-300'
+                      isDarkMode ? 'bg-slate-700 text-white border-gray-600' : 'bg-white text-gray-700 border-gray-300'
                     )}
                     placeholder="Summarize the final outcome or result..."
                   />
@@ -897,10 +829,7 @@ export default function Irac() {
                     />
                     <label
                       htmlFor="includeCounterAnalysis"
-                      className={clsx(
-                        'ml-3',
-                        isDarkMode ? 'text-white' : 'text-gray-700'
-                      )}
+                      className={clsx('ml-3', isDarkMode ? 'text-white' : 'text-gray-700')}
                     >
                       Include Counter-Analysis
                     </label>
@@ -962,7 +891,7 @@ export default function Irac() {
                     </select>
                   </div>
 
-                  {/* Action Buttons */}
+                  {/* Action Buttons – Both buttons are now in the same row without extra top margin */}
                   <div className="flex justify-end space-x-4">
                     <button
                       type="button"
@@ -970,11 +899,7 @@ export default function Irac() {
                         closeConfigModal();
                         generateIracAI();
                       }}
-                      className={clsx(
-                        'relative h-12 w-full sm:w-56 overflow-hidden rounded bg-blue-950 text-white shadow-lg transition-colors duration-200',
-                        'before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 ' +
-                          'before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-56'
-                      )}
+                      className="group relative h-12 w-full sm:w-56 overflow-hidden rounded bg-gradient-to-r from-blue-600 to-blue-800 text-white text-sm sm:text-base shadow hover:opacity-90 transition-all duration-200 flex items-center justify-center gradientShadowHoverBlue"
                       aria-label="Generate IRAC"
                     >
                       Generate IRAC
@@ -982,12 +907,7 @@ export default function Irac() {
                     <button
                       type="button"
                       onClick={closeConfigModal}
-                      className={clsx(
-                        'h-10 sm:h-12 px-6 py-2 rounded text-sm sm:text-base transition-colors duration-200',
-                        isDarkMode
-                          ? 'bg-gray-600 hover:bg-gray-500 text-gray-300'
-                          : 'bg-gray-300 hover:bg-gray-400 text-gray-700'
-                      )}
+                      className="group relative h-12 w-full sm:w-56 overflow-hidden rounded bg-gradient-to-r from-blue-600 to-blue-800 text-white text-sm sm:text-base shadow hover:opacity-90 transition-all duration-200 flex items-center justify-center gradientShadowHoverBlue"
                       aria-label="Cancel Configuration"
                     >
                       Cancel
@@ -1038,9 +958,7 @@ export default function Irac() {
                   Load Saved Progress
                 </h2>
                 {savedProgresses.length === 0 ? (
-                  <p
-                    className={clsx(isDarkMode ? 'text-gray-300' : 'text-gray-700')}
-                  >
+                  <p className={clsx(isDarkMode ? 'text-gray-300' : 'text-gray-700')}>
                     No saved progresses found.
                   </p>
                 ) : (
@@ -1055,61 +973,25 @@ export default function Irac() {
                       >
                         <div className="flex justify-between items-start">
                           <div>
-                            <p
-                              className={clsx(
-                                'font-semibold',
-                                isDarkMode ? 'text-blue-300' : 'text-blue-900'
-                              )}
-                            >
+                            <p className={clsx('font-semibold', isDarkMode ? 'text-blue-300' : 'text-blue-900')}>
                               IRAC Template: {progress.examConfig.templateType}
                             </p>
-                            <p
-                              className={clsx(
-                                'text-sm',
-                                isDarkMode ? 'text-gray-300' : 'text-gray-600'
-                              )}
-                            >
+                            <p className={clsx('text-sm', isDarkMode ? 'text-gray-300' : 'text-gray-600')}>
                               Legal Area: {progress.examConfig.legalArea}
                             </p>
-                            <p
-                              className={clsx(
-                                'text-sm',
-                                isDarkMode ? 'text-gray-300' : 'text-gray-600'
-                              )}
-                            >
+                            <p className={clsx('text-sm', isDarkMode ? 'text-gray-300' : 'text-gray-600')}>
                               Detail Level: {progress.examConfig.detailLevel}
                             </p>
-                            <p
-                              className={clsx(
-                                'text-sm',
-                                isDarkMode ? 'text-gray-300' : 'text-gray-600'
-                              )}
-                            >
-                              Include Counter-Analysis:{' '}
-                              {progress.examConfig.includeCounterAnalysis ? 'Yes' : 'No'}
+                            <p className={clsx('text-sm', isDarkMode ? 'text-gray-300' : 'text-gray-600')}>
+                              Include Counter-Analysis: {progress.examConfig.includeCounterAnalysis ? 'Yes' : 'No'}
                             </p>
-                            <p
-                              className={clsx(
-                                'text-sm',
-                                isDarkMode ? 'text-gray-300' : 'text-gray-600'
-                              )}
-                            >
+                            <p className={clsx('text-sm', isDarkMode ? 'text-gray-300' : 'text-gray-600')}>
                               Number of IRAC Entries: {progress.examConfig.numberOfIrac}
                             </p>
-                            <p
-                              className={clsx(
-                                'text-sm',
-                                isDarkMode ? 'text-gray-300' : 'text-gray-600'
-                              )}
-                            >
+                            <p className={clsx('text-sm', isDarkMode ? 'text-gray-300' : 'text-gray-600')}>
                               Scenario: {progress.scenario || '(None)'}
                             </p>
-                            <p
-                              className={clsx(
-                                'text-sm',
-                                isDarkMode ? 'text-gray-300' : 'text-gray-600'
-                              )}
-                            >
+                            <p className={clsx('text-sm', isDarkMode ? 'text-gray-300' : 'text-gray-600')}>
                               Saved on: {new Date(progress.timestamp).toLocaleString()}
                             </p>
                           </div>
@@ -1117,10 +999,7 @@ export default function Irac() {
                             <button
                               onClick={() => handleLoadProgress(progress)}
                               className={clsx(
-                                'h-10 w-20 sm:w-24 overflow-hidden rounded transition-colors duration-200 text-sm sm:text-base',
-                                isDarkMode
-                                  ? 'bg-blue-600 hover:bg-blue-700 text-white'
-                                  : 'bg-blue-600 hover:bg-blue-700 text-white'
+                                'group relative h-12 w-full sm:w-56 overflow-hidden rounded bg-gradient-to-r from-blue-600 to-blue-800 text-white text-sm sm:text-base shadow hover:opacity-90 transition-all duration-200 flex items-center justify-center'
                               )}
                               aria-label="Load Progress"
                             >
@@ -1129,10 +1008,7 @@ export default function Irac() {
                             <button
                               onClick={() => handleDeleteProgress(progress.id)}
                               className={clsx(
-                                'h-10 w-20 sm:w-24 overflow-hidden rounded transition-colors duration-200 text-sm sm:text-base',
-                                isDarkMode
-                                  ? 'bg-red-600 hover:bg-red-700 text-white'
-                                  : 'bg-red-600 hover:bg-red-700 text-white'
+                                'group relative h-12 w-full sm:w-56 overflow-hidden rounded bg-gradient-to-r from-red-600 to-red-700 text-white text-sm sm:text-base shadow hover:opacity-90 transition-all duration-200 flex items-center justify-center'
                               )}
                               aria-label="Delete Progress"
                             >
@@ -1149,10 +1025,7 @@ export default function Irac() {
                     type="button"
                     onClick={closeLoadProgressModal}
                     className={clsx(
-                      'h-10 sm:h-12 px-6 py-2 rounded text-sm sm:text-base transition-colors duration-200',
-                      isDarkMode
-                        ? 'bg-gray-600 hover:bg-gray-500 text-gray-300'
-                        : 'bg-gray-300 hover:bg-gray-400 text-gray-700'
+                      'group relative h-12 w-full sm:w-56 overflow-hidden rounded bg-gradient-to-r from-blue-600 to-blue-800 text-white text-sm sm:text-base shadow hover:opacity-90 transition-all duration-200 flex items-center justify-center'
                     )}
                     aria-label="Close Load Progress Modal"
                   >
@@ -1193,29 +1066,23 @@ export default function Irac() {
                   <p>No favorite case briefs found.</p>
                 ) : (
                   <ul className="space-y-4">
-                    {favoriteBriefs.map((fav) => {
-                      // 'fav.briefSummary' holds the actual summary
-                      return (
-                        <li
-                          key={fav.id}
-                          className={clsx(
-                            'p-4 border rounded cursor-pointer hover:bg-blue-100',
-                            isDarkMode
-                              ? 'border-gray-600 hover:bg-white/10'
-                              : 'border-gray-300'
-                          )}
-                          onClick={() => handleImportBrief(fav.briefSummary || {})}
-                        >
-                          <p className="font-semibold text-sm mb-1">
-                            {fav.title || 'Untitled Case'}
-                          </p>
-                          <p className="text-xs text-gray-400">
-                            {fav.jurisdiction} | {fav.decisionDate}
-                          </p>
-                          {/* Possibly show a snippet of facts or ruleOfLaw */}
-                        </li>
-                      );
-                    })}
+                    {favoriteBriefs.map((fav) => (
+                      <li
+                        key={fav.id}
+                        className={clsx(
+                          'p-4 border rounded cursor-pointer hover:bg-blue-100',
+                          isDarkMode ? 'border-gray-600 hover:bg-white/10' : 'border-gray-300'
+                        )}
+                        onClick={() => handleImportBrief(fav.briefSummary || {})}
+                      >
+                        <p className="font-semibold text-sm mb-1">
+                          {fav.title || 'Untitled Case'}
+                        </p>
+                        <p className="text-xs text-gray-400">
+                          {fav.jurisdiction} | {fav.decisionDate}
+                        </p>
+                      </li>
+                    ))}
                   </ul>
                 )}
                 <div className="flex justify-end mt-6">
@@ -1223,10 +1090,7 @@ export default function Irac() {
                     type="button"
                     onClick={() => setIsImportModalOpen(false)}
                     className={clsx(
-                      'px-4 py-2 rounded text-sm font-semibold transition-colors duration-300',
-                      isDarkMode
-                        ? 'bg-gray-600 hover:bg-gray-500 text-gray-300'
-                        : 'bg-gray-300 hover:bg-gray-400 text-gray-700'
+                      'group relative h-12 w-full sm:w-56 overflow-hidden rounded bg-gradient-to-r from-blue-600 to-blue-800 text-white text-sm sm:text-base shadow hover:opacity-90 transition-all duration-200 flex items-center justify-center'
                     )}
                   >
                     Cancel

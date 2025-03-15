@@ -465,7 +465,7 @@ export default function AIExamFlashCard() {
               {/* Configure Button */}
               <button
                 onClick={openConfigModal}
-                className="group relative h-12 w-full sm:w-56 overflow-hidden rounded bg-gradient-to-r from-blue-600 to-blue-800 text-white text-sm sm:text-base shadow hover:opacity-90 transition-all duration-200 flex items-center justify-center"
+                className="group relative h-12 w-full sm:w-56 overflow-hidden rounded bg-gradient-to-r from-blue-600 to-blue-800 text-white text-sm sm:text-base shadow hover:opacity-90 transition-all duration-200 flex items-center justify-center gradientShadowHoverBlue"
                 aria-label="Configure Flashcards"
               >
                 Configure
