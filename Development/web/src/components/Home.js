@@ -222,42 +222,49 @@ export default function Home() {
 
         <VerticalDivider />
 
-        {/* Universities Section */}
-        <section>
-          <div
-            ref={uniRef}
-            className={`flex flex-col items-center px-4 md:px-8 lg:px-16 transition-all duration-1000 ${
-              uniInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
-            }`}
-          >
-            <div className="max-w-5xl w-full">
-              <h3
-                className={`text-4xl sm:text-5xl font-semibold my-8 text-center ${
-                  isDarkMode ? 'text-white' : 'text-blue-950'
-                }`}
-              >
-                Universities We Partner With
-              </h3>
-              <CarouselComponent />
+      {/* Universities Section (Commented Out) */}
+{/*
+<section>
+  <div
+    ref={uniRef}
+    className={`flex flex-col items-center px-4 md:px-8 lg:px-16 transition-all duration-1000 ${
+      uniInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+    }`}
+  >
+    <div className="max-w-5xl w-full">
+      <h3
+        className={`text-4xl sm:text-5xl font-semibold my-8 text-center ${
+          isDarkMode ? 'text-white' : 'text-blue-950'
+        }`}
+      >
+        Universities We Partner With
+      </h3>
+      <CarouselComponent />
+    </div>
+  </div>
+</section>
+*/}
 
-              <p
-                className={`mt-4 text-center text-sm ${
-                  isDarkMode ? 'text-gray-300' : 'text-gray-700'
-                }`}
-              >
-                Are you associated with a university and interested in partnering with CadexLaw?
-                Please email us at{' '}
-                <a
-                  href="mailto:businessinquires@cadexlaw.com"
-                  className="text-blue-500 hover:underline"
-                >
-                  businessinquires@cadexlaw.com
-                </a>
-                .
-              </p>
-            </div>
-          </div>
-        </section>
+{/* Keep this text active/visible */}
+<section>
+  <div className="max-w-5xl w-full mx-auto">
+    <p
+      className={`mt-4 text-center text-sm ${
+        isDarkMode ? 'text-gray-300' : 'text-gray-700'
+      }`}
+    >
+      Are you associated with a university and interested in partnering with CadexLaw?
+      Please email us at{' '}
+      <a
+        href="mailto:businessinquires@cadexlaw.com"
+        className="text-blue-500 hover:underline"
+      >
+        businessinquires@cadexlaw.com
+      </a>
+      .
+    </p>
+  </div>
+</section>
       </div>
     </section>
   );

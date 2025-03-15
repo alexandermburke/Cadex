@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import clsx from 'clsx';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaBars, FaTimes, FaSave, FaSyncAlt, FaFilePdf } from 'react-icons/fa';
+import { FaBars, FaTimes, FaSyncAlt } from 'react-icons/fa';
 import Sidebar from '../Sidebar';
 import { useRouter } from 'next/navigation';
 // Firebase
@@ -151,13 +151,13 @@ export default function AIExamFlashCard() {
       <div
         className={clsx(
           'flex items-center justify-center h-screen',
-          isDarkMode ? 'bg-slate-900 text-white' : 'bg-gray-100 text-gray-800'
+          isDarkMode ? 'bg-slate-900 text-white' : 'bg-gray-50 text-blue-950'
         )}
       >
         <div
           className={clsx(
             'p-6 rounded shadow-md text-center',
-            isDarkMode ? 'bg-slate-800 text-white' : 'bg-white text-gray-700'
+            isDarkMode ? 'bg-slate-800 text-white' : 'bg-white text-blue-950'
           )}
         >
           <p className="mb-4">Please log in to use this tool.</p>
@@ -389,7 +389,7 @@ export default function AIExamFlashCard() {
         )}
       </AnimatePresence>
 
-      {/* Main content container */}
+      {/* Main content container remains unchanged */}
       <main className="flex-1 flex flex-col px-6 relative z-200 h-screen">
         {/* Top bar */}
         <div className="flex items-center justify-between">
@@ -426,13 +426,13 @@ export default function AIExamFlashCard() {
           </button>
         </div>
 
-        {/* Container for content (mirroring IRAC styling) */}
+        {/* Container for content */}
         <motion.div
           className={clsx(
             'flex-1 w-full rounded-2xl shadow-xl p-6 overflow-y-auto',
             isDarkMode
               ? 'bg-gradient-to-br from-slate-900 to-blue-950 text-white'
-              : 'bg-white text-gray-800'
+              : 'bg-white text-blue-950'
           )}
           variants={mainContainerVariants}
           initial="hidden"
@@ -440,66 +440,49 @@ export default function AIExamFlashCard() {
         >
           {/* Top row: Timer and config buttons */}
           <div className="flex items-center justify-between mb-4">
-            <div className="text-lg font-semibold">
+            <div className="text-lg  text-center w-full">
               {timeLeft > 0 ? `Time Left: ${formatTime()}` : ''}
             </div>
             <div className="inline-flex flex-row flex-nowrap items-center gap-2 sm:gap-4">
               {/* Load Progress Button */}
               <button
-                           onClick={openLoadProgressModal}
-                           className={clsx(
-                             'flex items-center justify-center w-10 h-10 rounded-full bg-transparent',
-                             'hover:text-slate-200 transition-colors duration-200',
-                             isDarkMode ? 'text-gray-200' : 'text-blue-950'
-                           )}
-                           aria-label="Load IRAC Progress"
-                         >
-                           <motion.div
-                             whileHover={{ scale: 1.2, rotate: 360 }}
-                             transition={{ duration: 0.5 }}
-                           >
-                             <FaSyncAlt size={20} />
-                           </motion.div>
-                         </button>
+                onClick={openLoadProgressModal}
+                className={clsx(
+                  'flex items-center justify-center w-10 h-10 rounded-full bg-transparent',
+                  'hover:text-slate-200 transition-colors duration-200',
+                  isDarkMode ? 'text-gray-200' : 'text-blue-950'
+                )}
+                aria-label="Load Progress"
+              >
+                <motion.div
+                  whileHover={{ scale: 1.2, rotate: 360 }}
+                  transition={{ duration: 0.5 }}
+                >
+                  <FaSyncAlt size={20} />
+                </motion.div>
+              </button>
 
               {/* Configure Button */}
               <button
-                           onClick={openConfigModal}
-                           className={clsx(
-                             'group relative h-10 sm:h-12 px-4 sm:px-6 overflow-hidden rounded-md text-white duration-200',
-                             isDarkMode ? 'bg-blue-700' : 'bg-blue-950',
-                             'before:absolute before:right-0 before:top-0 before:h-full before:w-5 ' +
-                               'before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 ' +
-                               'before:duration-700 hover:before:-translate-x-56 text-xs sm:text-base shadow-md'
-                           )}
-                           aria-label="Configure IRAC"
-                         >
-                           Configure
-                         </button>
+                onClick={openConfigModal}
+                className="group relative h-12 w-full sm:w-56 overflow-hidden rounded bg-gradient-to-r from-blue-600 to-blue-800 text-white text-sm sm:text-base shadow hover:opacity-90 transition-all duration-200 flex items-center justify-center"
+                aria-label="Configure Flashcards"
+              >
+                Configure
+              </button>
             </div>
           </div>
 
-          {/* If no flashcards generated */}
+          {/* No flashcards generated */}
           {flashcards.length === 0 && !isLoading && (
             <div
               className={clsx(
                 'w-full max-w-3xl p-6 rounded-lg shadow-md text-center mx-auto',
-                isDarkMode ? 'bg-slate-700 text-white' : 'bg-white text-black'
+                isDarkMode ? 'bg-gray-800 text-white' : 'bg-white text-blue-950'
               )}
             >
-              <h2
-                className={clsx(
-                  'text-2xl font-semibold mb-4',
-                  isDarkMode ? 'text-white' : 'text-blue-900'
-                )}
-              >
-                No flashcards generated yet.
-              </h2>
-              <p
-                className={clsx(
-                  isDarkMode ? 'text-gray-300' : 'text-gray-500'
-                )}
-              >
+              <h2 className="text-2xl  mb-4">No flashcards generated yet.</h2>
+              <p className={clsx(isDarkMode ? 'text-gray-300' : 'text-gray-500')}>
                 Click <strong>Configure</strong> to set up your flashcards.
               </p>
             </div>
@@ -516,31 +499,26 @@ export default function AIExamFlashCard() {
               key={currentFlashcardIndex}
               className={clsx(
                 'relative w-full max-w-xl p-6 my-4 rounded-xl shadow-md',
-                isDarkMode ? 'bg-gray-800 text-white' : 'bg-white text-gray-700'
+                isDarkMode ? 'bg-gray-800 text-white' : 'bg-white text-blue-950'
               )}
               initial={{ opacity: 0, y: 50 }}
               animate={{ opacity: 1, y: 0 }}
             >
-              <h2 className="text-xl font-semibold mb-2">Question:</h2>
-              <p className="mb-4">
+              <h2 className="text-xl  mb-2 text-center">Question:</h2>
+              <p className="mb-4 text-center">
                 {flashcards[currentFlashcardIndex].question}
               </p>
 
               {isAnswerRevealed ? (
                 <>
-                  <h3
-                    className={clsx(
-                      'text-lg font-semibold mb-2',
-                      isDarkMode ? 'text-blue-300' : 'text-blue-500'
-                    )}
-                  >
+                  <h3 className="text-lg  mb-2 text-center text-blue-500">
                     Answer:
                   </h3>
-                  <p className="mb-4">
+                  <p className="mb-4 text-center">
                     {flashcards[currentFlashcardIndex].correctAnswer ||
                       flashcards[currentFlashcardIndex].answer}
                   </p>
-                  <div className="mt-4 flex justify-between">
+                  <div className="mt-4 flex justify-center space-x-4">
                     <button
                       onClick={() => recordAnswer(false)}
                       className="px-4 py-2 rounded bg-red-500 hover:bg-red-600 text-white"
@@ -558,13 +536,8 @@ export default function AIExamFlashCard() {
               ) : (
                 <div className="flex justify-center">
                   <button
-                    onClick={() => setIsAnswerRevealed(true)}
-                    className={clsx(
-                      'px-4 py-2 rounded',
-                      isDarkMode
-                        ? 'bg-blue-700 hover:bg-blue-600 text-white'
-                        : 'bg-blue-600 hover:bg-blue-700 text-white'
-                    )}
+                    onClick={handleShowAnswer}
+                    className="px-4 py-2 rounded bg-gradient-to-r from-blue-600 to-blue-800 text-white shadow hover:opacity-90 transition-all duration-200"
                   >
                     Show Answer
                   </button>
@@ -594,17 +567,17 @@ export default function AIExamFlashCard() {
             >
               <motion.div
                 className={clsx(
-                  'p-6 rounded-lg w-11/12 max-w-3xl shadow-lg overflow-y-auto max-h-screen',
-                  isDarkMode ? 'bg-gray-800 text-white' : 'bg-white text-gray-800'
+                  'p-6 rounded-lg w-11/12 max-w-2xl shadow-lg overflow-y-auto',
+                  isDarkMode ? 'bg-gray-800 text-white' : 'bg-white text-blue-950'
                 )}
                 initial={{ scale: 0.8, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 exit={{ scale: 0.8, opacity: 0 }}
                 transition={{ duration: 0.3 }}
               >
-                <h2 className="text-2xl font-semibold mb-4">Load Saved Progress</h2>
+                <h2 className="text-2xl  mb-4 text-center">Load Saved Progress</h2>
                 {savedProgresses.length === 0 ? (
-                  <p>No saved progress found.</p>
+                  <p className="text-center">No saved progress found.</p>
                 ) : (
                   <ul className="space-y-4">
                     {savedProgresses.map((prog) => (
@@ -617,7 +590,7 @@ export default function AIExamFlashCard() {
                       >
                         <div className="flex justify-between items-start">
                           <div>
-                            <p className="font-semibold text-blue-400 mb-1">
+                            <p className=" text-blue-400 mb-1">
                               Study Year: {prog.studyConfig?.studyYear}
                             </p>
                             <p className="text-sm">Proficiency: {prog.studyConfig?.proficiency}</p>
@@ -641,19 +614,13 @@ export default function AIExamFlashCard() {
                           <div className="flex space-x-2">
                             <button
                               onClick={() => handleLoadProgress(prog)}
-                              className={clsx(
-                                'h-10 w-20 sm:w-24 overflow-hidden rounded transition-colors duration-200 text-sm sm:text-base',
-                                isDarkMode
-                                  ? 'bg-blue-700 hover:bg-blue-600'
-                                  : 'bg-blue-700 hover:bg-blue-800',
-                                'text-white'
-                              )}
+                              className="h-10 w-20 sm:w-24 overflow-hidden rounded bg-gradient-to-r from-blue-600 to-blue-800 text-white transition-all duration-200 text-sm sm:text-base flex items-center justify-center"
                             >
                               Load
                             </button>
                             <button
                               onClick={() => handleDeleteProgress(prog.id)}
-                              className="h-10 w-20 sm:w-24 overflow-hidden rounded bg-red-600 text-white transition-colors duration-200 hover:bg-red-700 text-sm sm:text-base"
+                              className="h-10 w-20 sm:w-24 overflow-hidden rounded bg-red-600 text-white transition-colors duration-200 hover:bg-red-700 text-sm sm:text-base flex items-center justify-center"
                             >
                               Delete
                             </button>
@@ -663,14 +630,14 @@ export default function AIExamFlashCard() {
                     ))}
                   </ul>
                 )}
-                <div className="text-right mt-4">
+                <div className="text-center mt-4">
                   <button
                     onClick={closeLoadProgressModal}
                     className={clsx(
                       'h-10 sm:h-12 px-4 py-2 rounded',
                       isDarkMode
                         ? 'bg-gray-700 hover:bg-gray-600 text-white'
-                        : 'bg-gray-300 hover:bg-gray-400 text-gray-800'
+                        : 'bg-gray-300 hover:bg-gray-400 text-blue-950'
                     )}
                   >
                     Close
@@ -692,15 +659,15 @@ export default function AIExamFlashCard() {
             >
               <motion.div
                 className={clsx(
-                  'p-6 rounded-lg w-11/12 max-w-3xl shadow-lg max-h-[80vh] overflow-y-auto',
-                  isDarkMode ? 'bg-gray-800 text-white' : 'bg-white text-gray-800'
+                  'p-6 rounded-lg w-11/12 max-w-2xl shadow-lg max-h-[80vh] overflow-y-auto',
+                  isDarkMode ? 'bg-gray-800 text-white' : 'bg-white text-blue-950'
                 )}
                 initial={{ scale: 0.8, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 exit={{ scale: 0.8, opacity: 0 }}
                 transition={{ duration: 0.3 }}
               >
-                <h2 className="text-2xl font-semibold mb-4">Final Feedback</h2>
+                <h2 className="text-2xl  mb-4 text-center">Final Feedback</h2>
                 {answeredFlashcards.map((card, idx) => (
                   <div
                     key={idx}
@@ -709,35 +676,25 @@ export default function AIExamFlashCard() {
                       isDarkMode ? 'border-gray-700' : 'border-gray-300'
                     )}
                   >
-                    <p
-                      className={clsx(
-                        'font-semibold mb-1',
-                        isDarkMode ? 'text-blue-300' : 'text-blue-900'
-                      )}
-                    >
+                    <p className={clsx(' mb-1', isDarkMode ? 'text-blue-300' : 'text-blue-900')}>
                       Flashcard {idx + 1}
                     </p>
-                    <p>
+                    <p className="text-center">
                       <strong>Question:</strong> {card.question}
                     </p>
-                    <p>
+                    <p className="text-center">
                       <strong>Answer:</strong> {card.correctAnswer || card.answer}
                     </p>
-                    <p
-                      className={clsx(
-                        'font-bold mt-1',
-                        card.isCorrect ? 'text-emerald-500' : 'text-red-500'
-                      )}
-                    >
+                    <p className={clsx('font-bold mt-1 text-center', card.isCorrect ? 'text-emerald-500' : 'text-red-500')}>
                       {card.isCorrect ? '✓ You got it right' : '✗ You got it wrong'}
                     </p>
                   </div>
                 ))}
-                <div className="text-right mt-4">
+                <div className="text-center mt-4">
                   <button
                     onClick={closeFinalFeedbackModal}
                     className={clsx(
-                      'h-10 sm:h-12 px-4 py-2 rounded font-semibold',
+                      'h-10 sm:h-12 px-4 py-2 rounded ',
                       isDarkMode
                         ? 'bg-blue-700 hover:bg-blue-600 text-white'
                         : 'bg-blue-600 hover:bg-blue-700 text-white'
@@ -755,9 +712,7 @@ export default function AIExamFlashCard() {
         <AnimatePresence>
           {isConfigModalOpen && (
             <motion.div
-              className={clsx(
-                'fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 overflow-y-scroll'
-              )}
+              className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 overflow-y-scroll"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
@@ -765,7 +720,7 @@ export default function AIExamFlashCard() {
               <motion.div
                 className={clsx(
                   'w-11/12 max-w-lg p-6 rounded shadow-lg overflow-y-auto',
-                  isDarkMode ? 'bg-gray-800 text-white' : 'bg-white text-gray-800'
+                  isDarkMode ? 'bg-gray-800 text-white' : 'bg-white text-blue-950'
                 )}
                 initial={{ scale: 0.8, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
@@ -773,7 +728,7 @@ export default function AIExamFlashCard() {
                 transition={{ duration: 0.3 }}
               >
                 <div className="flex justify-between items-center mb-4">
-                  <h2 className="text-xl font-semibold">Flashcard Configuration</h2>
+                  <h2 className="text-xl  text-center w-full">Flashcard Configuration</h2>
                   <button
                     onClick={closeConfigModal}
                     className={clsx(
@@ -787,7 +742,7 @@ export default function AIExamFlashCard() {
 
                 {/* Study Year */}
                 <div className="mb-4">
-                  <label className="block font-semibold mb-1">Year/Level:</label>
+                  <label className="block  mb-1">Year/Level:</label>
                   <select
                     name="studyYear"
                     value={studyConfig.studyYear}
@@ -807,7 +762,7 @@ export default function AIExamFlashCard() {
 
                 {/* Proficiency */}
                 <div className="mb-4">
-                  <label className="block font-semibold mb-1">Proficiency:</label>
+                  <label className="block  mb-1">Proficiency:</label>
                   <select
                     name="proficiency"
                     value={studyConfig.proficiency}
@@ -827,7 +782,7 @@ export default function AIExamFlashCard() {
 
                 {/* Course Name */}
                 <div className="mb-4">
-                  <label className="block font-semibold mb-1">Course/Subject:</label>
+                  <label className="block  mb-1">Course/Subject:</label>
                   <select
                     name="courseName"
                     value={studyConfig.courseName}
@@ -847,7 +802,7 @@ export default function AIExamFlashCard() {
 
                 {/* Number of flashcards */}
                 <div className="mb-4">
-                  <label className="block font-semibold mb-1">Number of Flashcards:</label>
+                  <label className="block  mb-1">Number of Flashcards:</label>
                   <input
                     type="range"
                     min="1"
@@ -862,7 +817,7 @@ export default function AIExamFlashCard() {
 
                 {/* Timer field (minutes) */}
                 <div className="mb-4">
-                  <label className="block font-semibold mb-1">Timer (in minutes):</label>
+                  <label className="block  mb-1">Timer (in minutes):</label>
                   <input
                     type="number"
                     min="0"
@@ -890,7 +845,7 @@ export default function AIExamFlashCard() {
                     onChange={handleConfigChange}
                     className="mr-2"
                   />
-                  <label className="font-semibold text-sm">Reset Timer On Each Question</label>
+                  <label className=" text-sm">Reset Timer On Each Question</label>
                 </div>
 
                 {/* Instant Feedback */}
@@ -902,7 +857,7 @@ export default function AIExamFlashCard() {
                     onChange={handleConfigChange}
                     className="mr-2"
                   />
-                  <label className="font-semibold text-sm">
+                  <label className=" text-sm">
                     Instant Feedback (reveal answer immediately upon marking correct/wrong)
                   </label>
                 </div>
@@ -916,7 +871,7 @@ export default function AIExamFlashCard() {
                     onChange={handleConfigChange}
                     className="mr-2"
                   />
-                  <label className="font-semibold text-sm">Include Extended Explanations</label>
+                  <label className=" text-sm">Include Extended Explanations</label>
                 </div>
 
                 {/* Action Buttons */}
@@ -924,22 +879,10 @@ export default function AIExamFlashCard() {
                   <button
                     type="button"
                     onClick={handleGenerateFlashcards}
-                    className={clsx(
-                      'relative h-12 w-full sm:w-56 overflow-hidden rounded bg-blue-950 text-white shadow-lg transition-colors duration-200',
-                      'before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 ' +
-                        'before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-56'
-                    )}
+                    className="relative h-12 w-full sm:w-56 overflow-hidden rounded bg-gradient-to-r from-blue-600 to-blue-800 text-white text-sm sm:text-base shadow hover:opacity-90 transition-all duration-200 flex items-center justify-center"
                     aria-label="Start Flashcards"
                   >
                     Start Flashcards
-                    <motion.span
-                      className="absolute right-4 top-3"
-                      initial={{ x: -10, opacity: 0 }}
-                      animate={{ x: 0, opacity: 1 }}
-                      transition={{ delay: 0.3, duration: 0.3 }}
-                    >
-                      <i className="fa-solid fa-arrow-right"></i>
-                    </motion.span>
                   </button>
                   <button
                     type="button"
@@ -947,81 +890,11 @@ export default function AIExamFlashCard() {
                     className={clsx(
                       'h-10 sm:h-12 px-6 py-2 rounded text-sm sm:text-base transition-colors duration-200',
                       isDarkMode
-                        ? 'bg-gray-600 text-gray-300 hover:bg-gray-500'
-                        : 'bg-gray-300 text-gray-700 hover:bg-gray-400'
+                        ? 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                        : 'bg-gray-300 text-blue-950 hover:bg-gray-400'
                     )}
                   >
                     Cancel
-                  </button>
-                </div>
-              </motion.div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* Final Feedback Modal */}
-        <AnimatePresence>
-          {isFinalFeedbackModalOpen && (
-            <motion.div
-              className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-            >
-              <motion.div
-                className={clsx(
-                  'p-6 rounded-lg w-11/12 max-w-3xl shadow-lg max-h-[80vh] overflow-y-auto',
-                  isDarkMode ? 'bg-gray-800 text-white' : 'bg-white text-gray-800'
-                )}
-                initial={{ scale: 0.8, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                exit={{ scale: 0.8, opacity: 0 }}
-                transition={{ duration: 0.3 }}
-              >
-                <h2 className="text-2xl font-semibold mb-4">Final Feedback</h2>
-                {answeredFlashcards.map((card, idx) => (
-                  <div
-                    key={idx}
-                    className={clsx(
-                      'mb-4 p-4 rounded border',
-                      isDarkMode ? 'border-gray-700' : 'border-gray-300'
-                    )}
-                  >
-                    <p
-                      className={clsx(
-                        'font-semibold mb-1',
-                        isDarkMode ? 'text-blue-300' : 'text-blue-900'
-                      )}
-                    >
-                      Flashcard {idx + 1}
-                    </p>
-                    <p>
-                      <strong>Question:</strong> {card.question}
-                    </p>
-                    <p>
-                      <strong>Answer:</strong> {card.correctAnswer || card.answer}
-                    </p>
-                    <p
-                      className={clsx(
-                        'font-bold mt-1',
-                        card.isCorrect ? 'text-emerald-500' : 'text-red-500'
-                      )}
-                    >
-                      {card.isCorrect ? '✓ You got it right' : '✗ You got it wrong'}
-                    </p>
-                  </div>
-                ))}
-                <div className="text-right mt-4">
-                  <button
-                    onClick={closeFinalFeedbackModal}
-                    className={clsx(
-                      'h-10 sm:h-12 px-4 py-2 rounded font-semibold',
-                      isDarkMode
-                        ? 'bg-blue-700 hover:bg-blue-600 text-white'
-                        : 'bg-blue-600 hover:bg-blue-700 text-white'
-                    )}
-                  >
-                    Close
                   </button>
                 </div>
               </motion.div>

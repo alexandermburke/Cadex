@@ -2,14 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ------------------------------
-   Your global custom CSS starts 
-   ------------------------------ */
-
-/* ------------------------------
-   Existing animations & classes
-   ------------------------------ */
-
 @keyframes fadeInSlide {
     0% {
         opacity: 0;
@@ -32,11 +24,11 @@ html {
 }
 
 .image-container {
-  width: 600px; /* Specify the size you want */
-  height: 800px; /* Specify the size you want */
+  width: 600px; 
+  height: 800px; 
   overflow: hidden;
   position: relative;
-  flex: none; /* Prevents images from stretching */
+  flex: none; 
 }
 
 .image {
@@ -161,7 +153,6 @@ html {
   }
 }
 
-/* Animation for dropdown */
 @keyframes dropdown {
   from {
     opacity: 0;
@@ -177,7 +168,6 @@ html {
   animation: dropdown 0.3s ease-out forwards;
 }
 
-/* Flare animation for "Your Legal Practice" */
 .flare-letter {
   display: inline-block;
   background: linear-gradient(30deg, #D4B44A, #ecddaa);
@@ -193,9 +183,9 @@ html {
   top: 0;
   left: 0;
   color: white;
-  background: none; /* Ensure no background on pseudo-element */
+  background: none; 
   -webkit-background-clip: unset;
-  -webkit-text-fill-color: white; /* Fills the text with white */
+  -webkit-text-fill-color: white; 
   opacity: 0;
   animation: flareAnimation 3.5s forwards;
   animation-delay: var(--animation-delay);
@@ -212,27 +202,20 @@ html {
   }
 }
 
-/* ------------------------------
-   Apple-like toggle switches
-   ------------------------------ */
-
-/* Base styles for the hidden checkbox */
 .toggle-checkbox {
   height: 0;
   width: 0;
   visibility: hidden;
 }
 
-/* The background (track) of the toggle */
 .toggle-label {
   display: block;
   position: relative;
   cursor: pointer;
-  background-color: #d1d5db; /* Tailwind gray-300 */
+  background-color: #d1d5db; 
   transition: background-color 0.3s ease-in-out;
 }
 
-/* The circle ("thumb") inside the toggle */
 .toggle-label::after {
   content: '';
   position: absolute;
@@ -247,21 +230,14 @@ html {
   transition: transform 0.3s ease-in-out;
 }
 
-/* When checked, change background color and move the toggle circle */
 .toggle-checkbox:checked + .toggle-label {
-  background-color: #2563eb; /* Tailwind blue-950 */
+  background-color: #2563eb; 
 }
 
 .toggle-checkbox:checked + .toggle-label::after {
   transform: translate(1.6rem, -50%);
 }
 
-/* ------------------------------
-   NEW: Swirling AI-like background animation 
-   and snowflake effect 
-   ------------------------------ */
-
-/* Keyframe for the swirling color animation */
 @keyframes windBlow {
   0% {
     background-position: 0% 50%;
@@ -274,13 +250,11 @@ html {
   }
 }
 
-/* Animated swirl background */
 .animatedBackground {
   position: absolute;
   inset: 0;
   background: linear-gradient(
     70deg,
-    /* AI-inspired bright colors */
     #f43f5e,
     #ec4899,
     #6366f1,
@@ -292,7 +266,6 @@ html {
   z-index: 0;
 }
 
-/* Keyframe for snowflake fall */
 @keyframes snowfall {
   0% {
     transform: translateY(-10%) rotate(0deg);
@@ -302,7 +275,6 @@ html {
   }
 }
 
-/* Snowflake container sits on top of background, behind main content */
 .snowflake-container {
   position: absolute;
   top: 0;
@@ -314,7 +286,6 @@ html {
   z-index: 10;
 }
 
-/* Each snowflake element */
 .snowflake {
   position: absolute;
   top: -5%;
@@ -322,25 +293,18 @@ html {
   will-change: transform;
 }
 
-/* ------------------------------
-   NEW: Infinite SVG Flowing Line Animation
-   ------------------------------ */
-
-/* Updated .flowing-line class for infinite animation */
 .flowing-line {
-  stroke-dasharray: 1000; /* Placeholder value; should match path length */
-  stroke-dashoffset: 1000; /* Start with dash offset equal to dash array */
+  stroke-dasharray: 1000;
+  stroke-dashoffset: 1000;
   animation: draw 15s linear infinite;
 }
 
-/* Updated @keyframes for continuous flow */
 @keyframes draw {
   to {
     stroke-dashoffset: 0;
   }
 }
 
-/* Existing delay classes */
 .delay-1 {
   animation-delay: 1s;
 }
@@ -393,7 +357,6 @@ html {
   animation-delay: 13s;
 }
 
-/* In your global CSS or a suitable location */
 @keyframes dash {
   0% {
     stroke-dasharray: 1, 100;
@@ -411,5 +374,27 @@ html {
 
 .animate-progress {
   animation: dash 1.5s ease-in-out infinite;
-  stroke: currentColor; /* So it inherits text-blue-500 from Tailwind */
+  stroke: currentColor; 
+}
+
+.gradientShadowHoverBlue {
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
+}
+
+.gradientShadowHoverBlue:hover {
+  box-shadow: 
+    0 0 4px 1px rgba(59, 130, 246, 0.5),  
+    0 0 10px 2px rgba(30, 64, 175, 0.3);  
+  transform: translateY(-2px);          
+}
+
+.gradientShadowHoverWhite {
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
+}
+
+.gradientShadowHoverWhite:hover {
+  box-shadow: 
+    0 0 4px 1px rgba(255, 255, 255, 0.3),  
+    0 0 10px 2px rgba(30, 64, 175, 0.15);  
+  transform: translateY(-2px);          
 }

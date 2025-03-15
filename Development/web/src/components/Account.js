@@ -270,7 +270,7 @@ export default function Account() {
                 className={`
                   group relative h-12 w-full sm:w-56 overflow-hidden rounded bg-gradient-to-r
                   from-blue-600 to-blue-800 text-white text-sm sm:text-base shadow hover:opacity-90
-                  transition-all duration-200 flex items-center justify-center
+                  transition-all duration-200 flex items-center justify-center gradientShadowHoverBlue
                 `}
               >
                 <span className="font-semibold">Upgrade Account</span>
@@ -285,7 +285,7 @@ export default function Account() {
                 className={`
                   group relative h-12 w-full sm:w-56 overflow-hidden rounded bg-gradient-to-r
                   from-gray-600 to-gray-700 text-white text-sm sm:text-base shadow hover:opacity-90
-                  transition-all duration-200 flex items-center justify-center
+                  transition-all duration-200 flex items-center justify-center gradientShadowHoverWhite
                 `}
               >
                 <span className="font-semibold">Cancel Subscription</span>
@@ -422,10 +422,11 @@ export default function Account() {
 
       {/* Update Log Button */}
       <div className="flex justify-center mt-4">
-        <button
-          onClick={() => setShowUpdateLog(true)}
-          className="group relative h-12 w-full sm:w-56 overflow-hidden rounded bg-gradient-to-r from-blue-600 to-blue-800 text-white text-sm sm:text-base shadow hover:opacity-90 transition-all duration-200 flex items-center justify-center"
-        >
+      <button
+  onClick={() => setShowUpdateLog(true)}
+  className="
+    group relative h-12 w-full sm:w-56 overflow-hidden rounded bg-gradient-to-r from-blue-600 to-blue-800 text-white text-sm sm:text-base shadow transition-all duration-300 flex items-center justify-center gradientShadowHoverBlue"
+          >
           <span className="font-semibold">Update Log</span>
         </button>
       </div>
