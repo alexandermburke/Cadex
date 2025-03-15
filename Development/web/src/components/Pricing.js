@@ -58,7 +58,7 @@ const plans = [
         info: 'Timed practice exams plus deeper analytics on strengths and weaknesses.',
       },
       {
-        text: 'IRAC Generator & Issue Spotter',
+        text: 'IRAC Drafting & Issue Spotter',
         info: 'Quickly generate IRAC outlines for assignments, exams, or practice scenarios.',
       },
       {

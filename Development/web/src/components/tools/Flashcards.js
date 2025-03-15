@@ -879,7 +879,7 @@ export default function AIExamFlashCard() {
                   <button
                     type="button"
                     onClick={handleGenerateFlashcards}
-                    className="relative h-12 w-full sm:w-56 overflow-hidden rounded bg-gradient-to-r from-blue-600 to-blue-800 text-white text-sm sm:text-base shadow hover:opacity-90 transition-all duration-200 flex items-center justify-center"
+                    className="relative h-12 w-full sm:w-56 overflow-hidden rounded bg-gradient-to-r from-blue-600 to-blue-800 text-white text-sm sm:text-base shadow hover:opacity-90 transition-all duration-200 flex items-center justify-center gradientShadowHoverBlue"
                     aria-label="Start Flashcards"
                   >
                     Start Flashcards
@@ -888,7 +888,7 @@ export default function AIExamFlashCard() {
                     type="button"
                     onClick={closeConfigModal}
                     className={clsx(
-                      'h-10 sm:h-12 px-6 py-2 rounded text-sm sm:text-base transition-colors duration-200',
+                      'h-10 sm:h-12 px-6 py-2 rounded text-sm sm:text-base transition-colors duration-200 gradientShadowHoverWhite',
                       isDarkMode
                         ? 'bg-gray-700 text-gray-300 hover:bg-gray-600'
                         : 'bg-gray-300 text-blue-950 hover:bg-gray-400'

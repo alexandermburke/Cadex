@@ -1,8 +1,17 @@
 'use client';
-
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaBars, FaTimes, FaHeart, FaRegHeart, FaPlus, FaSearch } from 'react-icons/fa';
+import {
+  FaBars,
+  FaTimes,
+  FaSearch,
+  FaHeart,
+  FaRegHeart,
+  FaChevronLeft,
+  FaChevronRight,
+  FaChevronUp,
+  FaChevronDown
+} from 'react-icons/fa';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import Sidebar from '../Sidebar';
@@ -16,91 +25,90 @@ import {
   arrayUnion,
   arrayRemove,
 } from 'firebase/firestore';
-
-// Import your extended local dictionary here:
 import localDictionary from '@/context/LocalDictionary';
 
 export default function LegalDictionary() {
   const router = useRouter();
   const { currentUser, userDataObj } = useAuth();
   const isDarkMode = userDataObj?.darkMode || false;
-
-  // Sidebar visibility
   const [isSidebarVisible, setIsSidebarVisible] = useState(true);
   const toggleSidebar = () => setIsSidebarVisible(!isSidebarVisible);
 
-  // Search bar state
+  const [activeTab, setActiveTab] = useState('browse');
   const [searchQuery, setSearchQuery] = useState('');
-
-  // All dictionary terms (merged from local + Firestore)
   const [dictionaryTerms, setDictionaryTerms] = useState([]);
-
-  // Loading state for Firestore fetch
   const [isLoading, setIsLoading] = useState(false);
-
-  // Favorites from user data (array of term IDs)
   const [favoriteTermIds, setFavoriteTermIds] = useState([]);
-
-  // Track expanded/collapsed definitions
   const [expandedTerm, setExpandedTerm] = useState(null);
 
-  // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 21;
+  const [pageDirection, setPageDirection] = useState(0);
+  const [itemsPerPage, setItemsPerPage] = useState(21);
 
-  // Reset pagination when search query changes
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [searchQuery]);
-
-  // Check if current user is admin for adding new terms
-  const isAdmin = userDataObj?.role === 'admin';
-
-  // Add-new-term form states
   const [newTermName, setNewTermName] = useState('');
   const [newTermDefinition, setNewTermDefinition] = useState('');
   const [newTermSynonyms, setNewTermSynonyms] = useState('');
   const [newTermReferences, setNewTermReferences] = useState('');
-  const [showAddForm, setShowAddForm] = useState(false);
+  const [autoGenerate, setAutoGenerate] = useState(false);
 
-  // ============================================================
-  // 1. Fetch dictionary data from Firestore & merge with local
-  // ============================================================
+  const [showGotoInput, setShowGotoInput] = useState(false);
+  const [gotoValue, setGotoValue] = useState('');
+  const [showAdvanced, setShowAdvanced] = useState(false);
+  const [sortBy, setSortBy] = useState('');
+
+  const pageVariants = {
+    initial: (direction) => ({
+      x: direction > 0 ? 300 : -300,
+      opacity: 0,
+    }),
+    animate: { x: 0, opacity: 1 },
+    exit: (direction) => ({
+      x: direction > 0 ? -300 : 300,
+      opacity: 0,
+    }),
+  };
+
+  useEffect(() => {
+    const updateItemsPerPage = () => {
+      let numCols = 2;
+      if (window.innerWidth >= 1024) numCols = 5;
+      else if (window.innerWidth >= 640) numCols = 3;
+      const offset = 250;
+      const availableHeight = window.innerHeight - offset;
+      const itemHeight = 220;
+      const numRows = Math.floor(availableHeight / itemHeight);
+      const newItems = numRows * numCols;
+      setItemsPerPage(newItems > 0 ? newItems : 1);
+    };
+    updateItemsPerPage();
+    window.addEventListener('resize', updateItemsPerPage);
+    return () => window.removeEventListener('resize', updateItemsPerPage);
+  }, []);
+
   useEffect(() => {
     const fetchDictionary = async () => {
       setIsLoading(true);
       try {
-        // Fetch Firestore-based dictionary
         const colRef = collection(db, 'legalDictionary');
         const snapshot = await getDocs(colRef);
-
         let firestoreTerms = [];
         snapshot.forEach((docItem) => {
           firestoreTerms.push({ id: docItem.id, ...docItem.data() });
         });
-
-        // Combine local + Firestore terms
-        const combinedTerms = [...localDictionary, ...firestoreTerms];
-
-        // Sort by name for convenience
-        combinedTerms.sort((a, b) =>
-          a.name.toLowerCase() > b.name.toLowerCase() ? 1 : -1
+        const combined = [...localDictionary, ...firestoreTerms];
+        combined.sort((a, b) =>
+          a.name.toLowerCase().localeCompare(b.name.toLowerCase())
         );
-
-        setDictionaryTerms(combinedTerms);
+        setDictionaryTerms(combined);
       } catch (error) {
-        console.error('Error fetching dictionary from Firestore:', error);
+        console.error('Error fetching dictionary:', error);
       } finally {
         setIsLoading(false);
       }
     };
-
     fetchDictionary();
   }, []);
 
-  // ============================================================
-  // 2. Fetch user favorites if logged in
-  // ============================================================
   useEffect(() => {
     if (currentUser && userDataObj?.favoriteDictionaryTerms) {
       setFavoriteTermIds(userDataObj.favoriteDictionaryTerms);
@@ -109,50 +117,75 @@ export default function LegalDictionary() {
     }
   }, [currentUser, userDataObj]);
 
-  // Filter dictionary terms by search query
-  const filteredTerms = dictionaryTerms.filter((term) => {
-    const query = searchQuery.toLowerCase();
-    return term.name.toLowerCase().includes(query);
-  });
-
-  // Pagination calculations
-  const totalPages = Math.ceil(filteredTerms.length / itemsPerPage);
-  const paginatedTerms = filteredTerms.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
+  const filteredTerms = dictionaryTerms.filter((term) =>
+    term.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  // Toggle expanded term definition
-  const toggleExpandTerm = (termId) => {
-    if (expandedTerm === termId) {
-      setExpandedTerm(null);
-    } else {
-      setExpandedTerm(termId);
+  const termsToDisplay =
+    activeTab === 'favorites'
+      ? filteredTerms.filter((term) => favoriteTermIds.includes(term.id))
+      : filteredTerms;
+
+  const sortedTerms = [...termsToDisplay].sort((a, b) => {
+    if (sortBy === 'citation') return (a.citation || '').localeCompare(b.citation || '');
+    if (sortBy === 'date') return (a.date || '').localeCompare(b.date || '');
+    if (sortBy === 'jurisdiction') return (a.jurisdiction || '').localeCompare(b.jurisdiction || '');
+    return 0;
+  });
+
+  const totalPages = Math.ceil(sortedTerms.length / itemsPerPage);
+  const validCurrentPage = Math.min(currentPage, totalPages || 1);
+  const paginatedTerms = sortedTerms.slice(
+    (validCurrentPage - 1) * itemsPerPage,
+    validCurrentPage * itemsPerPage
+  );
+
+  function goToPage(num) {
+    if (num >= 1 && num <= totalPages) {
+      setPageDirection(num > currentPage ? 1 : -1);
+      setCurrentPage(num);
     }
+  }
+  function goToPrevPage() {
+    if (currentPage > 1) {
+      setPageDirection(-1);
+      setCurrentPage(currentPage - 1);
+    }
+  }
+  function goToNextPage() {
+    if (currentPage < totalPages) {
+      setPageDirection(1);
+      setCurrentPage(currentPage + 1);
+    }
+  }
+  function handleGotoSubmit(e) {
+    e.preventDefault();
+    const page = parseInt(gotoValue, 10);
+    if (!isNaN(page)) goToPage(page);
+    else {
+      setGotoValue('');
+      setShowGotoInput(false);
+    }
+  }
+
+  const toggleExpandTerm = (termId) => {
+    setExpandedTerm(expandedTerm === termId ? null : termId);
   };
 
-  // ============================================================
-  // 3. Favorites: add or remove
-  // ============================================================
   const handleToggleFavorite = async (termId) => {
     if (!currentUser) {
       alert('Please log in to favorite terms.');
       return;
     }
-
     try {
-      // Update user doc
       const userDocRef = doc(db, 'users', currentUser.uid);
-      let updatedFavorites = [];
-
+      let updatedFavorites;
       if (favoriteTermIds.includes(termId)) {
-        // Remove from favorites
         updatedFavorites = favoriteTermIds.filter((id) => id !== termId);
         await updateDoc(userDocRef, {
           favoriteDictionaryTerms: arrayRemove(termId),
         });
       } else {
-        // Add to favorites
         updatedFavorites = [...favoriteTermIds, termId];
         await updateDoc(userDocRef, {
           favoriteDictionaryTerms: arrayUnion(termId),
@@ -165,23 +198,43 @@ export default function LegalDictionary() {
     }
   };
 
-  // ============================================================
-  // 4. Add new dictionary term (Admin-only or any user logic)
-  // ============================================================
-  const handleAddNewTerm = async () => {
+  const handleAddNewTerm = async (e) => {
+    e.preventDefault();
     if (!currentUser) {
       alert('Please log in to add a new dictionary term.');
       return;
     }
-    if (!isAdmin) {
-      alert('Only admin can add new terms, or adjust logic for others if needed.');
+    const existingTerm = dictionaryTerms.find(
+      (t) => t.name.toLowerCase() === newTermName.trim().toLowerCase()
+    );
+    if (existingTerm) {
+      alert('A term with this name already exists in the dictionary.');
       return;
     }
-    if (!newTermName.trim() || !newTermDefinition.trim()) {
-      alert('Please provide at least a name and definition.');
+    let finalDefinition = newTermDefinition.trim();
+    if (autoGenerate && !finalDefinition) {
+      try {
+        setIsLoading(true);
+        const res = await fetch('/api/dictionary-autogenerate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ termName: newTermName.trim() }),
+        });
+        const data = await res.json();
+        finalDefinition = data.definition || 'Generated definition placeholder.';
+      } catch (err) {
+        console.error('Error auto-generating definition:', err);
+        alert('Failed to auto-generate the definition. Please try again.');
+        setIsLoading(false);
+        return;
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    if (!finalDefinition) {
+      alert('Please provide a definition.');
       return;
     }
-
     const synonymsArray = newTermSynonyms
       .split(',')
       .map((s) => s.trim())
@@ -190,79 +243,31 @@ export default function LegalDictionary() {
       .split(',')
       .map((r) => r.trim())
       .filter((r) => r.length > 0);
-
     const newTermData = {
       name: newTermName.trim(),
-      definition: newTermDefinition.trim(),
+      definition: finalDefinition,
       synonyms: synonymsArray,
       references: refsArray,
     };
-
     try {
-      // Add new doc to Firestore
       await addDoc(collection(db, 'legalDictionary'), newTermData);
-
-      // Update local array
-      const updatedList = [
-        ...dictionaryTerms,
-        {
-          id: `temp-id-${Date.now()}`, // temp ID until next reload
-          ...newTermData,
-        },
-      ];
+      const updatedList = [...dictionaryTerms, { id: `temp-${Date.now()}`, ...newTermData }];
       updatedList.sort((a, b) =>
-        a.name.toLowerCase() > b.name.toLowerCase() ? 1 : -1
+        a.name.toLowerCase().localeCompare(b.name.toLowerCase())
       );
       setDictionaryTerms(updatedList);
-
-      // Reset form
       setNewTermName('');
       setNewTermDefinition('');
       setNewTermSynonyms('');
       setNewTermReferences('');
-      setShowAddForm(false);
-
       alert('Dictionary term added successfully!');
+      setActiveTab('browse');
     } catch (error) {
       console.error('Error adding dictionary term:', error);
       alert('Error adding term.');
     }
   };
 
-  // ============================================================
-  // 5. Handle user not logged in scenario
-  // ============================================================
-  if (!currentUser) {
-    return (
-      <div
-        className={`flex items-center justify-center h-screen transition-colors ${
-          isDarkMode
-            ? 'bg-gradient-to-br from-slate-900 to-slate-800 text-white'
-            : 'bg-gradient-to-br from-gray-100 to-white text-gray-800'
-        }`}
-      >
-        <div className="p-6 bg-white dark:bg-slate-800 rounded-2xl shadow-xl text-center">
-          <p className="mb-4 text-lg font-semibold">
-            Please log in to access the Legal Dictionary.
-          </p>
-          <button
-            onClick={() => router.push('/login')}
-            className={`px-4 py-2 rounded-md text-sm font-semibold transition-colors duration-300 ${
-              isDarkMode
-                ? 'bg-blue-600 hover:bg-blue-500 text-white'
-                : 'bg-blue-950 hover:bg-blue-800 text-white'
-            }`}
-          >
-            Go to Login
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  // ============================================================
-  // Main Render
-  // ============================================================
   return (
     <div
       className={`relative flex h-screen transition-colors duration-500 ${
@@ -289,201 +294,169 @@ export default function LegalDictionary() {
         )}
       </AnimatePresence>
 
-      <main className="flex-1 flex flex-col px-6 relative z-50 h-screen">
-        {/* Top Bar with Sidebar Toggle */}
-        <div className="flex items-center justify-between">
-          <button
-            onClick={toggleSidebar}
-            className="text-blue-900 dark:text-white p-2 rounded transition-colors hover:bg-black/10 focus:outline-none md:hidden"
-            aria-label={isSidebarVisible ? 'Hide Sidebar' : 'Show Sidebar'}
-          >
-            <AnimatePresence mode="wait" initial={false}>
-              {isSidebarVisible ? (
-                <motion.div
-                  key="close-icon"
-                  initial={{ rotate: 90, opacity: 0 }}
-                  animate={{ rotate: 0, opacity: 1 }}
-                  exit={{ rotate: -90, opacity: 0 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  <FaTimes size={20} />
-                </motion.div>
-              ) : (
-                <motion.div
-                  key="bars-icon"
-                  initial={{ rotate: -90, opacity: 0 }}
-                  animate={{ rotate: 0, opacity: 1 }}
-                  exit={{ rotate: 90, opacity: 0 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  <FaBars size={20} />
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </button>
-        </div>
-
-        {/* Main Container */}
+      <main className="flex-1 flex flex-col px-6 relative z-200 h-screen">
         <div
           className={`flex-1 w-full rounded-2xl shadow-xl p-6 overflow-y-auto overflow-x-auto ${
             isDarkMode
-              ? 'bg-gradient-to-br from-slate-900 to-blue-950 text-white'
+              ? 'bg-gradient-to-br from-blue-950 to-slate-900 text-white'
               : 'bg-white text-gray-800'
           } flex flex-col items-center`}
         >
-          <h1 className="text-2xl font-bold mb-4">Legal Dictionary</h1>
-
-          {/* Search bar */}
-          <div className="w-full max-w-md mb-6 relative">
-            <FaSearch
-              className={`absolute left-3 top-1/2 transform -translate-y-1/2 ${
-                isDarkMode ? 'text-slate-300' : 'text-gray-400'
-              }`}
-            />
-            <input
-              type="text"
-              placeholder="Search for a term..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className={`w-full pl-10 pr-4 py-2 rounded-md focus:outline-none text-sm shadow-sm transition-colors ${
-                isDarkMode
-                  ? 'bg-slate-700 border border-slate-600 text-white'
-                  : 'bg-gray-100 border border-gray-300 text-gray-800'
-              }`}
-            />
+          <div className="flex items-center justify-between w-full">
+            <button
+              onClick={toggleSidebar}
+              className="text-blue-900 dark:text-white p-2 rounded transition-colors hover:bg-black/10 focus:outline-none md:hidden"
+              aria-label={isSidebarVisible ? 'Hide Sidebar' : 'Show Sidebar'}
+            >
+              <AnimatePresence mode="wait" initial={false}>
+                {isSidebarVisible ? (
+                  <motion.div
+                    key="close-icon"
+                    initial={{ rotate: 90, opacity: 0 }}
+                    animate={{ rotate: 0, opacity: 1 }}
+                    exit={{ rotate: -90, opacity: 0 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <FaTimes size={20} />
+                  </motion.div>
+                ) : (
+                  <motion.div
+                    key="bars-icon"
+                    initial={{ rotate: -90, opacity: 0 }}
+                    animate={{ rotate: 0, opacity: 1 }}
+                    exit={{ rotate: 90, opacity: 0 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <FaBars size={20} />
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </button>
           </div>
 
-          {/* Add new term button (admin-only) */}
-          {isAdmin && (
-            <div className="mb-6">
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => setShowAddForm(!showAddForm)}
-                className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-semibold transition-colors duration-300 ${
-                  isDarkMode
-                    ? 'bg-blue-600 hover:bg-blue-500 text-white'
-                    : 'bg-blue-950 hover:bg-blue-800 text-white'
-                }`}
-              >
-                <FaPlus />
-                Add New Term
-              </motion.button>
-            </div>
-          )}
-
-          {/* Add new term form */}
-          {isAdmin && showAddForm && (
-            <motion.div
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: 'auto', opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              transition={{ duration: 0.3 }}
-              className={`w-full max-w-xl mb-6 p-4 rounded-xl ${
-                isDarkMode
-                  ? 'bg-slate-800 border border-slate-700'
-                  : 'bg-gray-100 border border-gray-300'
+          <div className="w-full max-w-md mx-auto mb-4 flex justify-around">
+            <motion.button
+              className={`px-4 py-2 font-semibold transition-colors duration-300 ${
+                activeTab === 'browse'
+                  ? isDarkMode
+                    ? 'text-white border-b-2 border-blue-400'
+                    : 'text-blue-900 border-b-2 border-blue-900'
+                  : isDarkMode
+                  ? 'text-gray-400'
+                  : 'text-gray-600'
               }`}
+              onClick={() => setActiveTab('browse')}
             >
-              <div className="mb-4">
-                <label className="block text-sm font-semibold mb-1">
-                  Term Name
-                </label>
-                <input
-                  type="text"
-                  value={newTermName}
-                  onChange={(e) => setNewTermName(e.target.value)}
-                  className={`w-full p-2 rounded-md text-sm focus:outline-none transition-colors ${
-                    isDarkMode
-                      ? 'bg-slate-700 border border-slate-600 text-white'
-                      : 'bg-white border border-gray-300 text-gray-800'
-                  }`}
-                  placeholder="e.g. Habeas Corpus"
-                />
-              </div>
+              Browse
+            </motion.button>
+            <motion.button
+              className={`px-4 py-2 font-semibold transition-colors duration-300 ${
+                activeTab === 'favorites'
+                  ? isDarkMode
+                    ? 'text-white border-b-2 border-blue-400'
+                    : 'text-blue-900 border-b-2 border-blue-900'
+                  : isDarkMode
+                  ? 'text-gray-400'
+                  : 'text-gray-600'
+              }`}
+              onClick={() => setActiveTab('favorites')}
+            >
+              Favorites
+            </motion.button>
+            <motion.button
+              className={`px-4 py-2 font-semibold transition-colors duration-300 ${
+                activeTab === 'create'
+                  ? isDarkMode
+                    ? 'text-white border-b-2 border-blue-400'
+                    : 'text-blue-900 border-b-2 border-blue-900'
+                  : isDarkMode
+                  ? 'text-gray-400'
+                  : 'text-gray-600'
+              }`}
+              onClick={() => setActiveTab('create')}
+            >
+              Create
+            </motion.button>
+          </div>
 
-              <div className="mb-4">
-                <label className="block text-sm font-semibold mb-1">
-                  Definition
-                </label>
-                <textarea
-                  rows="3"
-                  value={newTermDefinition}
-                  onChange={(e) => setNewTermDefinition(e.target.value)}
-                  className={`w-full p-2 rounded-md text-sm focus:outline-none transition-colors ${
-                    isDarkMode
-                      ? 'bg-slate-700 border border-slate-600 text-white'
-                      : 'bg-white border border-gray-300 text-gray-800'
-                  }`}
-                  placeholder="Enter a clear definition..."
-                />
-              </div>
-
-              <div className="mb-4">
-                <label className="block text-sm font-semibold mb-1">
-                  Synonyms (comma-separated)
-                </label>
-                <input
-                  type="text"
-                  value={newTermSynonyms}
-                  onChange={(e) => setNewTermSynonyms(e.target.value)}
-                  className={`w-full p-2 rounded-md text-sm focus:outline-none transition-colors ${
-                    isDarkMode
-                      ? 'bg-slate-700 border border-slate-600 text-white'
-                      : 'bg-white border border-gray-300 text-gray-800'
-                  }`}
-                  placeholder="e.g. Great Writ, Writ of Liberty"
-                />
-              </div>
-
-              <div className="mb-4">
-                <label className="block text-sm font-semibold mb-1">
-                  References (comma-separated)
-                </label>
-                <input
-                  type="text"
-                  value={newTermReferences}
-                  onChange={(e) => setNewTermReferences(e.target.value)}
-                  className={`w-full p-2 rounded-md text-sm focus:outline-none transition-colors ${
-                    isDarkMode
-                      ? 'bg-slate-700 border border-slate-600 text-white'
-                      : 'bg-white border border-gray-300 text-gray-800'
-                  }`}
-                  placeholder="e.g. Appeal, Detention"
-                />
-              </div>
-
-              <div className="flex justify-end">
-                <motion.button
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  onClick={handleAddNewTerm}
-                  className={`px-4 py-2 rounded-md text-sm font-semibold transition-colors duration-300 ${
-                    isDarkMode
-                      ? 'bg-green-600 hover:bg-green-500 text-white'
-                      : 'bg-green-700 hover:bg-green-600 text-white'
-                  }`}
-                >
-                  Save
-                </motion.button>
-              </div>
-            </motion.div>
-          )}
-
-          {/* Loading indicator for dictionary fetch */}
-          {isLoading ? (
-            <div className="text-sm text-gray-500 mt-4">
-              Loading dictionary...
-            </div>
-          ) : (
+          {(activeTab === 'browse' || activeTab === 'favorites') && (
             <>
-              {/* Terms list */}
-              <div className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 overflow-auto max-h-full pr-2">
-                <AnimatePresence>
+              <div className="w-full max-w-md mx-auto mb-6 flex items-center">
+                <div className="relative flex-1">
+                  <FaSearch
+                    className={`absolute left-4 top-1/2 transform -translate-y-1/2 ${
+                      isDarkMode ? 'text-slate-300' : 'text-gray-500'
+                    }`}
+                  />
+                  <input
+                    type="text"
+                    placeholder="Search for a term..."
+                    value={searchQuery}
+                    onChange={(e) => {
+                      setSearchQuery(e.target.value);
+                      setCurrentPage(1);
+                    }}
+                    className={`w-full pl-10 pr-4 py-3 rounded-full focus:outline-none text-sm transition-colors
+                      ${
+                        isDarkMode
+                          ? 'bg-slate-700 border border-slate-600 text-white placeholder-slate-300'
+                          : 'bg-gray-50 border border-gray-200 text-gray-700 placeholder-gray-400'
+                      }
+                    `}
+                  />
+                </div>
+                <div className="ml-4">
+                  <button
+                    onClick={() => setShowAdvanced(!showAdvanced)}
+                    className="flex items-center space-x-2 text-blue-600 hover:text-blue-800 transition-colors"
+                  >
+                    <span className="text-sm font-medium">Sort By</span>
+                    {showAdvanced ? <FaChevronUp /> : <FaChevronDown />}
+                  </button>
+                </div>
+              </div>
+
+              <AnimatePresence>
+                {showAdvanced && (
+                  <motion.div
+                    className="mb-6 w-full flex justify-center"
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    exit={{ opacity: 0, height: 0 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <div className="bg-transparent p-4 rounded-2xl shadow-md flex flex-col space-y-4 w-full max-w-md">
+                      <div className="flex flex-col">
+                        <select
+                          value={sortBy}
+                          onChange={(e) => setSortBy(e.target.value)}
+                          className="p-2 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200"
+                        >
+                          <option value="">Default</option>
+                          <option value="citation">Citation</option>
+                          <option value="date">Date</option>
+                          <option value="jurisdiction">Jurisdiction</option>
+                        </select>
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+              <AnimatePresence mode="wait" custom={pageDirection}>
+                <motion.div
+                  key={currentPage}
+                  custom={pageDirection}
+                  variants={pageVariants}
+                  initial="initial"
+                  animate="animate"
+                  exit="exit"
+                  transition={{ duration: 0.5 }}
+                  className="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 overflow-auto max-h-full pr-2"
+                >
                   {paginatedTerms.map((term) => {
                     const isFavorited = favoriteTermIds.includes(term.id);
                     const isExpanded = expandedTerm === term.id;
-
                     return (
                       <motion.div
                         key={term.id}
@@ -492,41 +465,39 @@ export default function LegalDictionary() {
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: 20 }}
                         transition={{ duration: 0.3 }}
-                        className={`p-4 rounded-xl shadow-lg transition-shadow cursor-pointer group ${
+                        className={`p-4 rounded-xl shadow-lg transition-shadow cursor-pointer group flex flex-col ${
                           isDarkMode
                             ? 'bg-slate-800 border border-slate-700 text-white'
                             : 'bg-white border border-gray-300 text-gray-800'
-                        } hover:shadow-xl flex flex-col`}
+                        } hover:shadow-xl`}
+                        onClick={() => toggleExpandTerm(term.id)}
                       >
                         <div className="flex justify-between items-center">
-                          <h3
-                            className="text-md font-bold mb-2"
-                            onClick={() => toggleExpandTerm(term.id)}
-                          >
+                          <h3 className="text-md font-bold mb-2 line-clamp-1">
                             {term.name}
                           </h3>
                           <motion.button
                             whileHover={{ scale: 1.1 }}
                             whileTap={{ scale: 0.95 }}
-                            onClick={() => handleToggleFavorite(term.id)}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleToggleFavorite(term.id);
+                            }}
                             className="p-1 rounded-full focus:outline-none"
                             aria-label="Favorite"
                           >
                             {isFavorited ? (
-                              <FaHeart className="text-red-500" />
+                              <FaHeart className="text-red-500" size={16} />
                             ) : (
                               <FaRegHeart
-                                className={`${
-                                  isDarkMode
-                                    ? 'text-gray-400'
-                                    : 'text-gray-600'
-                                }`}
+                                className={
+                                  isDarkMode ? 'text-gray-400' : 'text-gray-600'
+                                }
+                                size={16}
                               />
                             )}
                           </motion.button>
                         </div>
-
-                        {/* If not expanded, show truncated definition */}
                         {!isExpanded && (
                           <p className="text-sm text-gray-500 mb-2">
                             {term.definition.length > 100
@@ -534,8 +505,6 @@ export default function LegalDictionary() {
                               : term.definition}
                           </p>
                         )}
-
-                        {/* Expand/collapse */}
                         {isExpanded && (
                           <motion.div
                             className="overflow-hidden text-sm"
@@ -545,8 +514,6 @@ export default function LegalDictionary() {
                             transition={{ duration: 0.3 }}
                           >
                             <p className="mb-3">{term.definition}</p>
-
-                            {/* Synonyms */}
                             {term.synonyms && term.synonyms.length > 0 && (
                               <div className="mb-3">
                                 <strong>Synonyms:</strong>
@@ -557,8 +524,6 @@ export default function LegalDictionary() {
                                 </ul>
                               </div>
                             )}
-
-                            {/* References */}
                             {term.references && term.references.length > 0 && (
                               <div className="mb-3">
                                 <strong>References:</strong>
@@ -571,69 +536,237 @@ export default function LegalDictionary() {
                             )}
                           </motion.div>
                         )}
-
-                        {/* Expand/Collapse label */}
                         <div
-                          onClick={() => toggleExpandTerm(term.id)}
                           className={`text-xs font-semibold mt-auto self-end transition-colors cursor-pointer ${
                             isDarkMode
                               ? 'text-blue-400 group-hover:text-blue-200'
                               : 'text-blue-600 group-hover:text-blue-400'
                           }`}
+                          onClick={() => toggleExpandTerm(term.id)}
                         >
                           {isExpanded ? 'Hide' : 'View'} Details
                         </div>
                       </motion.div>
                     );
                   })}
-                </AnimatePresence>
-              </div>
+                </motion.div>
+              </AnimatePresence>
 
-              {/* No results message */}
-              {filteredTerms.length === 0 && (
-                <div className="text-sm text-gray-500 mt-4">
-                  No terms match your query.
-                </div>
-              )}
-
-              {/* Pagination Controls */}
-              {filteredTerms.length > itemsPerPage && (
-                <div className="flex items-center justify-center space-x-2 mt-4">
-                  <button
-                    onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+              {sortedTerms.length > itemsPerPage && (
+                <div className="mt-6 flex items-center justify-center gap-2">
+                  <motion.button
+                    onClick={goToPrevPage}
                     disabled={currentPage === 1}
-                    className="px-3 py-1 rounded-md text-sm font-semibold transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed bg-blue-600 hover:bg-blue-500 text-white"
+                    whileHover={{ scale: currentPage !== 1 ? 1.1 : 1 }}
+                    whileTap={{ scale: currentPage !== 1 ? 0.9 : 1 }}
+                    className={`px-4 py-2 font-semibold transition-colors duration-300 ${
+                      currentPage === 1
+                        ? isDarkMode
+                          ? 'text-gray-400'
+                          : 'text-gray-400'
+                        : isDarkMode
+                        ? 'text-white'
+                        : 'text-blue-900'
+                    }`}
                   >
-                    Previous
-                  </button>
-                  {Array.from({ length: totalPages }).map((_, index) => {
-                    const pageNumber = index + 1;
-                    return (
-                      <button
-                        key={pageNumber}
-                        onClick={() => setCurrentPage(pageNumber)}
-                        className={`px-3 py-1 rounded-md text-sm font-semibold transition-colors duration-300 ${
-                          currentPage === pageNumber
-                            ? 'bg-blue-600 text-white'
-                            : 'bg-gray-200 hover:bg-gray-300 text-gray-800'
+                    <FaChevronLeft />
+                  </motion.button>
+                  {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => i + 1).map(
+                    (num) => (
+                      <motion.button
+                        key={num}
+                        onClick={() => goToPage(num)}
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        className={`px-4 py-2 font-semibold transition-colors duration-300 ${
+                          num === currentPage
+                            ? isDarkMode
+                              ? 'text-white border-b-2 border-blue-400'
+                              : 'text-blue-900 border-b-2 border-blue-900'
+                            : isDarkMode
+                            ? 'text-gray-400'
+                            : 'text-gray-600'
                         }`}
                       >
-                        {pageNumber}
+                        {num}
+                      </motion.button>
+                    )
+                  )}
+                  {totalPages > 5 && (
+                    <motion.button
+                      onClick={() => setShowGotoInput(!showGotoInput)}
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                      className={`px-2 py-2 font-semibold transition-colors duration-300 ${
+                        isDarkMode ? 'text-gray-200' : 'text-gray-800'
+                      }`}
+                    >
+                      ...
+                    </motion.button>
+                  )}
+                  {showGotoInput && (
+                    <form onSubmit={handleGotoSubmit} className="flex items-center space-x-2">
+                      <input
+                        type="number"
+                        className={`w-16 px-2 py-1 border rounded-md ${
+                          isDarkMode
+                            ? 'bg-slate-700 text-white border-slate-600'
+                            : 'bg-white text-gray-800 border-gray-300'
+                        }`}
+                        value={gotoValue}
+                        onChange={(e) => setGotoValue(e.target.value)}
+                        placeholder="Page #"
+                      />
+                      <button
+                        type="submit"
+                        className={`px-3 py-1 rounded-md font-semibold transition-colors duration-300 ${
+                          isDarkMode
+                            ? 'bg-blue-600 hover:bg-blue-500 text-white'
+                            : 'bg-blue-950 hover:bg-blue-800 text-white'
+                        }`}
+                      >
+                        Go
                       </button>
-                    );
-                  })}
-                  <button
-                    onClick={() =>
-                      setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-                    }
-                    disabled={currentPage === totalPages}
-                    className="px-3 py-1 rounded-md text-sm font-semibold transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed bg-blue-600 hover:bg-blue-500 text-white"
+                    </form>
+                  )}
+                  <motion.button
+                    onClick={goToNextPage}
+                    disabled={currentPage === totalPages || totalPages === 0}
+                    whileHover={{
+                      scale: currentPage === totalPages || totalPages === 0 ? 1 : 1.1,
+                    }}
+                    whileTap={{
+                      scale: currentPage === totalPages || totalPages === 0 ? 1 : 0.9,
+                    }}
+                    className={`px-4 py-2 font-semibold transition-colors duration-300 ${
+                      currentPage === totalPages || totalPages === 0
+                        ? isDarkMode
+                          ? 'text-gray-400'
+                          : 'text-gray-400'
+                        : isDarkMode
+                        ? 'text-white'
+                        : 'text-blue-900'
+                    }`}
                   >
-                    Next
-                  </button>
+                    <FaChevronRight />
+                  </motion.button>
                 </div>
               )}
             </>
+          )}
+
+          {activeTab === 'create' && (
+            <div className="w-full flex justify-center">
+              <div className="max-w-md w-full">
+                <form
+                  onSubmit={handleAddNewTerm}
+                  className={`p-6 rounded-2xl shadow-md ${
+                    isDarkMode ? 'bg-slate-800 text-white' : 'bg-white text-gray-800'
+                  }`}
+                >
+                  <h2 className="text-2xl font-bold mb-4 text-center">
+                    Add New Term
+                  </h2>
+                  <div className="mb-4">
+                    <label className="block text-sm font-semibold mb-1">
+                      Term Name
+                    </label>
+                    <input
+                      type="text"
+                      value={newTermName}
+                      onChange={(e) => setNewTermName(e.target.value)}
+                      className={`w-full px-3 py-2 border rounded-md ${
+                        isDarkMode
+                          ? 'bg-slate-700 text-white border-slate-600 placeholder-gray-300'
+                          : 'bg-white text-gray-800 border-gray-300'
+                      }`}
+                      placeholder="e.g. Habeas Corpus"
+                    />
+                  </div>
+                  <div className="mb-4">
+                    <label className="block text-sm font-semibold mb-1">
+                      Definition
+                    </label>
+                    <textarea
+                      rows="3"
+                      value={newTermDefinition}
+                      onChange={(e) => setNewTermDefinition(e.target.value)}
+                      className={`w-full px-3 py-2 border rounded-md ${
+                        isDarkMode
+                          ? 'bg-slate-700 text-white border-slate-600 placeholder-gray-300'
+                          : 'bg-white text-gray-800 border-gray-300'
+                      }`}
+                      placeholder="Enter a clear definition..."
+                    />
+                  </div>
+                  <div className="mb-4">
+                    <label className="block text-sm font-semibold mb-1">
+                      Synonyms (comma-separated)
+                    </label>
+                    <input
+                      type="text"
+                      value={newTermSynonyms}
+                      onChange={(e) => setNewTermSynonyms(e.target.value)}
+                      className={`w-full px-3 py-2 border rounded-md ${
+                        isDarkMode
+                          ? 'bg-slate-700 text-white border-slate-600 placeholder-gray-300'
+                          : 'bg-white text-gray-800 border-gray-300'
+                      }`}
+                      placeholder="e.g. Great Writ, Writ of Liberty"
+                    />
+                  </div>
+                  <div className="mb-4">
+                    <label className="block text-sm font-semibold mb-1">
+                      References (comma-separated)
+                    </label>
+                    <input
+                      type="text"
+                      value={newTermReferences}
+                      onChange={(e) => setNewTermReferences(e.target.value)}
+                      className={`w-full px-3 py-2 border rounded-md ${
+                        isDarkMode
+                          ? 'bg-slate-700 text-white border-slate-600 placeholder-gray-300'
+                          : 'bg-white text-gray-800 border-gray-300'
+                      }`}
+                      placeholder="e.g. Appeal, Detention"
+                    />
+                  </div>
+                  <div className="flex items-center justify-between mb-4">
+                    <label
+                      htmlFor="autoGenerateToggle"
+                      className="cursor-pointer font-semibold text-sm"
+                    >
+                      Auto-generate definition with AI
+                    </label>
+                    <div className="relative inline-block w-14 h-8 select-none transition duration-200 ease-in">
+                      <input
+                        type="checkbox"
+                        name="autoGenerateToggle"
+                        id="autoGenerateToggle"
+                        checked={autoGenerate}
+                        onChange={() => setAutoGenerate(!autoGenerate)}
+                        className="toggle-checkbox absolute h-0 w-0 opacity-0"
+                      />
+                      <label
+                        htmlFor="autoGenerateToggle"
+                        className="toggle-label block overflow-hidden h-8 rounded-full bg-gray-300 cursor-pointer"
+                      ></label>
+                    </div>
+                  </div>
+                  <button
+                    type="submit"
+                    disabled={isLoading}
+                    className={`w-full py-2 rounded-md font-semibold transition-colors duration-300 ${
+                      isDarkMode
+                        ? 'bg-blue-600 hover:bg-blue-500 text-white'
+                        : 'bg-blue-950 hover:bg-blue-800 text-white'
+                    }`}
+                  >
+                    {isLoading ? 'Creating...' : 'Add Term'}
+                  </button>
+                </form>
+              </div>
+            </div>
           )}
         </div>
       </main>
