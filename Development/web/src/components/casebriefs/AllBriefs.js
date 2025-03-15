@@ -559,7 +559,7 @@ export default function AllBriefs() {
           {(activeTab === 'browse' || activeTab === 'favorites') && (
             <>
               <div className="mb-6 w-full flex justify-center items-center gap-4">
-                <div className="relative flex items-center bg-gray-50 dark:bg-white/10 rounded-full px-3 py-2 w-full max-w-md">
+                <div className={`relative flex items-center ${isDarkMode ? 'bg-slate-700' : 'bg-gray-50'} dark:bg-white/10 rounded-full px-3 py-2 w-full max-w-md`}>
                   <FaSearch className="text-gray-700 dark:text-white/70 mr-2" />
                   <input
                     type="text"
@@ -705,7 +705,7 @@ export default function AllBriefs() {
                         <p className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
                           Citation: {c.citation || 'N/A'}
                         </p>
-                        <p className={`text-xs mt-2 line-clamp-2 italic ${isDarkMode ? 'text-gray-200' : 'text-gray-600'}`}>
+                        <p className={`text-xs mt-2 line-clamp-2 italic ${isDarkMode ? 'text-gray-500' : 'text-gray-600'}`}>
                           {c.briefSummary?.facts?.slice(0, 100) || 'no description available'}...
                         </p>
                       </div>

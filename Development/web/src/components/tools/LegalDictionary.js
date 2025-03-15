@@ -10,7 +10,8 @@ import {
   FaChevronLeft,
   FaChevronRight,
   FaChevronUp,
-  FaChevronDown
+  FaChevronDown,
+  FaTimes as FaClose
 } from 'react-icons/fa';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
@@ -40,21 +41,19 @@ export default function LegalDictionary() {
   const [isLoading, setIsLoading] = useState(false);
   const [favoriteTermIds, setFavoriteTermIds] = useState([]);
   const [expandedTerm, setExpandedTerm] = useState(null);
-
   const [currentPage, setCurrentPage] = useState(1);
   const [pageDirection, setPageDirection] = useState(0);
   const [itemsPerPage, setItemsPerPage] = useState(21);
-
   const [newTermName, setNewTermName] = useState('');
   const [newTermDefinition, setNewTermDefinition] = useState('');
   const [newTermSynonyms, setNewTermSynonyms] = useState('');
   const [newTermReferences, setNewTermReferences] = useState('');
   const [autoGenerate, setAutoGenerate] = useState(false);
-
   const [showGotoInput, setShowGotoInput] = useState(false);
   const [gotoValue, setGotoValue] = useState('');
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [sortBy, setSortBy] = useState('');
+  const [selectedTerm, setSelectedTerm] = useState(null);
 
   const pageVariants = {
     initial: (direction) => ({
@@ -127,10 +126,10 @@ export default function LegalDictionary() {
       : filteredTerms;
 
   const sortedTerms = [...termsToDisplay].sort((a, b) => {
-    if (sortBy === 'citation') return (a.citation || '').localeCompare(b.citation || '');
-    if (sortBy === 'date') return (a.date || '').localeCompare(b.date || '');
-    if (sortBy === 'jurisdiction') return (a.jurisdiction || '').localeCompare(b.jurisdiction || '');
-    return 0;
+    if (sortBy === 'reverse') {
+      return b.name.localeCompare(a.name);
+    }
+    return a.name.localeCompare(b.name);
   });
 
   const totalPages = Math.ceil(sortedTerms.length / itemsPerPage);
@@ -171,6 +170,14 @@ export default function LegalDictionary() {
   const toggleExpandTerm = (termId) => {
     setExpandedTerm(expandedTerm === termId ? null : termId);
   };
+
+  function openTermModal(term) {
+    setSelectedTerm(term);
+  }
+
+  function closeTermModal() {
+    setSelectedTerm(null);
+  }
 
   const handleToggleFavorite = async (termId) => {
     if (!currentUser) {
@@ -430,12 +437,10 @@ export default function LegalDictionary() {
                         <select
                           value={sortBy}
                           onChange={(e) => setSortBy(e.target.value)}
-                          className="p-2 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200"
+                          className={`p-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none`}
                         >
-                          <option value="">Default</option>
-                          <option value="citation">Citation</option>
-                          <option value="date">Date</option>
-                          <option value="jurisdiction">Jurisdiction</option>
+                          <option value="">A - Z</option>
+                          <option value="reverse">Z - A</option>
                         </select>
                       </div>
                     </div>
@@ -470,7 +475,6 @@ export default function LegalDictionary() {
                             ? 'bg-slate-800 border border-slate-700 text-white'
                             : 'bg-white border border-gray-300 text-gray-800'
                         } hover:shadow-xl`}
-                        onClick={() => toggleExpandTerm(term.id)}
                       >
                         <div className="flex justify-between items-center">
                           <h3 className="text-md font-bold mb-2 line-clamp-1">
@@ -499,7 +503,13 @@ export default function LegalDictionary() {
                           </motion.button>
                         </div>
                         {!isExpanded && (
-                          <p className="text-sm text-gray-500 mb-2">
+                          <p
+                            className="text-sm text-gray-500 mb-2"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setSelectedTerm(term);
+                            }}
+                          >
                             {term.definition.length > 100
                               ? term.definition.slice(0, 100) + '...'
                               : term.definition}
@@ -513,7 +523,15 @@ export default function LegalDictionary() {
                             exit={{ height: 0, opacity: 0 }}
                             transition={{ duration: 0.3 }}
                           >
-                            <p className="mb-3">{term.definition}</p>
+                            <p
+                              className="mb-3"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setSelectedTerm(term);
+                              }}
+                            >
+                              {term.definition}
+                            </p>
                             {term.synonyms && term.synonyms.length > 0 && (
                               <div className="mb-3">
                                 <strong>Synonyms:</strong>
@@ -770,6 +788,57 @@ export default function LegalDictionary() {
           )}
         </div>
       </main>
+
+      {selectedTerm && (
+        <div className="fixed inset-0 z-[190] flex items-center justify-center bg-black bg-opacity-40">
+          <motion.div
+            className={`relative w-11/12 max-w-5xl p-6 rounded-2xl shadow-2xl ${
+              isDarkMode
+                ? 'bg-slate-800 text-gray-100'
+                : 'bg-gradient-to-br from-gray-50 to-gray-100 text-gray-900'
+            }`}
+            initial={{ scale: 0.7, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0.7, opacity: 0 }}
+            transition={{ duration: 0.3 }}
+          >
+            <div className="flex justify-between items-start mb-4">
+              <h2 className="text-2xl font-bold">{selectedTerm.name}</h2>
+              <button
+                onClick={() => setSelectedTerm(null)}
+                className={`inline-block px-4 py-2 rounded-full font-semibold text-sm transition-colors duration-300 ${
+                  isDarkMode
+                    ? 'bg-blue-600 hover:bg-blue-500 text-white'
+                    : 'bg-blue-950 hover:bg-blue-800 text-white'
+                }`}
+              >
+                <FaClose />
+              </button>
+            </div>
+            <p className="mb-3">{selectedTerm.definition}</p>
+            {selectedTerm.synonyms && selectedTerm.synonyms.length > 0 && (
+              <div className="mb-3">
+                <strong>Synonyms:</strong>
+                <ul className="list-disc list-inside ml-4 mt-1">
+                  {selectedTerm.synonyms.map((syn) => (
+                    <li key={syn}>{syn}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+            {selectedTerm.references && selectedTerm.references.length > 0 && (
+              <div className="mb-3">
+                <strong>References:</strong>
+                <ul className="list-disc list-inside ml-4 mt-1">
+                  {selectedTerm.references.map((ref) => (
+                    <li key={ref}>{ref}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </motion.div>
+        </div>
+      )}
     </div>
   );
 }

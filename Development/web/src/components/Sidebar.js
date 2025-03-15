@@ -227,7 +227,7 @@ export default function Sidebar({
     if (isBasic) {
       return 'bg-gradient-to-r from-emerald-400 to-emerald-600 text-white';
     }
-    if (isPro) { // Return to isExpert when ready
+    if (isPro) {
       return 'goldBackground text-white';
     }
     return 'bg-gradient-to-r from-gray-400 to-gray-400 text-white';
@@ -606,7 +606,7 @@ export default function Sidebar({
           </div>
           <span
             className={clsx(
-              'px-3 py-1 rounded text-xs font-semibold uppercase whitespace-nowrap',
+              'px-3 py-1 rounded text-xs uppercase whitespace-nowrap font-bold',
               planBadgeStyle
             )}
           >
