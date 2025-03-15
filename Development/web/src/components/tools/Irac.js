@@ -1090,7 +1090,7 @@ export default function Irac() {
                     type="button"
                     onClick={() => setIsImportModalOpen(false)}
                     className={clsx(
-                      'group relative h-12 w-full sm:w-56 overflow-hidden rounded bg-gradient-to-r from-blue-600 to-blue-800 text-white text-sm sm:text-base shadow hover:opacity-90 transition-all duration-200 flex items-center justify-center'
+                      'group relative h-12 w-full sm:w-56 overflow-hidden rounded bg-gradient-to-r from-blue-600 to-blue-800 text-white text-sm sm:text-base shadow hover:opacity-90 transition-all duration-200 flex items-center justify-center gradientShadowHoverBlue'
                     )}
                   >
                     Cancel
