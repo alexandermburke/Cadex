@@ -4,16 +4,13 @@ import { Poppins } from 'next/font/google';
 import Link from 'next/link';
 import CarouselComponent from './Carousel';
 import Image from 'next/image';
-import {
-  FaGavel,
-  FaGraduationCap,
-  FaUniversity,
-} from 'react-icons/fa'; // Now using three unique icons
+import { FaGavel, FaGraduationCap, FaUniversity } from 'react-icons/fa';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css';
 import { Autoplay } from 'swiper/modules';
 import { useInView } from 'react-intersection-observer';
 import { useAuth } from '@/context/AuthContext';
+import { useRouter } from 'next/navigation'; // Import router to navigate on button click
 
 const targetStats = {
   cases: 400,
@@ -27,6 +24,7 @@ const poppins = Poppins({
 });
 
 export default function Home() {
+  const router = useRouter();
   const { currentUser, userDataObj } = useAuth();
   const isDarkMode = userDataObj?.darkMode || false;
 
@@ -166,7 +164,7 @@ export default function Home() {
                       isDarkMode ? 'text-white' : 'text-gray-700'
                     }`}
                   >
-                    Get a head start, explore legal concepts, and prepare for law school
+                    Get a head start, explore legal concepts & prepare for law school
                   </p>
                 </div>
               </SwiperSlide>
@@ -189,7 +187,7 @@ export default function Home() {
                       isDarkMode ? 'text-white' : 'text-gray-700'
                     }`}
                   >
-                    Build on your foundation, excel in exams, and tackle advanced coursework
+                    Build on your foundation, excel in exams & tackle advanced coursework
                   </p>
                 </div>
               </SwiperSlide>
@@ -212,59 +210,74 @@ export default function Home() {
                       isDarkMode ? 'text-white' : 'text-gray-700'
                     }`}
                   >
-                    Enhance expertise for final year and bar exam readiness
+                    Enhance expertise for final year & bar exam readiness
                   </p>
                 </div>
               </SwiperSlide>
             </Swiper>
+
+            {/* Centered "Create an Account" button below carousel */}
+            <div className="flex justify-center mt-6">
+              <button
+                onClick={() => router.push('/register')}
+                className="
+                  group relative h-12 w-full sm:w-56 overflow-hidden rounded 
+                  bg-gradient-to-r from-blue-600 to-blue-800 text-white 
+                  text-sm sm:text-base shadow transition-all duration-300 
+                  flex items-center justify-center gradientShadowHoverBlue
+                "
+              >
+                <span className="font-semibold">Create an Account</span>
+              </button>
+            </div>
           </div>
         </div>
 
         <VerticalDivider />
 
-      {/* Universities Section (Commented Out) */}
-{/*
-<section>
-  <div
-    ref={uniRef}
-    className={`flex flex-col items-center px-4 md:px-8 lg:px-16 transition-all duration-1000 ${
-      uniInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
-    }`}
-  >
-    <div className="max-w-5xl w-full">
-      <h3
-        className={`text-4xl sm:text-5xl font-semibold my-8 text-center ${
-          isDarkMode ? 'text-white' : 'text-blue-950'
-        }`}
-      >
-        Universities We Partner With
-      </h3>
-      <CarouselComponent />
-    </div>
-  </div>
-</section>
-*/}
+        {/* Universities Section (Commented Out) */}
+        {/*
+        <section>
+          <div
+            ref={uniRef}
+            className={`flex flex-col items-center px-4 md:px-8 lg:px-16 transition-all duration-1000 ${
+              uniInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+            }`}
+          >
+            <div className="max-w-5xl w-full">
+              <h3
+                className={`text-4xl sm:text-5xl font-semibold my-8 text-center ${
+                  isDarkMode ? 'text-white' : 'text-blue-950'
+                }`}
+              >
+                Universities We Partner With
+              </h3>
+              <CarouselComponent />
+            </div>
+          </div>
+        </section>
+        */}
 
-{/* Keep this text active/visible */}
-<section>
-  <div className="max-w-5xl w-full mx-auto">
-    <p
-      className={`mt-4 text-center text-sm ${
-        isDarkMode ? 'text-gray-300' : 'text-gray-700'
-      }`}
-    >
-      Are you associated with a university and interested in partnering with CadexLaw?
-      Please email us at{' '}
-      <a
-        href="mailto:businessinquires@cadexlaw.com"
-        className="text-blue-500 hover:underline"
-      >
-        businessinquires@cadexlaw.com
-      </a>
-      .
-    </p>
-  </div>
-</section>
+        {/* Keep this text active/visible */}
+        <section>
+          <div className="max-w-5xl w-full mx-auto">
+            <p
+              className={`mt-4 text-center text-sm ${
+                isDarkMode ? 'text-gray-300' : 'text-gray-700'
+              }`}
+            >
+              Are you associated with a university and interested in partnering with CadexLaw?
+              Please email us at{' '}
+              <a
+                href="mailto:businessinquires@cadexlaw.com"
+                className="text-blue-500 hover:underline"
+              >
+                businessinquires@cadexlaw.com
+              </a>
+              .
+            </p>
+          </div>
+        </section>
       </div>
     </section>
   );
