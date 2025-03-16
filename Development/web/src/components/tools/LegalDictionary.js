@@ -754,7 +754,7 @@ export default function LegalDictionary() {
                       htmlFor="autoGenerateToggle"
                       className="cursor-pointer font-semibold text-sm"
                     >
-                      Auto-generate definition with AI
+                      Auto generate definition
                     </label>
                     <div className="relative inline-block w-14 h-8 select-none transition duration-200 ease-in">
                       <input

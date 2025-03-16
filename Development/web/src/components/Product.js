@@ -6,7 +6,7 @@ export default function FAQ() {
   return (
     <div className="relative w-full min-h-[60vh] bg-blue-950 drop-shadow-lg overflow-hidden flex items-center justify-center p-4">
       <div className="max-w-4xl text-center">
-        <h1 className="text-5xl sm:text-7xl font-bold text-white mb-6">
+        <h1 className="text-5xl sm:text-7xl font-bold text-white">
           Common Questions
         </h1>
         <p className="text-xl sm:text-2xl text-gray-200 mb-10">

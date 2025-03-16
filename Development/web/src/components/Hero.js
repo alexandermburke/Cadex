@@ -154,42 +154,6 @@ export default function Hero() {
     },
   ];
 
-  // Tailored How It Works for CadexLaw.com
-  const howItWorks = [
-    {
-      icon: (
-        <FaUserPlus className={`${isDarkMode ? 'text-white' : 'text-blue-950'} text-4xl mb-4`} />
-      ),
-      title: 'Sign Up & Customize',
-      description:
-        'Create an account, set your study objectives, and personalize your user experience.',
-    },
-    {
-      icon: (
-        <FaSearch className={`${isDarkMode ? 'text-white' : 'text-blue-950'} text-4xl mb-4`} />
-      ),
-      title: 'Discover Resources',
-      description:
-        'Browse our extensive library of briefs, study tools, exam prep content, and subject-specific guides.',
-    },
-    {
-      icon: (
-        <FaCogs className={`${isDarkMode ? 'text-white' : 'text-blue-950'} text-4xl mb-4`} />
-      ),
-      title: 'Use Advanced Tools',
-      description:
-        'Engage with AI-driven exam prep, interactive learning options, and adaptable study modules that suit your preferences.',
-    },
-    {
-      icon: (
-        <FaComment className={`${isDarkMode ? 'text-white' : 'text-blue-950'} text-4xl mb-4`} />
-      ),
-      title: 'Connect & Achieve',
-      description:
-        'Track your progress, get expert feedback, and collaborate with a supportive community of peers and legal professionals.',
-    },
-  ];
-
   // Framer Motion Variants for Advanced Animations
   const cardVariants = {
     hidden: {},
@@ -218,7 +182,7 @@ export default function Hero() {
   // Vertical divider (spacing remains unchanged)
   const VerticalDivider = () => (
     <div
-      className={`mx-auto w-[2px] my-4 ${
+      className={`mx-auto w-[2px] my-2 ${
         isDarkMode
           ? 'bg-white'
           : 'bg-gradient-to-b from-transparent via-slate-500 to-blue-950'
@@ -236,7 +200,6 @@ export default function Hero() {
 
   return (
     <section className="w-full bg-transparent relative">
-      {/* Fixed HeroBackground behind hero text on all screen sizes */}
       <div className="absolute inset-0 top-[100px] left-0 w-full h-[800px] z-0 pointer-events-none">
         <HeroBackground />
       </div>
@@ -287,7 +250,7 @@ export default function Hero() {
             } ${poppins.className}`}
           >
             <span className="block mb-5">
-              Welcome to the {' '}
+              Welcome to the{' '}
               <span
                 className="relative inline-block"
                 key={animationTrigger}
@@ -310,19 +273,12 @@ export default function Hero() {
               of Legal Education
             </span>
             <span className="sr-only">
-             Welcome to the future of Legal Education
+              Welcome to the future of Legal Education
             </span>
           </h2>
 
-          <p
-            className={`text-center text-2xl sm:text-2xl md:text-2xl ${
-              isDarkMode ? 'text-white' : 'text-slate-700'
-            } max-w-2xl mb-10`}
-          >
-            By law students, for law students. Our platform combines expert
-            insights and AI to deliver high quality preparation at up to{' '}
-            <span className="goldSolid font-bold">70% Lower Costs</span> than
-            traditional competitors.
+          <p className={`text-center text-2xl sm:text-2xl md:text-2xl ${isDarkMode ? 'text-white' : 'text-slate-700'} max-w-2xl mb-10`}>
+           Created by law students, for law students, CadexLaw.com is your trusted hub for practical insights and an extensive suite of resources, all at a fraction of traditional costs.
           </p>
 
           <div className="flex justify-center mt-6 mb-6">
@@ -338,19 +294,30 @@ export default function Hero() {
           </div>
         </div>
 
-        <VerticalDivider />
-
-        {/* Redesigned Features Section with Advanced Animations and Less Wide Cards */}
+        {/* Redesigned Sections Container */}
         <div
           ref={featuresRef}
-          className={`flex flex-col items-center py-4 px-4 md:px-8 lg:px-16 my-20 transition-all duration-1000 ${
+          className={`flex flex-col items-center px-4 md:px-8 lg:px-16 mt-10 transition-all duration-1000 ${
             featuresInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
           }`}
         >
+          {/* See How It Works Section */}
+          <div className="w-full max-w-4xl mx-auto">
+            <video
+              src="/DemoHome.mp4"
+              autoPlay
+              muted
+              loop
+              playsInline
+              className="w-full h-full rounded-md shadow-2xl"
+            ></video>
+          </div>
+
+          {/* What We Offer Section */}
           <h3
             className={`text-4xl sm:text-5xl font-bold text-center ${
               isDarkMode ? 'text-white' : 'text-blue-950'
-            } mb-12`}
+            } mt-32 mb-12`}
           >
             What We Offer
           </h3>
@@ -391,45 +358,6 @@ export default function Hero() {
                 >
                   {feature.description}
                 </motion.p>
-              </motion.div>
-            ))}
-          </div>
-
-          <h3
-            className={`text-4xl sm:text-5xl font-bold text-center ${
-              isDarkMode ? 'text-white' : 'text-blue-950'
-            } mt-16 mb-12`}
-          >
-            How It Works
-          </h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-            {howItWorks.map((step, index) => (
-              <motion.div
-                key={`how-it-works-${index}`}
-                className={`p-6 rounded-lg shadow-lg ${
-                  isDarkMode ? 'bg-gray-800' : 'bg-white'
-                } border border-transparent hover:border-blue-500 transition-all duration-300`}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.1 }}
-                whileHover={{ scale: 1.05 }}
-              >
-                <div className="flex justify-center">{step.icon}</div>
-                <h4
-                  className={`mt-4 text-xl font-semibold text-center ${
-                    isDarkMode ? 'text-white' : 'text-blue-950'
-                  }`}
-                >
-                  {step.title}
-                </h4>
-                <p
-                  className={`mt-2 text-center text-sm ${
-                    isDarkMode ? 'text-gray-300' : 'text-gray-700'
-                  }`}
-                >
-                  {step.description}
-                </p>
               </motion.div>
             ))}
           </div>
