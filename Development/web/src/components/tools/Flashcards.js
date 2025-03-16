@@ -6,7 +6,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { FaBars, FaTimes, FaSyncAlt } from 'react-icons/fa';
 import Sidebar from '../Sidebar';
 import { useRouter } from 'next/navigation';
-// Firebase
 import { db } from '@/firebase';
 import {
   doc,
@@ -17,11 +16,7 @@ import {
   query,
   where,
 } from 'firebase/firestore';
-
-// Auth
 import { useAuth } from '@/context/AuthContext';
-
-// Chart.js (Optional)
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -47,7 +42,6 @@ ChartJS.register(
   Legend
 );
 
-// Define possible selections for current law students
 const studyYearMapping = [
   { value: '1L', label: '1L (Core Subjects)' },
   { value: '2L', label: '2L (Intermediate Subjects)' },
@@ -79,23 +73,20 @@ export default function AIExamFlashCard() {
   const router = useRouter();
   const { currentUser, userDataObj } = useAuth();
   const isDarkMode = userDataObj?.darkMode || false;
-
-  // Sidebar
   const [isSidebarVisible, setIsSidebarVisible] = useState(true);
   const toggleSidebar = () => setIsSidebarVisible(!isSidebarVisible);
 
-  // Flashcard states
   const [flashcards, setFlashcards] = useState([]);
   const [answeredFlashcards, setAnsweredFlashcards] = useState([]);
   const [currentFlashcardIndex, setCurrentFlashcardIndex] = useState(0);
+
+  // Only ONE declaration for isAnswerRevealed:
   const [isAnswerRevealed, setIsAnswerRevealed] = useState(false);
 
-  // Timer states
-  const [timerDuration, setTimerDuration] = useState(0); // in minutes
-  const [timeLeft, setTimeLeft] = useState(0); // in seconds
+  const [timerDuration, setTimerDuration] = useState(0);
+  const [timeLeft, setTimeLeft] = useState(0);
   const timerRef = useRef(null);
 
-  // Configuration (repurposed for law students)
   const [studyConfig, setStudyConfig] = useState({
     studyYear: '1L',
     proficiency: 'Basic',
@@ -113,7 +104,6 @@ export default function AIExamFlashCard() {
   const [savedProgresses, setSavedProgresses] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
-  // Clear timer on unmount
   useEffect(() => {
     return () => {
       if (timerRef.current) {
@@ -122,7 +112,6 @@ export default function AIExamFlashCard() {
     };
   }, []);
 
-  // Timer logic
   const startTimer = (minutes) => {
     if (timerRef.current) {
       clearInterval(timerRef.current);
@@ -136,7 +125,6 @@ export default function AIExamFlashCard() {
         if (prev <= 1) {
           clearInterval(timerRef.current);
           timerRef.current = null;
-          // Timer ended
           setIsFinalFeedbackModalOpen(true);
           return 0;
         }
@@ -145,7 +133,6 @@ export default function AIExamFlashCard() {
     }, 1000);
   };
 
-  // If user is not logged in
   if (!currentUser) {
     return (
       <div
@@ -177,14 +164,12 @@ export default function AIExamFlashCard() {
     );
   }
 
-  // Format remaining time
   const formatTime = () => {
     const minutes = Math.floor(timeLeft / 60);
     const seconds = timeLeft % 60;
     return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
   };
 
-  // Save progress to Firestore
   const handleSaveProgress = async () => {
     if (!currentUser) {
       alert('You must be logged in to save progress.');
@@ -209,7 +194,6 @@ export default function AIExamFlashCard() {
     }
   };
 
-  // Load progress logic
   const openLoadProgressModal = () => {
     fetchSavedProgresses();
     setIsLoadProgressModalOpen(true);
@@ -254,11 +238,9 @@ export default function AIExamFlashCard() {
     }
   };
 
-  // Config modal
   const openConfigModal = () => setIsConfigModalOpen(true);
   const closeConfigModal = () => setIsConfigModalOpen(false);
 
-  // Handle config form changes
   const handleConfigChange = (e) => {
     const { name, value, type, checked } = e.target;
     setStudyConfig((prev) => ({
@@ -267,7 +249,6 @@ export default function AIExamFlashCard() {
     }));
   };
 
-  // Generate flashcards (calls your /api/generate-flashcards route)
   const handleGenerateFlashcards = async () => {
     setIsLoading(true);
     setFlashcards([]);
@@ -286,7 +267,6 @@ export default function AIExamFlashCard() {
       const { flashcards: newFCs } = await response.json();
       setFlashcards(newFCs);
 
-      // Start timer if set
       setTimerDuration(studyConfig.timerMinutes || 0);
       if (studyConfig.timerMinutes > 0) {
         startTimer(studyConfig.timerMinutes);
@@ -299,17 +279,13 @@ export default function AIExamFlashCard() {
     }
   };
 
-  // Access the current flashcard
   const currentFlashcard = flashcards[currentFlashcardIndex] || null;
 
-  // Reveal answer
   const handleShowAnswer = () => setIsAnswerRevealed(true);
 
-  // Mark correct/incorrect
   const markCorrect = () => recordAnswer(true);
   const markIncorrect = () => recordAnswer(false);
 
-  // Record an answer
   const recordAnswer = (isCorrect) => {
     const existingIndex = answeredFlashcards.findIndex(
       (item) => item.question === currentFlashcard?.question
@@ -335,7 +311,6 @@ export default function AIExamFlashCard() {
     }
   };
 
-  // Move to next flashcard
   const nextFlashcard = () => {
     setIsAnswerRevealed(false);
     if (studyConfig.resetTimerEveryQuestion && studyConfig.timerMinutes > 0) {
@@ -348,10 +323,8 @@ export default function AIExamFlashCard() {
     setCurrentFlashcardIndex((prev) => prev + 1);
   };
 
-  // Final feedback modal
   const closeFinalFeedbackModal = () => setIsFinalFeedbackModalOpen(false);
 
-  // FRAMER MOTION container for the main area
   const mainContainerVariants = {
     hidden: { opacity: 0, y: 50 },
     visible: {
@@ -368,7 +341,6 @@ export default function AIExamFlashCard() {
         isDarkMode ? 'text-white' : 'text-gray-800'
       )}
     >
-      {/* Sidebar + overlay (mobile) */}
       <AnimatePresence>
         {isSidebarVisible && (
           <>
@@ -389,9 +361,7 @@ export default function AIExamFlashCard() {
         )}
       </AnimatePresence>
 
-      {/* Main content container remains unchanged */}
       <main className="flex-1 flex flex-col px-6 relative z-200 h-screen">
-        {/* Top bar */}
         <div className="flex items-center justify-between">
           <button
             onClick={toggleSidebar}
@@ -426,7 +396,6 @@ export default function AIExamFlashCard() {
           </button>
         </div>
 
-        {/* Container for content */}
         <motion.div
           className={clsx(
             'flex-1 w-full rounded-2xl shadow-xl p-6 overflow-y-auto',
@@ -438,13 +407,11 @@ export default function AIExamFlashCard() {
           initial="hidden"
           animate="visible"
         >
-          {/* Top row: Timer and config buttons */}
           <div className="flex items-center justify-between mb-4">
             <div className="text-lg  text-center w-full">
               {timeLeft > 0 ? `Time Left: ${formatTime()}` : ''}
             </div>
             <div className="inline-flex flex-row flex-nowrap items-center gap-2 sm:gap-4">
-              {/* Load Progress Button */}
               <button
                 onClick={openLoadProgressModal}
                 className={clsx(
@@ -462,7 +429,6 @@ export default function AIExamFlashCard() {
                 </motion.div>
               </button>
 
-              {/* Configure Button */}
               <button
                 onClick={openConfigModal}
                 className="group relative h-12 w-full sm:w-56 overflow-hidden rounded bg-gradient-to-r from-blue-600 to-blue-800 text-white text-sm sm:text-base shadow hover:opacity-90 transition-all duration-200 flex items-center justify-center gradientShadowHoverBlue"
@@ -473,7 +439,6 @@ export default function AIExamFlashCard() {
             </div>
           </div>
 
-          {/* No flashcards generated */}
           {flashcards.length === 0 && !isLoading && (
             <div
               className={clsx(
@@ -488,65 +453,64 @@ export default function AIExamFlashCard() {
             </div>
           )}
 
-          {/* Loading bar */}
           {isLoading && (
             <div className="w-full h-1 bg-blue-500 z-50 animate-pulse my-4" />
           )}
 
-          {/* Flashcard display */}
           {flashcards.length > 0 && flashcards[currentFlashcardIndex] && (
-            <motion.div
-              key={currentFlashcardIndex}
-              className={clsx(
-                'relative w-full max-w-xl p-6 my-4 rounded-xl shadow-md',
-                isDarkMode ? 'bg-gray-800 text-white' : 'bg-white text-blue-950'
-              )}
-              initial={{ opacity: 0, y: 50 }}
-              animate={{ opacity: 1, y: 0 }}
-            >
-              <h2 className="text-xl  mb-2 text-center">Question:</h2>
-              <p className="mb-4 text-center">
-                {flashcards[currentFlashcardIndex].question}
-              </p>
+            <div className="flex justify-center">
+              <motion.div
+                key={currentFlashcardIndex}
+                className={clsx(
+                  'relative w-full max-w-xl p-6 my-4 rounded-xl shadow-md mx-auto',
+                  isDarkMode ? 'bg-gray-800 text-white' : 'bg-white text-blue-950'
+                )}
+                initial={{ opacity: 0, y: 50 }}
+                animate={{ opacity: 1, y: 0 }}
+              >
+                <h2 className="text-xl  mb-2 text-center">Question:</h2>
+                <p className="mb-4 text-center">
+                  {flashcards[currentFlashcardIndex].question}
+                </p>
 
-              {isAnswerRevealed ? (
-                <>
-                  <h3 className="text-lg  mb-2 text-center text-blue-500">
-                    Answer:
-                  </h3>
-                  <p className="mb-4 text-center">
-                    {flashcards[currentFlashcardIndex].correctAnswer ||
-                      flashcards[currentFlashcardIndex].answer}
-                  </p>
-                  <div className="mt-4 flex justify-center space-x-4">
+                {isAnswerRevealed ? (
+                  <>
+                    <h3 className="text-lg  mb-2 text-center text-blue-500">
+                      Answer:
+                    </h3>
+                    <p className="mb-4 text-center">
+                      {flashcards[currentFlashcardIndex].correctAnswer ||
+                        flashcards[currentFlashcardIndex].answer}
+                    </p>
+                    <div className="mt-4 flex justify-center space-x-4">
+                      <button
+                        onClick={() => recordAnswer(false)}
+                        className="px-4 py-2 rounded bg-red-500 hover:bg-red-600 text-white"
+                      >
+                        I Got It Wrong
+                      </button>
+                      <button
+                        onClick={() => recordAnswer(true)}
+                        className="px-4 py-2 rounded bg-emerald-500 hover:bg-emerald-600 text-white"
+                      >
+                        I Got It Right
+                      </button>
+                    </div>
+                  </>
+                ) : (
+                  <div className="flex justify-center">
                     <button
-                      onClick={() => recordAnswer(false)}
-                      className="px-4 py-2 rounded bg-red-500 hover:bg-red-600 text-white"
+                      onClick={handleShowAnswer}
+                      className="px-4 py-2 rounded bg-gradient-to-r from-blue-600 to-blue-800 text-white shadow hover:opacity-90 transition-all duration-200 gradientShadowHoverBlue"
                     >
-                      I Got It Wrong
-                    </button>
-                    <button
-                      onClick={() => recordAnswer(true)}
-                      className="px-4 py-2 rounded bg-emerald-500 hover:bg-emerald-600 text-white"
-                    >
-                      I Got It Right
+                      Show Answer
                     </button>
                   </div>
-                </>
-              ) : (
-                <div className="flex justify-center">
-                  <button
-                    onClick={handleShowAnswer}
-                    className="px-4 py-2 rounded bg-gradient-to-r from-blue-600 to-blue-800 text-white shadow hover:opacity-90 transition-all duration-200"
-                  >
-                    Show Answer
-                  </button>
-                </div>
-              )}
-            </motion.div>
+                )}
+              </motion.div>
+            </div>
           )}
 
-          {/* Flashcard progress info */}
           {flashcards.length > 0 && (
             <div className="mt-2 text-sm text-gray-400 text-center">
               <p>
@@ -556,7 +520,6 @@ export default function AIExamFlashCard() {
           )}
         </motion.div>
 
-        {/* Load Progress Modal */}
         <AnimatePresence>
           {isLoadProgressModalOpen && (
             <motion.div
@@ -595,7 +558,9 @@ export default function AIExamFlashCard() {
                             </p>
                             <p className="text-sm">Proficiency: {prog.studyConfig?.proficiency}</p>
                             <p className="text-sm">Course: {prog.studyConfig?.courseName}</p>
-                            <p className="text-sm">Questions: {prog.studyConfig?.questionLimit}</p>
+                            <p className="text-sm">
+                              Questions: {prog.studyConfig?.questionLimit}
+                            </p>
                             <p className="text-sm">
                               Timer: {prog.studyConfig?.timerMinutes || 0} min
                             </p>
@@ -648,7 +613,6 @@ export default function AIExamFlashCard() {
           )}
         </AnimatePresence>
 
-        {/* Final Feedback Modal */}
         <AnimatePresence>
           {isFinalFeedbackModalOpen && (
             <motion.div
@@ -676,7 +640,9 @@ export default function AIExamFlashCard() {
                       isDarkMode ? 'border-gray-700' : 'border-gray-300'
                     )}
                   >
-                    <p className={clsx(' mb-1', isDarkMode ? 'text-blue-300' : 'text-blue-900')}>
+                    <p
+                      className={clsx(' mb-1', isDarkMode ? 'text-blue-300' : 'text-blue-900')}
+                    >
                       Flashcard {idx + 1}
                     </p>
                     <p className="text-center">
@@ -685,7 +651,12 @@ export default function AIExamFlashCard() {
                     <p className="text-center">
                       <strong>Answer:</strong> {card.correctAnswer || card.answer}
                     </p>
-                    <p className={clsx('font-bold mt-1 text-center', card.isCorrect ? 'text-emerald-500' : 'text-red-500')}>
+                    <p
+                      className={clsx(
+                        'font-bold mt-1 text-center',
+                        card.isCorrect ? 'text-emerald-500' : 'text-red-500'
+                      )}
+                    >
                       {card.isCorrect ? '✓ You got it right' : '✗ You got it wrong'}
                     </p>
                   </div>
@@ -708,7 +679,6 @@ export default function AIExamFlashCard() {
           )}
         </AnimatePresence>
 
-        {/* Configuration Modal */}
         <AnimatePresence>
           {isConfigModalOpen && (
             <motion.div
@@ -740,7 +710,6 @@ export default function AIExamFlashCard() {
                   </button>
                 </div>
 
-                {/* Study Year */}
                 <div className="mb-4">
                   <label className="block  mb-1">Year/Level:</label>
                   <select
@@ -760,7 +729,6 @@ export default function AIExamFlashCard() {
                   </select>
                 </div>
 
-                {/* Proficiency */}
                 <div className="mb-4">
                   <label className="block  mb-1">Proficiency:</label>
                   <select
@@ -780,7 +748,6 @@ export default function AIExamFlashCard() {
                   </select>
                 </div>
 
-                {/* Course Name */}
                 <div className="mb-4">
                   <label className="block  mb-1">Course/Subject:</label>
                   <select
@@ -800,7 +767,6 @@ export default function AIExamFlashCard() {
                   </select>
                 </div>
 
-                {/* Number of flashcards */}
                 <div className="mb-4">
                   <label className="block  mb-1">Number of Flashcards:</label>
                   <input
@@ -815,7 +781,6 @@ export default function AIExamFlashCard() {
                   <p className="text-right">Selected: {studyConfig.questionLimit}</p>
                 </div>
 
-                {/* Timer field (minutes) */}
                 <div className="mb-4">
                   <label className="block  mb-1">Timer (in minutes):</label>
                   <input
@@ -836,7 +801,6 @@ export default function AIExamFlashCard() {
                   </p>
                 </div>
 
-                {/* Reset Timer On Each Question */}
                 <div className="flex items-center mb-4">
                   <input
                     type="checkbox"
@@ -848,7 +812,6 @@ export default function AIExamFlashCard() {
                   <label className=" text-sm">Reset Timer On Each Question</label>
                 </div>
 
-                {/* Instant Feedback */}
                 <div className="flex items-center mb-4">
                   <input
                     type="checkbox"
@@ -862,7 +825,6 @@ export default function AIExamFlashCard() {
                   </label>
                 </div>
 
-                {/* Include Explanations */}
                 <div className="flex items-center mb-4">
                   <input
                     type="checkbox"
@@ -874,7 +836,6 @@ export default function AIExamFlashCard() {
                   <label className=" text-sm">Include Extended Explanations</label>
                 </div>
 
-                {/* Action Buttons */}
                 <div className="flex justify-end space-x-4">
                   <button
                     type="button"

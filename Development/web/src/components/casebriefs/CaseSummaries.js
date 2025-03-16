@@ -35,15 +35,12 @@ import { useAuth } from '@/context/AuthContext';
 import html2canvas from 'html2canvas';
 import { jsPDF } from 'jspdf';
 
-// Helper: truncate text
 const simplifyText = (text = '', maxLength = 400) => {
   if (!text) return 'Not provided.';
   if (text.length <= maxLength) return text;
   return text.slice(0, maxLength) + '...';
 };
 
-// Dummy citation generators – placeholders for demonstration
-// Replace with your actual logic if needed.
 const generateCitation = (caseObj, reporter = 'U.S.', page = '___') => {
   let year = '____';
   if (caseObj.decisionDate) {
@@ -59,7 +56,6 @@ const generateBluebookCitation = (caseObj, page = '___') => {
   return `Bluebook: ${generateCitation(caseObj, 'U.S.', page)}`;
 };
 
-// New placeholders for IEEE, APA, MLA, Chicago & AMA
 const generateCitationIEEE = (caseObj, page = '___') => {
   return `IEEE: ${caseObj.title || 'N/A'}, ${caseObj.volume || '___'} U.S. ${page}, ${caseObj.decisionDate || '____'}.`;
 };
@@ -106,11 +102,9 @@ export default function CaseSummaries() {
   const searchParams = useSearchParams();
   const { currentUser, userDataObj } = useAuth();
   const plan = userDataObj?.billing?.plan?.toLowerCase() || 'free';
-  // Note: isPro is set to "free" for testing purposes as per your comment.
   const isPro = plan === 'pro';
   const isExpert = plan === 'expert';
   const isDarkMode = userDataObj?.darkMode || false;
-
   const [isSidebarVisible, setIsSidebarVisible] = useState(true);
   const toggleSidebar = () => setIsSidebarVisible(!isSidebarVisible);
 
@@ -120,13 +114,11 @@ export default function CaseSummaries() {
   const [reRunCount, setReRunCount] = useState(0);
   const [isVerified, setIsVerified] = useState(false);
 
-  // If no query param exists, fallback to the last stored case id.
   const queryCaseId = searchParams.get('caseId');
   const capCaseId = queryCaseId || localStorage.getItem('lastCapCaseId');
 
   const pdfRef = useRef(null);
 
-  // View Modes: 'classic', 'bulletpoint', 'simplified'
   const [viewMode, setViewMode] = useState('classic');
   const viewModes = [
     { label: 'Classic', value: 'classic' },
@@ -137,11 +129,54 @@ export default function CaseSummaries() {
 
   const [relatedCases, setRelatedCases] = useState([]);
 
-  // New state: favorites from userDataObj.favorites
+  // FAVORITES
+  const [favorites, setFavorites] = useState([]);
+  const [isFavorited, setIsFavorited] = useState(false);
+
+  useEffect(() => {
+    if (userDataObj && Array.isArray(userDataObj.favorites)) {
+      setFavorites(userDataObj.favorites);
+    }
+  }, [userDataObj]);
+
+  // Whenever capCase or favorites changes, determine if it's currently favorited.
+  useEffect(() => {
+    if (capCase && favorites.includes(capCase.id)) {
+      setIsFavorited(true);
+    } else {
+      setIsFavorited(false);
+    }
+  }, [capCase, favorites]);
+
+  const toggleFavoriteCase = async () => {
+    if (!capCase) return;
+    if (!currentUser) {
+      alert('Please log in to favorite cases.');
+      return;
+    }
+    try {
+      const userDocRef = doc(db, 'users', currentUser.uid);
+      let updatedFavorites;
+      if (favorites.includes(capCase.id)) {
+        updatedFavorites = favorites.filter((id) => id !== capCase.id);
+        setIsFavorited(false);
+      } else {
+        updatedFavorites = [...favorites, capCase.id];
+        setIsFavorited(true);
+      }
+      setFavorites(updatedFavorites);
+      await updateDoc(userDocRef, { favorites: updatedFavorites });
+      console.log('Updated favorites:', updatedFavorites);
+    } catch (error) {
+      console.error('Error toggling favorite:', error);
+      alert('Error toggling favorite.');
+    }
+  };
+  // END FAVORITES
+
   const [favoriteCases, setFavoriteCases] = useState([]);
   const [selectedFavorite, setSelectedFavorite] = useState(null);
 
-  // Persist the current case brief in localStorage so it remains open on tab change.
   useEffect(() => {
     if (capCaseId && caseBrief) {
       localStorage.setItem(`caseBrief_${capCaseId}`, JSON.stringify(caseBrief));
@@ -149,7 +184,6 @@ export default function CaseSummaries() {
     }
   }, [caseBrief, capCaseId]);
 
-  // Load saved case brief from localStorage when capCaseId changes.
   useEffect(() => {
     if (capCaseId) {
       const savedBrief = localStorage.getItem(`caseBrief_${capCaseId}`);
@@ -159,7 +193,6 @@ export default function CaseSummaries() {
     }
   }, [capCaseId]);
 
-  // Fetch favorites from userDataObj
   useEffect(() => {
     if (!userDataObj) return;
     if (Array.isArray(userDataObj.favorites)) {
@@ -181,10 +214,9 @@ export default function CaseSummaries() {
     }
   }, [userDataObj]);
 
-  // Load saved selected favorite from localStorage if available
   useEffect(() => {
     if (favoriteCases.length > 0) {
-      const savedFavId = localStorage.getItem("selectedFavoriteForSummary");
+      const savedFavId = localStorage.getItem('selectedFavoriteForSummary');
       if (savedFavId) {
         const fav = favoriteCases.find((c) => c.id === savedFavId);
         if (fav) setSelectedFavorite(fav);
@@ -192,7 +224,6 @@ export default function CaseSummaries() {
     }
   }, [favoriteCases]);
 
-  // New function: fetch favorite case summary from Firebase (for favorites only)
   const fetchFavoriteCaseSummary = async (fav) => {
     try {
       const favDoc = await getDoc(doc(db, 'capCases', fav.id));
@@ -221,7 +252,6 @@ export default function CaseSummaries() {
     }
   };
 
-  // Render helpers
   const renderFieldContent = (fieldText) => {
     if (!fieldText) return 'Not provided.';
     if (viewMode === 'bulletpoint') {
@@ -269,10 +299,6 @@ export default function CaseSummaries() {
     return <p className="text-base mt-2">{factsText}</p>;
   };
 
-  useEffect(() => {
-    if (!currentUser) return;
-  }, [currentUser]);
-
   const shareCase = async () => {
     if (!capCase) return;
     const shareData = {
@@ -301,7 +327,7 @@ export default function CaseSummaries() {
     }
   };
 
-  // Fetch main case and summary.
+  // Only call the external API if no summary in Firestore or verified is false
   useEffect(() => {
     if (!currentUser || !capCaseId) return;
     const fetchCapCaseAndSummary = async () => {
@@ -555,7 +581,6 @@ export default function CaseSummaries() {
     );
   }
 
-  // Structured data for Google Search Indexing.
   const structuredData = capCase
     ? {
         '@context': 'https://schema.org',
@@ -605,7 +630,6 @@ export default function CaseSummaries() {
         </AnimatePresence>
 
         <main className="flex-1 flex flex-col px-6 relative z-50 h-screen">
-          {/* Top Bar with Sidebar Toggle */}
           <div className="flex items-center justify-between">
             <button
               onClick={toggleSidebar}
@@ -649,7 +673,6 @@ export default function CaseSummaries() {
               {viewMode === 'simplified' ? 'Case Brief (Simple)' : 'Full Case Brief (Detailed)'}
             </h1>
 
-            {/* Case Info */}
             <div
               className={`p-6 rounded-xl mb-6 ${
                 isDarkMode
@@ -662,7 +685,6 @@ export default function CaseSummaries() {
                 {capCase?.jurisdiction || 'Unknown'} | Volume: {capCase?.volume || 'N/A'} | Date:{' '}
                 {capCase?.decisionDate || 'N/A'}
               </p>
-              {/* ADDING CITATION LINE HERE */}
               <p
                 className={`text-sm mt-1 font-semibold ${
                   isDarkMode ? 'text-gray-200' : 'text-gray-800'
@@ -714,10 +736,23 @@ export default function CaseSummaries() {
                 >
                   <FaShareAlt size={16} className="text-gray-400" />
                 </motion.button>
+                {/* FAVORITE BUTTON */}
+                <motion.button
+                  onClick={toggleFavoriteCase}
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                  className="ml-4"
+                  aria-label="Toggle Favorite"
+                >
+                  {isFavorited ? (
+                    <FaHeart size={16} className="text-red-500" />
+                  ) : (
+                    <FaRegHeart size={16} className="text-gray-400" />
+                  )}
+                </motion.button>
               </div>
             </div>
 
-            {/* 3-Way Animated Toggle for viewMode */}
             <div className="relative flex items-center justify-center mb-6">
               <div
                 className={`relative flex items-center rounded-full p-1 ${
@@ -754,7 +789,6 @@ export default function CaseSummaries() {
               </div>
             </div>
 
-            {/* Summary Section */}
             <div className="w-full">
               {isSummaryLoading ? (
                 <div className="flex flex-col items-center justify-center space-y-3">
@@ -833,7 +867,6 @@ export default function CaseSummaries() {
                   </div>
                 )
               ) : (
-                // When no summary available, show a dropdown of favorite cases centered.
                 <div className="w-full flex flex-col items-center">
                   <p className="text-sm text-gray-400 mb-2">View All Briefs to Select a Case Brief.</p>
                   <select
@@ -841,13 +874,12 @@ export default function CaseSummaries() {
                     onChange={(e) => {
                       const fav = favoriteCases.find((c) => c.id === e.target.value);
                       setSelectedFavorite(fav);
-                      localStorage.setItem("selectedFavoriteForSummary", e.target.value);
+                      localStorage.setItem('selectedFavoriteForSummary', e.target.value);
                       if (fav) {
-                        // For favorites, pull from Firebase first instead of generating a new summary.
                         fetchFavoriteCaseSummary(fav);
                       }
                     }}
-                    value={selectedFavorite ? selectedFavorite.id : ""}
+                    value={selectedFavorite ? selectedFavorite.id : ''}
                   >
                     <option value="">Select a favorite case</option>
                     {favoriteCases.map((fav) => (
@@ -860,7 +892,6 @@ export default function CaseSummaries() {
               )}
             </div>
 
-            {/* Related Cases */}
             <div className="w-full mt-8">
               <h2 className="text-lg font-bold mb-2 text-center">Related Cases</h2>
               <motion.div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 w-full" layout>
@@ -895,7 +926,6 @@ export default function CaseSummaries() {
               </motion.div>
             </div>
 
-            {/* Citation Generator */}
             {capCase && (
               <div className="w-full mt-8">
                 <h2 className="text-lg font-bold mb-2">Citation Generator</h2>
@@ -904,11 +934,8 @@ export default function CaseSummaries() {
                     isDarkMode ? 'bg-slate-800 border border-slate-700' : 'bg-gray-100 border border-gray-300'
                   }`}
                 >
-                  {/* Original: "Standard" and "Bluebook" */}
                   <p className="text-base italic">{generateCitation(capCase, 'U.S.', '113')}</p>
                   <p className="text-base italic mt-2">{generateBluebookCitation(capCase, '113')}</p>
-
-                  {/* Newly added: IEEE, APA, MLA, Chicago, AMA */}
                   <p className="text-base italic mt-4">{generateCitationIEEE(capCase, '113')}</p>
                   <p className="text-base italic mt-2">{generateCitationAPA(capCase, '113')}</p>
                   <p className="text-base italic mt-2">{generateCitationMLA(capCase, '113')}</p>
@@ -918,7 +945,6 @@ export default function CaseSummaries() {
               </div>
             )}
 
-            {/* PDF Save Button */}
             <motion.button
               onClick={saveAsPDFHandler}
               whileHover={{ scale: 1.1, rotate: 5 }}
