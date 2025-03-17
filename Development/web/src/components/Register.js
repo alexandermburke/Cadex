@@ -5,7 +5,10 @@ import { useSearchParams } from 'next/navigation';
 import AuthError from './AuthError';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 
-const poppins = Poppins({ subsets: ["latin"], weight: ['400', '100', '200', '300', '500', '600', '700'] });
+const poppins = Poppins({
+  subsets: ["latin"],
+  weight: ['400', '100', '200', '300', '500', '600', '700'],
+});
 
 export default function Register(props) {
   const {
@@ -71,6 +74,7 @@ export default function Register(props) {
   const handleEmailChange = (e) => {
     const value = e.target.value;
     setEmail(value);
+
     const parts = value.split('@');
     if (parts.length === 2) {
       const domain = parts[1].toLowerCase();
@@ -151,7 +155,7 @@ export default function Register(props) {
               <p className="text-red-500 text-sm text-center">{emailError}</p>
             )}
 
-            {/* Terms & Conditions checkbox */}
+            {/* Terms & Conditions + Privacy Policy checkbox */}
             <div className="flex items-center justify-center gap-2 max-w-[600px] mx-auto w-full">
               <input
                 type="checkbox"
@@ -163,6 +167,10 @@ export default function Register(props) {
                 By checking this box, I agree to the{' '}
                 <a href="/termsandconditions" target="_blank" className="underline">
                   Terms and Conditions
+                </a>{' '}
+                and{' '}
+                <a href="/privacypolicy" target="_blank" className="underline">
+                  Privacy Policy
                 </a>.
               </label>
             </div>
@@ -173,7 +181,9 @@ export default function Register(props) {
         ) : (
           // Step 1: Password
           <>
-            <p className="text-center">Choose a strong password with at least 8 characters.</p>
+            <p className="text-center">
+              Choose a strong password with at least 8 characters.
+            </p>
             <div className="relative max-w-[600px] mx-auto w-full">
               <input
                 value={password}

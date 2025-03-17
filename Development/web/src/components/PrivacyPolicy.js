@@ -33,28 +33,28 @@ export default function PrivacyPolicy() {
       </h1>
 
       <p className={`text-base sm:text-lg md:text-xl ${isDarkMode ? 'text-white' : 'text-black'}`}>
-        Welcome to Cadex. Your privacy is of utmost importance to us. This Privacy Policy outlines how we collect, use, and protect your information when you use our website and services. By accessing or using Cadex, you agree to the practices described in this Privacy Policy. If you do not agree with these practices, please do not use Cadex.
+        Welcome to CadexLaw. Your privacy is of utmost importance to us. This Privacy Policy outlines how we collect, use, and protect your information when you use our website and services. By accessing or using CadexLaw, you agree to the practices described in this Privacy Policy. If you do not agree with these practices, please do not use CadexLaw.
       </p>
 
       <h2 className={`text-2xl font-semibold mt-4 ${isDarkMode ? 'text-white' : 'text-blue-950'}`}>
         Information We Collect
       </h2>
       <p className={`text-base ${isDarkMode ? 'text-white' : 'text-black'}`}>
-        Cadex collects minimal information necessary to provide you with our services. Currently, we only store your login credentials, which include your email address and password. We do not collect or store any additional personal information unless you choose to provide it voluntarily.
+        CadexLaw collects minimal information necessary to provide you with our services. Currently, we only store your login credentials, which include your email address and password. We do not collect or store any additional personal information unless you choose to provide it voluntarily.
       </p>
 
       <h2 className={`text-2xl font-semibold mt-4 ${isDarkMode ? 'text-white' : 'text-blue-950'}`}>
         Use of Information
       </h2>
       <p className={`text-base ${isDarkMode ? 'text-white' : 'text-black'}`}>
-        The information we collect is used solely to authenticate your account and provide you with access to Cadex&apos;s features and services. We are committed to ensuring that your data is handled securely and responsibly.
+        The information we collect is used solely to authenticate your account and provide you with access to CadexLaw&apos;s features and services. We are committed to ensuring that your data is handled securely and responsibly.
       </p>
 
       <h2 className={`text-2xl font-semibold mt-4 ${isDarkMode ? 'text-white' : 'text-blue-950'}`}>
         Information Sharing and Disclosure
       </h2>
       <p className={`text-base ${isDarkMode ? 'text-white' : 'text-black'}`}>
-        Cadex does not sell, trade, or otherwise transfer your personally identifiable information to outside parties. This does not include trusted third parties who assist us in operating our website, conducting our business, or servicing you, so long as those parties agree to keep this information confidential.
+        CadexLaw does not sell, trade, or otherwise transfer your personally identifiable information to outside parties. This does not include trusted third parties who assist us in operating our website, conducting our business, or servicing you, so long as those parties agree to keep this information confidential.
       </p>
 
       <h2 className={`text-2xl font-semibold mt-4 ${isDarkMode ? 'text-white' : 'text-blue-950'}`}>
@@ -68,7 +68,7 @@ export default function PrivacyPolicy() {
         Changes to This Privacy Policy
       </h2>
       <p className={`text-base ${isDarkMode ? 'text-white' : 'text-black'}`}>
-        Cadex reserves the right to update or modify this Privacy Policy at any time. Any changes will be effective immediately upon posting the revised Privacy Policy on our website. We encourage you to review this Privacy Policy periodically to stay informed about how we are protecting your information.
+        CadexLaw reserves the right to update or modify this Privacy Policy at any time. Any changes will be effective immediately upon posting the revised Privacy Policy on our website. We encourage you to review this Privacy Policy periodically to stay informed about how we are protecting your information.
       </p>
 
       <h2 className={`text-2xl font-semibold mt-4 ${isDarkMode ? 'text-white' : 'text-blue-950'}`}>
@@ -76,14 +76,14 @@ export default function PrivacyPolicy() {
       </h2>
       <p className={`text-base ${isDarkMode ? 'text-white' : 'text-black'}`}>
         If you have any questions or concerns about this Privacy Policy or our data practices, please contact us at{' '}
-        <a href="mailto:support@cadexlaw.com" className={`underline ${isDarkMode ? 'text-white' : 'text-blue-600'}`}>
-          support@cadexlaw.com
+        <a href="mailto:support@CadexLaw.com" className={`underline ${isDarkMode ? 'text-white' : 'text-blue-600'}`}>
+          support@CadexLaw.com
         </a>
         .
       </p>
 
       <p className={`mt-4 ${isDarkMode ? 'text-white' : 'text-black'}`}>
-        By using Cadex, you acknowledge that you have read and understand this Privacy Policy and agree to the practices described herein.
+        By using CadexLaw, you acknowledge that you have read and understand this Privacy Policy and agree to the practices described herein.
       </p>
     </div>
   );

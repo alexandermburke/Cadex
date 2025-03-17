@@ -41,19 +41,19 @@ export default function Legal() {
           isDarkMode ? 'text-white' : 'text-black'
         }`}
       >
-        Welcome to Cadex – your premier legal education platform designed specifically for analyzing case briefs and preparing for exams. These Terms &amp; Conditions govern your use of Cadex’s website and services. By accessing or using Cadex, you agree to be bound by these Terms &amp; Conditions. If you do not agree, please refrain from using our platform.
+        Welcome to CadexLaw – your premier legal education platform designed specifically for analyzing case briefs and preparing for exams. These Terms &amp; Conditions govern your use of CadexLaw’s website and services. By accessing or using CadexLaw, you agree to be bound by these Terms &amp; Conditions. If you do not agree, please refrain from using our platform.
       </p>
 
-      {/* Use of Cadex */}
+      {/* Use of CadexLaw */}
       <h2
         className={`text-2xl font-semibold mt-4 ${
           isDarkMode ? 'text-white' : 'text-blue-950'
         }`}
       >
-        Use of Cadex
+        Use of CadexLaw
       </h2>
       <p className={`text-base ${isDarkMode ? 'text-white' : 'text-black'}`}>
-        Cadex is designed to assist law students and legal professionals in accessing detailed case briefs and exam preparation materials. You must be at least 18 years old to use Cadex. By using our platform, you represent and warrant that you meet this requirement and will use Cadex only for lawful purposes and in accordance with these Terms &amp; Conditions.
+        CadexLaw is designed to assist law students and legal professionals in accessing detailed case briefs and exam preparation materials. You must be at least 18 years old to use CadexLaw. By using our platform, you represent and warrant that you meet this requirement and will use CadexLaw only for lawful purposes and in accordance with these Terms &amp; Conditions.
       </p>
 
       {/* Disclaimer */}
@@ -67,7 +67,7 @@ export default function Legal() {
       <p
         className={`text-base ${isDarkMode ? 'text-white' : 'text-black'}`}
       >
-        Cadex is a supplementary educational tool designed to enhance your understanding of case briefs and exam strategies. It is not a substitute for professional legal advice, formal legal education, or comprehensive exam preparation programs. Always consult a qualified professional for advice regarding your legal and academic pursuits.
+        CadexLaw is a supplementary educational tool designed to enhance your understanding of case briefs and exam strategies. It is not a substitute for professional legal advice, formal legal education, or comprehensive exam preparation programs. Always consult a qualified professional for advice regarding your legal and academic pursuits.
       </p>
 
       {/* Intellectual Property */}
@@ -81,12 +81,12 @@ export default function Legal() {
       <p
         className={`text-base ${isDarkMode ? 'text-white' : 'text-black'}`}
       >
-        All content on Cadex’s website, including text, graphics, logos, images, and software, is the property of Cadex or its licensors and is protected by copyright, trademark, and other intellectual property laws.
+        All content on CadexLaw’s website, including text, graphics, logos, images, and software, is the property of CadexLaw or its licensors and is protected by copyright, trademark, and other intellectual property laws.
       </p>
       <p
         className={`text-base ${isDarkMode ? 'text-white' : 'text-black'}`}
       >
-        You may not modify, reproduce, distribute, transmit, display, or create derivative works of any content on Cadex without our prior written consent.
+        You may not modify, reproduce, distribute, transmit, display, or create derivative works of any content on CadexLaw without our prior written consent.
       </p>
 
       {/* Disclaimer of Warranties */}
@@ -100,7 +100,7 @@ export default function Legal() {
       <p
         className={`text-base ${isDarkMode ? 'text-white' : 'text-black'}`}
       >
-        Cadex’s website and services are provided &quot;as is&quot; and &quot;as available,&quot; without any warranties of any kind, either express or implied. We do not guarantee that our platform will be uninterrupted, error-free, or that the information provided is accurate, complete, or current.
+        CadexLaw’s website and services are provided &quot;as is&quot; and &quot;as available,&quot; without any warranties of any kind, either express or implied. We do not guarantee that our platform will be uninterrupted, error-free, or that the information provided is accurate, complete, or current.
       </p>
 
       {/* Limitation of Liability */}
@@ -114,7 +114,7 @@ export default function Legal() {
       <p
         className={`text-base ${isDarkMode ? 'text-white' : 'text-black'}`}
       >
-        In no event shall Cadex be liable for any direct, indirect, incidental, special, or consequential damages arising out of or related to your use of our website or services, whether based on contract, tort, strict liability, or any other legal theory.
+        In no event shall CadexLaw be liable for any direct, indirect, incidental, special, or consequential damages arising out of or related to your use of our website or services, whether based on contract, tort, strict liability, or any other legal theory.
       </p>
 
       {/* Indemnification */}
@@ -128,7 +128,7 @@ export default function Legal() {
       <p
         className={`text-base ${isDarkMode ? 'text-white' : 'text-black'}`}
       >
-        You agree to indemnify and hold harmless Cadex, its affiliates, officers, directors, employees, and agents from any claims, liabilities, damages, losses, or expenses (including reasonable attorneys’ fees) arising out of or in any way connected with your use of our website or services.
+        You agree to indemnify and hold harmless CadexLaw, its affiliates, officers, directors, employees, and agents from any claims, liabilities, damages, losses, or expenses (including reasonable attorneys’ fees) arising out of or in any way connected with your use of our website or services.
       </p>
 
       {/* Governing Law */}
@@ -156,7 +156,7 @@ export default function Legal() {
       <p
         className={`text-base ${isDarkMode ? 'text-white' : 'text-black'}`}
       >
-        Any legal suit, action, or proceeding arising out of or related to these Terms &amp; Conditions or your use of Cadex shall be brought exclusively in the federal or state courts located in Maricopa County, Arizona.
+        Any legal suit, action, or proceeding arising out of or related to these Terms &amp; Conditions or your use of CadexLaw shall be brought exclusively in the federal or state courts located in Maricopa County, Arizona.
       </p>
 
       {/* Changes to Terms & Conditions */}
@@ -170,7 +170,7 @@ export default function Legal() {
       <p
         className={`text-base ${isDarkMode ? 'text-white' : 'text-black'}`}
       >
-        Cadex reserves the right to update or modify these Terms &amp; Conditions at any time. Any changes will be effective immediately upon posting the revised Terms &amp; Conditions on our website.
+        CadexLaw reserves the right to update or modify these Terms &amp; Conditions at any time. Any changes will be effective immediately upon posting the revised Terms &amp; Conditions on our website.
       </p>
 
       {/* Contact Us */}
@@ -186,17 +186,17 @@ export default function Legal() {
       >
         If you have any questions or concerns about these Terms &amp; Conditions, please contact us at{' '}
         <a
-          href="mailto:support@cadexlaw.com"
+          href="mailto:support@CadexLaw.com"
           className={`underline ${isDarkMode ? 'text-white' : 'text-blue-600'}`}
         >
-          support@cadexlaw.com
+          support@CadexLaw.com
         </a>
         .
       </p>
 
       {/* Agreement */}
       <p className={`mt-4 ${isDarkMode ? 'text-white' : 'text-black'}`}>
-        By using Cadex, you acknowledge that you have read and understand these Terms &amp; Conditions and agree to be bound by them.
+        By using CadexLaw, you acknowledge that you have read and understand these Terms &amp; Conditions and agree to be bound by them.
       </p>
 
       {/* Last Updated */}
