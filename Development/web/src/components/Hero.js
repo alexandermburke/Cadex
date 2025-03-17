@@ -288,7 +288,6 @@ export default function Hero() {
             >
               <div className="flex items-center justify-center h-full">
                 Explore Our Plans
-                <i className="ml-8 fa-solid fa-arrow-right transition-opacity duration-200"></i>
               </div>
             </Link>
           </div>
