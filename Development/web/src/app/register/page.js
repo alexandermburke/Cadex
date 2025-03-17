@@ -9,6 +9,10 @@ import CoolLayout from '@/components/CoolLayout';
 import { collection, doc, documentId, getCountFromServer, getDoc, where, query } from 'firebase/firestore';
 import { db } from '@/firebase';
 
+export const metadata = {
+    title: "CadexLaw.com ⋅ Register",
+};
+
 export default function RegisterPage() {
     const [username, setUsername] = useState('')
     const [email, setEmail] = useState('')

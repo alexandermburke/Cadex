@@ -302,16 +302,19 @@ export default function Hero() {
           }`}
         >
           {/* See How It Works Section */}
-          <div className="w-full max-w-4xl mx-auto">
-            <video
-              src="/DemoHome.mp4"
-              autoPlay
-              muted
-              loop
-              playsInline
-              className="w-full h-full rounded-md shadow-2xl"
-            ></video>
+          <div className="relative w-full max-w-3xl mx-auto mt-4">
+            <div className="relative w-full h-0 pb-[50%] overflow-hidden rounded-lg shadow-xl"> {/* 16:9 = 56.25% */}
+              <video
+                src="/DemoHome.mp4"
+                autoPlay
+                muted
+                loop
+                playsInline
+               className="absolute top-0 left-0 w-full h-full object-cover"
+              ></video>
+            </div>
           </div>
+
 
           {/* What We Offer Section */}
           <h3
