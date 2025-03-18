@@ -231,7 +231,7 @@ export default function CaseAnalysis() {
             transition={{ duration: 0.3 }}
             className={`mb-4 overflow-y-auto rounded-lg p-6 backdrop-blur-sm shadow-lg ${
               isDarkMode
-                ? 'bg-slate-800 border border-slate-600 text-white'
+                ? 'bg-slate-800 bg-opacity-50 bg-opacity-50 border border-slate-600 text-white'
                 : 'bg-white border border-gray-300 text-gray-800'
             }`}
           >
@@ -319,7 +319,7 @@ export default function CaseAnalysis() {
             <motion.div
               className={`rounded-xl p-6 mb-6 shadow-lg flex-1 ${
                 isDarkMode
-                  ? 'bg-slate-800 border border-slate-700 text-white'
+                  ? 'bg-slate-800 bg-opacity-50 border border-slate-700 text-white'
                   : 'bg-white border border-gray-300 text-gray-800'
               }`}
               initial={{ opacity: 0, y: 30 }}
@@ -423,7 +423,7 @@ export default function CaseAnalysis() {
 
             <motion.div
               className={`rounded-xl p-6 shadow-lg flex-1 ${
-                isDarkMode ? 'bg-slate-800 text-white' : 'bg-white text-gray-800'
+                isDarkMode ? 'bg-slate-800 bg-opacity-50 text-white' : 'bg-white text-gray-800'
               }`}
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
@@ -606,7 +606,7 @@ export default function CaseAnalysis() {
       >
         <div
           className={`p-6 rounded-2xl shadow-xl text-center ${
-            isDarkMode ? 'bg-slate-800' : 'bg-white'
+            isDarkMode ? 'bg-slate-800 bg-opacity-50' : 'bg-white'
           }`}
         >
           <p className="mb-4 text-lg font-semibold">Please log in to access Case Analysis.</p>

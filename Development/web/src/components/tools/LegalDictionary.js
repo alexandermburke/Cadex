@@ -626,7 +626,7 @@ export default function LegalDictionary() {
                 <form
                   onSubmit={handleAddNewTerm}
                   className={`p-6 rounded-2xl shadow-md ${
-                    isDarkMode ? 'bg-slate-800 text-white' : 'bg-white text-gray-800'
+                    isDarkMode ? 'bg-slate-800 bg-opacity-50 text-white' : 'bg-white text-gray-800'
                   }`}
                 >
                   <h2 className="text-2xl font-bold mb-4 text-center">
