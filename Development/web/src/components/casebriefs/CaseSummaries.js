@@ -670,7 +670,7 @@ export default function CaseSummaries() {
             } flex flex-col items-center`}
           >
             <h1 className="text-2xl font-bold mb-4">
-              {viewMode === 'simplified' ? 'Case Brief (Simple)' : 'Full Case Brief (Detailed)'}
+              {viewMode === 'simplified' ? 'Case Brief (Simple)' : 'Full Case Brief Summary'}
             </h1>
 
             <div
