@@ -119,7 +119,7 @@ export default function CaseSummaries() {
 
   const pdfRef = useRef(null);
 
-  const [viewMode, setViewMode] = useState('classic');
+  const [viewMode, setViewMode] = useState('bulletpoint');
   const viewModes = [
     { label: 'Classic', value: 'classic' },
     { label: 'Bullets', value: 'bulletpoint' },
@@ -657,6 +657,7 @@ export default function CaseSummaries() {
                   >
                     <FaBars size={20} />
                   </motion.div>
+
                 )}
               </AnimatePresence>
             </button>
