@@ -683,7 +683,7 @@ export default function AllBriefs() {
                 <>
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 w-full relative">
                     {paginatedCases.map((c) => (
-                      <div key={c.id} onClick={() => openCase(c)} className={`p-4 rounded-xl shadow-lg transition-transform transform hover:scale-105 cursor-pointer group flex flex-col ${isDarkMode ? 'bg-slate-800 border border-slate-700 text-white' : 'bg-white border border-gray-300 text-gray-800'}`}>
+                      <div key={c.id} onClick={() => openCase(c)} className={`p-4 rounded-xl shadow-lg transition-transform transform hover:scale-105 cursor-pointer group flex flex-col ${isDarkMode ? 'bg-slate-800 bg-opacity-50 border border-slate-700 text-white' : 'bg-white border border-gray-300 text-gray-800'}`}>
                         <div className="flex justify-between items-center mb-2">
                           <h3 className="text-md font-semibold line-clamp-1">{c.title}</h3>
                           <div className="flex items-center space-x-2">

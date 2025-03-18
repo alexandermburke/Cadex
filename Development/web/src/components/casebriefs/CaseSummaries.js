@@ -676,7 +676,7 @@ export default function CaseSummaries() {
             <div
               className={`p-6 rounded-xl mb-6 ${
                 isDarkMode
-                  ? 'bg-slate-800 text-white border border-slate-700'
+                  ? 'bg-slate-800 bg-opacity-50 text-white border border-slate-700'
                   : 'bg-gray-100 text-gray-800 border border-gray-300'
               }`}
             >
@@ -823,7 +823,7 @@ export default function CaseSummaries() {
                   <div
                     className={`p-6 rounded-xl ${
                       isDarkMode
-                        ? 'bg-slate-800 text-white border border-blue-600'
+                        ? 'bg-slate-800 bg-opacity-50 text-white border border-blue-600'
                         : 'bg-white text-gray-800 border border-blue-200'
                     }`}
                   >
@@ -907,7 +907,7 @@ export default function CaseSummaries() {
                         transition={{ duration: 0.3 }}
                         className={`p-4 rounded-xl shadow-lg cursor-pointer ${
                           isDarkMode
-                            ? 'bg-slate-800 border border-slate-700 text-white'
+                            ? 'bg-slate-800 bg-opacity-50 border border-slate-700 text-white'
                             : 'bg-white border border-gray-300 text-gray-800'
                         } hover:shadow-xl transition-shadow`}
                         onClick={() => router.push(`/casebriefs/summaries?caseId=${rcase.id}`)}
@@ -931,7 +931,7 @@ export default function CaseSummaries() {
                 <h2 className="text-lg font-bold mb-2">Citation Generator</h2>
                 <div
                   className={`p-4 rounded-lg ${
-                    isDarkMode ? 'bg-slate-800 border border-slate-700' : 'bg-gray-100 border border-gray-300'
+                    isDarkMode ? 'bg-slate-800 bg-opacity-50 border border-slate-700' : 'bg-gray-100 border border-gray-300'
                   }`}
                 >
                   <p className="text-base italic">{generateCitation(capCase, 'U.S.', '113')}</p>

@@ -11,7 +11,7 @@ import {
   FaChevronRight,
   FaChevronUp,
   FaChevronDown,
-  FaTimes as FaClose
+  FaTimes as FaClose,
 } from 'react-icons/fa';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
@@ -40,7 +40,7 @@ export default function LegalDictionary() {
   const [dictionaryTerms, setDictionaryTerms] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [favoriteTermIds, setFavoriteTermIds] = useState([]);
-  const [expandedTerm, setExpandedTerm] = useState(null);
+  const [selectedTerm, setSelectedTerm] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageDirection, setPageDirection] = useState(0);
   const [itemsPerPage, setItemsPerPage] = useState(21);
@@ -53,7 +53,6 @@ export default function LegalDictionary() {
   const [gotoValue, setGotoValue] = useState('');
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [sortBy, setSortBy] = useState('');
-  const [selectedTerm, setSelectedTerm] = useState(null);
 
   const pageVariants = {
     initial: (direction) => ({
@@ -167,10 +166,6 @@ export default function LegalDictionary() {
     }
   }
 
-  const toggleExpandTerm = (termId) => {
-    setExpandedTerm(expandedTerm === termId ? null : termId);
-  };
-
   function openTermModal(term) {
     setSelectedTerm(term);
   }
@@ -258,7 +253,10 @@ export default function LegalDictionary() {
     };
     try {
       await addDoc(collection(db, 'legalDictionary'), newTermData);
-      const updatedList = [...dictionaryTerms, { id: `temp-${Date.now()}`, ...newTermData }];
+      const updatedList = [
+        ...dictionaryTerms,
+        { id: `temp-${Date.now()}`, ...newTermData },
+      ];
       updatedList.sort((a, b) =>
         a.name.toLowerCase().localeCompare(b.name.toLowerCase())
       );
@@ -459,114 +457,63 @@ export default function LegalDictionary() {
                   transition={{ duration: 0.5 }}
                   className="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 overflow-auto max-h-full pr-2"
                 >
-                  {paginatedTerms.map((term) => {
-                    const isFavorited = favoriteTermIds.includes(term.id);
-                    const isExpanded = expandedTerm === term.id;
-                    return (
-                      <motion.div
-                        key={term.id}
-                        layout
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: 20 }}
-                        transition={{ duration: 0.3 }}
-                        className={`p-4 rounded-xl shadow-lg transition-shadow cursor-pointer group flex flex-col ${
-                          isDarkMode
-                            ? 'bg-slate-800 border border-slate-700 text-white'
-                            : 'bg-white border border-gray-300 text-gray-800'
-                        } hover:shadow-xl`}
-                      >
-                        <div className="flex justify-between items-center">
-                          <h3 className="text-md font-bold mb-2 line-clamp-1">
-                            {term.name}
-                          </h3>
-                          <motion.button
-                            whileHover={{ scale: 1.1 }}
-                            whileTap={{ scale: 0.95 }}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleToggleFavorite(term.id);
-                            }}
-                            className="p-1 rounded-full focus:outline-none"
-                            aria-label="Favorite"
-                          >
-                            {isFavorited ? (
-                              <FaHeart className="text-red-500" size={16} />
-                            ) : (
-                              <FaRegHeart
-                                className={
-                                  isDarkMode ? 'text-gray-400' : 'text-gray-600'
-                                }
-                                size={16}
-                              />
-                            )}
-                          </motion.button>
-                        </div>
-                        {!isExpanded && (
-                          <p
-                            className="text-sm text-gray-500 mb-2"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setSelectedTerm(term);
-                            }}
-                          >
-                            {term.definition.length > 100
-                              ? term.definition.slice(0, 100) + '...'
-                              : term.definition}
-                          </p>
-                        )}
-                        {isExpanded && (
-                          <motion.div
-                            className="overflow-hidden text-sm"
-                            initial={{ height: 0, opacity: 0 }}
-                            animate={{ height: 'auto', opacity: 1 }}
-                            exit={{ height: 0, opacity: 0 }}
-                            transition={{ duration: 0.3 }}
-                          >
-                            <p
-                              className="mb-3"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setSelectedTerm(term);
-                              }}
-                            >
-                              {term.definition}
-                            </p>
-                            {term.synonyms && term.synonyms.length > 0 && (
-                              <div className="mb-3">
-                                <strong>Synonyms:</strong>
-                                <ul className="list-disc list-inside ml-4 mt-1">
-                                  {term.synonyms.map((syn) => (
-                                    <li key={syn}>{syn}</li>
-                                  ))}
-                                </ul>
-                              </div>
-                            )}
-                            {term.references && term.references.length > 0 && (
-                              <div className="mb-3">
-                                <strong>References:</strong>
-                                <ul className="list-disc list-inside ml-4 mt-1">
-                                  {term.references.map((ref) => (
-                                    <li key={ref}>{ref}</li>
-                                  ))}
-                                </ul>
-                              </div>
-                            )}
-                          </motion.div>
-                        )}
-                        <div
-                          className={`text-xs font-semibold mt-auto self-end transition-colors cursor-pointer ${
-                            isDarkMode
-                              ? 'text-blue-400 group-hover:text-blue-200'
-                              : 'text-blue-600 group-hover:text-blue-400'
-                          }`}
-                          onClick={() => toggleExpandTerm(term.id)}
+                  {paginatedTerms.map((term) => (
+                    <motion.div
+                      key={term.id}
+                      layout
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: 20 }}
+                      transition={{ duration: 0.3 }}
+                      className={`p-4 rounded-xl shadow-lg transition-shadow cursor-pointer group flex flex-col ${
+                        isDarkMode
+                          ? 'bg-slate-800 bg-opacity-50 border border-slate-700 text-white'
+                          : 'bg-white border border-gray-300 text-gray-800'
+                      } hover:shadow-xl`}
+                    >
+                      <div className="flex justify-between items-center">
+                        <h3 className="text-md font-bold mb-2 line-clamp-1">
+                          {term.name}
+                        </h3>
+                        <motion.button
+                          whileHover={{ scale: 1.1 }}
+                          whileTap={{ scale: 0.95 }}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleToggleFavorite(term.id);
+                          }}
+                          className="p-1 rounded-full focus:outline-none"
+                          aria-label="Favorite"
                         >
-                          {isExpanded ? 'Hide' : 'View'} Details
-                        </div>
-                      </motion.div>
-                    );
-                  })}
+                          {favoriteTermIds.includes(term.id) ? (
+                            <FaHeart className="text-red-500" size={16} />
+                          ) : (
+                            <FaRegHeart
+                              className={
+                                isDarkMode ? 'text-gray-400' : 'text-gray-600'
+                              }
+                              size={16}
+                            />
+                          )}
+                        </motion.button>
+                      </div>
+                      <p className="text-sm text-gray-500 mb-2">
+                        {term.definition.length > 100
+                          ? term.definition.slice(0, 100) + '...'
+                          : term.definition}
+                      </p>
+                      <div
+                        className={`text-xs font-semibold mt-auto self-end transition-colors cursor-pointer ${
+                          isDarkMode
+                            ? 'text-blue-400 group-hover:text-blue-200'
+                            : 'text-blue-600 group-hover:text-blue-400'
+                        }`}
+                        onClick={() => openTermModal(term)}
+                      >
+                        View Details
+                      </div>
+                    </motion.div>
+                  ))}
                 </motion.div>
               </AnimatePresence>
 
@@ -805,7 +752,7 @@ export default function LegalDictionary() {
             <div className="flex justify-between items-start mb-4">
               <h2 className="text-2xl font-bold">{selectedTerm.name}</h2>
               <button
-                onClick={() => setSelectedTerm(null)}
+                onClick={closeTermModal}
                 className={`inline-block px-4 py-2 rounded-full font-semibold text-sm transition-colors duration-300 ${
                   isDarkMode
                     ? 'bg-blue-600 hover:bg-blue-500 text-white'

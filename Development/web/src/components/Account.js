@@ -168,7 +168,7 @@ export default function Account() {
     } else if (currentPlan === 'Basic') {
       return 'bg-green-100 text-green-700';
     } else {
-      return isDarkMode ? 'bg-gray-800 text-white' : 'bg-gray-100 text-gray-700';
+      return isDarkMode ? 'bg-slate-800 text-white' : 'bg-gray-100 text-gray-700';
     }
   })();
 
@@ -203,7 +203,7 @@ export default function Account() {
       {/* Hero / Header Section */}
       <section
         className={`w-full p-6 rounded-lg shadow-md transition-colors duration-300 ${
-          isDarkMode ? 'bg-gray-800' : 'bg-white'
+          isDarkMode ? 'bg-slate-800' : 'bg-white'
         }`}
       >
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
@@ -259,7 +259,7 @@ export default function Account() {
         {/* Subscription/Billing Card */}
         <section
           className={`col-span-1 xl:col-span-1 p-6 rounded-lg shadow-md transition-colors duration-300 ${
-            isDarkMode ? 'bg-gray-800' : 'bg-white'
+            isDarkMode ? 'bg-slate-800' : 'bg-white'
           }`}
         >
           <h2 className="text-xl font-bold mb-4">Subscription &amp; Billing</h2>
@@ -298,7 +298,7 @@ export default function Account() {
         {/* Settings Card */}
         <section
           className={`col-span-1 xl:col-span-1 p-6 rounded-lg shadow-md transition-colors duration-300 ${
-            isDarkMode ? 'bg-gray-800' : 'bg-white'
+            isDarkMode ? 'bg-slate-800' : 'bg-white'
           }`}
         >
           <h2 className="text-xl font-bold mb-4">Settings</h2>
@@ -379,7 +379,7 @@ export default function Account() {
         {/* Quick Stats / Additional Info Card */}
         <section
           className={`col-span-1 xl:col-span-1 p-6 rounded-lg shadow-md transition-colors duration-300 ${
-            isDarkMode ? 'bg-gray-800' : 'bg-white'
+            isDarkMode ? 'bg-slate-800' : 'bg-white'
           }`}
         >
           <h2 className="text-xl font-bold mb-4">Account Stats</h2>
@@ -440,7 +440,7 @@ export default function Account() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
           <div
             className={`max-w-2xl w-full p-6 rounded-lg shadow-lg ${
-              isDarkMode ? 'bg-gray-800 text-white' : 'bg-white text-blue-950'
+              isDarkMode ? 'bg-slate-800 text-white' : 'bg-white text-blue-950'
             }`}
           >
             <div className="flex justify-between items-center mb-4">
@@ -509,7 +509,7 @@ export default function Account() {
       {/* Change Password Modal */}
       {showChangePasswordModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-          <div className={`max-w-lg w-full p-6 rounded-lg shadow-lg ${isDarkMode ? 'bg-gray-800 text-white' : 'bg-white text-blue-950'}`}>
+          <div className={`max-w-lg w-full p-6 rounded-lg shadow-lg ${isDarkMode ? 'bg-slate-800 text-white' : 'bg-white text-blue-950'}`}>
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-2xl font-bold">Change Password</h3>
               <button onClick={() => setShowChangePasswordModal(false)} className="text-xl font-bold">
