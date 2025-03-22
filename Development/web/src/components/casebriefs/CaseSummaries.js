@@ -28,54 +28,61 @@ import {
   query,
   where,
   limit,
-  getDocs,
-  addDoc
+  getDocs
 } from 'firebase/firestore';
 import { useAuth } from '@/context/AuthContext';
 import html2canvas from 'html2canvas';
 import { jsPDF } from 'jspdf';
 
+/**
+ * Truncate text if it exceeds maxLength.
+ */
 const simplifyText = (text = '', maxLength = 400) => {
   if (!text) return 'Not provided.';
   if (text.length <= maxLength) return text;
   return text.slice(0, maxLength) + '...';
 };
 
-const generateCitation = (caseObj, reporter = 'U.S.', page = '___') => {
-  let year = '____';
-  if (caseObj.decisionDate) {
-    const parsedDate = new Date(caseObj.decisionDate);
-    if (!isNaN(parsedDate)) {
-      year = parsedDate.getFullYear();
-    }
+/**
+ * Parse a year from a date string.
+ * Returns "____" if it can't parse.
+ */
+const parseYear = (dateString) => {
+  const parsed = new Date(dateString);
+  if (isNaN(parsed)) return '____';
+  return parsed.getFullYear();
+};
+
+/**
+ * Generate a citation string based on the style argument.
+ */
+const getCitation = (caseObj, style, page = '___') => {
+  const year = parseYear(caseObj.decisionDate);
+  const title = caseObj.title || 'N/A';
+  const volume = caseObj.volume || '___';
+  const reporter = 'U.S.';
+
+  switch (style) {
+    case 'bluebook':
+      return `${title}, ${volume} ${reporter} ${page} (${year}).`;
+    case 'ieee':
+      return `${title}, ${volume} ${reporter} ${page}, ${caseObj.decisionDate || '____'}.`;
+    case 'apa':
+      return `${title} (${year}). ${volume} ${reporter} ${page}.`;
+    case 'mla':
+      return `"${title}." ${volume} ${reporter} ${page} (${year}).`;
+    case 'chicago':
+      return `${title}, ${volume} ${reporter} ${page} (${year}).`;
+    case 'ama':
+      return `${title}. ${volume} ${reporter} ${page} (${year}).`;
+    default:
+      return `${title}, ${volume} ${reporter} ${page} (${year}).`;
   }
-  return `${caseObj.title || 'N/A'}, ${caseObj.volume || '___'} ${reporter} ${page} (${year})`;
 };
 
-const generateBluebookCitation = (caseObj, page = '___') => {
-  return `Bluebook: ${generateCitation(caseObj, 'U.S.', page)}`;
-};
-
-const generateCitationIEEE = (caseObj, page = '___') => {
-  return `IEEE: ${caseObj.title || 'N/A'}, ${caseObj.volume || '___'} U.S. ${page}, ${caseObj.decisionDate || '____'}.`;
-};
-
-const generateCitationAPA = (caseObj, page = '___') => {
-  return `APA: ${caseObj.title || 'N/A'} (${caseObj.decisionDate || '____'}). ${caseObj.volume || '___'} U.S. ${page}.`;
-};
-
-const generateCitationMLA = (caseObj, page = '___') => {
-  return `MLA: "${caseObj.title || 'N/A'}." ${caseObj.volume || '___'} U.S. ${page} (${caseObj.decisionDate || '____'}).`;
-};
-
-const generateCitationChicago = (caseObj, page = '___') => {
-  return `Chicago: ${caseObj.title || 'N/A'}, ${caseObj.volume || '___'} U.S. ${page} (${caseObj.decisionDate || '____'}).`;
-};
-
-const generateCitationAMA = (caseObj, page = '___') => {
-  return `AMA: ${caseObj.title || 'N/A'}. ${caseObj.volume || '___'} U.S. ${page} (${caseObj.decisionDate || '____'}).`;
-};
-
+/**
+ * Convert the page (HTML) to a PDF and download.
+ */
 const saveAsPDF = async (pdfRef, title) => {
   if (!pdfRef.current) return;
   try {
@@ -97,19 +104,37 @@ const saveAsPDF = async (pdfRef, title) => {
   }
 };
 
+/**
+ * Read from localStorage on initial render so we don't flicker back to "classic."
+ */
+function getInitialViewMode() {
+  if (typeof window !== 'undefined') {
+    const stored = localStorage.getItem('caseBriefViewMode');
+    if (stored && ['classic', 'bulletpoint', 'simplified'].includes(stored)) {
+      return stored;
+    }
+  }
+  return 'classic'; // fallback
+}
+
 export default function CaseSummaries() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { currentUser, userDataObj } = useAuth();
+
   const plan = userDataObj?.billing?.plan?.toLowerCase() || 'free';
   const isPro = plan === 'pro';
   const isExpert = plan === 'expert';
   const isDarkMode = userDataObj?.darkMode || false;
+
   const [isSidebarVisible, setIsSidebarVisible] = useState(true);
   const toggleSidebar = () => setIsSidebarVisible(!isSidebarVisible);
 
+  // This will store whichever case is currently displayed
   const [capCase, setCapCase] = useState(null);
+  // This is the actual summary (brief or detailed) for the case
   const [caseBrief, setCaseBrief] = useState(null);
+
   const [isSummaryLoading, setIsSummaryLoading] = useState(false);
   const [reRunCount, setReRunCount] = useState(0);
   const [isVerified, setIsVerified] = useState(false);
@@ -119,27 +144,45 @@ export default function CaseSummaries() {
 
   const pdfRef = useRef(null);
 
-  const [viewMode, setViewMode] = useState('bulletpoint');
+  /**
+   * Three possible modes:
+   *  - 'classic'
+   *  - 'bulletpoint'
+   *  - 'simplified'
+   */
   const viewModes = [
     { label: 'Classic', value: 'classic' },
     { label: 'Bullets', value: 'bulletpoint' },
     { label: 'Simple', value: 'simplified' },
   ];
+
+  // Use lazy initialization to load from localStorage:
+  const [viewMode, setViewMode] = useState(getInitialViewMode);
+
+  // Keep localStorage updated when viewMode changes:
+  useEffect(() => {
+    localStorage.setItem('caseBriefViewMode', viewMode);
+  }, [viewMode]);
+
+  // We find which index in the array is currently selected
   const selectedIndex = viewModes.findIndex((m) => m.value === viewMode);
 
   const [relatedCases, setRelatedCases] = useState([]);
-
-  // FAVORITES
   const [favorites, setFavorites] = useState([]);
   const [isFavorited, setIsFavorited] = useState(false);
+  const [favoriteCases, setFavoriteCases] = useState([]);
+  const [selectedFavorite, setSelectedFavorite] = useState(null);
 
+  const [citationStyle, setCitationStyle] = useState('bluebook');
+
+  // Load user favorites from userDataObj
   useEffect(() => {
     if (userDataObj && Array.isArray(userDataObj.favorites)) {
       setFavorites(userDataObj.favorites);
     }
   }, [userDataObj]);
 
-  // Whenever capCase or favorites changes, determine if it's currently favorited.
+  // If capCase is in the user's favorites, set isFavorited to true
   useEffect(() => {
     if (capCase && favorites.includes(capCase.id)) {
       setIsFavorited(true);
@@ -148,6 +191,9 @@ export default function CaseSummaries() {
     }
   }, [capCase, favorites]);
 
+  /**
+   * Toggle favorite status for the currently displayed case
+   */
   const toggleFavoriteCase = async () => {
     if (!capCase) return;
     if (!currentUser) {
@@ -166,17 +212,15 @@ export default function CaseSummaries() {
       }
       setFavorites(updatedFavorites);
       await updateDoc(userDocRef, { favorites: updatedFavorites });
-      console.log('Updated favorites:', updatedFavorites);
     } catch (error) {
       console.error('Error toggling favorite:', error);
       alert('Error toggling favorite.');
     }
   };
-  // END FAVORITES
 
-  const [favoriteCases, setFavoriteCases] = useState([]);
-  const [selectedFavorite, setSelectedFavorite] = useState(null);
-
+  /**
+   * Save the loaded summary to localStorage so it can be reused
+   */
   useEffect(() => {
     if (capCaseId && caseBrief) {
       localStorage.setItem(`caseBrief_${capCaseId}`, JSON.stringify(caseBrief));
@@ -184,6 +228,9 @@ export default function CaseSummaries() {
     }
   }, [caseBrief, capCaseId]);
 
+  /**
+   * If there's a saved brief for this case ID, load it from localStorage
+   */
   useEffect(() => {
     if (capCaseId) {
       const savedBrief = localStorage.getItem(`caseBrief_${capCaseId}`);
@@ -193,6 +240,9 @@ export default function CaseSummaries() {
     }
   }, [capCaseId]);
 
+  /**
+   * Load the user's favorites from Firestore so we can show them in the select
+   */
   useEffect(() => {
     if (!userDataObj) return;
     if (Array.isArray(userDataObj.favorites)) {
@@ -214,6 +264,9 @@ export default function CaseSummaries() {
     }
   }, [userDataObj]);
 
+  /**
+   * If the user had previously selected a favorite, restore that selection
+   */
   useEffect(() => {
     if (favoriteCases.length > 0) {
       const savedFavId = localStorage.getItem('selectedFavoriteForSummary');
@@ -224,12 +277,17 @@ export default function CaseSummaries() {
     }
   }, [favoriteCases]);
 
+  /**
+   * If the user picks a favorite from the dropdown, load that case
+   */
   const fetchFavoriteCaseSummary = async (fav) => {
     try {
       const favDoc = await getDoc(doc(db, 'capCases', fav.id));
       if (favDoc.exists()) {
         const fetchedCase = { id: favDoc.id, ...favDoc.data() };
         setCapCase(fetchedCase);
+
+        // If in "simplified" mode, load the briefSummary; else load the detailedSummary
         if (viewMode === 'simplified') {
           if (fetchedCase.briefSummary) {
             setCaseBrief(fetchedCase.briefSummary);
@@ -252,26 +310,17 @@ export default function CaseSummaries() {
     }
   };
 
-  const renderFieldContent = (fieldText) => {
-    if (!fieldText) return 'Not provided.';
-    if (viewMode === 'bulletpoint') {
-      return (
-        <ul className="list-disc list-inside text-base mt-2">
-          <li>{fieldText}</li>
-        </ul>
-      );
-    } else if (viewMode === 'simplified') {
-      return <p className="text-base mt-2">{simplifyText(fieldText)}</p>;
-    }
-    return <p className="text-base mt-2">{fieldText}</p>;
-  };
-
+  /**
+   * Parse enumerated facts. If user wants bullet points, show bullet points, etc.
+   */
   const renderFactsContent = (factsText) => {
     if (!factsText) return <p className="text-base mt-2">Not provided.</p>;
-    const enumeratedFacts = factsText.match(/(?:\d\.\s*[^0-9]+)/g);
+    const enumeratedFacts = factsText.match(/(\d+\.\s[\s\S]*?)(?=\d+\.\s|$)/g);
+
     if (viewMode === 'simplified') {
       return <p className="text-base mt-2">{simplifyText(factsText)}</p>;
     }
+
     if (enumeratedFacts && enumeratedFacts.length > 0) {
       if (viewMode === 'bulletpoint') {
         return (
@@ -283,6 +332,7 @@ export default function CaseSummaries() {
           </ul>
         );
       }
+      // Otherwise, "classic" => paragraphs
       return (
         <>
           {enumeratedFacts.map((fact, index) => {
@@ -299,6 +349,26 @@ export default function CaseSummaries() {
     return <p className="text-base mt-2">{factsText}</p>;
   };
 
+  /**
+   * For other fields like Rule of Law, Issue, etc.
+   */
+  const renderFieldContent = (fieldText) => {
+    if (!fieldText) return 'Not provided.';
+    if (viewMode === 'bulletpoint') {
+      return (
+        <ul className="list-disc list-inside text-base mt-2">
+          <li>{fieldText}</li>
+        </ul>
+      );
+    } else if (viewMode === 'simplified') {
+      return <p className="text-base mt-2">{simplifyText(fieldText)}</p>;
+    }
+    return <p className="text-base mt-2">{fieldText}</p>;
+  };
+
+  /**
+   * Share the current case link or copy to clipboard
+   */
   const shareCase = async () => {
     if (!capCase) return;
     const shareData = {
@@ -318,6 +388,9 @@ export default function CaseSummaries() {
     }
   };
 
+  /**
+   * Re-generate the summary if the user is Pro or Expert
+   */
   const reGenerateSummary = async () => {
     if (!capCase) return;
     if (viewMode === 'simplified') {
@@ -327,7 +400,10 @@ export default function CaseSummaries() {
     }
   };
 
-  // Only call the external API if no summary in Firestore or verified is false
+  /**
+   * On mount, fetch the case from Firestore if there's an ID,
+   * then load the appropriate summary (brief or detailed).
+   */
   useEffect(() => {
     if (!currentUser || !capCaseId) return;
     const fetchCapCaseAndSummary = async () => {
@@ -371,6 +447,9 @@ export default function CaseSummaries() {
     fetchCapCaseAndSummary();
   }, [capCaseId, currentUser, viewMode]);
 
+  /**
+   * Fetch "related cases" by the same jurisdiction
+   */
   useEffect(() => {
     if (!capCase) return;
     const fetchRelatedCases = async () => {
@@ -394,6 +473,9 @@ export default function CaseSummaries() {
     fetchRelatedCases();
   }, [capCase]);
 
+  /**
+   * If the user is in "detailed" mode, fetch the detailed summary
+   */
   const getCapCaseSummary = async (capCaseObj) => {
     setIsSummaryLoading(true);
     setCaseBrief(null);
@@ -439,6 +521,9 @@ export default function CaseSummaries() {
     }
   };
 
+  /**
+   * If the user is in "simplified" mode, fetch the brief summary
+   */
   const getCapCaseBriefSummary = async (capCaseObj) => {
     setIsSummaryLoading(true);
     setCaseBrief(null);
@@ -483,6 +568,9 @@ export default function CaseSummaries() {
     }
   };
 
+  /**
+   * Verification for the "detailed" summary
+   */
   const verifyDetailedSummary = async (summaryData, capCaseObj) => {
     try {
       const verifyRes = await fetch('/api/casebrief-verification', {
@@ -517,6 +605,9 @@ export default function CaseSummaries() {
     }
   };
 
+  /**
+   * Verification for the "brief" summary
+   */
   const verifyBriefSummary = async (summaryData, capCaseObj) => {
     try {
       const verifyRes = await fetch('/api/casebrief-verification', {
@@ -551,6 +642,9 @@ export default function CaseSummaries() {
     }
   };
 
+  /**
+   * Convert to PDF
+   */
   const saveAsPDFHandler = async () => {
     await saveAsPDF(pdfRef, capCase?.title);
   };
@@ -581,6 +675,7 @@ export default function CaseSummaries() {
     );
   }
 
+  // For SEO
   const structuredData = capCase
     ? {
         '@context': 'https://schema.org',
@@ -593,6 +688,13 @@ export default function CaseSummaries() {
       }
     : null;
 
+  // A simple mapping for heading text:
+  const headingByMode = {
+    classic: 'Case Brief (Classic)',
+    bulletpoint: 'Case Brief (Bullets)',
+    simplified: 'Case Brief (Simple)',
+  };
+
   return (
     <>
       {structuredData && (
@@ -603,6 +705,7 @@ export default function CaseSummaries() {
           />
         </Head>
       )}
+
       <div
         ref={pdfRef}
         className={`relative flex h-screen transition-colors duration-500 ${
@@ -657,7 +760,6 @@ export default function CaseSummaries() {
                   >
                     <FaBars size={20} />
                   </motion.div>
-
                 )}
               </AnimatePresence>
             </button>
@@ -671,7 +773,7 @@ export default function CaseSummaries() {
             } flex flex-col items-center`}
           >
             <h1 className="text-2xl font-bold mb-4">
-              {viewMode === 'simplified' ? 'Case Brief (Simple)' : 'Full Case Brief Summary'}
+              {headingByMode[viewMode]}
             </h1>
 
             <div
@@ -696,7 +798,7 @@ export default function CaseSummaries() {
               </p>
               <div className="flex items-center text-xs mt-1">
                 <span className="text-gray-400">
-                  Verified by LExAPI 3.0 ({viewMode === 'simplified' ? 'Simple Mode' : 'Detailed Mode'})
+                  Verified by LExAPI 3.0 ({viewMode})
                 </span>
                 {isVerified ? (
                   <motion.div
@@ -737,7 +839,6 @@ export default function CaseSummaries() {
                 >
                   <FaShareAlt size={16} className="text-gray-400" />
                 </motion.button>
-                {/* FAVORITE BUTTON */}
                 <motion.button
                   onClick={toggleFavoriteCase}
                   whileHover={{ scale: 1.1 }}
@@ -754,6 +855,7 @@ export default function CaseSummaries() {
               </div>
             </div>
 
+            {/* ViewMode Switcher */}
             <div className="relative flex items-center justify-center mb-6">
               <div
                 className={`relative flex items-center rounded-full p-1 ${
@@ -790,6 +892,7 @@ export default function CaseSummaries() {
               </div>
             </div>
 
+            {/* Main Summary Area */}
             <div className="w-full">
               {isSummaryLoading ? (
                 <div className="flex flex-col items-center justify-center space-y-3">
@@ -833,7 +936,11 @@ export default function CaseSummaries() {
                         isDarkMode ? 'text-blue-300' : 'text-blue-700'
                       } text-lg`}
                     >
-                      {viewMode === 'simplified' ? 'Brief Case Summary' : 'Detailed Case Brief'}
+                      {viewMode === 'simplified'
+                        ? 'Brief Case Summary'
+                        : viewMode === 'bulletpoint'
+                        ? 'Bulletpoint Summary'
+                        : 'Detailed Case Brief'}
                     </h3>
 
                     <div className="mb-4">
@@ -843,7 +950,9 @@ export default function CaseSummaries() {
 
                     <div className="mb-4">
                       <strong className="block text-lg">Facts:</strong>
-                      {caseBrief.facts ? renderFactsContent(caseBrief.facts) : <p className="text-base mt-2">Not provided.</p>}
+                      {caseBrief.facts
+                        ? renderFactsContent(caseBrief.facts)
+                        : <p className="text-base mt-2">Not provided.</p>}
                     </div>
 
                     <div className="mb-4">
@@ -869,7 +978,9 @@ export default function CaseSummaries() {
                 )
               ) : (
                 <div className="w-full flex flex-col items-center">
-                  <p className="text-sm text-gray-400 mb-2">View All Briefs to Select a Case Brief.</p>
+                  <p className="text-sm text-gray-400 mb-2">
+                    View All Briefs to Select a Case Brief.
+                  </p>
                   <select
                     className="p-2 rounded-md border border-gray-300 max-w-md"
                     onChange={(e) => {
@@ -893,6 +1004,7 @@ export default function CaseSummaries() {
               )}
             </div>
 
+            {/* Related Cases */}
             <div className="w-full mt-8">
               <h2 className="text-lg font-bold mb-2 text-center">Related Cases</h2>
               <motion.div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 w-full" layout>
@@ -921,27 +1033,52 @@ export default function CaseSummaries() {
                       </motion.div>
                     ))
                   ) : (
-                    <p className="text-sm text-gray-400 col-span-full text-center">No related cases found.</p>
+                    <p className="text-sm text-gray-400 col-span-full text-center">
+                      No related cases found.
+                    </p>
                   )}
                 </AnimatePresence>
               </motion.div>
             </div>
 
+            {/* Citation Generator */}
             {capCase && (
               <div className="w-full mt-8">
                 <h2 className="text-lg font-bold mb-2">Citation Generator</h2>
                 <div
                   className={`p-4 rounded-lg ${
-                    isDarkMode ? 'bg-slate-800 bg-opacity-50 border border-slate-700' : 'bg-gray-100 border border-gray-300'
+                    isDarkMode
+                      ? 'bg-slate-800 bg-opacity-50 border border-slate-700'
+                      : 'bg-gray-100 border border-gray-300'
                   }`}
                 >
-                  <p className="text-base italic">{generateCitation(capCase, 'U.S.', '113')}</p>
-                  <p className="text-base italic mt-2">{generateBluebookCitation(capCase, '113')}</p>
-                  <p className="text-base italic mt-4">{generateCitationIEEE(capCase, '113')}</p>
-                  <p className="text-base italic mt-2">{generateCitationAPA(capCase, '113')}</p>
-                  <p className="text-base italic mt-2">{generateCitationMLA(capCase, '113')}</p>
-                  <p className="text-base italic mt-2">{generateCitationChicago(capCase, '113')}</p>
-                  <p className="text-base italic mt-2">{generateCitationAMA(capCase, '113')}</p>
+                  <label htmlFor="citationStyle" className="block mb-2 font-semibold">
+                    Select Citation Style:
+                  </label>
+                  <select
+                    id="citationStyle"
+                    value={citationStyle}
+                    onChange={(e) => setCitationStyle(e.target.value)}
+                    className={`p-2 rounded-md 
+                      ${
+                        isDarkMode
+                          ? 'bg-slate-700 border border-slate-600 text-white'
+                          : 'bg-white border border-gray-300 text-gray-800'
+                      }
+                    `}
+                  >
+                    <option value="bluebook">Bluebook</option>
+                    <option value="ieee">IEEE</option>
+                    <option value="apa">APA</option>
+                    <option value="mla">MLA</option>
+                    <option value="chicago">Chicago</option>
+                    <option value="ama">AMA</option>
+                  </select>
+                  <div className="mt-4">
+                    <p className="text-base italic">
+                      {getCitation(capCase, citationStyle, '113')}
+                    </p>
+                  </div>
                 </div>
               </div>
             )}

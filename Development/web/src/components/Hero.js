@@ -328,7 +328,7 @@ export default function Hero() {
               <motion.div
                 key={`feature-${index}`}
                 className={`p-6 rounded-lg shadow-lg w-full max-w-sm ${
-                  isDarkMode ? 'bg-gray-800 bg-opacity-50' : 'bg-white'
+                  isDarkMode ? 'bg-gray-800 bg-opacity-30' : 'bg-white'
                 } border border-transparent hover:border-blue-500 transition-colors duration-300`}
                 variants={cardVariants}
                 initial="hidden"

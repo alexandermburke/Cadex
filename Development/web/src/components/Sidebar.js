@@ -12,9 +12,7 @@ import {
   FaListAlt,
   FaTools,
   FaBook,
-  FaGraduationCap,
   FaStickyNote,
-  FaFileInvoice,
   FaClipboardList,
   FaClipboardCheck,
   FaClock,
@@ -32,7 +30,9 @@ import {
   FaVideo,
   FaPlayCircle,
   FaChalkboardTeacher,
-  FaLightbulb
+  FaLightbulb,
+  FaCog,
+  FaCode // <-- Added this
 } from 'react-icons/fa';
 import { motion } from 'framer-motion';
 import clsx from 'clsx';
@@ -61,7 +61,7 @@ const LockedNavLink = ({ icon, label }) => (
     <div className="flex items-center justify-between gap-2 p-3 text-gray-400 cursor-not-allowed">
       <div className="flex items-center gap-3">
         {icon}
-        <span className="relative">{label}</span>
+        <span>{label}</span>
       </div>
       <FaLock className="text-gray-400" size={14} />
     </div>
@@ -102,11 +102,10 @@ export default function Sidebar({
   const router = useRouter();
   const { currentUser, userDataObj } = useAuth();
   const plan = userDataObj?.billing?.plan?.toLowerCase() || 'free';
- 
-  const isFree = plan === 'free';
-  const isBasic = plan === 'basic'; 
+
+  const isBasic = plan === 'basic';
   const isPro = plan === 'pro' || plan === 'expert';
-  const isExpert = false;  // Expert is disabled because it's not ready.
+  const isExpert = false;
   const isDarkMode = userDataObj?.darkMode || false;
 
   const [isCaseBriefBankOpen, setIsCaseBriefBankOpen] = useState(false);
@@ -119,35 +118,19 @@ export default function Sidebar({
 
   useEffect(() => {
     const storedCaseBriefBankOpen = localStorage.getItem('isCaseBriefBankOpen');
-    if (storedCaseBriefBankOpen) {
-      setIsCaseBriefBankOpen(storedCaseBriefBankOpen === 'true');
-    }
+    if (storedCaseBriefBankOpen) setIsCaseBriefBankOpen(storedCaseBriefBankOpen === 'true');
     const storedStudyToolsOpen = localStorage.getItem('isStudyToolsOpen');
-    if (storedStudyToolsOpen) {
-      setIsStudyToolsOpen(storedStudyToolsOpen === 'true');
-    }
+    if (storedStudyToolsOpen) setIsStudyToolsOpen(storedStudyToolsOpen === 'true');
     const storedExamPrepOpen = localStorage.getItem('isExamPrepOpen');
-    if (storedExamPrepOpen) {
-      setIsExamPrepOpen(storedExamPrepOpen === 'true');
-    }
+    if (storedExamPrepOpen) setIsExamPrepOpen(storedExamPrepOpen === 'true');
     const storedSubjectGuidesOpen = localStorage.getItem('isSubjectGuidesOpen');
-    if (storedSubjectGuidesOpen) {
-      setIsSubjectGuidesOpen(storedSubjectGuidesOpen === 'true');
-    }
+    if (storedSubjectGuidesOpen) setIsSubjectGuidesOpen(storedSubjectGuidesOpen === 'true');
     const storedVideoLessonsOpen = localStorage.getItem('isVideoLessonsOpen');
-    if (storedVideoLessonsOpen) {
-      setIsVideoLessonsOpen(storedVideoLessonsOpen === 'true');
-    }
+    if (storedVideoLessonsOpen) setIsVideoLessonsOpen(storedVideoLessonsOpen === 'true');
     const storedQuimbeeOpen = localStorage.getItem('isQuimbeeOpen');
-    if (storedQuimbeeOpen) {
-      setIsQuimbeeOpen(storedQuimbeeOpen === 'true');
-    }
-
-    // Restore showAllApps toggle
+    if (storedQuimbeeOpen) setIsQuimbeeOpen(storedQuimbeeOpen === 'true');
     const storedShowAllApps = localStorage.getItem('showAllApps');
-    if (storedShowAllApps) {
-      setShowAllApps(storedShowAllApps === 'true');
-    }
+    if (storedShowAllApps) setShowAllApps(storedShowAllApps === 'true');
   }, []);
 
   const toggleCaseBriefBank = () => {
@@ -192,7 +175,6 @@ export default function Sidebar({
     });
   };
 
-  // Save showAllApps toggle to localStorage
   const handleToggleShowAllApps = (value) => {
     setShowAllApps(value);
     localStorage.setItem('showAllApps', value);
@@ -201,17 +183,11 @@ export default function Sidebar({
   const sidebarVariants = {
     hidden: {
       x: '-100%',
-      transition: {
-        duration: 0.3,
-        ease: 'easeInOut',
-      },
+      transition: { duration: 0.3, ease: 'easeInOut' },
     },
     visible: {
       x: '0%',
-      transition: {
-        duration: 0.3,
-        ease: 'easeInOut',
-      },
+      transition: { duration: 0.3, ease: 'easeInOut' },
     },
   };
 
@@ -221,15 +197,9 @@ export default function Sidebar({
   });
 
   const planBadgeStyle = (() => {
-    if (isExpert) {
-      return 'bg-gradient-to-r from-blue-400 to-blue-600 text-white';
-    }
-    if (isBasic) {
-      return 'bg-gradient-to-r from-emerald-400 to-emerald-600 text-white';
-    }
-    if (isPro) {
-      return 'goldBackground text-white';
-    }
+    if (isExpert) return 'bg-gradient-to-r from-blue-400 to-blue-600 text-white';
+    if (isBasic) return 'bg-gradient-to-r from-emerald-400 to-emerald-600 text-white';
+    if (isPro) return 'goldBackground text-white';
     return 'bg-gradient-to-r from-gray-400 to-gray-400 text-white';
   })();
 
@@ -249,26 +219,17 @@ export default function Sidebar({
       aria-label="Sidebar Navigation"
     >
       <div className="p-6 flex items-center justify-center bg-opacity-20">
-        <h1 className="text-4xl font-normal relative overflow-hidden">
-          Dashboard
-        </h1>
+        <h1 className="text-4xl font-normal">Dashboard</h1>
       </div>
 
-      {/* Two-way toggle switch (My Apps / All Apps) */}
       <section className="my-4 px-6">
         <div className="relative flex items-center justify-center">
           <div
-            className={clsx(
-              'relative flex items-center rounded-full p-1 transition-colors duration-200',
-              isDarkMode ? 'bg-gray-200' : 'bg-gray-200'
-            )}
+            className="relative flex items-center rounded-full p-1 transition-colors duration-200 bg-gray-200"
             style={{ width: '160px' }}
           >
             <motion.div
-              className={clsx(
-                'absolute top-0 left-0 h-full rounded-full shadow',
-                isDarkMode ? 'bg-white' : 'bg-white'
-              )}
+              className="absolute top-0 left-0 h-full rounded-full shadow bg-white"
               style={{ width: '50%' }}
               initial={false}
               animate={{ x: `${selectedIndex * 100}%` }}
@@ -280,13 +241,7 @@ export default function Sidebar({
                 onClick={() => handleToggleShowAllApps(mode.value)}
                 className={clsx(
                   'relative z-10 flex-1 text-xs sm:text-sm font-semibold py-1 transition-colors',
-                  selectedIndex === i
-                    ? isDarkMode
-                      ? 'text-blue-600'
-                      : 'text-blue-600'
-                    : isDarkMode
-                    ? 'text-gray-700'
-                    : 'text-gray-700'
+                  selectedIndex === i ? 'text-blue-600' : 'text-gray-700'
                 )}
               >
                 {mode.label}
@@ -303,9 +258,9 @@ export default function Sidebar({
           title="Case Brief Bank"
           icon={<FaFolderOpen className="text-lg" />}
         >
-          {isBasic || isPro || isExpert ? (
+          {(isBasic || isPro || isExpert) ? (
             <>
-            <NavLink
+              <NavLink
                 href="/casebriefs/allbriefs"
                 icon={<FaListAlt className="text-sm" />}
                 label="All Briefs"
@@ -348,7 +303,7 @@ export default function Sidebar({
           title="Study Tools"
           icon={<FaTools className="text-lg" />}
         >
-          {isBasic || isPro || isExpert ? (
+          {(isBasic || isPro || isExpert) ? (
             <>
               <NavLink
                 href="/lawtools/dictionary"
@@ -393,7 +348,7 @@ export default function Sidebar({
           title="Exam Prep"
           icon={<FaClipboardList className="text-lg" />}
         >
-          {isPro || isExpert ? (
+          {(isPro || isExpert) ? (
             <>
               <NavLink
                 href="/ailawtools/examprep"
@@ -544,7 +499,7 @@ export default function Sidebar({
           title="Career & Internship Resources"
           icon={<FaChalkboardTeacher className="text-lg" />}
         >
-          {isPro || isExpert ? (
+          {(isPro || isExpert) ? (
             <>
               <NavLink
                 href="/lawtools/careerresources"
@@ -586,7 +541,7 @@ export default function Sidebar({
         <section>
           <Link
             href="https://discord.gg/wKgH9ussWc"
-            className="flex items-center gap-3 p-3 rounded transition-colors duration-200 hover:bg-blue-800 hover:bg-opacity-75 mt-6"
+            className="flex items-center gap-3 p-3 rounded transition-colors duration-200 hover:bg-blue-600 hover:bg-opacity-75 mt-6"
           >
             <FaComment className="text-lg" />
             <span>Requests/Suggestions</span>
@@ -595,6 +550,19 @@ export default function Sidebar({
       </nav>
 
       <footer className="px-6 py-14 bg-transparent">
+        <section className="mb-4">
+          <Link
+            href="#"
+            onClick={() => console.log('Open browser console manually')}
+            className="flex items-center justify-between p-3 rounded transition-colors duration-200 hover:bg-blue-600 hover:bg-opacity-75"
+          >
+            <span className="font-semibold text-sm">Developer</span>      
+              <FaCode className="text-lg" />
+          </Link>
+        </section>
+
+        <hr className="border-white my-2" />
+
         <div className="flex items-center gap-4">
           <div className="flex-1 min-w-0">
             <p className="font-semibold truncate">
