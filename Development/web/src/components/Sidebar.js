@@ -193,7 +193,7 @@ export default function Sidebar({
 
   const sidebarBackground = clsx({
     'bg-gradient-to-br from-blue-700 to-purple-700': !isDarkMode,
-    'bg-gradient-to-tr from-slate-900 to-blue-950': isDarkMode,
+    'bg-slate-800 bg-opacity-50': isDarkMode,
   });
 
   const planBadgeStyle = (() => {
@@ -218,9 +218,12 @@ export default function Sidebar({
       exit="hidden"
       aria-label="Sidebar Navigation"
     >
-      <div className="p-6 flex items-center justify-center bg-opacity-20">
-        <h1 className="text-4xl font-normal">Dashboard</h1>
-      </div>
+    <div className="p-6 flex items-center justify-center bg-opacity-20">
+  <h1 className="text-4xl sm:text-5xl font-semibold bg-white bg-clip-text text-transparent drop-shadow-lg">
+    Dashboard
+  </h1>
+</div>
+
 
       <section className="my-4 px-6">
         <div className="relative flex items-center justify-center">

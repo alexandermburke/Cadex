@@ -231,7 +231,7 @@ export default function CaseAnalysis() {
             transition={{ duration: 0.3 }}
             className={`mb-4 overflow-y-auto rounded-lg p-6 backdrop-blur-sm shadow-lg ${
               isDarkMode
-                ? 'bg-slate-800 bg-opacity-50 bg-opacity-50 border border-slate-600 text-white'
+                ? 'bg-slate-800 bg-opacity-50 border border-slate-600 text-white'
                 : 'bg-white border border-gray-300 text-gray-800'
             }`}
           >
@@ -662,7 +662,7 @@ export default function CaseAnalysis() {
           <main
             className={`w-full rounded-2xl shadow-xl py-6 px-6 overflow-y-auto overflow-x-auto h-screen flex flex-col relative z-50 ${
               isDarkMode
-                ? 'bg-gradient-to-br from-slate-900 to-blue-950 text-white'
+                ? 'bg-slate-800 bg-opacity-50 text-white'
                 : 'bg-white text-gray-800'
             }`}
           >
