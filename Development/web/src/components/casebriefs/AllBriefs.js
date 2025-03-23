@@ -1067,7 +1067,7 @@ export default function AllBriefs() {
                   <button
                     onClick={closeCase}
                     className={`inline-block px-4 py-2 rounded-full font-semibold text-sm transition-colors duration-300 ${
-                      isDarkMode ? 'bg-blue-600 hover:bg-blue-500 text-white' : 'bg-blue-950 hover:bg-blue-800 text-white'
+                      isDarkMode ? 'bg-blue-600 gradientShadowHoverBlue text-white' : 'bg-blue-950 gradientShadowHoverBlue text-white'
                     }`}
                     aria-label="Close Brief Modal"
                   >
@@ -1194,10 +1194,10 @@ export default function AllBriefs() {
                       </div>
                       <div className="text-xs italic text-gray-400">Still in development, information may not be fully accurate.</div>
                       <motion.a
-                        whileHover={{ scale: 1.05, x: 2 }}
+                        whileHover={{ scale: 1.02, x: 2 }}
                         whileTap={{ scale: 0.95 }}
                         href={`/casebriefs/summaries?caseId=${selectedCase.id}`}
-                        className={`mt-3 inline-flex items-center gap-1 text-sm font-semibold rounded px-2 py-1 hover:underline ${
+                        className={`mt-3 inline-flex items-center gap-1 text-sm font-semibold rounded px-2 py-1 gradientShadowHoverBlue ${
                           isDarkMode
                             ? 'bg-blue-700 border border-blue-500 text-white'
                             : 'bg-blue-100 border border-blue-600 text-blue-600'
