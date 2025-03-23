@@ -1194,10 +1194,10 @@ export default function AllBriefs() {
                       </div>
                       <div className="text-xs italic text-gray-400">Still in development, information may not be fully accurate.</div>
                       <motion.a
-                        whileHover={{ scale: 1.02, x: 2 }}
-                        whileTap={{ scale: 0.95 }}
+                        whileHover={{ scale: 1.0, x: 1 }}
+                        whileTap={{ scale: 1 }}
                         href={`/casebriefs/summaries?caseId=${selectedCase.id}`}
-                        className={`mt-3 inline-flex items-center gap-1 text-sm font-semibold rounded px-2 py-1 gradientShadowHoverBlue ${
+                        className={`mt-3 inline-flex items-center gap-1 text-sm font-semibold rounded px-2 py-1 gradientShadowHoverWhite ${
                           isDarkMode
                             ? 'bg-blue-700 border border-blue-500 text-white'
                             : 'bg-blue-100 border border-blue-600 text-blue-600'
