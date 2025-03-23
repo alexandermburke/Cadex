@@ -219,7 +219,7 @@ export default function Sidebar({
       aria-label="Sidebar Navigation"
     >
     <div className="p-6 flex items-center justify-center bg-opacity-20">
-  <h1 className="text-4xl sm:text-5xl bg-white bg-clip-text text-transparent drop-shadow-lg">
+  <h1 className="text-4xl sm:text-5xl bg-white bg-clip-text font-medium text-transparent drop-shadow-lg">
     Dashboard
   </h1>
 </div>
