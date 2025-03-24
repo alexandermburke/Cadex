@@ -1,5 +1,4 @@
 'use client';
-
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -32,7 +31,9 @@ import {
   FaChalkboardTeacher,
   FaLightbulb,
   FaCog,
-  FaCode // <-- Added this
+  FaCode,
+  FaBars,
+  FaTimes
 } from 'react-icons/fa';
 import { motion } from 'framer-motion';
 import clsx from 'clsx';
@@ -218,21 +219,43 @@ export default function Sidebar({
       exit="hidden"
       aria-label="Sidebar Navigation"
     >
-    <div className="p-6 flex items-center justify-center bg-opacity-20">
-  <h1 className="text-4xl sm:text-5xl bg-white bg-clip-text font-medium text-transparent drop-shadow-lg">
-    Dashboard
-  </h1>
-</div>
+      {/* Toggle Button for Mobile */}
+      <div className="absolute top-4 right-4 md:hidden">
+        <button
+          onClick={toggleSidebar}
+          className={clsx(
+            'p-2 rounded transition-colors duration-200 focus:outline-none',
+            isDarkMode
+              ? 'text-white hover:bg-slate-700'
+              : 'text-gray-800 hover:bg-gray-200'
+          )}
+          aria-label="Toggle Sidebar"
+        >
+          {isSidebarVisible ? <FaTimes size={20} /> : <FaBars size={20} />}
+        </button>
+      </div>
 
+      <div className="p-6 flex items-center justify-center bg-opacity-20">
+        <h1 className="text-4xl sm:text-5xl bg-white bg-clip-text text-transparent drop-shadow-lg">
+          Dashboard
+        </h1>
+      </div>
 
+      {/* Move My Apps Toggle back below the Dashboard header */}
       <section className="my-4 px-6">
         <div className="relative flex items-center justify-center">
           <div
-            className="relative flex items-center rounded-full p-1 transition-colors duration-200 bg-gray-200"
+            className={clsx(
+              'relative flex items-center rounded-full p-1 transition-colors duration-200',
+              { 'bg-gray-200': !isDarkMode, 'bg-slate-700': isDarkMode }
+            )}
             style={{ width: '160px' }}
           >
             <motion.div
-              className="absolute top-0 left-0 h-full rounded-full shadow bg-white"
+              className={clsx(
+                'absolute top-0 left-0 h-full rounded-full shadow',
+                { 'bg-white': !isDarkMode, 'bg-slate-500': isDarkMode }
+              )}
               style={{ width: '50%' }}
               initial={false}
               animate={{ x: `${selectedIndex * 100}%` }}
@@ -244,7 +267,13 @@ export default function Sidebar({
                 onClick={() => handleToggleShowAllApps(mode.value)}
                 className={clsx(
                   'relative z-10 flex-1 text-xs sm:text-sm font-semibold py-1 transition-colors',
-                  selectedIndex === i ? 'text-blue-600' : 'text-gray-700'
+                  selectedIndex === i
+                    ? isDarkMode
+                      ? 'text-blue-400'
+                      : 'text-blue-600'
+                    : isDarkMode
+                    ? 'text-white'
+                    : 'text-gray-700'
                 )}
               >
                 {mode.label}
@@ -416,7 +445,7 @@ export default function Sidebar({
           title="Subject Guides"
           icon={<FaBookReader className="text-lg" />}
         >
-          {isExpert ? (
+          {isPro || isExpert ? (
             <>
               <NavLink
                 href="/subjects/contracts"
@@ -559,8 +588,8 @@ export default function Sidebar({
             onClick={() => console.log('Open browser console manually')}
             className="flex items-center justify-between p-3 rounded transition-colors duration-200 hover:bg-blue-600 hover:bg-opacity-75"
           >
-            <span className="font-semibold text-sm">Developer</span>      
-              <FaCode className="text-lg" />
+            <span className="font-semibold text-sm">Developer</span>
+            <FaCode className="text-lg" />
           </Link>
         </section>
 

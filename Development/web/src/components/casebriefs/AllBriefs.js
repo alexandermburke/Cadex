@@ -144,7 +144,6 @@ export default function AllBriefs() {
       const availableHeight = window.innerHeight - offset;
       const itemHeight = 220;
       const numRows = Math.floor(availableHeight / itemHeight);
-      // Subtract 2 items so the grid is slightly smaller.
       const newItemsPerPage = (numRows * numCols) - 3;
       setItemsPerPage(newItemsPerPage > 0 ? newItemsPerPage : 1);
     };
@@ -232,7 +231,6 @@ export default function AllBriefs() {
   const endIndex = validCurrentPage * itemsPerPage;
   const paginatedCases = sortedCases.slice(startIndex, endIndex);
 
-  // Dynamic pagination: display a sliding window of 5 pages when possible.
   const paginationNumbers = () => {
     let startPage, endPage;
     if (totalPages <= 5) {

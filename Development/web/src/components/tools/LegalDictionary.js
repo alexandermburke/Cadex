@@ -303,7 +303,7 @@ export default function LegalDictionary() {
         <div
           className={`flex-1 w-full rounded-2xl shadow-xl p-6 overflow-y-auto overflow-x-auto ${
             isDarkMode
-              ? 'bg-gradient-to-br from-blue-950 to-slate-900 text-white'
+              ? 'bg-slate-800 bg-opacity-50 text-white'
               : 'bg-white text-gray-800'
           } flex flex-col items-center`}
         >
