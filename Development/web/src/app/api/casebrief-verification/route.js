@@ -38,10 +38,11 @@ In addition to checking that the summary includes detailed content for:
   4. Holding
   5. Reasoning
   6. Dissent
+  7. Citation
 please also verify that the provided case title, decision date (year), and jurisdiction are correct and well-formatted. This includes checking for proper punctuation, spelling, grammar, and capitalization.
-
+If the citation field is missing or its value is "N/A" (case‑insensitive), disregard the citation as a method of verification.
 If the summary is fully correct and all additional fields are accurate and properly formatted, set "verified" to true and "explanation" to "Summary is fully accurate." 
-If there are any issues—whether the summary is missing substantial details or if the title, date, or jurisdiction are incorrect, misspelled, or improperly formatted—set "verified" to false and provide a concise explanation stating what is wrong.
+If there are any issues—whether the summary is missing substantial details or if the title, date, jurisdiction, or citation (when provided) are incorrect, misspelled, or improperly formatted—set "verified" to false and provide a concise explanation stating what is wrong.
 If there is no Dissent provided, the summary can still be 100% accurate as it might not be possible to generate.
 Do not include any additional text.
 
@@ -56,13 +57,14 @@ Summary:
 4. Holding: ${briefSummary.holding || 'N/A'}
 5. Reasoning: ${briefSummary.reasoning || 'N/A'}
 6. Dissent: ${briefSummary.dissent || 'N/A'}
+7. Citation: ${briefSummary.citation || 'N/A'}
     `;
 
     const messages = [
       {
         role: 'system',
         content:
-          'You are an expert legal analyst. Your task is to verify the accuracy of a legal case brief summary and check that the case title, decision date (year), and jurisdiction are correct and properly formatted (including punctuation, spelling, grammar, and capitalization). Return ONLY a JSON object in the exact format specified.',
+          'You are an expert legal analyst. Your task is to verify the accuracy of a legal case brief summary and check that the case title, decision date (year), jurisdiction, and citation (if provided) are correct and properly formatted (including punctuation, spelling, grammar, and capitalization). Return ONLY a JSON object in the exact format specified.',
       },
       {
         role: 'user',

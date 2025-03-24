@@ -287,7 +287,7 @@ export default function Sidebar({
         <ToggleSection
           isOpen={isCaseBriefBankOpen}
           toggle={toggleCaseBriefBank}
-          title="Case Brief Bank"
+          title="Case Briefs"
           icon={<FaFolderOpen className="text-lg" />}
         >
           {(isBasic || isPro || isExpert) ? (
