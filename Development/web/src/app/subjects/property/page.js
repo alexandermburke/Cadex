@@ -1,14 +1,14 @@
-import LegalAnalysis from '@/components/tools/Flashcards'
+import Property from '@/components/subjects/Property'
 import CoolLayout from '@/components/CoolLayout'
 import Main from '@/components/Main'
 import React from 'react'
 
 export const metadata = {
-    title: "CadexLaw ⋅ Flashcards",
+    title: "CadexLaw ⋅ Property",
 };
 
 export default function ApplicationPage() {
     return (
-        <LegalAnalysis />
+        <Property />
     )
 }

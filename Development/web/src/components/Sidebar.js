@@ -409,7 +409,7 @@ export default function Sidebar({
               <NavLink
                 href="/ailawtools/lexapi"
                 icon={<FaBrain className="text-sm" />}
-                label="LExAPI Tutor"
+                label="Curated Practice Quiz"
                 active={activeLink === '/ailawtools/lexapi'}
               />
             </>
@@ -460,10 +460,10 @@ export default function Sidebar({
                 active={activeLink === '/subjects/torts'}
               />
               <NavLink
-                href="/subjects/crimlaw"
+                href="/subjects/criminal"
                 icon={<FaGavel className="text-sm" />}
                 label="Criminal Law"
-                active={activeLink === '/subjects/crimlaw'}
+                active={activeLink === '/subjects/criminal'}
               />
               <NavLink
                 href="/subjects/property"
@@ -472,10 +472,10 @@ export default function Sidebar({
                 active={activeLink === '/subjects/property'}
               />
               <NavLink
-                href="/subjects/constitutional-law"
+                href="/subjects/constitutional"
                 icon={<FaUniversity className="text-sm" />}
                 label="Constitutional Law"
-                active={activeLink === '/subjects/constitutional-law'}
+                active={activeLink === '/subjects/constitutional'}
               />
             </>
           ) : showAllApps ? (
