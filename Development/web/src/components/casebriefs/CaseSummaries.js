@@ -492,15 +492,40 @@ export default function CaseSummaries() {
   return (
     <>
       {capCase && (
-        <Head>
-          <title>{capCase.title} | CadexLaw Case Brief Summary</title>
-          <meta name="description" content={`${capCase.title} case brief summary from ${capCase.jurisdiction || 'Unknown jurisdiction'}. Preview the case details and subscribe for full access.`} />
-          <meta name="keywords" content="case brief, legal summary, CadexLaw, legal cases, case law" />
-          <link rel="canonical" href={typeof window !== 'undefined' ? window.location.href : ''} />
-          {structuredData && (
-            <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
-          )}
-        </Head>
+         <Head>
+         <title>{capCase.title} | CadexLaw Case Brief Summary</title>
+         <meta name="description" content={`${capCase.title} case brief summary from ${capCase.jurisdiction || 'Unknown jurisdiction'}. Preview the case details and subscribe for full access.`} />
+         <meta name="keywords" content="case brief, legal summary, CadexLaw, legal cases, case law" />
+         <meta name="case-title" content={capCase.title} />
+         <meta name="case-decision-date" content={capCase.decisionDate} />
+         <meta name="case-jurisdiction" content={capCase.jurisdiction} />
+         <meta property="og:title" content={`${capCase.title} | CadexLaw Case Brief Summary`} />
+         <meta property="og:description" content={`${capCase.title} case brief summary from ${capCase.jurisdiction || 'Unknown jurisdiction'}.`} />
+         <meta property="og:url" content={typeof window !== 'undefined' ? window.location.href : ''} />
+         <meta property="og:type" content="website" />
+         <meta property="og:image" content="https://cadexlaw.com/default-og-image.jpg" />
+         <meta name="twitter:card" content="summary_large_image" />
+         <meta name="twitter:title" content={`${capCase.title} | CadexLaw Case Brief Summary`} />
+         <meta name="twitter:description" content={`${capCase.title} case brief summary from ${capCase.jurisdiction || 'Unknown jurisdiction'}.`} />
+         <meta name="twitter:image" content="https://cadexlaw.com/default-twitter-image.jpg" />
+         <meta name="author" content="CadexLaw" />
+         <meta name="revisit-after" content="7 days" />
+         <meta name="robots" content="index, follow" />
+         <meta name="language" content="en" />
+         <meta name="distribution" content="global" />
+         <meta name="rating" content="general" />
+         <meta name="subject" content="Case Brief, Legal Summary" />
+         <meta name="coverage" content="Worldwide" />
+         <meta name="designer" content="CadexLaw Design Team" />
+         <meta name="publisher" content="CadexLaw" />
+         <meta name="twitter:site" content="@CadexLaw" />
+         <meta name="twitter:creator" content="@CadexLaw" />
+         <meta name="competitor" content="LexisNexis, Westlaw, Justia, FindLaw, Quimbee, LexPlug" />
+         <link rel="canonical" href={typeof window !== 'undefined' ? window.location.href : ''} />
+         {structuredData && (
+           <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
+         )}
+       </Head>
       )}
       <div ref={pdfRef} className={`relative flex h-screen transition-colors duration-500 ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>
         <AnimatePresence>
