@@ -346,7 +346,7 @@ export default function Sidebar({
               <NavLink
                 href="/ailawtools/flashcards"
                 icon={<FaStickyNote className="text-sm" />}
-                label="Flashcards & Outlines"
+                label="Flashcards"
                 active={activeLink === '/ailawtools/flashcards'}
               />
               <NavLink
@@ -364,7 +364,7 @@ export default function Sidebar({
               />
               <LockedNavLink
                 icon={<FaStickyNote className="text-sm" />}
-                label="Flashcards & Outlines"
+                label="Flashcards"
               />
               <LockedNavLink
                 icon={<FaBookReader className="text-sm" />}
@@ -442,7 +442,7 @@ export default function Sidebar({
         <ToggleSection
           isOpen={isSubjectGuidesOpen}
           toggle={toggleSubjectGuides}
-          title="Subject Guides"
+          title="Subject Outlines"
           icon={<FaBookReader className="text-lg" />}
         >
           {isPro || isExpert ? (
@@ -514,13 +514,13 @@ export default function Sidebar({
             <NavLink
               href="/videos/directory"
               icon={<FaPlayCircle className="text-sm" />}
-              label="Directory (Coming Soon)"
+              label="Directory"
               active={activeLink === '/videos/directory'}
             />
           ) : showAllApps ? (
             <LockedNavLink
               icon={<FaPlayCircle className="text-sm" />}
-              label="Directory (Coming Soon)"
+              label="Directory"
             />
           ) : null}
         </ToggleSection>

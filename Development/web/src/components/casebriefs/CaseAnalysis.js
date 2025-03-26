@@ -2,86 +2,86 @@
 import React, { useState, useEffect } from 'react';
 import clsx from 'clsx';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaBars, FaTimes, FaChevronUp, FaChevronDown } from 'react-icons/fa';
+import { FaBars, FaTimes } from 'react-icons/fa';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import Sidebar from '../Sidebar';
 import { db } from '@/firebase';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
-import Link from 'next/link';
 
-// Utility to simplify text
-const simplifyText = (text = '', maxLength = 100) => {
+function simplifyText(text = '', maxLength = 100) {
   if (!text) return 'Not provided.';
   if (text.length <= maxLength) return text;
   return text.slice(0, maxLength) + '...';
-};
+}
 
 export default function CaseAnalysis() {
   const router = useRouter();
   const { currentUser, userDataObj } = useAuth();
   const isDarkMode = userDataObj?.darkMode || false;
-
-  // Sidebar toggle
   const [isSidebarVisible, setIsSidebarVisible] = useState(true);
   const toggleSidebar = () => setIsSidebarVisible(!isSidebarVisible);
-
-  // Favorites & analyses (fetched from Firebase; code not shown here for brevity)
   const [favoriteCases, setFavoriteCases] = useState([]);
   const [savedAnalyses, setSavedAnalyses] = useState([]);
-  
-  // Analysis form state
   const [selectedFavorite, setSelectedFavorite] = useState(null);
   const [analysisTitle, setAnalysisTitle] = useState('');
   const [analysisDetails, setAnalysisDetails] = useState('');
   const [analysisTags, setAnalysisTags] = useState('');
   const [analysisDueDate, setAnalysisDueDate] = useState('');
-  
-  // For summary display – use the selected favorite as the case for summary
   const [selectedCaseForSummary, setSelectedCaseForSummary] = useState(null);
-  
-  // For saved analyses list collapse toggle
   const [expandedAnalysis, setExpandedAnalysis] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
-  
-  // Toggle auto-citation (not fully implemented, static version)
   const [autoCitationsOn, setAutoCitationsOn] = useState(false);
-  
-  // New: Use a tab-based interface instead of swapping columns
-  const [activeTab, setActiveTab] = useState('summary'); // 'summary' | 'new' | 'saved'
+  const tabOptions = [
+    { label: 'Summary', value: 'summary' },
+    { label: 'New', value: 'new' },
+    { label: 'Saved', value: 'saved' }
+  ];
+  const [activeTab, setActiveTab] = useState('summary');
 
-  // (Existing useEffects to fetch favoriteCases and savedAnalyses from Firebase remain unchanged)
   useEffect(() => {
     if (!currentUser) return;
-    // Fetch favorites and saved analyses from userDataObj (assume this code is working)
-    if (userDataObj && userDataObj.favorites) {
-      // ...fetch favoriteCases from Firebase...
-      // For demonstration, we'll assume favoriteCases is updated accordingly.
+    if (userDataObj && Array.isArray(userDataObj.favorites) && userDataObj.favorites.length > 0) {
+      const fetchFavCases = async () => {
+        try {
+          const arr = [];
+          for (const favId of userDataObj.favorites) {
+            const docSnap = await getDoc(doc(db, 'capCases', favId));
+            if (docSnap.exists()) {
+              arr.push({ id: docSnap.id, ...docSnap.data() });
+            }
+          }
+          setFavoriteCases(arr);
+        } catch (error) {
+          console.error('Error fetching favorite cases:', error);
+        }
+      };
+      fetchFavCases();
     }
     if (userDataObj && userDataObj.analyses) {
       setSavedAnalyses(userDataObj.analyses);
     }
   }, [currentUser, userDataObj]);
 
-  // Helper functions (parseTags, generateCitationsInText, handleCaseSelection, handleAddAnalysis, etc.)
-  const parseTags = (tagsString) =>
-    tagsString
+  function parseTags(tagsString) {
+    return tagsString
       .split(',')
       .map((tag) => tag.trim())
       .filter((tag) => tag.length > 0);
+  }
 
-  const generateCitationsInText = (text) => {
+  function generateCitationsInText(text) {
     if (!autoCitationsOn) return text;
     return text.replace(/\b([A-Z][a-z]+ v\. [A-Z][a-z]+)/g, (match) => `${match} (Auto-Cited)`);
-  };
+  }
 
-  const handleCaseSelection = (caseId) => {
+  function handleCaseSelection(caseId) {
     const selected = favoriteCases.find((c) => c.id === caseId) || null;
     setSelectedFavorite(selected);
     setSelectedCaseForSummary(selected);
-  };
+  }
 
-  const handleAddAnalysis = async () => {
+  async function handleAddAnalysis() {
     if (!selectedFavorite) {
       alert('Please select a favorite case.');
       return;
@@ -91,10 +91,10 @@ export default function CaseAnalysis() {
       return;
     }
     const tagsArray = parseTags(analysisTags);
-    let finalDetails = generateCitationsInText(analysisDetails);
+    const finalDetails = generateCitationsInText(analysisDetails);
     const newVersion = {
       timestamp: Date.now(),
-      details: finalDetails,
+      details: finalDetails
     };
     const newAnalysis = {
       caseId: selectedFavorite.id,
@@ -104,7 +104,7 @@ export default function CaseAnalysis() {
       tags: tagsArray,
       dueDate: analysisDueDate,
       details: finalDetails.trim(),
-      createdAt: Date.now(),
+      createdAt: Date.now()
     };
     try {
       const userDocRef = doc(db, 'users', currentUser.uid);
@@ -120,24 +120,24 @@ export default function CaseAnalysis() {
       console.error('Error saving analysis:', err);
       alert('Error saving analysis.');
     }
-  };
+  }
 
-  const handleOpenAnalysis = (analysis) => {
+  function handleOpenAnalysis(analysis) {
     const caseMatch = favoriteCases.find((c) => c.id === analysis.caseId);
     setSelectedFavorite(caseMatch || null);
     setAnalysisTitle(analysis.title);
     setAnalysisDetails(analysis.details);
     setAnalysisTags(analysis.tags?.join(', ') || '');
     setAnalysisDueDate(analysis.dueDate || '');
-  };
+  }
 
-  const handleUpdateAnalysis = async (index) => {
+  async function handleUpdateAnalysis(index) {
     try {
       const analysisToUpdate = { ...savedAnalyses[index] };
       const updatedDetails = generateCitationsInText(analysisToUpdate.details);
       const newVersion = {
         timestamp: Date.now(),
-        details: updatedDetails,
+        details: updatedDetails
       };
       analysisToUpdate.details = updatedDetails;
       analysisToUpdate.versions.push(newVersion);
@@ -151,9 +151,9 @@ export default function CaseAnalysis() {
       console.error('Error updating analysis:', err);
       alert('Error updating analysis.');
     }
-  };
+  }
 
-  const handleDeleteAnalysis = async (index) => {
+  async function handleDeleteAnalysis(index) {
     try {
       const updatedList = [...savedAnalyses];
       updatedList.splice(index, 1);
@@ -165,7 +165,7 @@ export default function CaseAnalysis() {
       console.error('Error deleting analysis:', err);
       alert('Error deleting analysis.');
     }
-  };
+  }
 
   const filteredAnalyses = savedAnalyses.filter((analysis) => {
     const query = searchQuery.toLowerCase();
@@ -175,8 +175,48 @@ export default function CaseAnalysis() {
     return inTitle || inCaseTitle || inTags;
   });
 
-  // ---------------------------------------------------
-  // Tab Sections
+  const activeTabIndex = tabOptions.findIndex((tab) => tab.value === activeTab);
+
+  function renderTabToggle() {
+    return (
+      <div
+        className={clsx(
+          'relative flex items-center rounded-full',
+          isDarkMode ? 'bg-slate-700' : 'bg-gray-200'
+        )}
+        style={{ width: '240px', paddingTop: '0.6rem', paddingBottom: '0.6rem' }}
+      >
+        <motion.div
+          className={clsx(
+            'absolute top-0 left-0 h-full rounded-full shadow',
+            isDarkMode ? 'bg-slate-600' : 'bg-white'
+          )}
+          style={{ width: `${100 / tabOptions.length}%` }}
+          initial={false}
+          animate={{ x: `${activeTabIndex * 100}%` }}
+          transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+        />
+        {tabOptions.map((tab) => (
+          <button
+            key={tab.value}
+            onClick={() => setActiveTab(tab.value)}
+            className={clsx(
+              'relative z-10 flex-1 text-xs font-semibold transition-colors',
+              activeTab === tab.value
+                ? isDarkMode
+                  ? 'text-blue-300'
+                  : 'text-blue-600'
+                : isDarkMode
+                ? 'text-gray-200'
+                : 'text-gray-700'
+            )}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </div>
+    );
+  }
 
   const summarySection = (
     <div className="space-y-4">
@@ -262,7 +302,7 @@ export default function CaseAnalysis() {
             placeholder="Enter analysis details"
             value={analysisDetails}
             onChange={(e) => setAnalysisDetails(e.target.value)}
-          ></textarea>
+          />
         </div>
         <div className="mb-4">
           <label className="block font-medium mb-1">Tags (comma-separated)</label>
@@ -441,8 +481,6 @@ export default function CaseAnalysis() {
     </div>
   );
 
-  // ---------------------------------------------------
-  // Render
   return (
     <div className={isDarkMode ? 'dark' : ''}>
       <div className={clsx('relative flex h-screen transition-colors duration-500', isDarkMode ? 'bg-transparent text-white' : 'bg-transparent text-gray-800')}>
@@ -470,12 +508,10 @@ export default function CaseAnalysis() {
             'w-full rounded-2xl shadow-xl py-6 px-6 overflow-y-auto overflow-x-auto h-screen flex flex-col relative z-50',
             isDarkMode ? 'bg-slate-800 bg-opacity-50 text-white' : 'bg-white text-gray-800'
           )}>
-            {/* Top Bar with Sidebar Toggle */}
             <div className="flex items-center justify-between w-full mb-4">
               <button
                 onClick={toggleSidebar}
                 className="text-blue-900 dark:text-white p-2 rounded transition-colors hover:bg-black/10 focus:outline-none md:hidden"
-                aria-label={isSidebarVisible ? 'Hide Sidebar' : 'Show Sidebar'}
               >
                 <AnimatePresence mode="wait" initial={false}>
                   {isSidebarVisible ? (
@@ -490,55 +526,9 @@ export default function CaseAnalysis() {
                 </AnimatePresence>
               </button>
             </div>
-            {/* Tab Bar */}
-            <div className="flex justify-around mb-6">
-              <button
-                onClick={() => setActiveTab('summary')}
-                className={clsx(
-                  'px-4 py-2 rounded-md font-semibold transition-colors duration-300',
-                  activeTab === 'summary'
-                    ? isDarkMode
-                      ? 'bg-blue-600 text-white'
-                      : 'bg-blue-950 text-white'
-                    : isDarkMode
-                    ? 'bg-slate-700 text-gray-300'
-                    : 'bg-gray-100 text-gray-800'
-                )}
-              >
-                Summary
-              </button>
-              <button
-                onClick={() => setActiveTab('new')}
-                className={clsx(
-                  'px-4 py-2 rounded-md font-semibold transition-colors duration-300',
-                  activeTab === 'new'
-                    ? isDarkMode
-                      ? 'bg-blue-600 text-white'
-                      : 'bg-blue-950 text-white'
-                    : isDarkMode
-                    ? 'bg-slate-700 text-gray-300'
-                    : 'bg-gray-100 text-gray-800'
-                )}
-              >
-                New Analysis
-              </button>
-              <button
-                onClick={() => setActiveTab('saved')}
-                className={clsx(
-                  'px-4 py-2 rounded-md font-semibold transition-colors duration-300',
-                  activeTab === 'saved'
-                    ? isDarkMode
-                      ? 'bg-blue-600 text-white'
-                      : 'bg-blue-950 text-white'
-                    : isDarkMode
-                    ? 'bg-slate-700 text-gray-300'
-                    : 'bg-gray-100 text-gray-800'
-                )}
-              >
-                Saved Analyses
-              </button>
+            <div className="flex justify-center mb-6">
+              {renderTabToggle()}
             </div>
-            {/* Render Tab Content */}
             {activeTab === 'summary' && summarySection}
             {activeTab === 'new' && newAnalysisSection}
             {activeTab === 'saved' && savedAnalysesSection}

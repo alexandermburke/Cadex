@@ -72,6 +72,18 @@ function getInitialViewMode() {
   return 'classic'
 }
 
+// Update generateOutline to be more detailed (using 150 characters per section)
+const generateOutline = (summaryData) => {
+  const sections = []
+  if (summaryData.ruleOfLaw) sections.push({ title: 'Rule of Law', summary: simplifyText(summaryData.ruleOfLaw, 150) })
+  if (summaryData.facts) sections.push({ title: 'Facts', summary: simplifyText(summaryData.facts, 150) })
+  if (summaryData.issue) sections.push({ title: 'Issue', summary: simplifyText(summaryData.issue, 150) })
+  if (summaryData.holding) sections.push({ title: 'Holding', summary: simplifyText(summaryData.holding, 150) })
+  if (summaryData.reasoning) sections.push({ title: 'Reasoning', summary: simplifyText(summaryData.reasoning, 150) })
+  if (summaryData.dissent) sections.push({ title: 'Dissent', summary: simplifyText(summaryData.dissent, 150) })
+  return sections
+}
+
 export default function CaseSummaries() {
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -95,9 +107,13 @@ export default function CaseSummaries() {
   const capCaseId = queryCaseId || localStorage.getItem('lastCapCaseId')
   const pdfRef = useRef(null)
 
+  // Updated viewModes:
+  // Classic now renders the former bullet (detailed bullet-style view)
+  // "Outline" (internal value "bulletpoint") now generates an outline from the case brief.
+  // Simple remains unchanged.
   const viewModes = [
     { label: 'Classic', value: 'classic' },
-    { label: 'Bullets', value: 'bulletpoint' },
+    { label: 'Outline', value: 'bulletpoint' },
     { label: 'Simple', value: 'simplified' }
   ]
   const [viewMode, setViewMode] = useState(getInitialViewMode)
@@ -201,48 +217,47 @@ export default function CaseSummaries() {
       setCaseBrief({ error: 'Error fetching favorite case summary.' })
     }
   }
+
   const renderFactsContent = (factsText) => {
     if (!factsText) return <p className="text-base mt-2">Not provided.</p>
     const enumeratedFacts = factsText.match(/(\d+\.\s[\s\S]*?)(?=\d+\.\s|$)/g)
     if (viewMode === 'simplified')
       return <p className={`text-base mt-2 ${!isLoggedIn ? 'blur-sm' : ''}`}>{simplifyText(factsText)}</p>
-    if (enumeratedFacts && enumeratedFacts.length > 0) {
-      if (viewMode === 'bulletpoint')
-        return (
-          <ul className={`list-disc list-inside text-base mt-2 ${!isLoggedIn ? 'blur-sm' : ''}`}>
-            {enumeratedFacts.map((fact, index) => {
-              const strippedFact = fact.replace(/^\d+\.\s*/, '')
-              return <li key={index}>{strippedFact.trim()}</li>
-            })}
-          </ul>
-        )
+    if (viewMode === 'classic' && enumeratedFacts && enumeratedFacts.length > 0) {
       return (
-        <>
+        <ul className={`list-disc list-inside text-base mt-2 ${!isLoggedIn ? 'blur-sm' : ''}`}>
           {enumeratedFacts.map((fact, index) => {
             const strippedFact = fact.replace(/^\d+\.\s*/, '')
-            return (
-              <p key={index} className={`text-base mt-2 ${!isLoggedIn ? 'blur-sm' : ''}`}>
-                {strippedFact.trim()}
-              </p>
-            )
+            return <li key={index}>{strippedFact.trim()}</li>
           })}
-        </>
+        </ul>
       )
     }
     return <p className={`text-base mt-2 ${!isLoggedIn ? 'blur-sm' : ''}`}>{factsText}</p>
   }
+
   const renderFieldContent = (fieldText) => {
     if (!fieldText) return 'Not provided.'
-    if (viewMode === 'bulletpoint')
-      return (
-        <ul className="list-disc list-inside text-base mt-2">
-          <li>{fieldText}</li>
-        </ul>
-      )
-    else if (viewMode === 'simplified')
+    if (viewMode === 'bulletpoint') {
+      // In outline mode, we don't use renderFieldContent
+      return null
+    } else if (viewMode === 'simplified')
       return <p className={`text-base mt-2 ${!isLoggedIn ? 'blur-sm' : ''}`}>{simplifyText(fieldText)}</p>
     return <p className={`text-base mt-2 ${!isLoggedIn ? 'blur-sm' : ''}`}>{fieldText}</p>
   }
+
+  // New function to generate an outline of the case brief (more detailed)
+  const generateOutline = (summaryData) => {
+    const sections = []
+    if (summaryData.ruleOfLaw) sections.push({ title: 'Rule of Law', summary: simplifyText(summaryData.ruleOfLaw, 150) })
+    if (summaryData.facts) sections.push({ title: 'Facts', summary: simplifyText(summaryData.facts, 150) })
+    if (summaryData.issue) sections.push({ title: 'Issue', summary: simplifyText(summaryData.issue, 150) })
+    if (summaryData.holding) sections.push({ title: 'Holding', summary: simplifyText(summaryData.holding, 150) })
+    if (summaryData.reasoning) sections.push({ title: 'Reasoning', summary: simplifyText(summaryData.reasoning, 150) })
+    if (summaryData.dissent) sections.push({ title: 'Dissent', summary: simplifyText(summaryData.dissent, 150) })
+    return sections
+  }
+
   const shareCase = async () => {
     if (!capCase) return
     const shareUrl = `${window.location.origin}/casebriefs/summaries?caseId=${capCase.id}`
@@ -262,11 +277,13 @@ export default function CaseSummaries() {
       alert('URL copied to clipboard')
     }
   }
+
   const reGenerateSummary = async () => {
     if (!capCase) return
     if (viewMode === 'simplified') await getCapCaseBriefSummary(capCase)
     else await getCapCaseSummary(capCase)
   }
+
   useEffect(() => {
     if (!capCaseId) return
     const fetchCapCaseAndSummary = async () => {
@@ -298,6 +315,7 @@ export default function CaseSummaries() {
     }
     fetchCapCaseAndSummary()
   }, [capCaseId, viewMode])
+
   useEffect(() => {
     if (!capCase) return
     const fetchRelatedCases = async () => {
@@ -320,6 +338,7 @@ export default function CaseSummaries() {
     }
     fetchRelatedCases()
   }, [capCase])
+
   const getCapCaseSummary = async (capCaseObj) => {
     setIsSummaryLoading(true)
     setCaseBrief(null)
@@ -364,6 +383,7 @@ export default function CaseSummaries() {
       setIsSummaryLoading(false)
     }
   }
+
   const getCapCaseBriefSummary = async (capCaseObj) => {
     setIsSummaryLoading(true)
     setCaseBrief(null)
@@ -407,6 +427,7 @@ export default function CaseSummaries() {
       setIsSummaryLoading(false)
     }
   }
+
   const verifyDetailedSummary = async (summaryData, capCaseObj) => {
     try {
       const verifyRes = await fetch('/api/casebrief-verification', {
@@ -438,6 +459,7 @@ export default function CaseSummaries() {
       setIsVerified(false)
     }
   }
+
   const verifyBriefSummary = async (summaryData, capCaseObj) => {
     try {
       const verifyRes = await fetch('/api/casebrief-verification', {
@@ -469,14 +491,17 @@ export default function CaseSummaries() {
       setIsVerified(false)
     }
   }
+
   const saveAsPDFHandler = async () => {
     await saveAsPDF(pdfRef, capCase?.title)
   }
+
   const headingByMode = {
-    classic: 'Case Brief (Classic)',
-    bulletpoint: 'Case Brief (Bullets)',
+    classic: 'Case Brief (Classic)', // Now renders bullet-style view
+    bulletpoint: 'Case Brief (Outline)', // Outline view now generates an outline
     simplified: 'Case Brief (Simple)'
   }
+
   const structuredData = capCase
     ? {
         '@context': 'https://schema.org',
@@ -492,40 +517,61 @@ export default function CaseSummaries() {
   return (
     <>
       {capCase && (
-         <Head>
-         <title>{capCase.title} | CadexLaw Case Brief Summary</title>
-         <meta name="description" content={`${capCase.title} case brief summary from ${capCase.jurisdiction || 'Unknown jurisdiction'}. Preview the case details and subscribe for full access.`} />
-         <meta name="keywords" content="case brief, legal summary, CadexLaw, legal cases, case law" />
-         <meta name="case-title" content={capCase.title} />
-         <meta name="case-decision-date" content={capCase.decisionDate} />
-         <meta name="case-jurisdiction" content={capCase.jurisdiction} />
-         <meta property="og:title" content={`${capCase.title} | CadexLaw Case Brief Summary`} />
-         <meta property="og:description" content={`${capCase.title} case brief summary from ${capCase.jurisdiction || 'Unknown jurisdiction'}.`} />
-         <meta property="og:url" content={typeof window !== 'undefined' ? window.location.href : ''} />
-         <meta property="og:type" content="website" />
-         <meta property="og:image" content="https://cadexlaw.com/default-og-image.jpg" />
-         <meta name="twitter:card" content="summary_large_image" />
-         <meta name="twitter:title" content={`${capCase.title} | CadexLaw Case Brief Summary`} />
-         <meta name="twitter:description" content={`${capCase.title} case brief summary from ${capCase.jurisdiction || 'Unknown jurisdiction'}.`} />
-         <meta name="twitter:image" content="https://cadexlaw.com/default-twitter-image.jpg" />
-         <meta name="author" content="CadexLaw" />
-         <meta name="revisit-after" content="7 days" />
-         <meta name="robots" content="index, follow" />
-         <meta name="language" content="en" />
-         <meta name="distribution" content="global" />
-         <meta name="rating" content="general" />
-         <meta name="subject" content="Case Brief, Legal Summary" />
-         <meta name="coverage" content="Worldwide" />
-         <meta name="designer" content="CadexLaw Design Team" />
-         <meta name="publisher" content="CadexLaw" />
-         <meta name="twitter:site" content="@CadexLaw" />
-         <meta name="twitter:creator" content="@CadexLaw" />
-         <meta name="competitor" content="LexisNexis, Westlaw, Justia, FindLaw, Quimbee, LexPlug" />
-         <link rel="canonical" href={typeof window !== 'undefined' ? window.location.href : ''} />
-         {structuredData && (
-           <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
-         )}
-       </Head>
+        <Head>
+          <title>{capCase.title} | CadexLaw Case Brief Summary</title>
+          <meta name="description" content={`${capCase.title} case brief summary from ${capCase.jurisdiction || 'Unknown jurisdiction'}. Preview the case details and subscribe for full access.`} />
+          <meta name="keywords" content="case brief, legal summary, CadexLaw, legal cases, case law" />
+          <meta name="case-title" content={capCase.title} />
+          <meta name="case-decision-date" content={capCase.decisionDate} />
+          <meta name="case-jurisdiction" content={capCase.jurisdiction} />
+          <meta property="og:title" content={`${capCase.title} | CadexLaw Case Brief Summary`} />
+          <meta property="og:description" content={`${capCase.title} case brief summary from ${capCase.jurisdiction || 'Unknown jurisdiction'}.`} />
+          <meta property="og:url" content={typeof window !== 'undefined' ? window.location.href : ''} />
+          <meta property="og:type" content="website" />
+          <meta property="og:image" content="https://cadexlaw.com/default-og-image.jpg" />
+          <meta name="twitter:card" content="summary_large_image" />
+          <meta name="twitter:title" content={`${capCase.title} | CadexLaw Case Brief Summary`} />
+          <meta name="twitter:description" content={`${capCase.title} case brief summary from ${capCase.jurisdiction || 'Unknown jurisdiction'}.`} />
+          <meta name="twitter:image" content="https://cadexlaw.com/default-twitter-image.jpg" />
+          <meta name="author" content="CadexLaw" />
+          <meta name="revisit-after" content="7 days" />
+          <meta name="robots" content="index, follow" />
+          <meta name="language" content="en" />
+          <meta name="distribution" content="global" />
+          <meta name="rating" content="general" />
+          <meta name="subject" content="Case Brief, Legal Summary" />
+          <meta name="coverage" content="Worldwide" />
+          <meta name="designer" content="CadexLaw Design Team" />
+          <meta name="publisher" content="CadexLaw" />
+          <meta name="twitter:site" content="@CadexLaw" />
+          <meta name="twitter:creator" content="@CadexLaw" />
+          <meta name="competitor" content="LexisNexis, Westlaw, Justia, FindLaw, Quimbee, LexPlug" />
+          {/* Additional meta tags */}
+          <meta charSet="UTF-8" />
+          <meta name="viewport" content="width=device-width, initial-scale=1" />
+          <meta property="og:site_name" content="CadexLaw" />
+          <meta property="og:locale" content="en_US" />
+          <meta name="twitter:image:alt" content={`${capCase.title} case brief`} />
+          <meta name="twitter:url" content={typeof window !== 'undefined' ? window.location.href : ''} />
+          <meta name="twitter:creator" content="@CadexLaw" />
+          <meta name="theme-color" content="#000000" />
+          <meta name="msapplication-TileColor" content="#000000" />
+          <meta name="distribution" content="global" />
+          <meta name="rating" content="general" />
+          <meta name="subject" content="Legal Case Briefs, Case Summaries" />
+          <meta name="coverage" content="Worldwide" />
+          <meta name="article:published_time" content={capCase.decisionDate || ''} />
+          <meta property="og:updated_time" content={new Date().toISOString()} />
+          <meta property="article:modified_time" content={new Date().toISOString()} />
+          <meta property="article:author" content="CadexLaw Legal Research Team" />
+          <meta property="article:section" content="Case Briefs" />
+          <meta property="article:tag" content="case brief" />
+          <meta property="article:tag" content="legal summary" />
+          <link rel="canonical" href={typeof window !== 'undefined' ? window.location.href : ''} />
+          {structuredData && (
+            <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
+          )}
+        </Head>
       )}
       <div ref={pdfRef} className={`relative flex h-screen transition-colors duration-500 ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>
         <AnimatePresence>
@@ -563,7 +609,7 @@ export default function CaseSummaries() {
                 Citation: <span className="font-normal">{capCase?.citation || 'N/A'}</span>
               </p>
               <div className="flex items-center text-xs mt-1">
-                <span className="text-gray-400">Verified by LExAPI 3.0 ({viewMode})</span>
+                <span className="text-gray-400">Verified by LExAPI 3.0</span>
                 {isVerified ? (
                   <motion.div initial={{ opacity: 0, scale: 0 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.5 }} className="ml-2 flex items-center justify-center w-6 h-6 border-2 border-emerald-500 rounded-full">
                     <span className="text-emerald-500 font-bold text-lg">✓</span>
@@ -610,42 +656,59 @@ export default function CaseSummaries() {
                   <div className="text-sm text-gray-400">We are verifying the Case Brief, please wait...</div>
                 </div>
               ) : caseBrief ? (
-                <div className="p-6 rounded-xl relative z-10">
-                  <h3 className={`font-bold mb-4 ${isDarkMode ? 'text-blue-300' : 'text-blue-700'} text-lg`}>
-                    {viewMode === 'simplified' ? 'Brief Case Summary' : viewMode === 'bulletpoint' ? 'Bulletpoint Summary' : 'Detailed Case Brief'}
-                  </h3>
-                  <div className="mb-4">
-                    <strong className="block text-lg">Rule of Law:</strong>
-                    {caseBrief.ruleOfLaw && <p className={`text-base mt-2`}>{caseBrief.ruleOfLaw}</p>}
+                viewMode === 'bulletpoint' ? (
+                  // Outline view with more detail
+                  <div className="p-6 rounded-xl relative z-10">
+                    <h3 className={`font-bold mb-4 ${isDarkMode ? 'text-blue-300' : 'text-blue-700'} text-lg`}>
+                      Outline of Case Brief
+                    </h3>
+                    <ul className="list-disc pl-4">
+                      {generateOutline(caseBrief).map((section, idx) => (
+                        <li key={idx}>
+                          <strong>{section.title}:</strong> {section.summary}
+                        </li>
+                      ))}
+                    </ul>
                   </div>
-                  <div className="mb-4">
-                    <strong className="block text-lg">Facts:</strong>
-                    {caseBrief.facts ? renderFactsContent(caseBrief.facts) : <p className={`text-base mt-2 ${!isLoggedIn ? 'blur-sm' : ''}`}>Not provided.</p>}
-                  </div>
-                  <div className="mb-4">
-                    <strong className="block text-lg">Issue:</strong>
-                    {caseBrief.issue && <p className={`text-base mt-2 ${!isLoggedIn ? 'blur-sm' : ''}`}>{caseBrief.issue}</p>}
-                  </div>
-                  <div className="mb-4">
-                    <strong className="block text-lg">Holding:</strong>
-                    {caseBrief.holding && <p className={`text-base mt-2 ${!isLoggedIn ? 'blur-sm' : ''}`}>{caseBrief.holding}</p>}
-                  </div>
-                  <div className="mb-4">
-                    <strong className="block text-lg">Reasoning:</strong>
-                    {caseBrief.reasoning && <p className={`text-base mt-2 ${!isLoggedIn ? 'blur-sm' : ''}`}>{caseBrief.reasoning}</p>}
-                  </div>
-                  <div className="mb-4">
-                    <strong className="block text-lg">Dissent:</strong>
-                    {caseBrief.dissent && <p className={`text-base mt-2 ${!isLoggedIn ? 'blur-sm' : ''}`}>{caseBrief.dissent}</p>}
-                  </div>
-                  {!isLoggedIn && (
-                    <div className="absolute inset-0 flex flex-col items-center justify-center text-white text-xl font-bold">
-                      <button onClick={() => router.push('/register')} className="mt-4 px-4 py-2 bg-blue-600 hover:bg-blue-500 rounded-lg gradientShadowHoverBlue">
-                        Register to View Full Case Brief
-                      </button>
+                ) : (
+                  // Classic and simple views
+                  <div className="p-6 rounded-xl relative z-10">
+                    <h3 className={`font-bold mb-4 ${isDarkMode ? 'text-blue-300' : 'text-blue-700'} text-lg`}>
+                      {viewMode === 'simplified' ? 'Brief Case Summary' : 'Detailed Case Brief'}
+                    </h3>
+                    <div className="mb-4">
+                      <strong className="block text-lg">Rule of Law:</strong>
+                      {caseBrief.ruleOfLaw && <p className={`text-base mt-2`}>{caseBrief.ruleOfLaw}</p>}
                     </div>
-                  )}
-                </div>
+                    <div className="mb-4">
+                      <strong className="block text-lg">Facts:</strong>
+                      {caseBrief.facts ? renderFactsContent(caseBrief.facts) : <p className={`text-base mt-2 ${!isLoggedIn ? 'blur-sm' : ''}`}>Not provided.</p>}
+                    </div>
+                    <div className="mb-4">
+                      <strong className="block text-lg">Issue:</strong>
+                      {caseBrief.issue && <p className={`text-base mt-2 ${!isLoggedIn ? 'blur-sm' : ''}`}>{caseBrief.issue}</p>}
+                    </div>
+                    <div className="mb-4">
+                      <strong className="block text-lg">Holding:</strong>
+                      {caseBrief.holding && <p className={`text-base mt-2 ${!isLoggedIn ? 'blur-sm' : ''}`}>{caseBrief.holding}</p>}
+                    </div>
+                    <div className="mb-4">
+                      <strong className="block text-lg">Reasoning:</strong>
+                      {caseBrief.reasoning && <p className={`text-base mt-2 ${!isLoggedIn ? 'blur-sm' : ''}`}>{caseBrief.reasoning}</p>}
+                    </div>
+                    <div className="mb-4">
+                      <strong className="block text-lg">Dissent:</strong>
+                      {caseBrief.dissent && <p className={`text-base mt-2 ${!isLoggedIn ? 'blur-sm' : ''}`}>{caseBrief.dissent}</p>}
+                    </div>
+                    {!isLoggedIn && (
+                      <div className="absolute inset-0 flex flex-col items-center justify-center text-white text-xl font-bold">
+                        <button onClick={() => router.push('/register')} className="mt-4 px-4 py-2 bg-blue-600 hover:bg-blue-500 rounded-lg gradientShadowHoverBlue">
+                          Register to View Full Case Brief
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                )
               ) : (
                 <div className="w-full flex flex-col items-center">
                   <p className="text-sm text-gray-400 mb-2">View All Briefs to Select a Case Brief.</p>
