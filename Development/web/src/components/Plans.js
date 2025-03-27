@@ -65,24 +65,24 @@ const plans = [
         info: 'Timed practice exams plus deeper analytics on strengths and weaknesses.',
       },
       {
-        text: 'IRAC Generator & Issue Spotter',
+        text: 'IRAC Drafting & Issue Spotter',
         info: 'Quickly generate IRAC outlines for assignments, exams, or practice scenarios.',
       },
       {
-        text: 'Smart Flashcards & Outlines',
+        text: 'Smart Flashcards',
         info: 'Adaptive flashcards to focus on areas needing improvement.',
       },
       {
-        text: 'Ability to Create Briefs',
+        text: 'Ability to Create & Refresh Briefs',
         info: 'Faster response times for technical and content-related questions.',
       },
       {
         text: 'Upgraded LExAPI 3.0 Access',
-        info: 'Accurate AI-based research, writing, and exam prep.',
+        info: 'Accurate AI based research, writing, and exam prep.',
       },
       {
         text: 'Early Access to Beta Features',
-        info: 'Accurate AI-based research, writing, and exam prep.',
+        info: 'Accurate AI based research, writing, and exam prep.',
       },
     ],
     recommended: true,
@@ -96,24 +96,26 @@ const plans = [
       { text: 'All Pro Plan Features' },
       {
         text: 'Upgraded LExAPI 4.0 Access',
-        info: 'Even more accurate AI-based research, writing, and exam prep.',
+        info: 'Even more accurate AI based research, writing, and exam prep.',
       },
       {
-        text: 'Advanced Analytics & Reports',
+        text: 'Advanced Subject Outlines',
         info: 'Deep-dive data on study patterns, time allocation, and performance.',
       },
       {
-        text: 'Exclusive Study Groups & Forums',
+        text: 'Access to AI Application Review',
         info: 'Network with top-performing peers and share study outlines.',
       },
       {
         text: 'Access to Career & Internship Resources',
-        info: 'Schedule 1:1 AI-assisted sessions to refine study strategy and address weak areas.',
+        info: 'Schedule 1:1 AI assisted sessions to refine study strategy and address weak areas.',
       },
     ],
     recommended: false,
+    comingSoon: false,
   },
 ];
+
 
 export default function Plans() {
   const [selectedPlan, setSelectedPlan] = useState(null);

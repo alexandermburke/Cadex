@@ -62,11 +62,11 @@ const plans = [
         info: 'Quickly generate IRAC outlines for assignments, exams, or practice scenarios.',
       },
       {
-        text: 'Smart Flashcards & Outlines',
+        text: 'Smart Flashcards',
         info: 'Adaptive flashcards to focus on areas needing improvement.',
       },
       {
-        text: 'Ability to Create Briefs',
+        text: 'Ability to Create & Refresh Briefs',
         info: 'Faster response times for technical and content-related questions.',
       },
       {
@@ -92,11 +92,11 @@ const plans = [
         info: 'Even more accurate AI based research, writing, and exam prep.',
       },
       {
-        text: 'Advanced Analytics & Reports',
+        text: 'Advanced Subject Outlines',
         info: 'Deep-dive data on study patterns, time allocation, and performance.',
       },
       {
-        text: 'Exclusive Study Groups & Forums',
+        text: 'Access to AI Application Review',
         info: 'Network with top-performing peers and share study outlines.',
       },
       {

@@ -32,11 +32,6 @@ export default function CaseAnalysis() {
   const [expandedAnalysis, setExpandedAnalysis] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [autoCitationsOn, setAutoCitationsOn] = useState(false);
-  const tabOptions = [
-    { label: 'Summary', value: 'summary' },
-    { label: 'New', value: 'new' },
-    { label: 'Saved', value: 'saved' }
-  ];
   const [activeTab, setActiveTab] = useState('summary');
 
   useEffect(() => {
@@ -175,80 +170,115 @@ export default function CaseAnalysis() {
     return inTitle || inCaseTitle || inTags;
   });
 
-  const activeTabIndex = tabOptions.findIndex((tab) => tab.value === activeTab);
-
+  // New tab toggle using a structure similar to AllBriefs
   function renderTabToggle() {
     return (
-      <div
-        className={clsx(
-          'relative flex items-center rounded-full',
-          isDarkMode ? 'bg-slate-700' : 'bg-gray-200'
-        )}
-        style={{ width: '240px', paddingTop: '0.6rem', paddingBottom: '0.6rem' }}
-      >
-        <motion.div
-          className={clsx(
-            'absolute top-0 left-0 h-full rounded-full shadow',
-            isDarkMode ? 'bg-slate-600' : 'bg-white'
-          )}
-          style={{ width: `${100 / tabOptions.length}%` }}
-          initial={false}
-          animate={{ x: `${activeTabIndex * 100}%` }}
-          transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-        />
-        {tabOptions.map((tab) => (
-          <button
-            key={tab.value}
-            onClick={() => setActiveTab(tab.value)}
-            className={clsx(
-              'relative z-10 flex-1 text-xs font-semibold transition-colors',
-              activeTab === tab.value
-                ? isDarkMode
-                  ? 'text-blue-300'
-                  : 'text-blue-600'
-                : isDarkMode
-                ? 'text-gray-200'
-                : 'text-gray-700'
-            )}
-          >
-            {tab.label}
-          </button>
-        ))}
+      <div className="w-full max-w-md mx-auto mb-4 flex justify-around">
+        <motion.button
+          className={`px-4 py-2 font-semibold transition-colors duration-300 ${
+            activeTab === 'summary'
+              ? isDarkMode
+                ? 'text-white border-b-2 border-blue-400'
+                : 'text-blue-900 border-b-2 border-blue-900'
+              : isDarkMode
+              ? 'text-gray-400'
+              : 'text-gray-600'
+          }`}
+          onClick={() => setActiveTab('summary')}
+        >
+          Summary
+        </motion.button>
+        <motion.button
+          className={`px-4 py-2 font-semibold transition-colors duration-300 ${
+            activeTab === 'new'
+              ? isDarkMode
+                ? 'text-white border-b-2 border-blue-400'
+                : 'text-blue-900 border-b-2 border-blue-900'
+              : isDarkMode
+              ? 'text-gray-400'
+              : 'text-gray-600'
+          }`}
+          onClick={() => setActiveTab('new')}
+        >
+          New
+        </motion.button>
+        <motion.button
+          className={`px-4 py-2 font-semibold transition-colors duration-300 ${
+            activeTab === 'saved'
+              ? isDarkMode
+                ? 'text-white border-b-2 border-blue-400'
+                : 'text-blue-900 border-b-2 border-blue-900'
+              : isDarkMode
+              ? 'text-gray-400'
+              : 'text-gray-600'
+          }`}
+          onClick={() => setActiveTab('saved')}
+        >
+          Saved
+        </motion.button>
       </div>
     );
   }
 
   const summarySection = (
     <div className="space-y-4">
-      <h2 className="text-2xl font-bold">Case Summary</h2>
+      <h2 className="text-2xl font-bold text-center">Case Summary</h2>
       {selectedCaseForSummary ? (
-        <div className={clsx(
-          'p-6 rounded-lg shadow-lg',
-          isDarkMode ? 'bg-slate-800 bg-opacity-50 border border-slate-600 text-white' : 'bg-white border border-gray-300 text-gray-800'
-        )}>
+        <div
+          className={clsx(
+            'p-6 rounded-lg shadow-lg',
+            isDarkMode
+              ? 'bg-slate-800 bg-opacity-50 border border-slate-600 text-white'
+              : 'bg-white border border-gray-300 text-gray-800'
+          )}
+        >
           <h3 className="text-xl font-bold mb-2">{selectedCaseForSummary.title}</h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <p><strong>Citation:</strong> {selectedCaseForSummary.citation || 'N/A'}</p>
-            <p><strong>Jurisdiction:</strong> {selectedCaseForSummary.jurisdiction || 'Unknown'}</p>
-            <p><strong>Date:</strong> {selectedCaseForSummary.decisionDate || 'N/A'}</p>
-            <p><strong>Volume:</strong> {selectedCaseForSummary.volume || 'N/A'}</p>
+            <p>
+              <strong>Citation:</strong> {selectedCaseForSummary.citation || 'N/A'}
+            </p>
+            <p>
+              <strong>Jurisdiction:</strong> {selectedCaseForSummary.jurisdiction || 'Unknown'}
+            </p>
+            <p>
+              <strong>Date:</strong> {selectedCaseForSummary.decisionDate || 'N/A'}
+            </p>
+            <p>
+              <strong>Volume:</strong> {selectedCaseForSummary.volume || 'N/A'}
+            </p>
           </div>
           {selectedCaseForSummary.briefSummary &&
           typeof selectedCaseForSummary.briefSummary === 'object' ? (
-            <div className="mt-4 space-y-2 text-sm">
-              <p><strong>Rule of Law:</strong> {selectedCaseForSummary.briefSummary.ruleOfLaw || 'Not provided.'}</p>
-              <p><strong>Facts:</strong> {selectedCaseForSummary.briefSummary.facts || 'Not provided.'}</p>
-              <p><strong>Issue:</strong> {selectedCaseForSummary.briefSummary.issue || 'Not provided.'}</p>
-              <p><strong>Holding:</strong> {selectedCaseForSummary.briefSummary.holding || 'Not provided.'}</p>
-              <p><strong>Reasoning:</strong> {selectedCaseForSummary.briefSummary.reasoning || 'Not provided.'}</p>
-              <p><strong>Dissent:</strong> {selectedCaseForSummary.briefSummary.dissent || 'Not provided.'}</p>
+            <div className="mt-4 space-y-2 text-sm text-left">
+              <p>
+                <strong>Rule of Law:</strong> {selectedCaseForSummary.briefSummary.ruleOfLaw || 'Not provided.'}
+              </p>
+              <p>
+                <strong>Facts:</strong> {selectedCaseForSummary.briefSummary.facts || 'Not provided.'}
+              </p>
+              <p>
+                <strong>Issue:</strong> {selectedCaseForSummary.briefSummary.issue || 'Not provided.'}
+              </p>
+              <p>
+                <strong>Holding:</strong> {selectedCaseForSummary.briefSummary.holding || 'Not provided.'}
+              </p>
+              <p>
+                <strong>Reasoning:</strong> {selectedCaseForSummary.briefSummary.reasoning || 'Not provided.'}
+              </p>
+              <p>
+                <strong>Dissent:</strong> {selectedCaseForSummary.briefSummary.dissent || 'Not provided.'}
+              </p>
             </div>
           ) : (
             <p className="text-sm mt-4">No summary available.</p>
           )}
         </div>
       ) : (
-        <p className="text-gray-500">Select a case from your favorites to view its summary.</p>
+        <div className="text-center">
+          <p className="text-gray-500">
+            Select a case from your favorites to view its summary.
+          </p>
+        </div>
       )}
     </div>
   );
@@ -256,16 +286,22 @@ export default function CaseAnalysis() {
   const newAnalysisSection = (
     <div className="space-y-4">
       <h2 className="text-2xl font-bold">Add New Analysis</h2>
-      <div className={clsx(
-        'p-6 rounded-lg shadow-lg',
-        isDarkMode ? 'bg-slate-800 bg-opacity-50 border border-slate-600 text-white' : 'bg-white border border-gray-300 text-gray-800'
-      )}>
+      <div
+        className={clsx(
+          'p-6 rounded-lg shadow-lg',
+          isDarkMode
+            ? 'bg-slate-800 bg-opacity-50 border border-slate-600 text-white'
+            : 'bg-white border border-gray-300 text-gray-800'
+        )}
+      >
         <div className="mb-4">
           <label className="block font-medium mb-1">Select a Case Brief</label>
           <select
             className={clsx(
               'w-full p-2 rounded-md focus:outline-none shadow-sm text-sm transition-colors',
-              isDarkMode ? 'bg-slate-700 border border-slate-600 text-white' : 'bg-white border border-gray-300 text-gray-800'
+              isDarkMode
+                ? 'bg-slate-800 bg-opacity-50 border border-slate-600 text-white'
+                : 'bg-white border border-gray-300 text-gray-800'
             )}
             value={selectedFavorite ? selectedFavorite.id : ''}
             onChange={(e) => handleCaseSelection(e.target.value)}
@@ -284,7 +320,9 @@ export default function CaseAnalysis() {
             type="text"
             className={clsx(
               'w-full p-3 rounded-md shadow-sm text-sm focus:outline-none transition-colors',
-              isDarkMode ? 'bg-slate-700 border border-slate-600 text-white' : 'bg-white border border-gray-300 text-gray-800'
+              isDarkMode
+                ? 'bg-slate-800 bg-opacity-50 border border-slate-600 text-white'
+                : 'bg-white border border-gray-300 text-gray-800'
             )}
             placeholder="Enter analysis title"
             value={analysisTitle}
@@ -297,7 +335,9 @@ export default function CaseAnalysis() {
             rows="5"
             className={clsx(
               'w-full p-3 rounded-md shadow-sm text-sm focus:outline-none transition-colors',
-              isDarkMode ? 'bg-slate-700 border border-slate-600 text-white' : 'bg-white border border-gray-300 text-gray-800'
+              isDarkMode
+                ? 'bg-slate-800 bg-opacity-50 border border-slate-600 text-white'
+                : 'bg-white border border-gray-300 text-gray-800'
             )}
             placeholder="Enter analysis details"
             value={analysisDetails}
@@ -310,7 +350,9 @@ export default function CaseAnalysis() {
             type="text"
             className={clsx(
               'w-full p-3 rounded-md shadow-sm text-sm focus:outline-none transition-colors',
-              isDarkMode ? 'bg-slate-700 border border-slate-600 text-white' : 'bg-white border border-gray-300 text-gray-800'
+              isDarkMode
+                ? 'bg-slate-800 bg-opacity-50 border border-slate-600 text-white'
+                : 'bg-white border border-gray-300 text-gray-800'
             )}
             placeholder="e.g. Torts, Negligence"
             value={analysisTags}
@@ -323,7 +365,9 @@ export default function CaseAnalysis() {
             type="date"
             className={clsx(
               'w-full p-3 rounded-md shadow-sm text-sm focus:outline-none transition-colors',
-              isDarkMode ? 'bg-slate-700 border border-slate-600 text-white' : 'bg-white border border-gray-300 text-gray-800'
+              isDarkMode
+                ? 'bg-slate-800 bg-opacity-50 border border-slate-600 text-white'
+                : 'bg-white border border-gray-300 text-gray-800'
             )}
             value={analysisDueDate}
             onChange={(e) => setAnalysisDueDate(e.target.value)}
@@ -352,7 +396,7 @@ export default function CaseAnalysis() {
           type="text"
           className={clsx(
             'w-full p-2 rounded-md shadow-sm text-sm focus:outline-none transition-colors',
-            isDarkMode ? 'bg-slate-700 border border-slate-600 text-white' : 'bg-white border border-gray-300 text-gray-800'
+            isDarkMode ? 'bg-slate-800 bg-opacity-50 border border-slate-600 text-white' : 'bg-white border border-gray-300 text-gray-800'
           )}
           placeholder="Search by title, case, or tags..."
           value={searchQuery}
@@ -374,7 +418,7 @@ export default function CaseAnalysis() {
                   transition={{ duration: 0.3 }}
                   className={clsx(
                     'p-4 rounded-lg shadow transition-shadow cursor-pointer group',
-                    isDarkMode ? 'bg-slate-700 border border-slate-600 text-white' : 'bg-white border border-gray-300 text-gray-800',
+                    isDarkMode ? 'bg-slate-800 bg-opacity-50 border border-slate-600 text-white' : 'bg-white border border-gray-300 text-gray-800',
                     'hover:shadow-xl'
                   )}
                 >
