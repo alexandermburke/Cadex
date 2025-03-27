@@ -72,18 +72,6 @@ function getInitialViewMode() {
   return 'classic'
 }
 
-// Update generateOutline to be more detailed (using 150 characters per section)
-const generateOutline = (summaryData) => {
-  const sections = []
-  if (summaryData.ruleOfLaw) sections.push({ title: 'Rule of Law', summary: simplifyText(summaryData.ruleOfLaw, 150) })
-  if (summaryData.facts) sections.push({ title: 'Facts', summary: simplifyText(summaryData.facts, 150) })
-  if (summaryData.issue) sections.push({ title: 'Issue', summary: simplifyText(summaryData.issue, 150) })
-  if (summaryData.holding) sections.push({ title: 'Holding', summary: simplifyText(summaryData.holding, 150) })
-  if (summaryData.reasoning) sections.push({ title: 'Reasoning', summary: simplifyText(summaryData.reasoning, 150) })
-  if (summaryData.dissent) sections.push({ title: 'Dissent', summary: simplifyText(summaryData.dissent, 150) })
-  return sections
-}
-
 export default function CaseSummaries() {
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -107,10 +95,6 @@ export default function CaseSummaries() {
   const capCaseId = queryCaseId || localStorage.getItem('lastCapCaseId')
   const pdfRef = useRef(null)
 
-  // Updated viewModes:
-  // Classic now renders the former bullet (detailed bullet-style view)
-  // "Outline" (internal value "bulletpoint") now generates an outline from the case brief.
-  // Simple remains unchanged.
   const viewModes = [
     { label: 'Classic', value: 'classic' },
     { label: 'Outline', value: 'bulletpoint' },
@@ -198,6 +182,7 @@ export default function CaseSummaries() {
       }
     }
   }, [favoriteCases])
+
   const fetchFavoriteCaseSummary = async (fav) => {
     try {
       const favDoc = await getDoc(doc(db, 'capCases', fav.id))
@@ -218,6 +203,7 @@ export default function CaseSummaries() {
     }
   }
 
+  // Moved inside the component to access isLoggedIn and viewMode.
   const renderFactsContent = (factsText) => {
     if (!factsText) return <p className="text-base mt-2">Not provided.</p>
     const enumeratedFacts = factsText.match(/(\d+\.\s[\s\S]*?)(?=\d+\.\s|$)/g)
@@ -239,14 +225,12 @@ export default function CaseSummaries() {
   const renderFieldContent = (fieldText) => {
     if (!fieldText) return 'Not provided.'
     if (viewMode === 'bulletpoint') {
-      // In outline mode, we don't use renderFieldContent
       return null
     } else if (viewMode === 'simplified')
       return <p className={`text-base mt-2 ${!isLoggedIn ? 'blur-sm' : ''}`}>{simplifyText(fieldText)}</p>
     return <p className={`text-base mt-2 ${!isLoggedIn ? 'blur-sm' : ''}`}>{fieldText}</p>
   }
 
-  // New function to generate an outline of the case brief (more detailed)
   const generateOutline = (summaryData) => {
     const sections = []
     if (summaryData.ruleOfLaw) sections.push({ title: 'Rule of Law', summary: simplifyText(summaryData.ruleOfLaw, 150) })
@@ -497,8 +481,8 @@ export default function CaseSummaries() {
   }
 
   const headingByMode = {
-    classic: 'Case Brief (Classic)', // Now renders bullet-style view
-    bulletpoint: 'Case Brief (Outline)', // Outline view now generates an outline
+    classic: 'Case Brief (Classic)',
+    bulletpoint: 'Case Brief (Outline)',
     simplified: 'Case Brief (Simple)'
   }
 
@@ -546,7 +530,6 @@ export default function CaseSummaries() {
           <meta name="twitter:site" content="@CadexLaw" />
           <meta name="twitter:creator" content="@CadexLaw" />
           <meta name="competitor" content="LexisNexis, Westlaw, Justia, FindLaw, Quimbee, LexPlug" />
-          {/* Additional meta tags */}
           <meta charSet="UTF-8" />
           <meta name="viewport" content="width=device-width, initial-scale=1" />
           <meta property="og:site_name" content="CadexLaw" />
@@ -657,28 +640,80 @@ export default function CaseSummaries() {
                 </div>
               ) : caseBrief ? (
                 viewMode === 'bulletpoint' ? (
-                  // Outline view with more detail
                   <div className="p-6 rounded-xl relative z-10">
                     <h3 className={`font-bold mb-4 ${isDarkMode ? 'text-blue-300' : 'text-blue-700'} text-lg`}>
-                      Outline of Case Brief
+                      Detailed Outline of Case Brief
                     </h3>
-                    <ul className="list-disc pl-4">
-                      {generateOutline(caseBrief).map((section, idx) => (
-                        <li key={idx}>
-                          <strong>{section.title}:</strong> {section.summary}
-                        </li>
-                      ))}
-                    </ul>
+                    <div className="space-y-4">
+                      <div>
+                        <h4 className="font-semibold text-base">Case Overview</h4>
+                        <p className="ml-4 text-sm">
+                          <span className="font-bold">Title:</span> {capCase?.title || 'N/A'}<br/>
+                          <span className="font-bold">Jurisdiction:</span> {capCase?.jurisdiction || 'Unknown'}<br/>
+                          <span className="font-bold">Decision Date:</span> {capCase?.decisionDate || 'N/A'}<br/>
+                          <span className="font-bold">Volume:</span> {capCase?.volume || 'N/A'}
+                        </p>
+                      </div>
+                      {caseBrief && (
+                        <div className="space-y-3">
+                          {caseBrief.ruleOfLaw && (
+                            <div>
+                              <h4 className="font-semibold text-base">Rule of Law</h4>
+                              <p className="ml-4 text-sm">{caseBrief.ruleOfLaw}</p>
+                            </div>
+                          )}
+                          {caseBrief.facts && (
+                            <div>
+                              <h4 className="font-semibold text-base">Key Facts</h4>
+                              <p className={`ml-4 text-sm ${!isLoggedIn ? 'blur-sm' : ''}`}>{caseBrief.facts}</p>
+                            </div>
+                          )}
+                          {caseBrief.issue && (
+                            <div>
+                              <h4 className="font-semibold text-base">Legal Issue</h4>
+                              <p className={`ml-4 text-sm ${!isLoggedIn ? 'blur-sm' : ''}`}>{caseBrief.issue}</p>
+                            </div>
+                          )}
+                          {caseBrief.holding && (
+                            <div>
+                              <h4 className="font-semibold text-base">Holding</h4>
+                              <p className={`ml-4 text-sm ${!isLoggedIn ? 'blur-sm' : ''}`}>{caseBrief.holding}</p>
+                            </div>
+                          )}
+                          {caseBrief.reasoning && (
+                            <div>
+                              <h4 className="font-semibold text-base">Reasoning</h4>
+                              <p className={`ml-4 text-sm ${!isLoggedIn ? 'blur-sm' : ''}`}>{caseBrief.reasoning}</p>
+                            </div>
+                          )}
+                          {caseBrief.dissent && (
+                            <div>
+                              <h4 className="font-semibold text-base">Dissenting Opinion</h4>
+                              <p className={`ml-4 text-sm ${!isLoggedIn ? 'blur-sm' : ''}`}>{caseBrief.dissent}</p>
+                            </div>
+                          )}
+                        </div>
+                      )}
+                      <div>
+                        <h4 className="font-semibold text-base">Additional Analysis</h4>
+                        <ul className="list-disc ml-8 text-sm">
+                          <li>Examine the interplay between the established rule and the presented facts.</li>
+                          <li>Identify potential conflicts in legal reasoning and any persuasive arguments.</li>
+                          <li>Consider the broader implications of the holding for future case law.</li>
+                          <li>Assess the strength of dissenting opinions and their impact on legal precedent.</li>
+                          <li>Highlight any ambiguities or uncertainties in the case summary that warrant further review.</li>
+                        </ul>
+                      </div>
+                    </div>
                   </div>
                 ) : (
-                  // Classic and simple views
                   <div className="p-6 rounded-xl relative z-10">
                     <h3 className={`font-bold mb-4 ${isDarkMode ? 'text-blue-300' : 'text-blue-700'} text-lg`}>
                       {viewMode === 'simplified' ? 'Brief Case Summary' : 'Detailed Case Brief'}
                     </h3>
                     <div className="mb-4">
                       <strong className="block text-lg">Rule of Law:</strong>
-                      {caseBrief.ruleOfLaw && <p className={`text-base mt-2`}>{caseBrief.ruleOfLaw}</p>}
+                      {caseBrief.ruleOfLaw && <p className="text-base mt-2">{caseBrief.ruleOfLaw}</p>}
                     </div>
                     <div className="mb-4">
                       <strong className="block text-lg">Facts:</strong>

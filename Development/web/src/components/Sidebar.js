@@ -346,7 +346,7 @@ export default function Sidebar({
               <NavLink
                 href="/ailawtools/flashcards"
                 icon={<FaStickyNote className="text-sm" />}
-                label="Flashcards"
+                label="Smart Flashcards"
                 active={activeLink === '/ailawtools/flashcards'}
               />
               <NavLink
@@ -364,7 +364,7 @@ export default function Sidebar({
               />
               <LockedNavLink
                 icon={<FaStickyNote className="text-sm" />}
-                label="Flashcards"
+                label="Smart Flashcards"
               />
               <LockedNavLink
                 icon={<FaBookReader className="text-sm" />}
