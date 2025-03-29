@@ -1,11 +1,10 @@
-import { NextResponse } from 'next/server';
-import OpenAI from 'openai';
+import { NextResponse } from 'next/server'
+import OpenAI from 'openai'
 
 export async function POST(request) {
-  console.log('Received request to /api/casebrief-verification');
-
+  console.log('Received request to /api/casebrief-verification')
   try {
-    const { briefSummary, caseTitle, decisionDate, jurisdiction } = await request.json();
+    const { briefSummary, caseTitle, decisionDate, jurisdiction } = await request.json()
 
     if (
       !briefSummary ||
@@ -14,28 +13,19 @@ export async function POST(request) {
       typeof caseTitle !== 'string' ||
       !caseTitle.trim()
     ) {
-      console.warn('Invalid or missing briefSummary or caseTitle in request body.');
+      console.warn('Invalid or missing briefSummary or caseTitle in request body.')
       return NextResponse.json(
         { error: 'Invalid or missing briefSummary or caseTitle in request body.' },
         { status: 400 }
-      );
+      )
     }
 
-    // Grab the citation, if present
-    const rawCitation = (briefSummary.citation || '').trim();
-    const isCitationProvided = rawCitation && rawCitation.toUpperCase() !== 'N/A';
+    const rawCitation = (briefSummary.citation || '').trim()
+    const isCitationProvided = rawCitation && rawCitation.toUpperCase() !== 'N/A'
 
-    // Build the portion of the prompt for citation only if we actually have one
-    const citationLine = isCitationProvided
-      ? `7. Citation: ${rawCitation}`
-      : '';
+    const citationLine = isCitationProvided ? `7. Citation: ${rawCitation}` : ''
+    const citationCriteria = isCitationProvided ? '  7. Citation' : ''
 
-    // Build the “in addition to checking” line for citation only if it exists
-    const citationCriteria = isCitationProvided
-      ? '  7. Citation'
-      : '';
-
-    // Compose the verification prompt. We conditionally omit the citation lines if it's "N/A" or missing.
     const verificationPrompt = `
 Generate a JSON object with the following keys:
 {
@@ -53,7 +43,7 @@ In addition to checking that the summary includes detailed content for:
 ${citationCriteria}
 please also verify that the provided case title, decision date (year), and jurisdiction are correct and well-formatted. This includes checking for proper punctuation, spelling, grammar, and capitalization.
 If the citation field is missing or its value is "N/A" (case-insensitive), disregard the citation as a method of verification.
-If the summary is fully correct and all additional fields are accurate and properly formatted, set "verified" to true and "explanation" to "Summary is fully accurate." 
+If the summary is fully correct and all additional fields are accurate and properly formatted, set "verified" to true and "explanation" to "Summary is fully accurate."
 If there are any issues—whether the summary is missing substantial details or if the title, date, jurisdiction, or citation (when provided) are incorrect, misspelled, or improperly formatted—set "verified" to false and provide a concise explanation stating what is wrong.
 If there is no Dissent provided, the summary can still be 100% accurate as it might not be possible to generate.
 Do not include any additional text.
@@ -70,30 +60,30 @@ Summary:
 5. Reasoning: ${briefSummary.reasoning || 'N/A'}
 6. Dissent: ${briefSummary.dissent || 'N/A'}
 ${citationLine}
-    `;
+    `
 
     const messages = [
       {
         role: 'system',
         content:
-          'You are an expert legal analyst. Your task is to verify the accuracy of a legal case brief summary and check that the case title, decision date (year), jurisdiction, and citation (if provided) are correct and properly formatted (including punctuation, spelling, grammar, and capitalization). Return ONLY a JSON object in the exact format specified.',
+          'You are an expert legal analyst. Your task is to verify the accuracy of a legal case brief summary and check that the case title, decision date (year), jurisdiction, and citation (if provided) are correct and properly formatted (including punctuation, spelling, grammar, and capitalization). Return ONLY a JSON object in the exact format specified.'
       },
       {
         role: 'user',
-        content: verificationPrompt,
-      },
-    ];
+        content: verificationPrompt
+      }
+    ]
 
     const openai = new OpenAI({
       apiKey: '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',
-    });
+    })
 
     const response = await openai.chat.completions.create({
-      model: 'gpt-4', 
+      model: 'gpt-4',
       messages,
       max_tokens: 150,
-      temperature: 0,
-    });
+      temperature: 0
+    })
 
     if (
       !response ||
@@ -102,59 +92,58 @@ ${citationLine}
       response.choices.length === 0 ||
       !response.choices[0].message
     ) {
-      console.error('Invalid response structure from OpenAI:', response);
-      throw new Error('Invalid OpenAI response structure.');
+      console.error('Invalid response structure from OpenAI:', response)
+      throw new Error('Invalid OpenAI response structure.')
     }
 
-    let rawOutput = response.choices[0].message.content.trim();
-    console.log('Raw verification output:', rawOutput);
+    let rawOutput = response.choices[0].message.content.trim()
+    console.log('Raw verification output:', rawOutput)
 
-    // Ensure the output starts with '{'
     if (!rawOutput.startsWith('{')) {
-      console.error("GPT verification response does not start with '{':", rawOutput);
-      throw new Error("GPT verification response is not valid JSON");
+      console.error("GPT verification response does not start with '{':", rawOutput)
+      throw new Error("GPT verification response is not valid JSON")
     }
 
-    let parsed;
+    let parsed
     try {
-      parsed = JSON.parse(rawOutput);
+      parsed = JSON.parse(rawOutput)
     } catch (err) {
-      console.warn('Direct JSON parse failed. Attempting substring extraction...');
-      const firstCurly = rawOutput.indexOf('{');
-      const lastCurly = rawOutput.lastIndexOf('}');
+      console.warn('Direct JSON parse failed. Attempting substring extraction...')
+      const firstCurly = rawOutput.indexOf('{')
+      const lastCurly = rawOutput.lastIndexOf('}')
       if (firstCurly !== -1 && lastCurly !== -1) {
-        const jsonSubstring = rawOutput.substring(firstCurly, lastCurly + 1);
+        const jsonSubstring = rawOutput.substring(firstCurly, lastCurly + 1)
         try {
-          parsed = JSON.parse(jsonSubstring);
-          console.log('Successfully parsed JSON substring:', jsonSubstring);
+          parsed = JSON.parse(jsonSubstring)
+          console.log('Successfully parsed JSON substring:', jsonSubstring)
         } catch (innerErr) {
-          console.error('Failed to parse JSON substring:', jsonSubstring);
+          console.error('Failed to parse JSON substring:', jsonSubstring)
           return NextResponse.json(
             { error: 'Could not parse JSON from GPT.' },
             { status: 500 }
-          );
+          )
         }
       } else {
-        console.error('No JSON object found in GPT response:', rawOutput);
+        console.error('No JSON object found in GPT response:', rawOutput)
         return NextResponse.json(
           { error: 'Could not parse JSON from GPT.' },
           { status: 500 }
-        );
+        )
       }
     }
 
     const result = {
       verified: parsed.verified === true,
-      explanation: parsed.explanation || '',
-    };
+      explanation: parsed.explanation || ''
+    }
 
-    console.log('FINAL VERIFICATION RESULT =>', result);
-    return NextResponse.json(result, { status: 200 });
+    console.log('FINAL VERIFICATION RESULT =>', result)
+    return NextResponse.json(result, { status: 200 })
   } catch (err) {
-    console.error('Error in /api/casebrief-verification:', err);
+    console.error('Error in /api/casebrief-verification:', err)
     return NextResponse.json(
       { error: 'Error verifying case brief.' },
       { status: 500 }
-    );
+    )
   }
 }

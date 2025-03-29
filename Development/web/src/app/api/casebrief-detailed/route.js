@@ -4,7 +4,7 @@ import OpenAI from 'openai'
 export async function POST(request) {
   console.log('Received request to /api/casebrief-detailed')
   try {
-    const { title, citation, detailed } = await request.json()
+    const { title, citation, date, detailed } = await request.json()
     if (!title || typeof title !== 'string' || !title.trim()) {
       console.warn('Invalid or missing "title" in request body.')
       return NextResponse.json(
@@ -21,7 +21,9 @@ export async function POST(request) {
     }
     const inputTitle = title.trim()
     const inputCitation = citation.trim()
-    console.log(`Generating ${detailed ? 'detailed' : 'brief'} summary for: "${inputTitle}" with citation "${inputCitation}"`)
+    const parsedYear = parseInt(date, 10)
+    const year = isNaN(parsedYear) ? '' : parsedYear
+    console.log(`Generating ${detailed ? 'detailed' : 'brief'} summary for: "${inputTitle}" with citation "${inputCitation}" during the year of "${year}"`)
     let prompt
     if (detailed) {
       prompt = `
@@ -46,6 +48,8 @@ Case Title:
 "${inputTitle}"
 Case Citation:
 "${inputCitation}"
+Case Year:
+"${year}"
       `
     } else {
       prompt = `
@@ -70,6 +74,8 @@ Case Title:
 "${inputTitle}"
 Case Citation:
 "${inputCitation}"
+Case Year:
+"${year}"
       `
     }
     const messages = [
