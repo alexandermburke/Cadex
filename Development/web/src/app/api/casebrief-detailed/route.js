@@ -93,7 +93,7 @@ Case Citation:
         const response = await openai.chat.completions.create({
           model: 'gpt-3.5-turbo',
           messages,
-          max_tokens: detailed ? 3000 : 1500,
+          max_tokens: detailed ? 2000 : 1200,
           temperature: 0.7
         })
         if (
