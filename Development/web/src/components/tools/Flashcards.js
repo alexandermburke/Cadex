@@ -191,7 +191,7 @@ export default function AIExamFlashCard() {
             cy={50}
             r={radius}
             stroke={isDarkMode ? "#444" : "#eee"}
-            strokeWidth={8}
+            strokeWidth={0}
             fill="transparent"
           />
           <circle
@@ -199,7 +199,7 @@ export default function AIExamFlashCard() {
             cy={50}
             r={radius}
             stroke={isDarkMode ? "#4ade80" : "#10b981"}
-            strokeWidth={8}
+            strokeWidth={4}
             fill="transparent"
             strokeDasharray={circumference}
             strokeDashoffset={offset}
@@ -214,7 +214,7 @@ export default function AIExamFlashCard() {
             dominantBaseline="middle"
             fill={isDarkMode ? "#fff" : "#333"}
             fontSize="16"
-            fontWeight="bold"
+            fontWeight=""
           >
             {formatTime()}
           </text>
