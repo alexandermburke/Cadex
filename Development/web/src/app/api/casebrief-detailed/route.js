@@ -83,7 +83,7 @@ Case Citation:
       }
     ]
     const openai = new OpenAI({
-      apiKey: process.env.OPENAI_API_KEY
+    apiKey: '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',
     })
     let attemptCount = 0
     let parsedResponse = null
@@ -91,9 +91,9 @@ Case Citation:
       attemptCount++
       try {
         const response = await openai.chat.completions.create({
-          model: 'gpt-3.5-turbo',
+          model: 'gpt-4-turbo',
           messages,
-          max_tokens: detailed ? 2000 : 1200,
+          max_tokens: detailed ? 3000 : 1500,
           temperature: 0.7
         })
         if (

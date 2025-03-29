@@ -3,18 +3,17 @@
 
 import Link from 'next/link';
 import React, { useState, useEffect } from 'react';
-import ActionCard from './ActionCard'; // If you still want to use your existing ActionCard
+import ActionCard from './ActionCard'; // If you're using ActionCard
 import { useAuth } from '@/context/AuthContext';
 import LogoFiller from './LogoFiller';
 import { doc, updateDoc } from 'firebase/firestore';
 import { db } from '@/firebase';
 import { sendEmailVerification } from 'firebase/auth';
 import { motion } from 'framer-motion';
+import { FaInfoCircle } from 'react-icons/fa';
 
 export default function Account() {
   const { currentUser, userDataObj, refreshUserData } = useAuth();
-
-  // Local subscription/billing state
   const [subscriptionData, setSubscriptionData] = useState({
     plan: userDataObj?.billing?.plan || 'Free',
     status: 'Inactive',
@@ -24,22 +23,15 @@ export default function Account() {
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
-  // Local settings states
   const [isDarkMode, setIsDarkMode] = useState(userDataObj?.darkMode || false);
   const [emailNotifications, setEmailNotifications] = useState(
     userDataObj?.emailNotifications || true
   );
-
-  // NEW: State to control Update Log modal visibility
+  const [lexApiEnabled, setLexApiEnabled] = useState(userDataObj?.lexApiEnabled || false);
   const [showUpdateLog, setShowUpdateLog] = useState(false);
-  // NEW: State to control Change Password modal visibility
   const [showChangePasswordModal, setShowChangePasswordModal] = useState(false);
-
-  // Grab the subscription plan
   const plan = subscriptionData.plan || 'Free';
 
-  // Fetch subscription data
   useEffect(() => {
     async function fetchBillingData() {
       if (!currentUser?.uid) {
@@ -48,13 +40,11 @@ export default function Account() {
         return;
       }
       try {
-        console.log('Fetching subscription data for userId:', currentUser.uid);
         const response = await fetch('/api/billing', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ userId: currentUser.uid }),
         });
-        console.log('Response status:', response.status);
 
         if (!response.ok) {
           const errorData = await response.json();
@@ -63,12 +53,10 @@ export default function Account() {
         }
 
         const { billing } = await response.json();
-        console.log('Billing data received:', billing);
-
         setSubscriptionData({
           plan: billing.plan || 'Free',
           status: billing.status || 'Inactive',
-          nextPaymentDue: billing.nextPaymentDue, // Unix timestamp
+          nextPaymentDue: billing.nextPaymentDue,
           amountDue: billing.amountDue ? (billing.amountDue / 100).toFixed(2) : null,
           currency: billing.currency || null,
         });
@@ -82,13 +70,12 @@ export default function Account() {
     fetchBillingData();
   }, [currentUser?.uid]);
 
-  // Sync local dark mode with userDataObj
   useEffect(() => {
     setIsDarkMode(userDataObj?.darkMode || false);
     setEmailNotifications(userDataObj?.emailNotifications || false);
-  }, [userDataObj?.darkMode, userDataObj?.emailNotifications]);
+    setLexApiEnabled(userDataObj?.lexApiEnabled || false);
+  }, [userDataObj?.darkMode, userDataObj?.emailNotifications, userDataObj?.lexApiEnabled]);
 
-  // Basic account details
   const vals = {
     email: currentUser?.email || 'Not available',
     username: currentUser?.displayName || 'Not available',
@@ -98,27 +85,7 @@ export default function Account() {
       : 'Not available',
   };
 
-  let paymentDueDisplay = 'N/A';
-  if (loading) {
-    paymentDueDisplay = 'Loading...';
-  } else if (error) {
-    paymentDueDisplay = `Error: ${error}`;
-  } else if (subscriptionData.nextPaymentDue) {
-    paymentDueDisplay = new Date(subscriptionData.nextPaymentDue * 1000).toLocaleDateString();
-  }
-
-  let amountDueDisplay = 'N/A';
-  if (loading) {
-    amountDueDisplay = 'Loading...';
-  } else if (error) {
-    amountDueDisplay = 'N/A';
-  } else if (subscriptionData.amountDue && subscriptionData.currency) {
-    amountDueDisplay = `${subscriptionData.amountDue} ${subscriptionData.currency}`;
-  }
-
-  // --------------------------
   // Handlers for toggles
-  // --------------------------
   const handleDarkModeToggle = async (e) => {
     const newDarkMode = e.target.checked;
     setIsDarkMode(newDarkMode);
@@ -155,26 +122,28 @@ export default function Account() {
     }
   };
 
-  // --------------------------
-  // Prepare data for rendering
-  // --------------------------
-  const currentPlan = subscriptionData.plan;
-  const planStatus = subscriptionData.status || 'Inactive';
-
-  // Return a color style for the plan badge
-  const planBadgeClasses = (() => {
-    if (currentPlan === 'Pro' || currentPlan === 'Developer') {
-      return 'bg-blue-100 text-blue-700';
-    } else if (currentPlan === 'Basic') {
-      return 'bg-green-100 text-green-700';
-    } else {
-      return isDarkMode ? 'bg-slate-800 text-white' : 'bg-gray-100 text-gray-700';
+  const handleLexApiToggle = async (e) => {
+    if (!(plan === 'Pro' || plan === 'Expert')) {
+      return;
     }
-  })();
+    const newValue = e.target.checked;
+    setLexApiEnabled(newValue);
 
-  // --------------------------
-  // Handle Verify Email
-  // --------------------------
+    if (!currentUser?.uid) {
+      alert('You need to be logged in to update your settings.');
+      return;
+    }
+    try {
+      const userDocRef = doc(db, 'users', currentUser.uid);
+      await updateDoc(userDocRef, { lexApiEnabled: newValue });
+      await refreshUserData();
+    } catch (err) {
+      console.error('Error updating LExAPI setting:', err);
+      alert('Failed to update LExAPI setting.');
+      setLexApiEnabled(!newValue);
+    }
+  };
+
   const handleSendVerificationEmail = async () => {
     if (!currentUser) {
       alert('No user is logged in.');
@@ -189,10 +158,38 @@ export default function Account() {
     }
   };
 
-  // NEW: Handle Change Password - open modal instead of routing.
+  // Change password
   const handleChangePassword = () => {
     setShowChangePasswordModal(true);
   };
+
+  // Payment info displays
+  let paymentDueDisplay = 'N/A';
+  if (loading) paymentDueDisplay = 'Loading...';
+  else if (error) paymentDueDisplay = `Error: ${error}`;
+  else if (subscriptionData.nextPaymentDue) {
+    paymentDueDisplay = new Date(subscriptionData.nextPaymentDue * 1000).toLocaleDateString();
+  }
+
+  let amountDueDisplay = 'N/A';
+  if (loading) amountDueDisplay = 'Loading...';
+  else if (error) amountDueDisplay = 'N/A';
+  else if (subscriptionData.amountDue && subscriptionData.currency) {
+    amountDueDisplay = `${subscriptionData.amountDue} ${subscriptionData.currency}`;
+  }
+
+  // Color style for the plan badge
+  const planBadgeClasses = (() => {
+    if (plan === 'Pro' || plan === 'Developer' || plan === 'Expert') {
+      return 'bg-blue-100 text-blue-700';
+    } else if (plan === 'Basic') {
+      return 'bg-green-100 text-green-700';
+    } else {
+      return isDarkMode ? 'bg-slate-800 text-white' : 'bg-gray-100 text-gray-700';
+    }
+  })();
+
+  const planStatus = subscriptionData.status || 'Inactive';
 
   return (
     <div
@@ -229,7 +226,7 @@ export default function Account() {
             <span
               className={`inline-block px-3 py-1 rounded-full text-xs font-semibold uppercase ${planBadgeClasses}`}
             >
-              Current Plan: {currentPlan}
+              Current Plan: {plan}
             </span>
             <span
               className={`inline-block px-2 py-1 text-xs font-semibold rounded-md ${
@@ -242,7 +239,7 @@ export default function Account() {
             </span>
             {subscriptionData.nextPaymentDue && (
               <p className="text-sm">
-                Next Payment Due: <strong>{new Date(subscriptionData.nextPaymentDue * 1000).toLocaleDateString()}</strong>
+                Next Payment Due: <strong>{paymentDueDisplay}</strong>
               </p>
             )}
             {subscriptionData.amountDue && subscriptionData.currency && (
@@ -264,7 +261,7 @@ export default function Account() {
         >
           <h2 className="text-xl font-bold mb-4">Subscription &amp; Billing</h2>
           <div className="flex flex-col gap-2">
-            {(currentPlan === 'Basic' || currentPlan === 'Free') && (
+            {(plan === 'Basic' || plan === 'Free') && (
               <Link
                 href="/admin/billing"
                 className={`
@@ -277,7 +274,10 @@ export default function Account() {
                 <i className="ml-2 fa-solid fa-arrow-right transition-transform duration-300 group-hover:translate-x-1"></i>
               </Link>
             )}
-            {(currentPlan === 'Pro' || currentPlan === 'Basic' || currentPlan === 'Developer') && (
+            {(plan === 'Pro' ||
+              plan === 'Basic' ||
+              plan === 'Developer' ||
+              plan === 'Expert') && (
               <a
                 href="https://billing.stripe.com/p/login/4gwaH17kt3TRbZu5kk"
                 target="_blank"
@@ -319,13 +319,16 @@ export default function Account() {
               <label
                 htmlFor="darkModeToggle"
                 className="toggle-label block overflow-hidden h-8 rounded-full bg-gray-300 cursor-pointer"
-              ></label>
+              />
             </div>
           </div>
 
           {/* Email Notifications Toggle */}
           <div className="flex items-center justify-between">
-            <label htmlFor="emailNotificationsToggle" className="cursor-pointer font-semibold text-sm">
+            <label
+              htmlFor="emailNotificationsToggle"
+              className="cursor-pointer font-semibold text-sm"
+            >
               Email Notifications
             </label>
             <div className="relative inline-block w-14 h-8 select-none transition duration-200 ease-in">
@@ -340,7 +343,50 @@ export default function Account() {
               <label
                 htmlFor="emailNotificationsToggle"
                 className="toggle-label block overflow-hidden h-8 rounded-full bg-gray-300 cursor-pointer"
-              ></label>
+              />
+            </div>
+          </div>
+
+          {/* LExAPI 4.0 Toggle */}
+          <div className="flex items-center justify-between mt-4">
+            <label
+              htmlFor="lexApiToggle"
+              className={`cursor-pointer font-semibold text-sm ${
+                !(plan === 'Pro' || plan === 'Expert') ? 'text-gray-400' : ''
+              }`}
+            >
+              LExAPI 4.0 Enabled
+              <span className="inline-block ml-2 relative group">
+                <FaInfoCircle className="text-gray-400 hover:text-gray-600 inline-block ml-1" />
+                {/* Tooltip */}
+                <div
+                  className={`
+                    absolute left-1/2 -translate-x-1/2 -top-10
+                    w-48 bg-gray-700 text-white text-xs rounded py-1 px-2
+                    opacity-0 group-hover:opacity-100
+                    transition-opacity duration-200 z-50
+                  `}
+                >
+                  LExAPI 3.0 is faster; 4.0 is more accurate &amp; detailed.
+                </div>
+              </span>
+            </label>
+            <div className="relative inline-block w-14 h-8 select-none transition duration-200 ease-in">
+              <input
+                type="checkbox"
+                name="lexApiToggle"
+                id="lexApiToggle"
+                checked={lexApiEnabled}
+                onChange={handleLexApiToggle}
+                disabled={!(plan === 'Pro' || plan === 'Expert')}
+                className="toggle-checkbox absolute h-0 w-0 opacity-0"
+              />
+              <label
+                htmlFor="lexApiToggle"
+                className={`toggle-label block overflow-hidden h-8 rounded-full cursor-pointer
+                  ${!(plan === 'Pro' || plan === 'Expert') ? 'bg-gray-400' : 'bg-gray-300'}
+                `}
+              />
             </div>
           </div>
 
@@ -376,7 +422,7 @@ export default function Account() {
           )}
         </section>
 
-        {/* Quick Stats / Additional Info Card */}
+        {/* Quick Stats / Additional Info */}
         <section
           className={`col-span-1 xl:col-span-1 p-6 rounded-lg shadow-md transition-colors duration-300 ${
             isDarkMode ? 'bg-slate-800' : 'bg-white'
@@ -407,14 +453,18 @@ export default function Account() {
             </p>
             <p>
               <strong>Last Login:</strong>{' '}
-              {currentUser?.metadata?.lastSignInTime ? new Date(currentUser.metadata.lastSignInTime).toLocaleString() : 'N/A'}
+              {currentUser?.metadata?.lastSignInTime
+                ? new Date(currentUser.metadata.lastSignInTime).toLocaleString()
+                : 'N/A'}
             </p>
             <p>
               <strong>Account Created:</strong>{' '}
-              {currentUser?.metadata?.creationTime ? new Date(currentUser.metadata.creationTime).toLocaleString() : 'N/A'}
+              {currentUser?.metadata?.creationTime
+                ? new Date(currentUser.metadata.creationTime).toLocaleString()
+                : 'N/A'}
             </p>
             <p>
-              <strong>Email Verified:</strong> {currentUser?.emailVerified ? "Yes" : "No"}
+              <strong>Email Verified:</strong> {currentUser?.emailVerified ? 'Yes' : 'No'}
             </p>
           </div>
         </section>
@@ -422,11 +472,10 @@ export default function Account() {
 
       {/* Update Log Button */}
       <div className="flex justify-center mt-4">
-      <button
-  onClick={() => setShowUpdateLog(true)}
-  className="
-    group relative h-12 w-full sm:w-56 overflow-hidden rounded bg-gradient-to-r from-blue-600 to-blue-800 text-white text-sm sm:text-base shadow transition-all duration-300 flex items-center justify-center gradientShadowHoverBlue"
-          >
+        <button
+          onClick={() => setShowUpdateLog(true)}
+          className="group relative h-12 w-full sm:w-56 overflow-hidden rounded bg-gradient-to-r from-blue-600 to-blue-800 text-white text-sm sm:text-base shadow transition-all duration-300 flex items-center justify-center gradientShadowHoverBlue"
+        >
           <span className="font-semibold">Update Log</span>
         </button>
       </div>
@@ -509,7 +558,11 @@ export default function Account() {
       {/* Change Password Modal */}
       {showChangePasswordModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-          <div className={`max-w-lg w-full p-6 rounded-lg shadow-lg ${isDarkMode ? 'bg-slate-800 text-white' : 'bg-white text-blue-950'}`}>
+          <div
+            className={`max-w-lg w-full p-6 rounded-lg shadow-lg ${
+              isDarkMode ? 'bg-slate-800 text-white' : 'bg-white text-blue-950'
+            }`}
+          >
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-2xl font-bold">Change Password</h3>
               <button onClick={() => setShowChangePasswordModal(false)} className="text-xl font-bold">
@@ -518,7 +571,8 @@ export default function Account() {
             </div>
             <p className="text-lg">Coming Soon</p>
             <p className="mt-2 text-sm">
-              Our team is currently working on this feature to ensure a secure and robust experience. Please check back soon for updates.
+              Our team is currently working on this feature to ensure a secure and robust experience. Please check back
+              soon for updates.
             </p>
           </div>
         </div>

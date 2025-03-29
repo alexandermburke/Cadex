@@ -615,7 +615,7 @@ export default function CaseSummaries() {
                       <path className="text-blue-500 animate-progress" strokeWidth="4" strokeLinecap="round" fill="none" strokeDasharray="25, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
                     </svg>
                   </div>
-                  <div className="text-sm text-gray-400">We are verifying the Case Brief, please wait...</div>
+                  <div className="text-sm text-gray-400">We are verifying the Case Brief, this may take up to 1 minute..</div>
                 </div>
               ) : caseBrief ? (
                 viewMode === 'bulletpoint' ? (
