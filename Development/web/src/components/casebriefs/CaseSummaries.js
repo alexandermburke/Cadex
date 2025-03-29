@@ -203,23 +203,23 @@ export default function CaseSummaries() {
     }
   }
 
-  // Moved inside the component to access isLoggedIn and viewMode.
   const renderFactsContent = (factsText) => {
-    if (!factsText) return <p className="text-base mt-2">Not provided.</p>
-    const enumeratedFacts = factsText.match(/(\d+\.\s[\s\S]*?)(?=\d+\.\s|$)/g)
+    if (!factsText) return <p className="text-base mt-2">Not provided.</p>;
+    const factsStr = typeof factsText === 'string' ? factsText : String(factsText);
+    const enumeratedFacts = factsStr.match(/(\d+\.\s[\s\S]*?)(?=\d+\.\s|$)/g);
     if (viewMode === 'simplified')
-      return <p className={`text-base mt-2 ${!isLoggedIn ? 'blur-sm' : ''}`}>{simplifyText(factsText)}</p>
+      return <p className={`text-base mt-2 ${!isLoggedIn ? 'blur-sm' : ''}`}>{simplifyText(factsStr)}</p>;
     if (viewMode === 'classic' && enumeratedFacts && enumeratedFacts.length > 0) {
       return (
         <ul className={`list-disc list-inside text-base mt-2 ${!isLoggedIn ? 'blur-sm' : ''}`}>
           {enumeratedFacts.map((fact, index) => {
-            const strippedFact = fact.replace(/^\d+\.\s*/, '')
-            return <li key={index}>{strippedFact.trim()}</li>
+            const strippedFact = fact.replace(/^\d+\.\s*/, '');
+            return <li key={index}>{strippedFact.trim()}</li>;
           })}
         </ul>
-      )
+      );
     }
-    return <p className={`text-base mt-2 ${!isLoggedIn ? 'blur-sm' : ''}`}>{factsText}</p>
+    return <p className={`text-base mt-2 ${!isLoggedIn ? 'blur-sm' : ''}`}>{factsStr}</p>;
   }
 
   const renderFieldContent = (fieldText) => {

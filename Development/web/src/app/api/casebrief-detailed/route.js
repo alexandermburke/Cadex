@@ -5,7 +5,7 @@ export async function POST(request) {
   console.log('Received request to /api/casebrief-detailed');
 
   try {
-    const { title, detailed } = await request.json();
+    const { title, detailed, citation } = await request.json();
     if (!title || typeof title !== 'string' || !title.trim()) {
       console.warn('Invalid or missing "title" in request body.');
       return NextResponse.json(
@@ -79,7 +79,7 @@ Case Title:
     ];
 
     const openai = new OpenAI({
-      apiKey: process.env.OPENAI_API_KEY,
+      apiKey: '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',
     });
     let attemptCount = 0;
     let parsedResponse = null;
@@ -89,7 +89,7 @@ Case Title:
 
       try {
         const response = await openai.chat.completions.create({
-          model: 'gpt-3.5-turbo',
+          model: 'gpt-4-turbo',
           messages,
           max_tokens: detailed ? 3000 : 1500,
           temperature: 0.7,
@@ -109,7 +109,7 @@ Case Title:
         let rawContent = response.choices[0].message.content.trim();
         console.log('RAW GPT CONTENT =>', rawContent);
 
-         try {
+        try {
           parsedResponse = JSON.parse(rawContent);
         } catch (err) {
           console.warn('Direct JSON parse failed. Attempting substring extraction...');
@@ -151,6 +151,10 @@ Case Title:
       dissent: parsedResponse.dissent || '',
       verified: false,
     };
+
+    if (citation && citation.trim() !== '' && citation.trim().toUpperCase() !== 'N/A') {
+      result.citation = citation.trim();
+    }
 
     console.log('FINAL PARSED RESULT =>', result);
     return NextResponse.json(result, { status: 200 });

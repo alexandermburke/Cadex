@@ -847,7 +847,7 @@ export default function AllBriefs() {
                         onClick={() => openCase(c)}
                         className={`p-4 rounded-xl shadow-lg transition-transform transform hover:scale-105 cursor-pointer group flex flex-col ${
                           isDarkMode
-                            ? 'bg-slate-800 border border-slate-700 text-white'
+                            ? 'bg-slate-800 bg-opacity-50 border border-slate-700 text-white'
                             : 'bg-white border border-gray-300 text-gray-800'
                         }`}
                       >
@@ -1060,6 +1060,19 @@ export default function AllBriefs() {
                           <FaSync size={20} className="text-gray-400" />
                         </motion.button>
                       )}
+                      <motion.button
+                        onClick={() => toggleFavorite(selectedCase.id)}
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.9 }}
+                        className="ml-4"
+                        aria-label="Toggle Favorite"
+                      >
+                        {favorites.includes(selectedCase.id) ? (
+                          <FaHeart size={20} className="text-red-500" />
+                        ) : (
+                          <FaRegHeart size={20} className="text-gray-400" />
+                        )}
+                      </motion.button>
                     </div>
                   </div>
                   <button

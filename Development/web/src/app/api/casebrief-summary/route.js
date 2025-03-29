@@ -1,27 +1,16 @@
-// app/api/casebrief-summary/route.js
-
 import { NextResponse } from 'next/server';
 import OpenAI from 'openai';
 
-/**
- * POST /api/casebrief-summary
- * Expects JSON body: { title: "Case Title" }
- * Returns JSON: { ruleOfLaw, facts, issue, holding, reasoning, dissent }
- */
 export async function POST(request) {
   console.log('Received request to /api/casebrief-summary');
 
   try {
-    // Parse the JSON body to extract the title
-    const { title } = await request.json();
+    const { title, citation } = await request.json();
 
-    // Validate the presence and type of the title
     if (!title || typeof title !== 'string' || !title.trim()) {
       console.warn('Invalid or missing "title" in request body.');
       return NextResponse.json(
-        {
-          error: 'Invalid or missing "title" in request body.',
-        },
+        { error: 'Invalid or missing "title" in request body.' },
         { status: 400 }
       );
     }
@@ -54,7 +43,6 @@ Case Title:
 "${inputTitle}"
     `;
 
-    // Define the conversation messages to guide the AI
     const messages = [
       {
         role: 'system',
@@ -77,20 +65,17 @@ ONLY return the JSON object. DO NOT include any additional text or commentary.
       },
     ];
 
-    // Initialize OpenAI API client
     const openai = new OpenAI({
-      apiKey: process.env.OPENAI_API_KEY,
+      apiKey: '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',
     });
 
-    // Make the API request to OpenAI
     const response = await openai.chat.completions.create({
-      model: 'gpt-3.5-turbo',
+      model: 'gpt-4-turbo',
       messages: messages,
       max_tokens: 1500,
       temperature: 0.7,
     });
 
-    // Validate the structure of the response
     if (
       !response ||
       !response.choices ||
@@ -103,7 +88,6 @@ ONLY return the JSON object. DO NOT include any additional text or commentary.
     }
 
     let rawContent = response.choices[0].message.content.trim();
-
     console.log('RAW GPT CONTENT =>', rawContent);
 
     let parsed;
@@ -134,7 +118,6 @@ ONLY return the JSON object. DO NOT include any additional text or commentary.
       }
     }
 
-    // Structure the parsed result
     const result = {
       ruleOfLaw: parsed.ruleOfLaw || '',
       facts: parsed.facts || '',
@@ -144,9 +127,11 @@ ONLY return the JSON object. DO NOT include any additional text or commentary.
       dissent: parsed.dissent || '',
     };
 
-    console.log('FINAL PARSED RESULT =>', result);
+    if (citation && citation.trim() !== '' && citation.trim().toUpperCase() !== 'N/A') {
+      result.citation = citation.trim();
+    }
 
-    // Return the structured summary as JSON
+    console.log('FINAL PARSED RESULT =>', result);
     return NextResponse.json(result, { status: 200 });
   } catch (err) {
     console.error('Error in /api/casebrief-summary:', err);
