@@ -5,7 +5,7 @@ export async function POST(request) {
   console.log('Received request to /api/casebrief-detailed');
 
   try {
-    const { title, detailed } = await request.json();
+    const { title, detailed, citation } = await request.json();
     if (!title || typeof title !== 'string' || !title.trim()) {
       console.warn('Invalid or missing "title" in request body.');
       return NextResponse.json(
@@ -22,12 +22,21 @@ export async function POST(request) {
       prompt = `
 Generate an extremely comprehensive and detailed case summary for the following case title. The summary should be as in-depth and accurate as Quimbee case briefs, and must include the following sections:
 
-1. Rule of Law: Provide a comprehensive explanation of the general legal principles, including detailed references to relevant statutory law, landmark cases, and legal doctrines. Your explanation should be at least six sentences long to ensure a full understanding of the applicable legal framework.
-2. Facts: Enumerate and elaborate on at least eight key facts or events that are crucial for understanding the case. Each fact should be clearly stated and explained in detail.
-3. Issue: Analyze and describe the primary legal question(s) in at least five sentences, delving into any complexities or alternative interpretations.
-4. Holding: Summarize the court's decision in three to four sentences, clearly outlining the legal outcome.
-5. Reasoning: Provide an in-depth discussion of the court's rationale in at least seven sentences. Explain how legal principles, statutory interpretations, and precedents influenced the decision.
-6. Dissent: If applicable, summarize any dissenting opinions in at least three sentences, highlighting the key points of disagreement. If no dissent exists, simply state "None."
+1. Rule of Law: Provide a comprehensive explanation of the general legal principles, including detailed references to relevant statutory law, landmark cases, and legal doctrines. Your explanation should be at least five sentences long to ensure a full understanding of the applicable legal framework.
+
+2. Facts: Enumerate and elaborate on at least eight key facts or events that are crucial for understanding the case. 
+   - Each fact must be prefixed with a number, followed by exactly one period and one space (e.g., "1. ").
+   - Do NOT place an extra period immediately after the bullet number unless it is the start of a new bullet. 
+   - For example: "1. Dr. L.A. Nixon, an African-American dentist... 2. The denial was based on a 1923 Texas statute..."
+   - All facts should be returned in a single string, without line breaks between bullet points.
+
+3. Issue: Analyze and describe the primary legal question(s) in at least four sentences, delving into any complexities or alternative interpretations.
+
+4. Holding: Summarize the court's decision in two to three sentences, clearly outlining the legal outcome.
+
+5. Reasoning: Provide an in-depth discussion of the court's rationale in at least six sentences. Explain how legal principles, statutory interpretations, and precedents influenced the decision.
+
+6. Dissent: If applicable, summarize any dissenting opinions in at least two sentences, highlighting the key points of disagreement. If no dissent exists, simply state "None."
 
 Return the summary strictly in JSON format with the following keys:
 {
@@ -38,6 +47,7 @@ Return the summary strictly in JSON format with the following keys:
   "reasoning": "",
   "dissent": ""
 }
+
 Do not include any additional text.
 Case Title:
 "${inputTitle}"
@@ -45,12 +55,12 @@ Case Title:
     } else {
       prompt = `
 Generate a comprehensive case summary based on the following case title. The summary should include:
-1. Rule of Law: Provide a succinct explanation of the legal principles and applicable case law in at least three sentences.
-2. Facts: List and explain at least five key facts or events that are crucial for understanding the case.
-3. Issue: Describe the primary legal question(s) in at least three sentences.
-4. Holding: Summarize the court's decision in three sentences.
-5. Reasoning: Explain the court's rationale in at least four sentences.
-6. Dissent: If applicable, provide a brief summary of any dissenting opinions in at least two sentences; otherwise, state "None."
+1. Rule of Law: Provide a succinct explanation of the legal principles and applicable case law in at least two sentences
+2. Facts: List and explain at least four key facts or events that are crucial for understanding the case.
+3. Issue: Describe the primary legal question(s) in at least two sentences.
+4. Holding: Summarize the court's decision in two sentences.
+5. Reasoning: Explain the court's rationale in at least three sentences.
+6. Dissent: If applicable, provide a brief summary of any dissenting opinions in at least one sentence; otherwise, state "None."
 
 Return the summary in JSON format with the keys:
 {
@@ -79,19 +89,20 @@ Case Title:
     ];
 
     const openai = new OpenAI({
-      apiKey: process.env.OPENAI_API_KEY,
+      apiKey: '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',
     });
+
     let attemptCount = 0;
     let parsedResponse = null;
+    const maxTokens = detailed ? 1500 : 1000;
 
     while (attemptCount < 10) {
       attemptCount++;
-
       try {
         const response = await openai.chat.completions.create({
-          model: 'gpt-3.5-turbo',
+          model: 'gpt-4-turbo',
           messages,
-          max_tokens: detailed ? 3000 : 1500,
+          max_tokens: maxTokens,
           temperature: 0.7,
         });
 
@@ -109,7 +120,8 @@ Case Title:
         let rawContent = response.choices[0].message.content.trim();
         console.log('RAW GPT CONTENT =>', rawContent);
 
-         try {
+        // Try direct JSON parse
+        try {
           parsedResponse = JSON.parse(rawContent);
         } catch (err) {
           console.warn('Direct JSON parse failed. Attempting substring extraction...');
@@ -151,6 +163,10 @@ Case Title:
       dissent: parsedResponse.dissent || '',
       verified: false,
     };
+
+    if (citation && citation.trim() !== '' && citation.trim().toUpperCase() !== 'N/A') {
+      result.citation = citation.trim();
+    }
 
     console.log('FINAL PARSED RESULT =>', result);
     return NextResponse.json(result, { status: 200 });
