@@ -81,20 +81,16 @@ export default function CaseSummaries() {
   const isPro = plan === 'pro'
   const isExpert = plan === 'expert'
   const isDarkMode = userDataObj?.darkMode || false
-
   const [isSidebarVisible, setIsSidebarVisible] = useState(true)
   const toggleSidebar = () => setIsSidebarVisible(!isSidebarVisible)
-
   const [capCase, setCapCase] = useState(null)
   const [caseBrief, setCaseBrief] = useState(null)
   const [isSummaryLoading, setIsSummaryLoading] = useState(false)
   const [reRunCount, setReRunCount] = useState(0)
   const [isVerified, setIsVerified] = useState(false)
-
   const queryCaseId = searchParams.get('caseId')
   const capCaseId = queryCaseId || localStorage.getItem('lastCapCaseId')
   const pdfRef = useRef(null)
-
   const viewModes = [
     { label: 'Classic', value: 'classic' },
     { label: 'Outline', value: 'bulletpoint' },
@@ -105,14 +101,12 @@ export default function CaseSummaries() {
     localStorage.setItem('caseBriefViewMode', viewMode)
   }, [viewMode])
   const selectedIndex = viewModes.findIndex((m) => m.value === viewMode)
-
   const [relatedCases, setRelatedCases] = useState([])
   const [favorites, setFavorites] = useState([])
   const [isFavorited, setIsFavorited] = useState(false)
   const [favoriteCases, setFavoriteCases] = useState([])
   const [selectedFavorite, setSelectedFavorite] = useState(null)
   const [citationStyle, setCitationStyle] = useState('bluebook')
-
   useEffect(() => {
     if (userDataObj && Array.isArray(userDataObj.favorites)) setFavorites(userDataObj.favorites)
   }, [userDataObj])
@@ -182,7 +176,6 @@ export default function CaseSummaries() {
       }
     }
   }, [favoriteCases])
-
   const fetchFavoriteCaseSummary = async (fav) => {
     try {
       const favDoc = await getDoc(doc(db, 'capCases', fav.id))
@@ -202,26 +195,24 @@ export default function CaseSummaries() {
       setCaseBrief({ error: 'Error fetching favorite case summary.' })
     }
   }
-
   const renderFactsContent = (factsText) => {
-    if (!factsText) return <p className="text-base mt-2">Not provided.</p>;
-    const factsStr = typeof factsText === 'string' ? factsText : String(factsText);
-    const enumeratedFacts = factsStr.match(/(\d+\.\s[\s\S]*?)(?=\d+\.\s|$)/g);
+    if (!factsText) return <p className="text-base mt-2">Not provided.</p>
+    const factsStr = typeof factsText === 'string' ? factsText : String(factsText)
+    const enumeratedFacts = factsStr.match(/(\d+\.\s[\s\S]*?)(?=\d+\.\s|$)/g)
     if (viewMode === 'simplified')
-      return <p className={`text-base mt-2 ${!isLoggedIn ? 'blur-sm' : ''}`}>{simplifyText(factsStr)}</p>;
+      return <p className={`text-base mt-2 ${!isLoggedIn ? 'blur-sm' : ''}`}>{simplifyText(factsStr)}</p>
     if (viewMode === 'classic' && enumeratedFacts && enumeratedFacts.length > 0) {
       return (
         <ul className={`list-disc list-inside text-base mt-2 ${!isLoggedIn ? 'blur-sm' : ''}`}>
           {enumeratedFacts.map((fact, index) => {
-            const strippedFact = fact.replace(/^\d+\.\s*/, '');
-            return <li key={index}>{strippedFact.trim()}</li>;
+            const strippedFact = fact.replace(/^\d+\.\s*/, '')
+            return <li key={index}>{strippedFact.trim()}</li>
           })}
         </ul>
-      );
+      )
     }
-    return <p className={`text-base mt-2 ${!isLoggedIn ? 'blur-sm' : ''}`}>{factsStr}</p>;
+    return <p className={`text-base mt-2 ${!isLoggedIn ? 'blur-sm' : ''}`}>{factsStr}</p>
   }
-
   const renderFieldContent = (fieldText) => {
     if (!fieldText) return 'Not provided.'
     if (viewMode === 'bulletpoint') {
@@ -230,7 +221,6 @@ export default function CaseSummaries() {
       return <p className={`text-base mt-2 ${!isLoggedIn ? 'blur-sm' : ''}`}>{simplifyText(fieldText)}</p>
     return <p className={`text-base mt-2 ${!isLoggedIn ? 'blur-sm' : ''}`}>{fieldText}</p>
   }
-
   const generateOutline = (summaryData) => {
     const sections = []
     if (summaryData.ruleOfLaw) sections.push({ title: 'Rule of Law', summary: simplifyText(summaryData.ruleOfLaw, 150) })
@@ -241,7 +231,6 @@ export default function CaseSummaries() {
     if (summaryData.dissent) sections.push({ title: 'Dissent', summary: simplifyText(summaryData.dissent, 150) })
     return sections
   }
-
   const shareCase = async () => {
     if (!capCase) return
     const shareUrl = `${window.location.origin}/casebriefs/summaries?caseId=${capCase.id}`
@@ -261,13 +250,11 @@ export default function CaseSummaries() {
       alert('URL copied to clipboard')
     }
   }
-
   const reGenerateSummary = async () => {
     if (!capCase) return
     if (viewMode === 'simplified') await getCapCaseBriefSummary(capCase)
     else await getCapCaseSummary(capCase)
   }
-
   useEffect(() => {
     if (!capCaseId) return
     const fetchCapCaseAndSummary = async () => {
@@ -299,7 +286,6 @@ export default function CaseSummaries() {
     }
     fetchCapCaseAndSummary()
   }, [capCaseId, viewMode])
-
   useEffect(() => {
     if (!capCase) return
     const fetchRelatedCases = async () => {
@@ -322,13 +308,13 @@ export default function CaseSummaries() {
     }
     fetchRelatedCases()
   }, [capCase])
-
   const getCapCaseSummary = async (capCaseObj) => {
     setIsSummaryLoading(true)
     setCaseBrief(null)
     try {
       const payload = {
         title: capCaseObj.title,
+        citation: capCaseObj.citation,
         date: capCaseObj.decisionDate || '',
         detailed: true
       }
@@ -367,7 +353,6 @@ export default function CaseSummaries() {
       setIsSummaryLoading(false)
     }
   }
-
   const getCapCaseBriefSummary = async (capCaseObj) => {
     setIsSummaryLoading(true)
     setCaseBrief(null)
@@ -411,7 +396,6 @@ export default function CaseSummaries() {
       setIsSummaryLoading(false)
     }
   }
-
   const verifyDetailedSummary = async (summaryData, capCaseObj) => {
     try {
       const verifyRes = await fetch('/api/casebrief-verification', {
@@ -443,7 +427,6 @@ export default function CaseSummaries() {
       setIsVerified(false)
     }
   }
-
   const verifyBriefSummary = async (summaryData, capCaseObj) => {
     try {
       const verifyRes = await fetch('/api/casebrief-verification', {
@@ -475,17 +458,14 @@ export default function CaseSummaries() {
       setIsVerified(false)
     }
   }
-
   const saveAsPDFHandler = async () => {
     await saveAsPDF(pdfRef, capCase?.title)
   }
-
   const headingByMode = {
     classic: 'Case Brief (Classic)',
     bulletpoint: 'Case Brief (Outline)',
     simplified: 'Case Brief (Simple)'
   }
-
   const structuredData = capCase
     ? {
         '@context': 'https://schema.org',
@@ -497,7 +477,6 @@ export default function CaseSummaries() {
         url: typeof window !== 'undefined' ? window.location.href : ''
       }
     : null
-
   return (
     <>
       {capCase && (
