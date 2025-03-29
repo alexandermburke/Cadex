@@ -84,7 +84,7 @@ Case Title:
 
     let attemptCount = 0;
     let parsedResponse = null;
-    const maxTokens = detailed ? 2000 : 1500; // reduced for detailed summaries
+    const maxTokens = detailed ? 2000 : 1500; // adjusted without altering the prompt
 
     while (attemptCount < 10) {
       attemptCount++;
@@ -111,8 +111,8 @@ Case Title:
         let rawContent = response.choices[0].message.content.trim();
         console.log('RAW GPT CONTENT =>', rawContent);
 
-        // If the response doesn't appear to be JSON, throw an error immediately
-        if (!rawContent.trim().startsWith('{')) {
+        // If the response does not start with '{', immediately throw an error
+        if (!rawContent.startsWith('{')) {
           console.error("GPT response does not start with '{':", rawContent);
           throw new Error("GPT response is not valid JSON");
         }
