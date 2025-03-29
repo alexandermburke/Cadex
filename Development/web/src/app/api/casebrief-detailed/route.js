@@ -81,8 +81,10 @@ Case Title:
     const openai = new OpenAI({
       apiKey: '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',
     });
+
     let attemptCount = 0;
     let parsedResponse = null;
+    const maxTokens = detailed ? 2000 : 1500; // reduced for detailed summaries
 
     while (attemptCount < 10) {
       attemptCount++;
@@ -91,7 +93,7 @@ Case Title:
         const response = await openai.chat.completions.create({
           model: 'gpt-4-turbo',
           messages,
-          max_tokens: detailed ? 3000 : 1500,
+          max_tokens: maxTokens,
           temperature: 0.7,
         });
 
@@ -108,6 +110,12 @@ Case Title:
 
         let rawContent = response.choices[0].message.content.trim();
         console.log('RAW GPT CONTENT =>', rawContent);
+
+        // If the response doesn't appear to be JSON, throw an error immediately
+        if (!rawContent.trim().startsWith('{')) {
+          console.error("GPT response does not start with '{':", rawContent);
+          throw new Error("GPT response is not valid JSON");
+        }
 
         try {
           parsedResponse = JSON.parse(rawContent);

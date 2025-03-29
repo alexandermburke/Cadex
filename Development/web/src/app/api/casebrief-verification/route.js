@@ -5,10 +5,8 @@ export async function POST(request) {
   console.log('Received request to /api/casebrief-verification');
 
   try {
-    // Parse the JSON body to extract briefSummary, caseTitle, decisionDate, and jurisdiction
     const { briefSummary, caseTitle, decisionDate, jurisdiction } = await request.json();
 
-    // Validate input
     if (
       !briefSummary ||
       typeof briefSummary !== 'object' ||
@@ -23,7 +21,6 @@ export async function POST(request) {
       );
     }
 
-    // Construct the verification prompt with additional checks.
     const verificationPrompt = `
 Generate a JSON object with the following keys:
 {
@@ -78,7 +75,7 @@ Summary:
 
     const response = await openai.chat.completions.create({
       model: 'gpt-4-turbo',
-      messages: messages,
+      messages,
       max_tokens: 150,
       temperature: 0,
     });
@@ -96,6 +93,12 @@ Summary:
 
     let rawOutput = response.choices[0].message.content.trim();
     console.log('Raw verification output:', rawOutput);
+
+    // Check if the output starts with '{'
+    if (!rawOutput.trim().startsWith('{')) {
+      console.error("GPT verification response does not start with '{':", rawOutput);
+      throw new Error("GPT verification response is not valid JSON");
+    }
 
     let parsed;
     try {
