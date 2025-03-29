@@ -4,32 +4,8 @@ import OpenAI from 'openai';
 export async function POST(request) {
   console.log('Received request to /api/casebrief-detailed');
 
-  // Helper function for parsing JSON from raw GPT output.
-  const parseGPTResponse = (rawContent) => {
-    if (!rawContent.startsWith('{')) {
-      throw new Error("GPT response is not valid JSON");
-    }
-    try {
-      return JSON.parse(rawContent);
-    } catch (err) {
-      console.warn('Direct JSON parse failed. Attempting substring extraction...');
-      const firstCurly = rawContent.indexOf('{');
-      const lastCurly = rawContent.lastIndexOf('}');
-      if (firstCurly !== -1 && lastCurly !== -1) {
-        const jsonSubstring = rawContent.substring(firstCurly, lastCurly + 1);
-        try {
-          return JSON.parse(jsonSubstring);
-        } catch (innerErr) {
-          throw new Error('Could not parse JSON from GPT.');
-        }
-      } else {
-        throw new Error('Could not parse JSON from GPT.');
-      }
-    }
-  };
-
   try {
-    const { title, detailed, citation } = await request.json();
+    const { title, detailed } = await request.json();
     if (!title || typeof title !== 'string' || !title.trim()) {
       console.warn('Invalid or missing "title" in request body.');
       return NextResponse.json(
@@ -103,20 +79,19 @@ Case Title:
     ];
 
     const openai = new OpenAI({
-      apiKey: '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',
+      apiKey: process.env.OPENAI_API_KEY,
     });
-
     let attemptCount = 0;
     let parsedResponse = null;
-    const maxTokens = detailed ? 1500 : 1000;
 
     while (attemptCount < 10) {
       attemptCount++;
+
       try {
         const response = await openai.chat.completions.create({
-          model: 'gpt-4-turbo',
+          model: 'gpt-3.5-turbo',
           messages,
-          max_tokens: maxTokens,
+          max_tokens: detailed ? 3000 : 1500,
           temperature: 0.7,
         });
 
@@ -134,7 +109,27 @@ Case Title:
         let rawContent = response.choices[0].message.content.trim();
         console.log('RAW GPT CONTENT =>', rawContent);
 
-        parsedResponse = parseGPTResponse(rawContent);
+         try {
+          parsedResponse = JSON.parse(rawContent);
+        } catch (err) {
+          console.warn('Direct JSON parse failed. Attempting substring extraction...');
+          const firstCurly = rawContent.indexOf('{');
+          const lastCurly = rawContent.lastIndexOf('}');
+          if (firstCurly !== -1 && lastCurly !== -1) {
+            const jsonSubstring = rawContent.substring(firstCurly, lastCurly + 1);
+            try {
+              parsedResponse = JSON.parse(jsonSubstring);
+              console.log('Successfully parsed JSON substring:', jsonSubstring);
+            } catch (innerErr) {
+              console.error('Failed to parse JSON substring:', jsonSubstring);
+              throw new Error('Could not parse JSON from GPT.');
+            }
+          } else {
+            console.error('No JSON object found in GPT response:', rawContent);
+            throw new Error('Could not parse JSON from GPT.');
+          }
+        }
+
         break;
       } catch (err) {
         console.error(`Attempt ${attemptCount} failed:`, err);
@@ -156,10 +151,6 @@ Case Title:
       dissent: parsedResponse.dissent || '',
       verified: false,
     };
-
-    if (citation && citation.trim() !== '' && citation.trim().toUpperCase() !== 'N/A') {
-      result.citation = citation.trim();
-    }
 
     console.log('FINAL PARSED RESULT =>', result);
     return NextResponse.json(result, { status: 200 });
