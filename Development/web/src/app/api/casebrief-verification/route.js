@@ -21,6 +21,21 @@ export async function POST(request) {
       );
     }
 
+    // Grab the citation, if present
+    const rawCitation = (briefSummary.citation || '').trim();
+    const isCitationProvided = rawCitation && rawCitation.toUpperCase() !== 'N/A';
+
+    // Build the portion of the prompt for citation only if we actually have one
+    const citationLine = isCitationProvided
+      ? `7. Citation: ${rawCitation}`
+      : '';
+
+    // Build the “in addition to checking” line for citation only if it exists
+    const citationCriteria = isCitationProvided
+      ? '  7. Citation'
+      : '';
+
+    // Compose the verification prompt. We conditionally omit the citation lines if it's "N/A" or missing.
     const verificationPrompt = `
 Generate a JSON object with the following keys:
 {
@@ -35,9 +50,9 @@ In addition to checking that the summary includes detailed content for:
   4. Holding
   5. Reasoning
   6. Dissent
-  7. Citation
+${citationCriteria}
 please also verify that the provided case title, decision date (year), and jurisdiction are correct and well-formatted. This includes checking for proper punctuation, spelling, grammar, and capitalization.
-If the citation field is missing or its value is "N/A" (case‑insensitive), disregard the citation as a method of verification.
+If the citation field is missing or its value is "N/A" (case-insensitive), disregard the citation as a method of verification.
 If the summary is fully correct and all additional fields are accurate and properly formatted, set "verified" to true and "explanation" to "Summary is fully accurate." 
 If there are any issues—whether the summary is missing substantial details or if the title, date, jurisdiction, or citation (when provided) are incorrect, misspelled, or improperly formatted—set "verified" to false and provide a concise explanation stating what is wrong.
 If there is no Dissent provided, the summary can still be 100% accurate as it might not be possible to generate.
@@ -54,7 +69,7 @@ Summary:
 4. Holding: ${briefSummary.holding || 'N/A'}
 5. Reasoning: ${briefSummary.reasoning || 'N/A'}
 6. Dissent: ${briefSummary.dissent || 'N/A'}
-7. Citation: ${briefSummary.citation || 'N/A'}
+${citationLine}
     `;
 
     const messages = [
@@ -74,7 +89,7 @@ Summary:
     });
 
     const response = await openai.chat.completions.create({
-      model: 'gpt-4-turbo',
+      model: 'gpt-4', 
       messages,
       max_tokens: 150,
       temperature: 0,
@@ -94,8 +109,8 @@ Summary:
     let rawOutput = response.choices[0].message.content.trim();
     console.log('Raw verification output:', rawOutput);
 
-    // Check if the output starts with '{'
-    if (!rawOutput.trim().startsWith('{')) {
+    // Ensure the output starts with '{'
+    if (!rawOutput.startsWith('{')) {
       console.error("GPT verification response does not start with '{':", rawOutput);
       throw new Error("GPT verification response is not valid JSON");
     }
