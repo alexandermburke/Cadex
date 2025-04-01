@@ -3,7 +3,7 @@ import React, { useState, useEffect, useRef } from 'react'
 import Head from 'next/head'
 import Sidebar from '../Sidebar'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { FaBars, FaTimes, FaHeart, FaRegHeart, FaSync, FaDownload, FaShareAlt } from 'react-icons/fa'
+import { FaBars, FaTimes, FaHeart, FaRegHeart, FaSync, FaDownload, FaShareAlt, FaCopy } from 'react-icons/fa'
 import { motion, AnimatePresence } from 'framer-motion'
 import { db } from '@/firebase'
 import { doc, getDoc, updateDoc, collection, query, where, limit, getDocs } from 'firebase/firestore'
@@ -23,26 +23,31 @@ const parseYear = (dateString) => {
   return parsed.getFullYear()
 }
 
+// Updated getCitation function.
+// It now automatically uses caseObj.page (if available) as the citation number.
 const getCitation = (caseObj, style, page = '___') => {
+  if (!caseObj) return 'Citation not available.'
   const year = parseYear(caseObj.decisionDate)
   const title = caseObj.title || 'N/A'
   const volume = caseObj.volume || '___'
   const reporter = 'U.S.'
+  // Use the page number from the case object if available, otherwise use the provided page argument.
+  const pageNumber = caseObj.page || page
   switch (style) {
     case 'bluebook':
-      return `${title}, ${volume} ${reporter} ${page} (${year}).`
+      return `${title}, ${volume} ${reporter} ${pageNumber} (${year}).`
     case 'ieee':
-      return `${title}, ${volume} ${reporter} ${page}, ${caseObj.decisionDate || '____'}.`
+      return `[${title}, ${volume} ${reporter} ${pageNumber} (${year})]`
     case 'apa':
-      return `${title} (${year}). ${volume} ${reporter} ${page}.`
+      return `${title}, ${volume} ${reporter} ${pageNumber} (${year}).`
     case 'mla':
-      return `"${title}." ${volume} ${reporter} ${page} (${year}).`
+      return `${title}. ${volume} ${reporter} ${pageNumber}. ${year}.`
     case 'chicago':
-      return `${title}, ${volume} ${reporter} ${page} (${year}).`
+      return `${title}, ${volume} ${reporter} ${pageNumber} (${year}).`
     case 'ama':
-      return `${title}. ${volume} ${reporter} ${page} (${year}).`
+      return `${title}. ${volume} ${reporter} ${pageNumber} (${year}).`
     default:
-      return `${title}, ${volume} ${reporter} ${page} (${year}).`
+      return `${title}, ${volume} ${reporter} ${pageNumber} (${year}).`
   }
 }
 
@@ -107,6 +112,9 @@ export default function CaseSummaries() {
   const [favoriteCases, setFavoriteCases] = useState([])
   const [selectedFavorite, setSelectedFavorite] = useState(null)
   const [citationStyle, setCitationStyle] = useState('bluebook')
+  // New state for copy success message
+  const [copySuccess, setCopySuccess] = useState(false)
+  
   useEffect(() => {
     if (userDataObj && Array.isArray(userDataObj.favorites)) setFavorites(userDataObj.favorites)
   }, [userDataObj])
@@ -461,6 +469,19 @@ export default function CaseSummaries() {
   const saveAsPDFHandler = async () => {
     await saveAsPDF(pdfRef, capCase?.title)
   }
+
+  const copyCitationToClipboard = () => {
+    const citationText = getCitation(capCase, citationStyle, '113')
+    navigator.clipboard.writeText(citationText)
+      .then(() => {
+        setCopySuccess(true)
+        setTimeout(() => setCopySuccess(false), 2000)
+      })
+      .catch((err) => {
+        console.error('Failed to copy citation: ', err)
+      })
+  }
+
   const headingByMode = {
     classic: 'Case Brief (Classic)',
     bulletpoint: 'Case Brief (Outline)',
@@ -743,44 +764,26 @@ export default function CaseSummaries() {
               )}
             </div>
             <div className="w-full mt-8">
-              <h2 className="text-lg font-bold mb-2 text-center">Related Cases</h2>
-              <motion.div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 w-full" layout>
-                <AnimatePresence>
-                  {relatedCases && relatedCases.length > 0 ? (
-                    relatedCases.map((rcase) => (
-                      <motion.div key={rcase.id} layout initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 20 }} transition={{ duration: 0.3 }} className={`p-4 rounded-xl shadow-lg cursor-pointer ${isDarkMode ? 'bg-slate-800 bg-opacity-50 border border-slate-700 text-white' : 'bg-white border border-gray-300 text-gray-800'} hover:shadow-xl transition-shadow`} onClick={() => router.push(`/casebriefs/summaries?caseId=${rcase.id}`)}>
-                        <h3 className="text-lg font-semibold mb-2 truncate">{rcase.title}</h3>
-                        <p className="text-sm">{rcase.jurisdiction || 'Unknown'}</p>
-                        <p className="text-xs mt-1 text-gray-400">
-                          Volume: {rcase.volume || 'N/A'} | Date: {rcase.decisionDate || 'N/A'}
-                        </p>
-                      </motion.div>
-                    ))
-                  ) : (
-                    <p className="text-sm text-gray-400 col-span-full text-center">No related cases found.</p>
-                  )}
-                </AnimatePresence>
-              </motion.div>
-            </div>
-            {capCase && (
-              <div className="w-full mt-8">
-                <h2 className="text-lg font-bold mb-2">Citation Generator</h2>
-                <div className={`p-4 rounded-lg ${isDarkMode ? 'bg-slate-800 bg-opacity-50 border border-slate-700' : 'bg-gray-100 border border-gray-300'}`}>
-                  <label htmlFor="citationStyle" className="block mb-2 font-semibold">Select Citation Style:</label>
-                  <select id="citationStyle" value={citationStyle} onChange={(e) => setCitationStyle(e.target.value)} className={`p-2 rounded-md ${isDarkMode ? 'bg-slate-700 border border-slate-600 text-white' : 'bg-white border border-gray-300 text-gray-800'}`}>
-                    <option value="bluebook">Bluebook</option>
-                    <option value="ieee">IEEE</option>
-                    <option value="apa">APA</option>
-                    <option value="mla">MLA</option>
-                    <option value="chicago">Chicago</option>
-                    <option value="ama">AMA</option>
-                  </select>
-                  <div className="mt-4">
-                    <p className="text-base italic">{getCitation(capCase, citationStyle, '113')}</p>
-                  </div>
+              <h2 className="text-lg font-bold mb-2 text-center">Citation Generator</h2>
+              <div className={`p-4 rounded-lg ${isDarkMode ? 'bg-slate-800 bg-opacity-50 border border-slate-700' : 'bg-gray-100 border border-gray-300'}`}>
+                <label htmlFor="citationStyle" className="block mb-2 font-semibold">Select Citation Style:</label>
+                <select id="citationStyle" value={citationStyle} onChange={(e) => setCitationStyle(e.target.value)} className={`p-2 rounded-md ${isDarkMode ? 'bg-slate-700 border border-slate-600 text-white' : 'bg-white border border-gray-300 text-gray-800'}`}>
+                  <option value="bluebook">Bluebook</option>
+                  <option value="ieee">IEEE</option>
+                  <option value="apa">APA</option>
+                  <option value="mla">MLA</option>
+                  <option value="chicago">Chicago</option>
+                  <option value="ama">AMA</option>
+                </select>
+                <div className="mt-4 flex items-center">
+                  <p className="text-base italic flex-grow">{getCitation(capCase, citationStyle, '113')}</p>
+                  <motion.button onClick={copyCitationToClipboard} whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }} className="ml-4" aria-label="Copy Citation">
+                    <FaCopy size={20} className="text-gray-500" />
+                  </motion.button>
+                  {copySuccess && <span className="text-emerald-500 ml-2">Copied successfully!</span>}
                 </div>
               </div>
-            )}
+            </div>
             {isLoggedIn && (
               <motion.button onClick={saveAsPDFHandler} whileHover={{ scale: 1.1, rotate: 5 }} whileTap={{ scale: 0.9, rotate: -5 }} className="mt-6 p-3 rounded-full bg-blue-600 text-white shadow-lg" aria-label="Save as PDF">
                 <FaDownload size={24} />
