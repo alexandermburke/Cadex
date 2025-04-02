@@ -284,8 +284,13 @@ export default function Hero() {
           <div className="flex justify-center mt-6 mb-6">
             <Link
               href="/pricing"
-              className="group relative h-12 w-56 overflow-hidden rounded bg-blue-950 text-white shadow-2xl transition-all before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-56 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
+              className="
+              group relative h-12 w-full sm:w-56 overflow-hidden rounded 
+              bg-gradient-to-r from-blue-600 to-blue-800 text-white 
+              text-sm sm:text-base shadow transition-all duration-300 
+              flex items-center justify-center gradientShadowHoverBlue
+            "
+          >
               <div className="flex items-center justify-center h-full">
                 Explore Our Plans
               </div>

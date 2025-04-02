@@ -76,6 +76,17 @@ export default function CaseAnalysis() {
     setSelectedCaseForSummary(selected);
   }
 
+  // Modified function: now also redirects to the 'new' tab when opening a saved analysis.
+  function handleOpenAnalysis(analysis) {
+    const caseMatch = favoriteCases.find((c) => c.id === analysis.caseId);
+    setSelectedFavorite(caseMatch || null);
+    setAnalysisTitle(analysis.title);
+    setAnalysisDetails(analysis.details);
+    setAnalysisTags(analysis.tags?.join(', ') || '');
+    setAnalysisDueDate(analysis.dueDate || '');
+    setActiveTab('new');
+  }
+
   async function handleAddAnalysis() {
     if (!selectedFavorite) {
       alert('Please select a favorite case.');
@@ -115,15 +126,6 @@ export default function CaseAnalysis() {
       console.error('Error saving analysis:', err);
       alert('Error saving analysis.');
     }
-  }
-
-  function handleOpenAnalysis(analysis) {
-    const caseMatch = favoriteCases.find((c) => c.id === analysis.caseId);
-    setSelectedFavorite(caseMatch || null);
-    setAnalysisTitle(analysis.title);
-    setAnalysisDetails(analysis.details);
-    setAnalysisTags(analysis.tags?.join(', ') || '');
-    setAnalysisDueDate(analysis.dueDate || '');
   }
 
   async function handleUpdateAnalysis(index) {

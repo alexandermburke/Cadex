@@ -462,7 +462,7 @@ export default function Sidebar({
               <NavLink
                 href="/subjects/criminal"
                 icon={<FaGavel className="text-sm" />}
-                label="Criminal Law"
+                label="Criminal"
                 active={activeLink === '/subjects/criminal'}
               />
               <NavLink
@@ -474,7 +474,7 @@ export default function Sidebar({
               <NavLink
                 href="/subjects/constitutional"
                 icon={<FaUniversity className="text-sm" />}
-                label="Constitutional Law"
+                label="Constitutional"
                 active={activeLink === '/subjects/constitutional'}
               />
             </>
@@ -534,10 +534,16 @@ export default function Sidebar({
           {(isPro || isExpert) ? (
             <>
               <NavLink
-                href="/lawtools/careerresources"
+                href="/lawtools/resumereview"
                 icon={<FaLightbulb className="text-sm" />}
                 label="Resume Review"
-                active={activeLink === '/lawtools/careerresources'}
+                active={activeLink === '/lawtools/resumereview'}
+              />
+              <NavLink
+                href="/lawtools/applicationreview"
+                icon={<FaUniversity className="text-sm" />}
+                label="Application Review"
+                active={activeLink === '/lawtools/applicationreview'}
               />
               <NavLink
                 href="/lawtools/interviewprep"
@@ -557,6 +563,10 @@ export default function Sidebar({
               <LockedNavLink
                 icon={<FaLightbulb className="text-sm" />}
                 label="Resume Review"
+              />
+              <LockedNavLink
+                icon={<FaUniversity className="text-sm" />}
+                label="Law School Application Review"
               />
               <LockedNavLink
                 icon={<FaComment className="text-sm" />}

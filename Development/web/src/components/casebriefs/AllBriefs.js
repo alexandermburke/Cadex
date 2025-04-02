@@ -1078,7 +1078,7 @@ export default function AllBriefs() {
                   <button
                     onClick={closeCase}
                     className={`inline-block px-4 py-2 rounded-full font-semibold text-sm transition-colors duration-300 ${
-                      isDarkMode ? 'bg-blue-600 gradientShadowHoverBlue text-white' : 'bg-blue-950 gradientShadowHoverBlue text-white'
+                      isDarkMode ? 'bg-blue-600 gradientShadowHoverBlue text-white' : 'bg-blue-950 gradientShadowHoverWhite text-white'
                     }`}
                     aria-label="Close Brief Modal"
                   >
