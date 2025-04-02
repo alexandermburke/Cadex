@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import clsx from 'clsx';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaBars, FaTimes } from 'react-icons/fa';
+import { FaBars, FaTimes, FaColumns } from 'react-icons/fa';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import Sidebar from '../Sidebar';
@@ -32,7 +32,9 @@ export default function CaseAnalysis() {
   const [expandedAnalysis, setExpandedAnalysis] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [autoCitationsOn, setAutoCitationsOn] = useState(false);
+  // activeTab now can be 'summary', 'analysis', or 'saved'
   const [activeTab, setActiveTab] = useState('summary');
+  const [combinedView, setCombinedView] = useState(false);
 
   useEffect(() => {
     if (!currentUser) return;
@@ -76,7 +78,7 @@ export default function CaseAnalysis() {
     setSelectedCaseForSummary(selected);
   }
 
-  // Modified function: now also redirects to the 'new' tab when opening a saved analysis.
+  // When opening a saved analysis, set the active tab to 'analysis'
   function handleOpenAnalysis(analysis) {
     const caseMatch = favoriteCases.find((c) => c.id === analysis.caseId);
     setSelectedFavorite(caseMatch || null);
@@ -84,7 +86,7 @@ export default function CaseAnalysis() {
     setAnalysisDetails(analysis.details);
     setAnalysisTags(analysis.tags?.join(', ') || '');
     setAnalysisDueDate(analysis.dueDate || '');
-    setActiveTab('new');
+    setActiveTab('analysis');
   }
 
   async function handleAddAnalysis() {
@@ -172,52 +174,80 @@ export default function CaseAnalysis() {
     return inTitle || inCaseTitle || inTags;
   });
 
-  // New tab toggle using a structure similar to AllBriefs
+  // Updated tab toggle using a CSS grid:
+  // The grid has three columns: an empty left cell, a centered middle cell for tabs, and a right cell for the consolidation button.
   function renderTabToggle() {
     return (
-      <div className="w-full max-w-md mx-auto mb-4 flex justify-around">
-        <motion.button
-          className={`px-4 py-2 font-semibold transition-colors duration-300 ${
-            activeTab === 'summary'
-              ? isDarkMode
-                ? 'text-white border-b-2 border-blue-400'
-                : 'text-blue-900 border-b-2 border-blue-900'
-              : isDarkMode
-              ? 'text-gray-400'
-              : 'text-gray-600'
-          }`}
-          onClick={() => setActiveTab('summary')}
-        >
-          Summary
-        </motion.button>
-        <motion.button
-          className={`px-4 py-2 font-semibold transition-colors duration-300 ${
-            activeTab === 'new'
-              ? isDarkMode
-                ? 'text-white border-b-2 border-blue-400'
-                : 'text-blue-900 border-b-2 border-blue-900'
-              : isDarkMode
-              ? 'text-gray-400'
-              : 'text-gray-600'
-          }`}
-          onClick={() => setActiveTab('new')}
-        >
-          New
-        </motion.button>
-        <motion.button
-          className={`px-4 py-2 font-semibold transition-colors duration-300 ${
-            activeTab === 'saved'
-              ? isDarkMode
-                ? 'text-white border-b-2 border-blue-400'
-                : 'text-blue-900 border-b-2 border-blue-900'
-              : isDarkMode
-              ? 'text-gray-400'
-              : 'text-gray-600'
-          }`}
-          onClick={() => setActiveTab('saved')}
-        >
-          Saved
-        </motion.button>
+      <div className="w-full max-w-md mx-auto mb-4 grid grid-cols-3 items-center">
+        {/* Left cell: empty */}
+        <div />
+        {/* Center cell: tab buttons */}
+        <div className="flex justify-center space-x-4">
+          <motion.button
+            className={clsx(
+              'px-4 py-2 font-semibold transition-colors duration-300',
+              activeTab === 'summary'
+                ? isDarkMode
+                  ? 'text-white border-b-2 border-blue-400'
+                  : 'text-blue-900 border-b-2 border-blue-900'
+                : isDarkMode
+                ? 'text-gray-400'
+                : 'text-gray-600'
+            )}
+            onClick={() => setActiveTab('summary')}
+          >
+            Summary
+          </motion.button>
+          <motion.button
+            className={clsx(
+              'px-4 py-2 font-semibold transition-colors duration-300',
+              activeTab === 'analysis'
+                ? isDarkMode
+                  ? 'text-white border-b-2 border-blue-400'
+                  : 'text-blue-900 border-b-2 border-blue-900'
+                : isDarkMode
+                ? 'text-gray-400'
+                : 'text-gray-600'
+            )}
+            onClick={() => setActiveTab('analysis')}
+          >
+            Analysis
+          </motion.button>
+          <motion.button
+            className={clsx(
+              'px-4 py-2 font-semibold transition-colors duration-300',
+              activeTab === 'saved'
+                ? isDarkMode
+                  ? 'text-white border-b-2 border-blue-400'
+                  : 'text-blue-900 border-b-2 border-blue-900'
+                : isDarkMode
+                ? 'text-gray-400'
+                : 'text-gray-600'
+            )}
+            onClick={() => setActiveTab('saved')}
+          >
+            Saved
+          </motion.button>
+        </div>
+        {/* Right cell: consolidation button (only in Analysis tab) */}
+        <div className="flex justify-end">
+          {activeTab === 'analysis' && (
+            <motion.button
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.5 }}
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+              onClick={() => setCombinedView(!combinedView)}
+              className={clsx(
+                'p-2 rounded-full transition-colors duration-300',
+                isDarkMode ? 'bg-gray-700 text-white' : 'bg-gray-200 text-gray-800'
+              )}
+            >
+              <FaColumns size={20} />
+            </motion.button>
+          )}
+        </div>
       </div>
     );
   }
@@ -572,12 +602,17 @@ export default function CaseAnalysis() {
                 </AnimatePresence>
               </button>
             </div>
-            <div className="flex justify-center mb-6">
-              {renderTabToggle()}
-            </div>
-            {activeTab === 'summary' && summarySection}
-            {activeTab === 'new' && newAnalysisSection}
-            {activeTab === 'saved' && savedAnalysesSection}
+            {renderTabToggle()}
+            {activeTab === 'saved'
+              ? savedAnalysesSection
+              : combinedView
+              ? (
+                <>
+                  {newAnalysisSection}
+                  {summarySection}
+                </>
+              )
+              : (activeTab === 'summary' ? summarySection : newAnalysisSection)}
           </main>
         </div>
       </div>
