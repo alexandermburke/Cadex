@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import clsx from 'clsx';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaBars, FaTimes, FaColumns } from 'react-icons/fa';
+import { FaBars, FaTimes, FaLayerGroup } from 'react-icons/fa';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import Sidebar from '../Sidebar';
@@ -32,7 +32,6 @@ export default function CaseAnalysis() {
   const [expandedAnalysis, setExpandedAnalysis] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [autoCitationsOn, setAutoCitationsOn] = useState(false);
-  // activeTab now can be 'summary', 'analysis', or 'saved'
   const [activeTab, setActiveTab] = useState('summary');
   const [combinedView, setCombinedView] = useState(false);
 
@@ -78,7 +77,6 @@ export default function CaseAnalysis() {
     setSelectedCaseForSummary(selected);
   }
 
-  // When opening a saved analysis, set the active tab to 'analysis'
   function handleOpenAnalysis(analysis) {
     const caseMatch = favoriteCases.find((c) => c.id === analysis.caseId);
     setSelectedFavorite(caseMatch || null);
@@ -174,14 +172,10 @@ export default function CaseAnalysis() {
     return inTitle || inCaseTitle || inTags;
   });
 
-  // Updated tab toggle using a CSS grid:
-  // The grid has three columns: an empty left cell, a centered middle cell for tabs, and a right cell for the consolidation button.
   function renderTabToggle() {
     return (
       <div className="w-full max-w-md mx-auto mb-4 grid grid-cols-3 items-center">
-        {/* Left cell: empty */}
         <div />
-        {/* Center cell: tab buttons */}
         <div className="flex justify-center space-x-4">
           <motion.button
             className={clsx(
@@ -229,7 +223,6 @@ export default function CaseAnalysis() {
             Saved
           </motion.button>
         </div>
-        {/* Right cell: consolidation button (only in Analysis tab) */}
         <div className="flex justify-end">
           {activeTab === 'analysis' && (
             <motion.button
@@ -244,7 +237,7 @@ export default function CaseAnalysis() {
                 isDarkMode ? 'bg-gray-700 text-white' : 'bg-gray-200 text-gray-800'
               )}
             >
-              <FaColumns size={20} />
+              <FaLayerGroup size={20} />
             </motion.button>
           )}
         </div>
