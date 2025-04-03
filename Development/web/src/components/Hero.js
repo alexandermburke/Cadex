@@ -102,7 +102,6 @@ export default function Hero() {
 
   const animatedWord = 'Future';
 
-  // Tailored Features for CadexLaw.com
   const features = [
     {
       icon: (
@@ -278,23 +277,24 @@ export default function Hero() {
           </h2>
 
           <p className={`text-center text-2xl sm:text-2xl md:text-2xl ${isDarkMode ? 'text-white' : 'text-slate-700'} max-w-2xl mb-10`}>
-           Created by law students, for law students, CadexLaw.com is your trusted hub for practical insights and an extensive suite of resources, all at a fraction of traditional costs.
+           Created by law students, for law students, CadexLaw is your trusted hub for practical insights and an extensive suite of resources, all at a fraction of traditional costs.
           </p>
 
           <div className="flex justify-center mt-6 mb-6">
-            <Link
-              href="/pricing"
-              className="
-              group relative h-12 w-full sm:w-56 overflow-hidden rounded 
-              bg-gradient-to-r from-blue-600 to-blue-800 text-white 
-              text-sm sm:text-base shadow transition-all duration-300 
-              flex items-center justify-center gradientShadowHoverBlue
-            "
-          >
-              <div className="flex items-center justify-center h-full">
-                Explore Our Plans
-              </div>
-            </Link>
+          <Link
+  href="/pricing"
+  className="
+      block group relative h-12 w-full sm:w-56 overflow-hidden rounded 
+      bg-gradient-to-r from-blue-600 to-blue-800 text-white 
+      text-sm sm:text-base shadow transition-all duration-300 
+      flex items-center justify-center gradientShadowHoverBlue
+    "
+>
+  <div className="font-semibold">
+    Explore Our Plans
+  </div>
+</Link>
+
           </div>
         </div>
 

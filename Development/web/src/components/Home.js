@@ -215,8 +215,6 @@ export default function Home() {
                 </div>
               </SwiperSlide>
             </Swiper>
-
-            {/* Centered "Create an Account" button below carousel */}
             <div className="flex justify-center mt-6">
               <button
                 onClick={() => router.push('/register')}

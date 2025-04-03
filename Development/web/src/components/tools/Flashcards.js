@@ -80,7 +80,6 @@ const courseNameMapping = [
   'Professional Responsibility',
 ];
 
-// Utility to simplify text
 const simplifyText = (text = '', maxLength = 100) => {
   if (!text) return 'Not provided.';
   if (text.length <= maxLength) return text;
@@ -92,11 +91,9 @@ export default function AIExamFlashCard() {
   const { currentUser, userDataObj } = useAuth();
   const isDarkMode = userDataObj?.darkMode || false;
 
-  // Sidebar toggle
   const [isSidebarVisible, setIsSidebarVisible] = useState(true);
   const toggleSidebar = () => setIsSidebarVisible(!isSidebarVisible);
 
-  // Flashcard & analysis state
   const [favoriteCases, setFavoriteCases] = useState([]);
   const [savedAnalyses, setSavedAnalyses] = useState([]);
   const [selectedFavorite, setSelectedFavorite] = useState(null);
@@ -108,29 +105,24 @@ export default function AIExamFlashCard() {
   const [expandedAnalysis, setExpandedAnalysis] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [autoCitationsOn, setAutoCitationsOn] = useState(false);
-  const [activeTab, setActiveTab] = useState('summary'); // 'summary' | 'new' | 'saved'
+  const [activeTab, setActiveTab] = useState('summary');
 
-  // Flashcards display state
   const [flashcards, setFlashcards] = useState([]);
   const [answeredFlashcards, setAnsweredFlashcards] = useState([]);
   const [currentFlashcardIndex, setCurrentFlashcardIndex] = useState(0);
   const [isAnswerRevealed, setIsAnswerRevealed] = useState(false);
 
-  // Timer state
   const [timerDuration, setTimerDuration] = useState(0);
   const [timeLeft, setTimeLeft] = useState(0);
   const timerRef = useRef(null);
-  // Timer style: 'digital' or 'analog'
   const [timerStyle, setTimerStyle] = useState('digital');
 
-  // Modal states
   const [isConfigModalOpen, setIsConfigModalOpen] = useState(false);
   const [isLoadProgressModalOpen, setIsLoadProgressModalOpen] = useState(false);
   const [isFinalFeedbackModalOpen, setIsFinalFeedbackModalOpen] = useState(false);
   const [savedProgresses, setSavedProgresses] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
-  // Study configuration for generating flashcards
   const [studyConfig, setStudyConfig] = useState({
     studyYear: '1L',
     proficiency: 'Basic',
@@ -142,7 +134,6 @@ export default function AIExamFlashCard() {
     includeExplanations: false,
   });
 
-  // Cleanup timer on unmount
   useEffect(() => {
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
@@ -175,9 +166,7 @@ export default function AIExamFlashCard() {
     return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
   };
 
-  // Timer Display Component always showing analog + time in the circle
   const TimerDisplay = ({ timeLeft, totalMinutes }) => {
-    // We always do the analog approach, with the time in the circle
     const radius = 40;
     const circumference = 2 * Math.PI * radius;
     const progress = timeLeft / (totalMinutes * 60);
@@ -206,7 +195,6 @@ export default function AIExamFlashCard() {
             strokeLinecap="round"
             transform="rotate(-90 50 50)"
           />
-          {/* The time text inside the circle */}
           <text
             x="50%"
             y="50%"
@@ -227,7 +215,6 @@ export default function AIExamFlashCard() {
     setTimerStyle(timerStyle === 'digital' ? 'analog' : 'digital');
   };
 
-  // Ensure flashcards do not exceed question limit
   const nextFlashcard = () => {
     setIsAnswerRevealed(false);
     if (studyConfig.resetTimerEveryQuestion && studyConfig.timerMinutes > 0) {
@@ -270,7 +257,6 @@ export default function AIExamFlashCard() {
     }
   };
 
-  // Analysis functions
   const parseTags = (tagsString) =>
     tagsString.split(',').map((tag) => tag.trim()).filter((tag) => tag.length > 0);
 
@@ -367,7 +353,6 @@ export default function AIExamFlashCard() {
     return inTitle || inCaseTitle || inTags;
   });
 
-  // Load Progress Functions
   const fetchSavedProgresses = async () => {
     try {
       const q = query(collection(db, 'examProgress'), where('userId', '==', currentUser.uid));
@@ -411,7 +396,6 @@ export default function AIExamFlashCard() {
     }
   };
 
-  // Configuration Modal Functions
   const openConfigModal = () => setIsConfigModalOpen(true);
   const closeConfigModal = () => setIsConfigModalOpen(false);
 
@@ -423,7 +407,6 @@ export default function AIExamFlashCard() {
     }));
   };
 
-  // Flashcard Generation via API
   const handleGenerateFlashcards = async () => {
     setIsLoading(true);
     setFlashcards([]);
@@ -490,8 +473,35 @@ export default function AIExamFlashCard() {
         )}
       </AnimatePresence>
 
+      {/* Updated Buttons Container - moved further to the right */}
+      <div className="absolute top-6 right-[5%] z-[100] flex flex-col items-center gap-2">
+        <div className="flex flex-col items-center">
+          <motion.button
+            onClick={openLoadProgressModal}
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.95 }}
+            className="p-3 rounded-full bg-gradient-to-r from-blue-600 to-blue-800 text-white transition-all duration-200 gradientShadowHoverBlue"
+            aria-label="Load Progress"
+          >
+            <FaSyncAlt size={20} />
+          </motion.button>
+          <span className="text-xs mt-1">Load Saves</span>
+        </div>
+        <div className="flex flex-col items-center mt-4">
+          <motion.button
+            onClick={openConfigModal}
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.95 }}
+            className="p-3 rounded-full bg-gradient-to-r from-blue-600 to-blue-800 text-white transition-all duration-200 gradientShadowHoverBlue"
+            aria-label="Configure Flashcards"
+          >
+            <FaChevronDown size={20} />
+          </motion.button>
+          <span className="text-xs mt-1">Configure</span>
+        </div>
+      </div>
+
       <main className="flex-1 flex flex-col px-6 relative z-200 h-screen">
-        {/* Top Bar */}
         <div className="flex items-center justify-between">
           <button
             onClick={toggleSidebar}
@@ -526,28 +536,6 @@ export default function AIExamFlashCard() {
           </button>
         </div>
 
-        {/* Side Buttons (Reload & Configure) */}
-        <div className="absolute top-6 right-6 flex flex-col gap-4">
-          <motion.button
-            onClick={openLoadProgressModal}
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.95 }}
-            className="p-3 rounded-full bg-gradient-to-r from-blue-600 to-blue-800 text-white transition-all duration-200 gradientShadowHoverBlue"
-            aria-label="Load Progress"
-          >
-            <FaSyncAlt size={20} />
-          </motion.button>
-          <motion.button
-            onClick={openConfigModal}
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.95 }}
-            className="p-3 rounded-full bg-gradient-to-r from-blue-600 to-blue-800 text-white transition-all duration-200 gradientShadowHoverBlue"
-            aria-label="Configure Flashcards"
-          >
-            <FaChevronDown size={20} />
-          </motion.button>
-        </div>
-
         <motion.div
           className={clsx(
             'flex-1 w-full rounded-2xl shadow-xl p-6 overflow-y-auto',
@@ -559,7 +547,6 @@ export default function AIExamFlashCard() {
           initial="hidden"
           animate="visible"
         >
-          {/* Timer always analog with text in center */}
           <div className="flex flex-col items-center justify-center mb-4">
             <TimerDisplay
               timeLeft={timeLeft}
@@ -567,7 +554,6 @@ export default function AIExamFlashCard() {
             />
           </div>
 
-          {/* Flashcards Display */}
           {flashcards.length === 0 && !isLoading && (
             <div
               className={clsx(
@@ -655,7 +641,6 @@ export default function AIExamFlashCard() {
           )}
         </motion.div>
 
-        {/* Load Progress Modal */}
         <AnimatePresence>
           {isLoadProgressModalOpen && (
             <motion.div
@@ -756,7 +741,6 @@ export default function AIExamFlashCard() {
           )}
         </AnimatePresence>
 
-        {/* Final Feedback Modal */}
         <AnimatePresence>
           {isFinalFeedbackModalOpen && (
             <motion.div
@@ -821,7 +805,6 @@ export default function AIExamFlashCard() {
           )}
         </AnimatePresence>
 
-        {/* Configuration Modal */}
         <AnimatePresence>
           {isConfigModalOpen && (
             <motion.div
