@@ -172,11 +172,11 @@ export default function CaseAnalysis() {
     return inTitle || inCaseTitle || inTags;
   });
 
+  // Updated renderTabToggle with flex layout so the saved button is clickable regardless of activeTab.
   function renderTabToggle() {
     return (
-      <div className="w-full max-w-md mx-auto mb-4 grid grid-cols-3 items-center">
-        <div />
-        <div className="flex justify-center space-x-4">
+      <div className="w-full max-w-md mx-auto mb-4 flex items-center justify-between">
+        <div className="flex space-x-4">
           <motion.button
             className={clsx(
               'px-4 py-2 font-semibold transition-colors duration-300',

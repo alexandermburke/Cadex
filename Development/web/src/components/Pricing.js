@@ -34,8 +34,8 @@ const plans = [
         info: 'Unlimited access to our database of Case briefs with detailed summaries.',
       },
       {
-        text: 'Lecture Summaries & Dictionary',
-        info: 'Quickly recap lectures and look up legal terms.',
+        text: 'Access to LExAPI Chatbot',
+        info: 'Ask any Legal question, at any time.',
       },
       {
         text: 'Ad-free user experience',

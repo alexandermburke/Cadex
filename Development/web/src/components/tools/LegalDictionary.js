@@ -66,6 +66,7 @@ export default function LegalDictionary() {
     }),
   };
 
+  // Handle responsive page count
   useEffect(() => {
     const updateItemsPerPage = () => {
       let numCols = 2;
@@ -83,6 +84,7 @@ export default function LegalDictionary() {
     return () => window.removeEventListener('resize', updateItemsPerPage);
   }, []);
 
+  // Fetch dictionary from Firestore + local
   useEffect(() => {
     const fetchDictionary = async () => {
       setIsLoading(true);
@@ -107,6 +109,7 @@ export default function LegalDictionary() {
     fetchDictionary();
   }, []);
 
+  // Load any existing favorite terms
   useEffect(() => {
     if (currentUser && userDataObj?.favoriteDictionaryTerms) {
       setFavoriteTermIds(userDataObj.favoriteDictionaryTerms);
@@ -115,22 +118,31 @@ export default function LegalDictionary() {
     }
   }, [currentUser, userDataObj]);
 
+  // Filter terms by search
   const filteredTerms = dictionaryTerms.filter((term) =>
     term.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  // Filter by favorites if needed
   const termsToDisplay =
     activeTab === 'favorites'
       ? filteredTerms.filter((term) => favoriteTermIds.includes(term.id))
       : filteredTerms;
 
+  // Apply sorting logic
   const sortedTerms = [...termsToDisplay].sort((a, b) => {
     if (sortBy === 'reverse') {
       return b.name.localeCompare(a.name);
+    } else if (sortBy === 'typeOfLaw') {
+      // In your data, "typeOfLaw" might be called something else.
+      // Use optional chaining so if "typeOfLaw" is missing, we get an empty string.
+      return (a.typeOfLaw || '').localeCompare(b.typeOfLaw || '');
     }
+    // Default sort (A-Z)
     return a.name.localeCompare(b.name);
   });
 
+  // Pagination
   const totalPages = Math.ceil(sortedTerms.length / itemsPerPage);
   const validCurrentPage = Math.min(currentPage, totalPages || 1);
   const paginatedTerms = sortedTerms.slice(
@@ -166,14 +178,15 @@ export default function LegalDictionary() {
     }
   }
 
+  // Modal logic
   function openTermModal(term) {
     setSelectedTerm(term);
   }
-
   function closeTermModal() {
     setSelectedTerm(null);
   }
 
+  // Toggle favorite
   const handleToggleFavorite = async (termId) => {
     if (!currentUser) {
       alert('Please log in to favorite terms.');
@@ -200,12 +213,14 @@ export default function LegalDictionary() {
     }
   };
 
+  // Add new term
   const handleAddNewTerm = async (e) => {
     e.preventDefault();
     if (!currentUser) {
       alert('Please log in to add a new dictionary term.');
       return;
     }
+    // Check for existing
     const existingTerm = dictionaryTerms.find(
       (t) => t.name.toLowerCase() === newTermName.trim().toLowerCase()
     );
@@ -213,6 +228,7 @@ export default function LegalDictionary() {
       alert('A term with this name already exists in the dictionary.');
       return;
     }
+    // If autoGenerate is toggled on & no definition given
     let finalDefinition = newTermDefinition.trim();
     if (autoGenerate && !finalDefinition) {
       try {
@@ -245,12 +261,16 @@ export default function LegalDictionary() {
       .split(',')
       .map((r) => r.trim())
       .filter((r) => r.length > 0);
+
+    // Build new term object
     const newTermData = {
       name: newTermName.trim(),
       definition: finalDefinition,
       synonyms: synonymsArray,
       references: refsArray,
+      // If you store typeOfLaw, add it here too, e.g.: typeOfLaw: someValue,
     };
+
     try {
       await addDoc(collection(db, 'legalDictionary'), newTermData);
       const updatedList = [
@@ -261,6 +281,7 @@ export default function LegalDictionary() {
         a.name.toLowerCase().localeCompare(b.name.toLowerCase())
       );
       setDictionaryTerms(updatedList);
+      // Reset form
       setNewTermName('');
       setNewTermDefinition('');
       setNewTermSynonyms('');
@@ -307,6 +328,7 @@ export default function LegalDictionary() {
               : 'bg-white text-gray-800'
           } flex flex-col items-center`}
         >
+          {/* Toggle sidebar (mobile) */}
           <div className="flex items-center justify-between w-full">
             <button
               onClick={toggleSidebar}
@@ -339,6 +361,7 @@ export default function LegalDictionary() {
             </button>
           </div>
 
+          {/* Tabs */}
           <div className="w-full max-w-md mx-auto mb-4 flex justify-around">
             <motion.button
               className={`px-4 py-2 font-semibold transition-colors duration-300 ${
@@ -386,6 +409,7 @@ export default function LegalDictionary() {
 
           {(activeTab === 'browse' || activeTab === 'favorites') && (
             <>
+              {/* Search + Sort */}
               <div className="w-full max-w-md mx-auto mb-6 flex items-center">
                 <div className="relative flex-1">
                   <FaSearch
@@ -421,6 +445,7 @@ export default function LegalDictionary() {
                 </div>
               </div>
 
+              {/* Sort Panel */}
               <AnimatePresence>
                 {showAdvanced && (
                   <motion.div
@@ -430,22 +455,61 @@ export default function LegalDictionary() {
                     exit={{ opacity: 0, height: 0 }}
                     transition={{ duration: 0.3 }}
                   >
-                    <div className="bg-transparent p-4 rounded-2xl shadow-md flex flex-col space-y-4 w-full max-w-md">
-                      <div className="flex flex-col">
-                        <select
-                          value={sortBy}
-                          onChange={(e) => setSortBy(e.target.value)}
-                          className={`p-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none`}
-                        >
-                          <option value="">A - Z</option>
-                          <option value="reverse">Z - A</option>
-                        </select>
-                      </div>
+                    <div className="bg-transparent p-4 rounded-2xl shadow-md flex flex-row gap-4 w-full max-w-md justify-center">
+                      <button
+                        onClick={() => setSortBy('')}
+                        className={`px-3 py-1 rounded-md transition-colors duration-300 
+                          ${
+                            sortBy === ''
+                              ? isDarkMode
+                                ? 'bg-blue-600 text-white'
+                                : 'bg-blue-900 text-white'
+                              : isDarkMode
+                              ? 'bg-slate-700 text-white'
+                              : 'bg-white text-gray-800 border border-gray-300'
+                          }
+                        `}
+                      >
+                        A - Z
+                      </button>
+                      <button
+                        onClick={() => setSortBy('reverse')}
+                        className={`px-3 py-1 rounded-md transition-colors duration-300 
+                          ${
+                            sortBy === 'reverse'
+                              ? isDarkMode
+                                ? 'bg-blue-600 text-white'
+                                : 'bg-blue-900 text-white'
+                              : isDarkMode
+                              ? 'bg-slate-700 text-white'
+                              : 'bg-white text-gray-800 border border-gray-300'
+                          }
+                        `}
+                      >
+                        Z - A
+                      </button>
+                      <button
+                        onClick={() => setSortBy('typeOfLaw')}
+                        className={`px-3 py-1 rounded-md transition-colors duration-300 
+                          ${
+                            sortBy === 'typeOfLaw'
+                              ? isDarkMode
+                                ? 'bg-blue-600 text-white'
+                                : 'bg-blue-900 text-white'
+                              : isDarkMode
+                              ? 'bg-slate-700 text-white'
+                              : 'bg-white text-gray-800 border border-gray-300'
+                          }
+                        `}
+                      >
+                        Type of Law
+                      </button>
                     </div>
                   </motion.div>
                 )}
               </AnimatePresence>
 
+              {/* Paged Terms */}
               <AnimatePresence mode="wait" custom={pageDirection}>
                 <motion.div
                   key={currentPage}
@@ -517,6 +581,7 @@ export default function LegalDictionary() {
                 </motion.div>
               </AnimatePresence>
 
+              {/* Pagination Buttons */}
               {sortedTerms.length > itemsPerPage && (
                 <div className="mt-6 flex items-center justify-center gap-2">
                   <motion.button
@@ -620,6 +685,7 @@ export default function LegalDictionary() {
             </>
           )}
 
+          {/* Create Tab */}
           {activeTab === 'create' && (
             <div className="w-full flex justify-center">
               <div className="max-w-md w-full">
@@ -736,6 +802,7 @@ export default function LegalDictionary() {
         </div>
       </main>
 
+      {/* Term Modal */}
       {selectedTerm && (
         <div className="fixed inset-0 z-[190] flex items-center justify-center bg-black bg-opacity-40">
           <motion.div
@@ -781,6 +848,12 @@ export default function LegalDictionary() {
                     <li key={ref}>{ref}</li>
                   ))}
                 </ul>
+              </div>
+            )}
+            {/* If you store typeOfLaw, you can display it here: */}
+            {selectedTerm.typeOfLaw && (
+              <div className="mb-3">
+                <strong>Type of Law:</strong> {selectedTerm.typeOfLaw}
               </div>
             )}
           </motion.div>

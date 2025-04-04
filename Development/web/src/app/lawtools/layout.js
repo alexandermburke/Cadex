@@ -2,6 +2,7 @@
 import CoolLayout from '@/components/CoolLayout'
 import Login from '@/components/Login'
 import MainTool from '@/components/MainTool'
+import Chatbot from '@/components/Chatbot'
 import { useAuth } from '@/context/AuthContext'
 import React from 'react'
 
@@ -17,7 +18,6 @@ export default function SubLayout({ children }) {
         )
     }
 
-
     if (!currentUser && !loading) {
         content = (
             <Login />
@@ -29,6 +29,7 @@ export default function SubLayout({ children }) {
             <MainTool>
                 {content}
             </MainTool>
+            <Chatbot />
         </CoolLayout>
     )
 }
