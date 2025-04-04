@@ -280,21 +280,20 @@ export default function Hero() {
            Created by law students, for law students, CadexLaw is your trusted hub for practical insights and an extensive suite of resources, all at a fraction of traditional costs.
           </p>
 
-          <div className="flex justify-center mt-6 mb-6">
-          <Link
-  href="/pricing"
-  className="
-      block group relative h-12 w-full sm:w-56 overflow-hidden rounded 
-      bg-gradient-to-r from-blue-600 to-blue-800 text-white 
-      text-sm sm:text-base shadow transition-all duration-300 
-      flex items-center justify-center gradientShadowHoverBlue
-    "
->
-  <div className="font-semibold">
-    Explore Our Plans
-  </div>
-</Link>
-
+          <div className="flex justify-center mt-6 mb-6 w-full">
+            <Link
+              href="/pricing"
+              className="
+                block group relative h-12 w-full sm:w-56 overflow-hidden rounded 
+                bg-gradient-to-r from-blue-600 to-blue-800 text-white 
+                text-sm sm:text-base shadow transition-all duration-300 
+                flex items-center justify-center gradientShadowHoverBlue
+              "
+            >
+              <div className="font-semibold">
+                Explore Our Plans
+              </div>
+            </Link>
           </div>
         </div>
 
@@ -307,18 +306,17 @@ export default function Hero() {
         >
           {/* See How It Works Section */}
           <div className="relative w-full max-w-3xl mx-auto mt-4">
-            <div className="relative w-full h-0 pb-[50%] overflow-hidden rounded-lg shadow-xl"> {/* 16:9 = 56.25% */}
+            <div className="relative w-full h-0 pb-[50%] overflow-hidden rounded-lg shadow-xl">
               <video
                 src="/DemoHome.mp4"
                 autoPlay
                 muted
                 loop
                 playsInline
-               className="absolute top-0 left-0 w-full h-full object-cover"
+                className="absolute top-0 left-0 w-full h-full object-cover"
               ></video>
             </div>
           </div>
-
 
           {/* What We Offer Section */}
           <h3
