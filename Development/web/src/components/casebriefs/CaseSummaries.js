@@ -3,7 +3,7 @@ import React, { useState, useEffect, useRef } from 'react'
 import Head from 'next/head'
 import Sidebar from '../Sidebar'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { FaBars, FaTimes, FaHeart, FaRegHeart, FaSync, FaDownload, FaShareAlt, FaCopy } from 'react-icons/fa'
+import { FaBars, FaTimes, FaHeart, FaRegHeart, FaSync, FaShareAlt, FaCopy } from 'react-icons/fa'
 import { motion, AnimatePresence } from 'framer-motion'
 import { db } from '@/firebase'
 import { doc, getDoc, updateDoc, collection, query, where, limit, getDocs } from 'firebase/firestore'
@@ -716,7 +716,7 @@ export default function CaseSummaries() {
               )}
             </div>
             <div className="w-full mt-8">
-              <h2 className="text-lg font-bold mb-2 text-center">Citation Generator</h2>
+              <h2 className="text-lg font-bold mb-2 text-center">Citation Formatter</h2>
               <div className={`p-4 rounded-lg ${isDarkMode ? 'bg-slate-800 bg-opacity-50 border border-slate-700' : 'bg-gray-100 border border-gray-300'}`}>
                 <label htmlFor="citationStyle" className="block mb-2 font-semibold">Select Citation Style:</label>
                 <select id="citationStyle" value={citationStyle} onChange={(e) => setCitationStyle(e.target.value)} className={`p-2 rounded-md ${isDarkMode ? 'bg-slate-700 border border-slate-600 text-white' : 'bg-white border border-gray-300 text-gray-800'}`}>
@@ -736,16 +736,11 @@ export default function CaseSummaries() {
                 </div>
               </div>
             </div>
-            {isLoggedIn && (
-              <motion.button onClick={saveAsPDFHandler} whileHover={{ scale: 1.1, rotate: 5 }} whileTap={{ scale: 0.9, rotate: -5 }} className="mt-6 p-3 rounded-full bg-blue-600 text-white shadow-lg" aria-label="Save as PDF">
-                <FaDownload size={24} />
-              </motion.button>
-            )}
           </div>
         </main>
       </div>
-      {/* Chatbot integration: Pass the current case title to the chatbot */}
-      <CaseChatbot caseName={capCase?.title || 'this case'} />
+      {/* Chatbot integration: Pass the current case title and id to the chatbot */}
+      <CaseChatbot caseName={capCase?.title || 'this case'} caseId={capCase?.id || ''} />
     </>
   )
 }
