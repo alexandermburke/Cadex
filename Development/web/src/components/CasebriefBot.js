@@ -72,7 +72,7 @@ export default function CaseChatbot({
         source: '',
         sender: 'bot',
         saved: false,
-        nonSavable: true, // Mark as non-savable so source links are not rendered
+        nonSavable: true, 
       };
       setMessages([greetingMessage]);
     }

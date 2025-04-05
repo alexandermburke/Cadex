@@ -172,82 +172,81 @@ export default function CaseAnalysis() {
     return inTitle || inCaseTitle || inTags;
   });
 
-  // Updated renderTabToggle with flex layout so the saved button is clickable regardless of activeTab.
   function renderTabToggle() {
     return (
-      <div className="w-full max-w-md mx-auto mb-4 flex items-center justify-between">
-        <div className="flex space-x-4">
-          <motion.button
-            className={clsx(
-              'px-4 py-2 font-semibold transition-colors duration-300',
-              activeTab === 'summary'
-                ? isDarkMode
-                  ? 'text-white border-b-2 border-blue-400'
-                  : 'text-blue-900 border-b-2 border-blue-900'
-                : isDarkMode
-                ? 'text-gray-400'
-                : 'text-gray-600'
-            )}
-            onClick={() => setActiveTab('summary')}
-          >
-            Summary
-          </motion.button>
-          <motion.button
-            className={clsx(
-              'px-4 py-2 font-semibold transition-colors duration-300',
-              activeTab === 'analysis'
-                ? isDarkMode
-                  ? 'text-white border-b-2 border-blue-400'
-                  : 'text-blue-900 border-b-2 border-blue-900'
-                : isDarkMode
-                ? 'text-gray-400'
-                : 'text-gray-600'
-            )}
-            onClick={() => setActiveTab('analysis')}
-          >
-            Analysis
-          </motion.button>
-          <motion.button
-            className={clsx(
-              'px-4 py-2 font-semibold transition-colors duration-300',
-              activeTab === 'saved'
-                ? isDarkMode
-                  ? 'text-white border-b-2 border-blue-400'
-                  : 'text-blue-900 border-b-2 border-blue-900'
-                : isDarkMode
-                ? 'text-gray-400'
-                : 'text-gray-600'
-            )}
-            onClick={() => setActiveTab('saved')}
-          >
-            Saved
-          </motion.button>
-        </div>
-        <div className="flex justify-end">
-          {activeTab === 'analysis' && (
+      <div className="w-full max-w-md mx-auto mb-4 relative">
+        {/* Centered tabs container */}
+        <div className="flex justify-center">
+          <div className="flex space-x-4">
             <motion.button
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.5 }}
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
-              onClick={() => setCombinedView(!combinedView)}
               className={clsx(
-                'p-2 rounded-full transition-colors duration-300',
-                isDarkMode ? 'bg-gray-700 text-white' : 'bg-gray-200 text-gray-800'
+                'px-4 py-2 font-semibold transition-colors duration-300',
+                activeTab === 'summary'
+                  ? isDarkMode
+                    ? 'text-white border-b-2 border-blue-400'
+                    : 'text-blue-900 border-b-2 border-blue-900'
+                  : isDarkMode
+                  ? 'text-gray-400'
+                  : 'text-gray-600'
               )}
+              onClick={() => setActiveTab('summary')}
             >
-              <FaLayerGroup size={20} />
+              Summary
             </motion.button>
-          )}
+            <motion.button
+              className={clsx(
+                'px-4 py-2 font-semibold transition-colors duration-300',
+                activeTab === 'analysis'
+                  ? isDarkMode
+                    ? 'text-white border-b-2 border-blue-400'
+                    : 'text-blue-900 border-b-2 border-blue-900'
+                  : isDarkMode
+                  ? 'text-gray-400'
+                  : 'text-gray-600'
+              )}
+              onClick={() => setActiveTab('analysis')}
+            >
+              Analysis
+            </motion.button>
+            <motion.button
+              className={clsx(
+                'px-4 py-2 font-semibold transition-colors duration-300',
+                activeTab === 'saved'
+                  ? isDarkMode
+                    ? 'text-white border-b-2 border-blue-400'
+                    : 'text-blue-900 border-b-2 border-blue-900'
+                  : isDarkMode
+                  ? 'text-gray-400'
+                  : 'text-gray-600'
+              )}
+              onClick={() => setActiveTab('saved')}
+            >
+              Saved
+            </motion.button>
+          </div>
         </div>
+        {activeTab === 'analysis' && (
+          <motion.button
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.5 }}
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
+            onClick={() => setCombinedView(!combinedView)}
+            className={clsx(
+              'absolute right-0 top-1/4 transform -translate-y-1/2 p-2 rounded-full transition-colors duration-300',
+              isDarkMode ? 'bg-gray-700 text-white' : 'bg-gray-200 text-gray-800'
+            )}
+          >
+            <FaLayerGroup size={20} />
+          </motion.button>
+        )}
       </div>
     );
   }
-
+  
   const summarySection = (
-    <div className="space-y-4">
-      <h2 className="text-2xl font-bold text-center">Case Summary</h2>
+    <div className="space-y-4 mt-4">
       {selectedCaseForSummary ? (
         <div
           className={clsx(
@@ -276,19 +275,19 @@ export default function CaseAnalysis() {
           typeof selectedCaseForSummary.briefSummary === 'object' ? (
             <div className="mt-4 space-y-2 text-sm text-left">
               <p>
-                <strong>Rule of Law:</strong> {selectedCaseForSummary.briefSummary.ruleOfLaw || 'Not provided.'}
+                <strong>Rule of Law:</strong> {selectedCaseForSummary.detailedSummary.ruleOfLaw || 'Not provided.'}
               </p>
               <p>
                 <strong>Facts:</strong> {selectedCaseForSummary.briefSummary.facts || 'Not provided.'}
               </p>
               <p>
-                <strong>Issue:</strong> {selectedCaseForSummary.briefSummary.issue || 'Not provided.'}
+                <strong>Issue:</strong> {selectedCaseForSummary.detailedSummary.issue || 'Not provided.'}
               </p>
               <p>
-                <strong>Holding:</strong> {selectedCaseForSummary.briefSummary.holding || 'Not provided.'}
+                <strong>Holding:</strong> {selectedCaseForSummary.detailedSummary.holding || 'Not provided.'}
               </p>
               <p>
-                <strong>Reasoning:</strong> {selectedCaseForSummary.briefSummary.reasoning || 'Not provided.'}
+                <strong>Reasoning:</strong> {selectedCaseForSummary.detailedSummary.reasoning || 'Not provided.'}
               </p>
               <p>
                 <strong>Dissent:</strong> {selectedCaseForSummary.briefSummary.dissent || 'Not provided.'}
