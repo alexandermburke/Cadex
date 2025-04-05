@@ -201,7 +201,7 @@ export default function CaseChatbot({
                 transition={{ duration: 0.3 }}
                 className="flex justify-start"
               >
-                <span className="inline-block px-4 py-2 rounded-2xl bg-white text-gray-600 shadow-md text-sm">
+                <span className="inline-block px-4 py-2 rounded-2xl bg-gray-100 text-gray-600 shadow-md text-sm">
                   Sending...
                 </span>
               </motion.div>
