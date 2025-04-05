@@ -38,10 +38,10 @@ export default function LogoFiller() {
         </div>
         {/* Italian Tri-Color Flag */}
         <div className="flex items-center justify-center mt-2">
-          <div className="flex rounded-lg overflow-hidden">
-            <span className="block w-6 h-2 bg-green-600 transform -skew-x-12"></span>
-            <span className="block w-6 h-2 bg-white transform -skew-x-12"></span>
-            <span className="block w-6 h-2 bg-red-600 transform -skew-x-12"></span>
+        <div className="flex rounded-full overflow-hidden">
+            <span className="block w-6 h-1 bg-red-600 transform -skew-x-12"></span>
+            <span className="block w-6 h-1 bg-white transform -skew-x-12"></span>
+            <span className="block w-6 h-1 bg-blue-900 transform -skew-x-12"></span>
           </div>
         </div>
         {/* Slogan */}
