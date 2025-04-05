@@ -226,20 +226,22 @@ export default function CaseAnalysis() {
           </div>
         </div>
         {activeTab === 'analysis' && (
-          <motion.button
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.5 }}
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.9 }}
-            onClick={() => setCombinedView(!combinedView)}
-            className={clsx(
-              'absolute right-0 top-1/4 transform -translate-y-1/2 p-2 rounded-full transition-colors duration-300',
-              isDarkMode ? 'bg-gray-700 text-white' : 'bg-gray-200 text-gray-800'
-            )}
-          >
-            <FaLayerGroup size={20} />
-          </motion.button>
+          <div className="absolute right-0 top-1/2 transform -translate-y-1/2 flex flex-col items-center">
+            <motion.button
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.5 }}
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+              onClick={() => setCombinedView(!combinedView)}
+              className={clsx(
+                'p-2 rounded-full transition-colors duration-300',
+                isDarkMode ? 'bg-gray-700 text-white' : 'bg-gray-200 text-gray-800'
+              )}
+            >
+              <FaLayerGroup size={20} />
+            </motion.button>
+          </div>
         )}
       </div>
     );
@@ -299,9 +301,23 @@ export default function CaseAnalysis() {
         </div>
       ) : (
         <div className="text-center">
-          <p className="text-gray-500">
-            Select a case from your favorites to view its summary.
-          </p>
+          <select
+            className={clsx(
+              'w-full p-2 rounded-md focus:outline-none shadow-sm text-sm transition-colors',
+              isDarkMode
+                ? 'bg-slate-800 bg-opacity-50 border border-slate-600 text-white'
+                : 'bg-white border border-gray-300 text-gray-800'
+            )}
+            value={selectedCaseForSummary ? selectedCaseForSummary.id : ''}
+            onChange={(e) => handleCaseSelection(e.target.value)}
+          >
+            <option value="">Select a Favorite Case for Summary</option>
+            {favoriteCases.map((fav) => (
+              <option key={fav.id} value={fav.id}>
+                {fav.title} ({fav.jurisdiction || 'Unknown'})
+              </option>
+            ))}
+          </select>
         </div>
       )}
     </div>
@@ -402,7 +418,7 @@ export default function CaseAnalysis() {
           whileTap={{ scale: 0.98 }}
           onClick={handleAddAnalysis}
           className={clsx(
-            'w-full px-4 py-2 rounded-md text-sm font-semibold transition-colors duration-300',
+            'px-4 py-2 rounded-md text-sm font-semibold transition-colors duration-300',
             isDarkMode ? 'bg-blue-600 hover:bg-blue-500 text-white' : 'bg-blue-950 hover:bg-blue-800 text-white'
           )}
         >

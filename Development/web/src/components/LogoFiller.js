@@ -24,7 +24,7 @@ export default function LogoFiller() {
         {/* Header Image */}
         <div
           className="relative mx-auto my-auto"
-          style={{ width: 'min(65px, 35vw)', height: 'min(65px, 35vw)' }}
+          style={{ width: 'min(75px, 45vw)', height: 'min(75px, 45vw)' }}
         >
           <Image
             src="/header.avif"
@@ -36,16 +36,17 @@ export default function LogoFiller() {
             quality={'100'}
           />
         </div>
-        {/* Text Content */}
-        <h4
-          className={`text-xl px-3 sm:text-2xl goldGradient font-medium sm:px-4 ${poppins.className}`}
-        >
-          CadexLaw
-        </h4>
-        <p className={isDarkMode ? 'text-gray-200' : 'text-blue-950'}>
-          Elevate your legal studies
-          <br />
-          Dive into interactive case simulations to enhance your skills
+        {/* Italian Tri-Color Flag */}
+        <div className="flex items-center justify-center mt-2">
+          <div className="flex rounded-lg overflow-hidden">
+            <span className="block w-6 h-2 bg-green-600 transform -skew-x-12"></span>
+            <span className="block w-6 h-2 bg-white transform -skew-x-12"></span>
+            <span className="block w-6 h-2 bg-red-600 transform -skew-x-12"></span>
+          </div>
+        </div>
+        {/* Slogan */}
+        <p className={`mt-2 text-sm ${isDarkMode ? 'text-gray-300' : 'text-slate-500'} ${poppins.className}`}>
+        Empowering your legal journey with precision and clarity.
         </p>
       </div>
     </div>
