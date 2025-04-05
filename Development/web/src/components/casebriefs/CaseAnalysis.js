@@ -175,7 +175,6 @@ export default function CaseAnalysis() {
   function renderTabToggle() {
     return (
       <div className="w-full max-w-md mx-auto mb-4 relative">
-        {/* Centered tabs container */}
         <div className="flex justify-center">
           <div className="flex space-x-4">
             <motion.button
@@ -250,14 +249,12 @@ export default function CaseAnalysis() {
   const summarySection = (
     <div className="space-y-4 mt-4">
       {selectedCaseForSummary ? (
-        <div
-          className={clsx(
+        <div className={clsx(
             'p-6 rounded-lg shadow-lg',
             isDarkMode
               ? 'bg-slate-800 bg-opacity-50 border border-slate-600 text-white'
               : 'bg-white border border-gray-300 text-gray-800'
-          )}
-        >
+          )}>
           <h3 className="text-xl font-bold mb-2">{selectedCaseForSummary.title}</h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <p>
@@ -303,7 +300,7 @@ export default function CaseAnalysis() {
         <div className="text-center">
           <select
             className={clsx(
-              'w-full p-2 rounded-md focus:outline-none shadow-sm text-sm transition-colors',
+              'w-64 p-2 mx-auto rounded-md focus:outline-none shadow-sm text-sm transition-colors',
               isDarkMode
                 ? 'bg-slate-800 bg-opacity-50 border border-slate-600 text-white'
                 : 'bg-white border border-gray-300 text-gray-800'
@@ -326,14 +323,12 @@ export default function CaseAnalysis() {
   const newAnalysisSection = (
     <div className="space-y-4">
       <h2 className="text-2xl font-bold">Add New Analysis</h2>
-      <div
-        className={clsx(
+      <div className={clsx(
           'p-6 rounded-lg shadow-lg',
           isDarkMode
             ? 'bg-slate-800 bg-opacity-50 border border-slate-600 text-white'
             : 'bg-white border border-gray-300 text-gray-800'
-        )}
-      >
+        )}>
         <div className="mb-4">
           <label className="block font-medium mb-1">Select a Case Brief</label>
           <select
@@ -615,10 +610,10 @@ export default function CaseAnalysis() {
               ? savedAnalysesSection
               : combinedView
               ? (
-                <>
-                  {newAnalysisSection}
-                  {summarySection}
-                </>
+                <div className="flex flex-row space-x-4">
+                  <div className="w-1/2">{newAnalysisSection}</div>
+                  <div className="w-1/2">{summarySection}</div>
+                </div>
               )
               : (activeTab === 'summary' ? summarySection : newAnalysisSection)}
           </main>

@@ -200,23 +200,36 @@ export default function CaseSummaries() {
       setCaseBrief({ error: 'Error fetching favorite case summary.' })
     }
   }
+  // Updated renderFactsContent function
   const renderFactsContent = (factsText) => {
     if (!factsText) return <p className="text-base mt-2">Not provided.</p>
     const factsStr = typeof factsText === 'string' ? factsText : String(factsText)
-    const enumeratedFacts = factsStr.match(/(\d+\.\s[\s\S]*?)(?=\d+\.\s|$)/g)
+  
     if (viewMode === 'simplified')
       return <p className={`text-base mt-2 ${!isLoggedIn ? 'blur-sm' : ''}`}>{simplifyText(factsStr)}</p>
-    if (viewMode === 'classic' && enumeratedFacts && enumeratedFacts.length > 0) {
-      return (
-        <ul className={`list-disc list-inside text-base mt-2 ${!isLoggedIn ? 'blur-sm' : ''}`}>
-          {enumeratedFacts.map((fact, index) => {
-            const strippedFact = fact.replace(/^\d+\.\s*/, '')
-            return <li key={index}>{strippedFact.trim()}</li>
-          })}
-        </ul>
-      )
+  
+    // Attempt to match already enumerated facts (e.g., "1. First fact 2. Second fact...")
+    let enumeratedFacts = factsStr.match(/(\d+\.\s[\s\S]*?)(?=\d+\.\s|$)/g)
+  
+    // If no enumerated facts, split by commas and treat each segment as a fact
+    if (!enumeratedFacts) {
+      const commaFacts = factsStr.split(',').map(fact => fact.trim()).filter(fact => fact.length > 0)
+      if (commaFacts.length > 1) {
+        enumeratedFacts = commaFacts
+      } else {
+        return <p className={`text-base mt-2 ${!isLoggedIn ? 'blur-sm' : ''}`}>{factsStr}</p>
+      }
     }
-    return <p className={`text-base mt-2 ${!isLoggedIn ? 'blur-sm' : ''}`}>{factsStr}</p>
+  
+    return (
+      <ul className={`list-disc list-inside text-base mt-2 ${!isLoggedIn ? 'blur-sm' : ''}`}>
+        {enumeratedFacts.map((fact, index) => {
+          // Remove any leading numbering (e.g., "1. ") if present.
+          const strippedFact = fact.replace(/^\d+\.\s*/, '')
+          return <li key={index}>{strippedFact.trim()}</li>
+        })}
+      </ul>
+    )
   }
   const renderFieldContent = (fieldText) => {
     if (!fieldText) return 'Not provided.'
@@ -617,7 +630,7 @@ export default function CaseSummaries() {
                           {caseBrief.facts && (
                             <div>
                               <h4 className="font-semibold text-base">Key Facts</h4>
-                              <p className={`ml-4 text-sm ${!isLoggedIn ? 'blur-sm' : ''}`}>{caseBrief.facts}</p>
+                              {renderFactsContent(caseBrief.facts)}
                             </div>
                           )}
                           {caseBrief.issue && (
