@@ -3,6 +3,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import { FaComments, FaTimes, FaStar, FaRegStar, FaCopy } from 'react-icons/fa';
 import { motion } from 'framer-motion';
 
+{/* Need to make an API that is catered to this component as the current API calls are sometimes inaccurate or flat out wrong. */}
+
 export default function CaseChatbot({
   caseName = 'this case',
   caseId = '', 
@@ -143,8 +145,7 @@ export default function CaseChatbot({
                   <div className="max-w-xs relative">
                     <div className="inline-block w-full px-4 py-3 rounded-2xl whitespace-pre-wrap break-words bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 shadow-md pr-10 pb-8 text-sm">
                       <p>{msg.answer || msg.text}</p>
-                      {/* Only render the source list if the message is savable (i.e. not a greeting) */}
-                      {!msg.nonSavable && (
+                        {!msg.nonSavable && (
                         <>
                           {((msg.source ? msg.source.split('\n').map(src => src.trim()).filter(Boolean) : [])
                             .concat([`https://cadexlaw.com/casebriefs/summaries?caseId=${caseId}`])
