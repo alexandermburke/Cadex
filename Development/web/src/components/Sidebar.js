@@ -16,7 +16,7 @@ import {
   FaClipboardCheck,
   FaClock,
   FaChartBar,
-  FaRobot,
+  FaFileAlt,
   FaListOl,
   FaBookReader,
   FaExclamationTriangle,
@@ -44,10 +44,7 @@ const NavLink = ({ href, icon, label, active }) => (
       href={href}
       className={clsx(
         'flex items-center gap-3 p-3 rounded transition-colors duration-200',
-        {
-          'bg-blue-600': active,
-          'hover:bg-blue-600 hover:bg-opacity-75': !active,
-        }
+        { 'bg-blue-600': active, 'hover:bg-blue-600 hover:bg-opacity-75': !active }
       )}
       aria-current={active ? 'page' : undefined}
     >
@@ -84,31 +81,21 @@ const ToggleSection = ({ isOpen, toggle, title, icon, children }) => (
       {isOpen ? <FaChevronUp /> : <FaChevronDown />}
     </button>
     {isOpen && (
-      <div
-        id={`${title}-section`}
-        className="mt-2 ml-6 border-l-2 border-white pl-4"
-      >
+      <div id={`${title}-section`} className="mt-2 ml-6 border-l-2 border-white pl-4">
         {children}
       </div>
     )}
   </section>
 );
 
-export default function Sidebar({
-  activeLink,
-  isSidebarVisible,
-  toggleSidebar,
-  isAiTutor,
-}) {
+export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, isAiTutor }) {
   const router = useRouter();
   const { currentUser, userDataObj } = useAuth();
   const plan = userDataObj?.billing?.plan?.toLowerCase() || 'free';
-
   const isBasic = plan === 'basic';
   const isPro = plan === 'pro' || plan === 'expert';
   const isExpert = false;
   const isDarkMode = userDataObj?.darkMode || false;
-
   const [isCaseBriefBankOpen, setIsCaseBriefBankOpen] = useState(false);
   const [isStudyToolsOpen, setIsStudyToolsOpen] = useState(false);
   const [isExamPrepOpen, setIsExamPrepOpen] = useState(false);
@@ -182,19 +169,13 @@ export default function Sidebar({
   };
 
   const sidebarVariants = {
-    hidden: {
-      x: '-100%',
-      transition: { duration: 0.3, ease: 'easeInOut' },
-    },
-    visible: {
-      x: '0%',
-      transition: { duration: 0.3, ease: 'easeInOut' },
-    },
+    hidden: { x: '-100%', transition: { duration: 0.3, ease: 'easeInOut' } },
+    visible: { x: '0%', transition: { duration: 0.3, ease: 'easeInOut' } }
   };
 
   const sidebarBackground = clsx({
     'bg-gradient-to-br from-blue-700 to-purple-700': !isDarkMode,
-    'bg-slate-800 bg-opacity-50': isDarkMode,
+    'bg-slate-800 bg-opacity-50': isDarkMode
   });
 
   const planBadgeStyle = (() => {
@@ -206,7 +187,7 @@ export default function Sidebar({
 
   const appModes = [
     { label: 'My Apps', value: false },
-    { label: 'All Apps', value: true },
+    { label: 'All Apps', value: true }
   ];
   const selectedIndex = showAllApps ? 1 : 0;
 
@@ -219,29 +200,23 @@ export default function Sidebar({
       exit="hidden"
       aria-label="Sidebar Navigation"
     >
-      {/* Toggle Button for Mobile */}
       <div className="absolute top-4 right-4 md:hidden">
         <button
           onClick={toggleSidebar}
           className={clsx(
             'p-2 rounded transition-colors duration-200 focus:outline-none',
-            isDarkMode
-              ? 'text-white hover:bg-slate-700'
-              : 'text-gray-800 hover:bg-gray-200'
+            isDarkMode ? 'text-white hover:bg-slate-700' : 'text-gray-800 hover:bg-gray-200'
           )}
           aria-label="Toggle Sidebar"
         >
           {isSidebarVisible ? <FaTimes size={20} /> : <FaBars size={20} />}
         </button>
       </div>
-
       <div className="p-6 flex items-center justify-center bg-opacity-20">
         <h1 className="text-4xl sm:text-5xl bg-white bg-clip-text text-transparent drop-shadow-lg">
           Dashboard
         </h1>
       </div>
-
-      {/* Move My Apps Toggle back below the Dashboard header */}
       <section className="my-4 px-6">
         <div className="relative flex items-center justify-center">
           <div
@@ -267,13 +242,7 @@ export default function Sidebar({
                 onClick={() => handleToggleShowAllApps(mode.value)}
                 className={clsx(
                   'relative z-10 flex-1 text-xs sm:text-sm font-semibold py-1 transition-colors',
-                  selectedIndex === i
-                    ? isDarkMode
-                      ? 'text-blue-400'
-                      : 'text-blue-600'
-                    : isDarkMode
-                    ? 'text-white'
-                    : 'text-gray-700'
+                  selectedIndex === i ? (isDarkMode ? 'text-blue-400' : 'text-blue-600') : isDarkMode ? 'text-white' : 'text-gray-700'
                 )}
               >
                 {mode.label}
@@ -282,7 +251,6 @@ export default function Sidebar({
           </div>
         </div>
       </section>
-
       <nav className="flex-1 px-6 py-4 space-y-6">
         <ToggleSection
           isOpen={isCaseBriefBankOpen}
@@ -300,7 +268,7 @@ export default function Sidebar({
               />
               <NavLink
                 href="/casebriefs/analysis"
-                icon={<FaRobot className="text-sm" />}
+                icon={<FaFileAlt className="text-sm" />}
                 label="Case Analysis"
                 active={activeLink === '/casebriefs/analysis'}
               />
@@ -313,22 +281,12 @@ export default function Sidebar({
             </>
           ) : showAllApps ? (
             <>
-              <LockedNavLink
-                icon={<FaBookOpen className="text-sm" />}
-                label="Case Summaries"
-              />
-              <LockedNavLink
-                icon={<FaRobot className="text-sm" />}
-                label="Case Analysis"
-              />
-              <LockedNavLink
-                icon={<FaListAlt className="text-sm" />}
-                label="All Briefs"
-              />
+              <LockedNavLink icon={<FaBookOpen className="text-sm" />} label="Case Summaries" />
+              <LockedNavLink icon={<FaFileAlt className="text-sm" />} label="Case Analysis" />
+              <LockedNavLink icon={<FaListAlt className="text-sm" />} label="All Briefs" />
             </>
           ) : null}
         </ToggleSection>
-
         <ToggleSection
           isOpen={isStudyToolsOpen}
           toggle={toggleStudyTools}
@@ -358,22 +316,12 @@ export default function Sidebar({
             </>
           ) : showAllApps ? (
             <>
-              <LockedNavLink
-                icon={<FaBook className="text-sm" />}
-                label="Legal Dictionary"
-              />
-              <LockedNavLink
-                icon={<FaStickyNote className="text-sm" />}
-                label="Smart Flashcards"
-              />
-              <LockedNavLink
-                icon={<FaBookReader className="text-sm" />}
-                label="IRAC Drafting"
-              />
+              <LockedNavLink icon={<FaBook className="text-sm" />} label="Legal Dictionary" />
+              <LockedNavLink icon={<FaStickyNote className="text-sm" />} label="Smart Flashcards" />
+              <LockedNavLink icon={<FaBookReader className="text-sm" />} label="IRAC Drafting" />
             </>
           ) : null}
         </ToggleSection>
-
         <ToggleSection
           isOpen={isExamPrepOpen}
           toggle={toggleExamPrep}
@@ -415,30 +363,14 @@ export default function Sidebar({
             </>
           ) : showAllApps ? (
             <>
-              <LockedNavLink
-                icon={<FaClipboardCheck className="text-sm" />}
-                label="Practice Exams"
-              />
-              <LockedNavLink
-                icon={<FaClock className="text-sm" />}
-                label="Time Management"
-              />
-              <LockedNavLink
-                icon={<FaChartBar className="text-sm" />}
-                label="Exam Insights"
-              />
-              <LockedNavLink
-                icon={<FaListOl className="text-sm" />}
-                label="MBE Practice"
-              />
-              <LockedNavLink
-                icon={<FaBrain className="text-sm" />}
-                label="LExAPI Tutor"
-              />
+              <LockedNavLink icon={<FaClipboardCheck className="text-sm" />} label="Practice Exams" />
+              <LockedNavLink icon={<FaClock className="text-sm" />} label="Time Management" />
+              <LockedNavLink icon={<FaChartBar className="text-sm" />} label="Exam Insights" />
+              <LockedNavLink icon={<FaListOl className="text-sm" />} label="MBE Practice" />
+              <LockedNavLink icon={<FaBrain className="text-sm" />} label="LExAPI Tutor" />
             </>
           ) : null}
         </ToggleSection>
-
         <ToggleSection
           isOpen={isSubjectGuidesOpen}
           toggle={toggleSubjectGuides}
@@ -480,30 +412,14 @@ export default function Sidebar({
             </>
           ) : showAllApps ? (
             <>
-              <LockedNavLink
-                icon={<FaBookReader className="text-sm" />}
-                label="Contracts"
-              />
-              <LockedNavLink
-                icon={<FaExclamationTriangle className="text-sm" />}
-                label="Torts"
-              />
-              <LockedNavLink
-                icon={<FaGavel className="text-sm" />}
-                label="Criminal Law"
-              />
-              <LockedNavLink
-                icon={<FaHome className="text-sm" />}
-                label="Property"
-              />
-              <LockedNavLink
-                icon={<FaUniversity className="text-sm" />}
-                label="Constitutional Law"
-              />
+              <LockedNavLink icon={<FaBookReader className="text-sm" />} label="Contracts" />
+              <LockedNavLink icon={<FaExclamationTriangle className="text-sm" />} label="Torts" />
+              <LockedNavLink icon={<FaGavel className="text-sm" />} label="Criminal Law" />
+              <LockedNavLink icon={<FaHome className="text-sm" />} label="Property" />
+              <LockedNavLink icon={<FaUniversity className="text-sm" />} label="Constitutional Law" />
             </>
           ) : null}
         </ToggleSection>
-
         <ToggleSection
           isOpen={isVideoLessonsOpen}
           toggle={toggleVideoLessons}
@@ -518,13 +434,9 @@ export default function Sidebar({
               active={activeLink === '/videos/directory'}
             />
           ) : showAllApps ? (
-            <LockedNavLink
-              icon={<FaPlayCircle className="text-sm" />}
-              label="Directory"
-            />
+            <LockedNavLink icon={<FaPlayCircle className="text-sm" />} label="Directory" />
           ) : null}
         </ToggleSection>
-
         <ToggleSection
           isOpen={isQuimbeeOpen}
           toggle={toggleQuimbee}
@@ -560,26 +472,13 @@ export default function Sidebar({
             </>
           ) : showAllApps ? (
             <>
-              <LockedNavLink
-                icon={<FaLightbulb className="text-sm" />}
-                label="Resume Review"
-              />
-              <LockedNavLink
-                icon={<FaUniversity className="text-sm" />}
-                label="Law School Application Review"
-              />
-              <LockedNavLink
-                icon={<FaComment className="text-sm" />}
-                label="Interview Preparation"
-              />
-              <LockedNavLink
-                icon={<FaChalkboardTeacher className="text-sm" />}
-                label="Networking Opportunities"
-              />
+              <LockedNavLink icon={<FaLightbulb className="text-sm" />} label="Resume Review" />
+              <LockedNavLink icon={<FaUniversity className="text-sm" />} label="Law School Application Review" />
+              <LockedNavLink icon={<FaComment className="text-sm" />} label="Interview Preparation" />
+              <LockedNavLink icon={<FaChalkboardTeacher className="text-sm" />} label="Networking Opportunities" />
             </>
           ) : null}
         </ToggleSection>
-
         <section>
           <Link
             href="https://discord.gg/wKgH9ussWc"
@@ -590,7 +489,6 @@ export default function Sidebar({
           </Link>
         </section>
       </nav>
-
       <footer className="px-6 py-14 bg-transparent">
         <section className="mb-4">
           <Link
@@ -602,9 +500,7 @@ export default function Sidebar({
             <FaCode className="text-lg" />
           </Link>
         </section>
-
         <hr className="border-white my-2" />
-
         <div className="flex items-center gap-4">
           <div className="flex-1 min-w-0">
             <p className="font-semibold truncate">
@@ -614,12 +510,7 @@ export default function Sidebar({
               {currentUser?.email || 'user@example.com'}
             </p>
           </div>
-          <span
-            className={clsx(
-              'px-3 py-1 rounded text-xs uppercase whitespace-nowrap font-bold',
-              planBadgeStyle
-            )}
-          >
+          <span className={clsx('px-3 py-1 rounded text-xs uppercase whitespace-nowrap font-bold', planBadgeStyle)}>
             {plan.charAt(0).toUpperCase() + plan.slice(1)}
           </span>
         </div>
