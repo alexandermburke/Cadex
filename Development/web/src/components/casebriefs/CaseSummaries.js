@@ -752,8 +752,10 @@ export default function CaseSummaries() {
           </div>
         </main>
       </div>
-      {/* Chatbot integration: Pass the current case title and id to the chatbot */}
-      <CaseChatbot caseName={capCase?.title || 'this case'} caseId={capCase?.id || ''} />
+      {/* Chatbot integration: Non-logged in users cannot access the chatbot */}
+      {isLoggedIn && (
+        <CaseChatbot caseName={capCase?.title || 'this case'} caseId={capCase?.id || ''} />
+      )}
     </>
   )
 }
