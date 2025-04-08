@@ -87,35 +87,24 @@ export default function AIExamFlashCard() {
   const router = useRouter();
   const { currentUser, userDataObj } = useAuth();
   const isDarkMode = userDataObj?.darkMode || false;
-
-  // Sidebar & Flashcard state
   const [isSidebarVisible, setIsSidebarVisible] = useState(true);
   const toggleSidebar = () => setIsSidebarVisible(!isSidebarVisible);
-
   const [flashcards, setFlashcards] = useState([]);
   const [answeredFlashcards, setAnsweredFlashcards] = useState([]);
   const [currentFlashcardIndex, setCurrentFlashcardIndex] = useState(0);
   const [isAnswerRevealed, setIsAnswerRevealed] = useState(false);
-
-  // Timer state
   const [timerDuration, setTimerDuration] = useState(0);
   const [timeLeft, setTimeLeft] = useState(0);
   const timerRef = useRef(null);
   const [timerStyle, setTimerStyle] = useState('digital');
-
-  // Modal states
   const [isConfigModalOpen, setIsConfigModalOpen] = useState(false);
   const [isLoadProgressModalOpen, setIsLoadProgressModalOpen] = useState(false);
   const [isFinalFeedbackModalOpen, setIsFinalFeedbackModalOpen] = useState(false);
   const [savedProgresses, setSavedProgresses] = useState([]);
   const [savedAnalyses, setSavedAnalyses] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-
-  // Missed questions
   const [savedMissedQuestions, setSavedMissedQuestions] = useState([]);
   const [isMissedQuestionsModalOpen, setIsMissedQuestionsModalOpen] = useState(false);
-
-  // Study configuration (including option to save missed questions)
   const [studyConfig, setStudyConfig] = useState({
     studyYear: '1L',
     proficiency: 'Basic',
@@ -127,8 +116,6 @@ export default function AIExamFlashCard() {
     includeExplanations: false,
     saveMissedQuestions: true,
   });
-
-  // NEW: Flag to ensure we save progress only once per session
   const [hasSavedProgress, setHasSavedProgress] = useState(false);
 
   useEffect(() => {
@@ -236,7 +223,6 @@ export default function AIExamFlashCard() {
       nextFlashcard();
       return;
     }
-    // Save the answer data (which insights will use)
     setAnsweredFlashcards((prev) => [
       ...prev,
       {
@@ -246,7 +232,6 @@ export default function AIExamFlashCard() {
         isCorrect,
       },
     ]);
-    // Save missed question if enabled
     if (!isCorrect && studyConfig.saveMissedQuestions) {
       const alreadySaved = savedMissedQuestions.some(
         (item) => item.question === flashcards[currentFlashcardIndex]?.question
@@ -358,19 +343,15 @@ export default function AIExamFlashCard() {
     return inTitle || inCaseTitle || inTags;
   });
 
-  // --- New Functionality: Save exam progress for insights ---
   const saveExamProgress = async () => {
-    // Compute overall correct count and total answers from the session
     const overallCorrect = answeredFlashcards.filter(card => card.isCorrect).length;
     const overallTotal = answeredFlashcards.length;
-    // For simplicity, assume that all flashcards in this session pertain to the same law subject (studyConfig.courseName)
     const categories = {
       [studyConfig.courseName]: {
         correct: overallCorrect,
         total: overallTotal,
       },
     };
-
     try {
       await addDoc(collection(db, 'examProgress'), {
         userId: currentUser.uid,
@@ -378,7 +359,7 @@ export default function AIExamFlashCard() {
         overallCorrect,
         overallTotal,
         categories,
-        answeredFlashcards, // Optionally include detailed responses
+        answeredFlashcards,
         timestamp: Date.now(),
       });
       setHasSavedProgress(true);
@@ -388,14 +369,12 @@ export default function AIExamFlashCard() {
     }
   };
 
-  // NEW: Save progress automatically when Final Feedback modal opens (i.e. session is complete)
   useEffect(() => {
     if (isFinalFeedbackModalOpen && !hasSavedProgress) {
       saveExamProgress();
     }
   }, [isFinalFeedbackModalOpen, hasSavedProgress]);
 
-  // (Remaining functions for loading/deleting saved progress, config modal, etc., are kept as before.)
   const fetchSavedProgresses = async () => {
     try {
       const q = query(collection(db, 'examProgress'), where('userId', '==', currentUser.uid));
@@ -417,7 +396,6 @@ export default function AIExamFlashCard() {
 
   const handleLoadProgress = (progress) => {
     setStudyConfig(progress.studyConfig);
-    // Load additional progress data if needed
     closeLoadProgressModal();
   };
 
@@ -502,8 +480,6 @@ export default function AIExamFlashCard() {
           </>
         )}
       </AnimatePresence>
-
-      {/* Buttons Container */}
       <div className="absolute top-6 right-[5%] z-[100] flex flex-col items-center gap-2 mt-4">
         <div className="flex flex-col items-center">
           <motion.button
@@ -530,7 +506,6 @@ export default function AIExamFlashCard() {
           <span className="text-xs mt-1">Configure</span>
         </div>
       </div>
-
       <main className="flex-1 flex flex-col px-6 relative z-200 h-screen">
         <div className="flex items-center justify-between">
           <button
@@ -551,7 +526,6 @@ export default function AIExamFlashCard() {
             </AnimatePresence>
           </button>
         </div>
-
         <motion.div
           className={clsx(
             'flex-1 w-full rounded-2xl shadow-xl p-6 overflow-y-auto',
@@ -564,16 +538,13 @@ export default function AIExamFlashCard() {
           <div className="flex flex-col items-center justify-center mb-4">
             <TimerDisplay timeLeft={timeLeft} totalMinutes={studyConfig.timerMinutes} />
           </div>
-
           {flashcards.length === 0 && !isLoading && (
             <div className={clsx('w-full max-w-3xl p-6 rounded-lg shadow-md text-center mx-auto', isDarkMode ? 'bg-slate-800 bg-opacity-50 text-white' : 'bg-white text-gray-800')}>
               <h2 className="text-2xl mb-4">No flashcards generated yet.</h2>
               <p className={clsx(isDarkMode ? 'text-gray-300' : 'text-gray-500')}>Click <strong>Configure</strong> to set up your flashcards.</p>
             </div>
           )}
-
           {isLoading && <div className="w-full h-1 bg-blue-500 animate-pulse my-4" />}
-
           {flashcards.length > 0 && flashcards[currentFlashcardIndex] && (
             <div className="flex justify-center">
               <motion.div
@@ -624,13 +595,11 @@ export default function AIExamFlashCard() {
               </motion.div>
             </div>
           )}
-
           {flashcards.length > 0 && (
             <div className="mt-2 text-sm text-gray-400 text-center">
               <p>Questions Answered: {answeredFlashcards.length} / {studyConfig.questionLimit}</p>
             </div>
           )}
-
           {savedMissedQuestions.length > 0 && (
             <div className="mt-4 text-center">
               <button
@@ -643,7 +612,6 @@ export default function AIExamFlashCard() {
           )}
         </motion.div>
       </main>
-
       <AnimatePresence>
         {isLoadProgressModalOpen && (
           <motion.div
@@ -711,7 +679,6 @@ export default function AIExamFlashCard() {
           </motion.div>
         )}
       </AnimatePresence>
-
       <AnimatePresence>
         {isFinalFeedbackModalOpen && (
           <motion.div
@@ -750,7 +717,6 @@ export default function AIExamFlashCard() {
           </motion.div>
         )}
       </AnimatePresence>
-
       <AnimatePresence>
         {isMissedQuestionsModalOpen && (
           <motion.div
@@ -792,7 +758,6 @@ export default function AIExamFlashCard() {
           </motion.div>
         )}
       </AnimatePresence>
-
       <AnimatePresence>
         {isConfigModalOpen && (
           <motion.div
@@ -884,7 +849,7 @@ export default function AIExamFlashCard() {
                 <p className="text-sm text-gray-400 mt-1">If &gt; 0, a countdown starts once flashcards are generated.</p>
               </div>
               <div className="flex items-center justify-between mb-4">
-                <label htmlFor="resetTimerToggle" className="cursor-pointer font-semibold text-sm">Reset Timer On Each Question</label>
+                <label htmlFor="resetTimerToggle" className="cursor-pointer text-sm">Reset Timer On Each Question</label>
                 <div className="relative inline-block w-14 h-8 select-none transition duration-200 ease-in">
                   <input
                     type="checkbox"
@@ -898,7 +863,7 @@ export default function AIExamFlashCard() {
                 </div>
               </div>
               <div className="flex items-center justify-between mb-4">
-                <label htmlFor="instantFeedbackToggle" className="cursor-pointer font-semibold text-sm">Instant Feedback (reveal answer immediately)</label>
+                <label htmlFor="instantFeedbackToggle" className="cursor-pointer text-sm">Instant Feedback (reveal answer immediately)</label>
                 <div className="relative inline-block w-14 h-8 select-none transition duration-200 ease-in">
                   <input
                     type="checkbox"
@@ -912,7 +877,7 @@ export default function AIExamFlashCard() {
                 </div>
               </div>
               <div className="flex items-center justify-between mb-4">
-                <label htmlFor="includeExplanationsToggle" className="cursor-pointer font-semibold text-sm">Include Extended Explanations</label>
+                <label htmlFor="includeExplanationsToggle" className="cursor-pointer text-sm">Include Extended Explanations</label>
                 <div className="relative inline-block w-14 h-8 select-none transition duration-200 ease-in">
                   <input
                     type="checkbox"
@@ -926,7 +891,7 @@ export default function AIExamFlashCard() {
                 </div>
               </div>
               <div className="flex items-center justify-between mb-4">
-                <label htmlFor="saveMissedQuestionsToggle" className="cursor-pointer font-semibold text-sm">Save Missed Questions for Review</label>
+                <label htmlFor="saveMissedQuestionsToggle" className="cursor-pointer text-sm">Save Missed Questions for Review</label>
                 <div className="relative inline-block w-14 h-8 select-none transition duration-200 ease-in">
                   <input
                     type="checkbox"
@@ -938,6 +903,15 @@ export default function AIExamFlashCard() {
                   />
                   <label htmlFor="saveMissedQuestionsToggle" className="toggle-label block overflow-hidden h-8 rounded-full bg-gray-300 cursor-pointer"></label>
                 </div>
+              </div>
+              <div className="mb-4">
+                <textarea
+                  name="customInstructions"
+                  value={studyConfig.customInstructions || ""}
+                  onChange={(e) => setStudyConfig({ ...studyConfig, customInstructions: e.target.value })}
+                  className={clsx('w-full p-3 border rounded', isDarkMode ? 'bg-gray-700 border-gray-600' : 'bg-gray-100 border-gray-300')}
+                  placeholder="Enter custom instructions..."
+                />
               </div>
               <div className="flex justify-end space-x-4">
                 <button

@@ -26,7 +26,8 @@ function CaseCards({ collectionName, isDarkMode }) {
 
   if (!cases.length) return <p>Loading cases...</p>;
 
-  const randomCases = cases.length > 3 ? [...cases].sort(() => Math.random() - 0.5).slice(0, 3) : cases;
+  const randomCases =
+    cases.length > 3 ? [...cases].sort(() => Math.random() - 0.5).slice(0, 3) : cases;
 
   return (
     <div className="grid grid-cols-3 gap-4 mt-4">
@@ -56,225 +57,7 @@ function CaseCards({ collectionName, isDarkMode }) {
   );
 }
 
-function DetailedFelonies({ onBack, isDarkMode }) {
-  return (
-    <motion.div
-      className={clsx('flex-1 w-full rounded-2xl shadow-xl p-6 overflow-y-auto', isDarkMode ? 'bg-slate-800 bg-opacity-50 text-white' : 'bg-white text-gray-800')}
-      initial={{ opacity: 0, y: 50 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -50 }}
-      transition={{ duration: 0.4 }}
-    >
-      <div className="flex justify-between items-center mb-4">
-        <button
-          onClick={onBack}
-          className={clsx('px-4 py-2 rounded text-sm font-semibold transition-colors',
-            isDarkMode ? 'bg-gray-700 hover:bg-gray-600 text-white' : 'bg-gray-300 hover:bg-gray-400 text-gray-800'
-          )}
-        >
-          Back to Overview
-        </button>
-        <a
-          href="https://cadexlaw.com/pricing"
-          target="_blank"
-          rel="noopener noreferrer"
-          className={clsx('px-4 py-2 rounded text-sm font-semibold transition-colors',
-            isDarkMode ? 'bg-blue-700 hover:bg-blue-600 text-white' : 'bg-blue-300 hover:bg-blue-400 text-gray-800'
-          )}
-        >
-          Suggestions
-        </a>
-      </div>
-      <h2 className="text-2xl font-bold my-4">Felonies</h2>
-      <section className="mb-6 space-y-2 text-sm leading-relaxed">
-        <p>
-          Felonies are serious crimes that carry heavy penalties, including long-term imprisonment, substantial fines, and other severe consequences. They typically involve significant harm or threat to public safety.
-        </p>
-      </section>
-      <section className="mb-6">
-        <h3 className="text-xl font-semibold">Case Examples</h3>
-        <CaseCards collectionName="capCases" isDarkMode={isDarkMode} />
-      </section>
-      <section className="mb-6 space-y-2 text-sm leading-relaxed">
-        <h3 className="text-xl font-semibold">Practice Tools & Features</h3>
-        <ul className="list-disc ml-6">
-          <li>Interactive Flowchart: Map out the elements and classifications of felony crimes.</li>
-          <li>Multiple-Choice Quiz: Test your knowledge on felony definitions and examples.</li>
-          <li>Practice Scenarios: Engage with hypothetical felony cases to solidify your understanding.</li>
-        </ul>
-      </section>
-    </motion.div>
-  );
-}
-
-function DetailedMisdemeanors({ onBack, isDarkMode }) {
-  return (
-    <motion.div
-      className={clsx('flex-1 w-full rounded-2xl shadow-xl p-6 overflow-y-auto', isDarkMode ? 'bg-slate-800 bg-opacity-50 text-white' : 'bg-white text-gray-800')}
-      initial={{ opacity: 0, y: 50 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -50 }}
-      transition={{ duration: 0.4 }}
-    >
-      <div className="flex justify-between items-center mb-4">
-        <button
-          onClick={onBack}
-          className={clsx('px-4 py-2 rounded text-sm font-semibold transition-colors',
-            isDarkMode ? 'bg-gray-700 hover:bg-gray-600 text-white' : 'bg-gray-300 hover:bg-gray-400 text-gray-800'
-          )}
-        >
-          Back to Overview
-        </button>
-        <a
-          href="https://cadexlaw.com/pricing"
-          target="_blank"
-          rel="noopener noreferrer"
-          className={clsx('px-4 py-2 rounded text-sm font-semibold transition-colors',
-            isDarkMode ? 'bg-blue-700 hover:bg-blue-600 text-white' : 'bg-blue-300 hover:bg-blue-400 text-gray-800'
-          )}
-        >
-          Suggestions
-        </a>
-      </div>
-      <h2 className="text-2xl font-bold my-4">Misdemeanors</h2>
-      <section className="mb-6 space-y-2 text-sm leading-relaxed">
-        <p>
-          Misdemeanors are less serious crimes compared to felonies, typically resulting in shorter jail terms, lower fines, or community service. They often involve minor offenses or first-time incidents.
-        </p>
-      </section>
-      <section className="mb-6">
-        <h3 className="text-xl font-semibold">Case Examples</h3>
-        <CaseCards collectionName="capCases" isDarkMode={isDarkMode} />
-      </section>
-      <section className="mb-6 space-y-2 text-sm leading-relaxed">
-        <h3 className="text-xl font-semibold">Practice Tools & Features</h3>
-        <ul className="list-disc ml-6">
-          <li>Flowchart: Differentiate between misdemeanor and felony charges.</li>
-          <li>Quiz: Assess your understanding of misdemeanor case outcomes.</li>
-          <li>Scenarios: Review hypothetical misdemeanor cases.</li>
-        </ul>
-      </section>
-    </motion.div>
-  );
-}
-
-function DetailedDefenses({ onBack, isDarkMode }) {
-  return (
-    <motion.div
-      className={clsx('flex-1 w-full rounded-2xl shadow-xl p-6 overflow-y-auto', isDarkMode ? 'bg-slate-800 bg-opacity-50 text-white' : 'bg-white text-gray-800')}
-      initial={{ opacity: 0, y: 50 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -50 }}
-      transition={{ duration: 0.4 }}
-    >
-      <div className="flex justify-between items-center mb-4">
-        <button
-          onClick={onBack}
-          className={clsx('px-4 py-2 rounded text-sm font-semibold transition-colors',
-            isDarkMode ? 'bg-gray-700 hover:bg-gray-600 text-white' : 'bg-gray-300 hover:bg-gray-400 text-gray-800'
-          )}
-        >
-          Back to Overview
-        </button>
-        <a
-          href="https://cadexlaw.com/pricing"
-          target="_blank"
-          rel="noopener noreferrer"
-          className={clsx('px-4 py-2 rounded text-sm font-semibold transition-colors',
-            isDarkMode ? 'bg-blue-700 hover:bg-blue-600 text-white' : 'bg-blue-300 hover:bg-blue-400 text-gray-800'
-          )}
-        >
-          Suggestions
-        </a>
-      </div>
-      <h2 className="text-2xl font-bold my-4">Defenses</h2>
-      <section className="mb-6 space-y-2 text-sm leading-relaxed">
-        <p>
-          In criminal law, defendants may assert various defenses to reduce or negate liability. Common defenses include insanity, self-defense, duress, entrapment, and mistake of fact.
-        </p>
-        <p>
-          <strong>Insanity:</strong> Claiming the defendant was not in control of their actions due to a mental disorder.
-        </p>
-        <p>
-          <strong>Self-Defense:</strong> Using reasonable force to protect oneself.
-        </p>
-        <p>
-          <strong>Duress:</strong> Arguing that the defendant acted under threat or coercion.
-        </p>
-        <p>
-          <strong>Entrapment:</strong> Asserting that law enforcement induced the defendant to commit a crime.
-        </p>
-        <p>
-          <strong>Mistake of Fact:</strong> A genuine misunderstanding that negates criminal intent.
-        </p>
-      </section>
-      <section className="mb-6">
-        <h3 className="text-xl font-semibold">Case Examples</h3>
-        <CaseCards collectionName="capCases" isDarkMode={isDarkMode} />
-      </section>
-      <section className="mb-6 space-y-2 text-sm leading-relaxed">
-        <h3 className="text-xl font-semibold">Practice Tools & Features</h3>
-        <ul className="list-disc ml-6">
-          <li>Checklist: Evaluate the applicability of criminal defenses.</li>
-          <li>Case Analyzer: Review scenarios to determine valid defenses.</li>
-          <li>Quick Reference Charts: Summaries of defenses with case examples.</li>
-        </ul>
-      </section>
-    </motion.div>
-  );
-}
-
-function DetailedSentencing({ onBack, isDarkMode }) {
-  return (
-    <motion.div
-      className={clsx('flex-1 w-full rounded-2xl shadow-xl p-6 overflow-y-auto', isDarkMode ? 'bg-slate-800 bg-opacity-50 text-white' : 'bg-white text-gray-800')}
-      initial={{ opacity: 0, y: 50 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -50 }}
-      transition={{ duration: 0.4 }}
-    >
-      <div className="flex justify-between items-center mb-4">
-        <button
-          onClick={onBack}
-          className={clsx('px-4 py-2 rounded text-sm font-semibold transition-colors',
-            isDarkMode ? 'bg-gray-700 hover:bg-gray-600 text-white' : 'bg-gray-300 hover:bg-gray-400 text-gray-800'
-          )}
-        >
-          Back to Overview
-        </button>
-        <a
-          href="https://cadexlaw.com/pricing"
-          target="_blank"
-          rel="noopener noreferrer"
-          className={clsx('px-4 py-2 rounded text-sm font-semibold transition-colors',
-            isDarkMode ? 'bg-blue-700 hover:bg-blue-600 text-white' : 'bg-blue-300 hover:bg-blue-400 text-gray-800'
-          )}
-        >
-          Suggestions
-        </a>
-      </div>
-      <h2 className="text-2xl font-bold my-4">Sentencing</h2>
-      <section className="mb-6 space-y-2 text-sm leading-relaxed">
-        <p>
-          Sentencing in criminal law involves determining the appropriate punishment for a convicted offender. Options may include incarceration, probation, fines, community service, and restitution. The sentence often reflects the severity of the crime and the defendant&apos;s criminal history.
-        </p>
-      </section>
-      <section className="mb-6">
-        <h3 className="text-xl font-semibold">Case Examples</h3>
-        <CaseCards collectionName="capCases" isDarkMode={isDarkMode} />
-      </section>
-      <section className="mb-6 space-y-2 text-sm leading-relaxed">
-        <h3 className="text-xl font-semibold">Practice Tools & Features</h3>
-        <ul className="list-disc ml-6">
-          <li>Sentencing Calculator: Compare potential sentences.</li>
-          <li>Scenario Builder: Explore sentencing outcomes based on case facts.</li>
-          <li>Reference Charts: Overview of sentencing guidelines and standards.</li>
-        </ul>
-      </section>
-    </motion.div>
-  );
-}
-
+/* ---------------------- StaticFeatures Component ---------------------- */
 function StaticFeatures({ isDarkMode }) {
   return (
     <section className="mt-6">
@@ -321,14 +104,796 @@ function StaticFeatures({ isDarkMode }) {
   );
 }
 
+/* ==================== Detailed Felony Subcategory Views ==================== */
+function DetailedMurderContent({ onBack, isDarkMode }) {
+  return (
+    <motion.div
+      className={clsx(
+        'flex-1 w-full rounded-2xl shadow-xl p-6 overflow-y-auto',
+        isDarkMode ? 'bg-slate-800 bg-opacity-50 text-white' : 'bg-white text-gray-800'
+      )}
+      initial={{ opacity: 0, y: 50 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -50 }}
+      transition={{ duration: 0.4 }}
+    >
+      <div className="flex justify-between items-center mb-4">
+        <button
+          onClick={onBack}
+          className={clsx(
+            'px-4 py-2 rounded text-sm font-semibold transition-colors',
+            isDarkMode
+              ? 'bg-gray-700 hover:bg-gray-600 text-white'
+              : 'bg-gray-300 hover:bg-gray-400 text-gray-800'
+          )}
+        >
+          Back to Overview
+        </button>
+        <a
+          href="https://cadexlaw.com/pricing"
+          target="_blank"
+          rel="noopener noreferrer"
+          className={clsx(
+            'px-4 py-2 rounded text-sm font-semibold transition-colors',
+            isDarkMode
+              ? 'bg-blue-700 hover:bg-blue-600 text-white'
+              : 'bg-blue-300 hover:bg-blue-400 text-gray-800'
+          )}
+        >
+          Suggestions
+        </a>
+      </div>
+      <h2 className="text-2xl font-bold my-4">Murder</h2>
+      <section className="mb-6 text-sm leading-relaxed">
+        <p>
+          Murder is the unlawful killing of another person with malice aforethought. This felony involves the deliberate or reckless disregard for human life.
+        </p>
+      </section>
+    </motion.div>
+  );
+}
+
+function DetailedRapeContent({ onBack, isDarkMode }) {
+  return (
+    <motion.div 
+      className={clsx(
+        'flex-1 w-full rounded-2xl shadow-xl p-6 overflow-y-auto',
+        isDarkMode ? 'bg-slate-800 bg-opacity-50 text-white' : 'bg-white text-gray-800'
+      )}
+      initial={{ opacity: 0, y: 50 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -50 }}
+      transition={{ duration: 0.4 }}
+    >
+      <div className="flex justify-between items-center mb-4">
+        <button 
+          onClick={onBack} 
+          className={clsx(
+            'px-4 py-2 rounded text-sm font-semibold transition-colors',
+            isDarkMode
+              ? 'bg-gray-700 hover:bg-gray-600 text-white'
+              : 'bg-gray-300 hover:bg-gray-400 text-gray-800'
+          )}
+        >
+          Back to Overview
+        </button>
+        <a 
+          href="https://cadexlaw.com/pricing"
+          target="_blank"
+          rel="noopener noreferrer"
+          className={clsx(
+            'px-4 py-2 rounded text-sm font-semibold transition-colors',
+            isDarkMode
+              ? 'bg-blue-700 hover:bg-blue-600 text-white'
+              : 'bg-blue-300 hover:bg-blue-400 text-gray-800'
+          )}
+        >
+          Suggestions
+        </a>
+      </div>
+      <h2 className="text-2xl font-bold my-4">Rape</h2>
+      <section className="mb-6 text-sm leading-relaxed">
+        <p>
+          Rape is a forcible or coercive sexual assault that involves non-consensual penetration, classified as a grave felony due to its severe violation of personal autonomy.
+        </p>
+      </section>
+    </motion.div>
+  );
+}
+
+function DetailedRobberyContent({ onBack, isDarkMode }) {
+  return (
+    <motion.div 
+      className={clsx(
+        'flex-1 w-full rounded-2xl shadow-xl p-6 overflow-y-auto',
+        isDarkMode ? 'bg-slate-800 bg-opacity-50 text-white' : 'bg-white text-gray-800'
+      )}
+      initial={{ opacity: 0, y: 50 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -50 }}
+      transition={{ duration: 0.4 }}
+    >
+      <div className="flex justify-between items-center mb-4">
+        <button 
+          onClick={onBack} 
+          className={clsx(
+            'px-4 py-2 rounded text-sm font-semibold transition-colors',
+            isDarkMode
+              ? 'bg-gray-700 hover:bg-gray-600 text-white'
+              : 'bg-gray-300 hover:bg-gray-400 text-gray-800'
+          )}
+        >
+          Back to Overview
+        </button>
+        <a 
+          href="https://cadexlaw.com/pricing"
+          target="_blank"
+          rel="noopener noreferrer"
+          className={clsx(
+            'px-4 py-2 rounded text-sm font-semibold transition-colors',
+            isDarkMode
+              ? 'bg-blue-700 hover:bg-blue-600 text-white'
+              : 'bg-blue-300 hover:bg-blue-400 text-gray-800'
+          )}
+        >
+          Suggestions
+        </a>
+      </div>
+      <h2 className="text-2xl font-bold my-4">Robbery</h2>
+      <section className="mb-6 text-sm leading-relaxed">
+        <p>
+          Robbery involves the theft of property with the use of force or intimidation. The presence of violence or threats distinguishes it from mere theft.
+        </p>
+      </section>
+    </motion.div>
+  );
+}
+
+function DetailedArsonContent({ onBack, isDarkMode }) {
+  return (
+    <motion.div 
+      className={clsx(
+        'flex-1 w-full rounded-2xl shadow-xl p-6 overflow-y-auto',
+        isDarkMode ? 'bg-slate-800 bg-opacity-50 text-white' : 'bg-white text-gray-800'
+      )}
+      initial={{ opacity: 0, y: 50 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -50 }}
+      transition={{ duration: 0.4 }}
+    >
+      <div className="flex justify-between items-center mb-4">
+        <button 
+          onClick={onBack} 
+          className={clsx(
+            'px-4 py-2 rounded text-sm font-semibold transition-colors',
+            isDarkMode
+              ? 'bg-gray-700 hover:bg-gray-600 text-white'
+              : 'bg-gray-300 hover:bg-gray-400 text-gray-800'
+          )}
+        >
+          Back to Overview
+        </button>
+        <a 
+          href="https://cadexlaw.com/pricing"
+          target="_blank"
+          rel="noopener noreferrer"
+          className={clsx(
+            'px-4 py-2 rounded text-sm font-semibold transition-colors',
+            isDarkMode
+              ? 'bg-blue-700 hover:bg-blue-600 text-white'
+              : 'bg-blue-300 hover:bg-blue-400 text-gray-800'
+          )}
+        >
+          Suggestions
+        </a>
+      </div>
+      <h2 className="text-2xl font-bold my-4">Arson</h2>
+      <section className="mb-6 text-sm leading-relaxed">
+        <p>
+          Arson is the intentional or reckless setting of a fire to property. Due to the threat it poses to public safety and property, it is treated as a serious felony.
+        </p>
+      </section>
+    </motion.div>
+  );
+}
+
+function DetailedKidnappingContent({ onBack, isDarkMode }) {
+  return (
+    <motion.div 
+      className={clsx(
+        'flex-1 w-full rounded-2xl shadow-xl p-6 overflow-y-auto',
+        isDarkMode ? 'bg-slate-800 bg-opacity-50 text-white' : 'bg-white text-gray-800'
+      )}
+      initial={{ opacity: 0, y: 50 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -50 }}
+      transition={{ duration: 0.4 }}
+    >
+      <div className="flex justify-between items-center mb-4">
+        <button 
+          onClick={onBack} 
+          className={clsx(
+            'px-4 py-2 rounded text-sm font-semibold transition-colors',
+            isDarkMode
+              ? 'bg-gray-700 hover:bg-gray-600 text-white'
+              : 'bg-gray-300 hover:bg-gray-400 text-gray-800'
+          )}
+        >
+          Back to Overview
+        </button>
+        <a 
+          href="https://cadexlaw.com/pricing"
+          target="_blank"
+          rel="noopener noreferrer"
+          className={clsx(
+            'px-4 py-2 rounded text-sm font-semibold transition-colors',
+            isDarkMode
+              ? 'bg-blue-700 hover:bg-blue-600 text-white'
+              : 'bg-blue-300 hover:bg-blue-400 text-gray-800'
+          )}
+        >
+          Suggestions
+        </a>
+      </div>
+      <h2 className="text-2xl font-bold my-4">Kidnapping</h2>
+      <section className="mb-6 text-sm leading-relaxed">
+        <p>
+          Kidnapping is the unlawful confinement or transportation of a person by force or coercion, typically with the intent to demand a ransom or cause harm.
+        </p>
+      </section>
+    </motion.div>
+  );
+}
+
+/* ------------------- Misdemeanors Subcategory Views ------------------- */
+function DetailedPettyTheftContent({ onBack, isDarkMode }) {
+  return (
+    <motion.div 
+      className={clsx(
+        'flex-1 w-full rounded-2xl shadow-xl p-6 overflow-y-auto', 
+        isDarkMode ? 'bg-slate-800 bg-opacity-50 text-white' : 'bg-white text-gray-800'
+      )}
+      initial={{ opacity: 0, y: 50 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -50 }}
+      transition={{ duration: 0.4 }}
+    >
+      <div className="flex justify-between items-center mb-4">
+        <button 
+          onClick={onBack} 
+          className={clsx(
+            'px-4 py-2 rounded text-sm font-semibold transition-colors',
+            isDarkMode ? 'bg-gray-700 hover:bg-gray-600 text-white' : 'bg-gray-300 hover:bg-gray-400 text-gray-800'
+          )}
+        >Back to Overview</button>
+        <a 
+          href="https://cadexlaw.com/pricing" 
+          target="_blank" rel="noopener noreferrer"
+          className={clsx(
+            'px-4 py-2 rounded text-sm font-semibold transition-colors',
+            isDarkMode ? 'bg-blue-700 hover:bg-blue-600 text-white' : 'bg-blue-300 hover:bg-blue-400 text-gray-800'
+          )}
+        >Suggestions</a>
+      </div>
+      <h2 className="text-2xl font-bold my-4">Petty Theft</h2>
+      <section className="mb-6 text-sm leading-relaxed">
+        <p>
+          Petty theft involves the unlawful taking of property of relatively low value, typically resulting in minor penalties such as fines or short jail terms.
+        </p>
+      </section>
+    </motion.div>
+  );
+}
+
+function DetailedPublicIntoxicationContent({ onBack, isDarkMode }) {
+  return (
+    <motion.div 
+      className={clsx(
+        'flex-1 w-full rounded-2xl shadow-xl p-6 overflow-y-auto', 
+        isDarkMode ? 'bg-slate-800 bg-opacity-50 text-white' : 'bg-white text-gray-800'
+      )}
+      initial={{ opacity: 0, y: 50 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -50 }}
+      transition={{ duration: 0.4 }}
+    >
+      <div className="flex justify-between items-center mb-4">
+        <button 
+          onClick={onBack} 
+          className={clsx(
+            'px-4 py-2 rounded text-sm font-semibold transition-colors',
+            isDarkMode ? 'bg-gray-700 hover:bg-gray-600 text-white' : 'bg-gray-300 hover:bg-gray-400 text-gray-800'
+          )}
+        >Back to Overview</button>
+        <a 
+          href="https://cadexlaw.com/pricing" 
+          target="_blank" rel="noopener noreferrer"
+          className={clsx(
+            'px-4 py-2 rounded text-sm font-semibold transition-colors',
+            isDarkMode ? 'bg-blue-700 hover:bg-blue-600 text-white' : 'bg-blue-300 hover:bg-blue-400 text-gray-800'
+          )}
+        >Suggestions</a>
+      </div>
+      <h2 className="text-2xl font-bold my-4">Public Intoxication</h2>
+      <section className="mb-6 text-sm leading-relaxed">
+        <p>
+          Public intoxication occurs when an individual’s behavior while under the influence disrupts public order or safety, leading to minor criminal sanctions.
+        </p>
+      </section>
+    </motion.div>
+  );
+}
+
+function DetailedVandalismContent({ onBack, isDarkMode }) {
+  return (
+    <motion.div 
+      className={clsx(
+        'flex-1 w-full rounded-2xl shadow-xl p-6 overflow-y-auto',
+        isDarkMode ? 'bg-slate-800 bg-opacity-50 text-white' : 'bg-white text-gray-800'
+      )}
+      initial={{ opacity: 0, y: 50 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -50 }}
+      transition={{ duration: 0.4 }}
+    >
+      <div className="flex justify-between items-center mb-4">
+        <button 
+          onClick={onBack}
+          className={clsx(
+            'px-4 py-2 rounded text-sm font-semibold transition-colors',
+            isDarkMode ? 'bg-gray-700 hover:bg-gray-600 text-white' : 'bg-gray-300 hover:bg-gray-400 text-gray-800'
+          )}
+        >Back to Overview</button>
+        <a 
+          href="https://cadexlaw.com/pricing" 
+          target="_blank" rel="noopener noreferrer"
+          className={clsx(
+            'px-4 py-2 rounded text-sm font-semibold transition-colors',
+            isDarkMode ? 'bg-blue-700 hover:bg-blue-600 text-white' : 'bg-blue-300 hover:bg-blue-400 text-gray-800'
+          )}
+        >Suggestions</a>
+      </div>
+      <h2 className="text-2xl font-bold my-4">Vandalism</h2>
+      <section className="mb-6 text-sm leading-relaxed">
+        <p>
+          Vandalism is the intentional damage to or defacement of property. It is generally classified as a misdemeanor, though severe cases can attract felony charges.
+        </p>
+      </section>
+    </motion.div>
+  );
+}
+
+function DetailedDisorderlyConductContent({ onBack, isDarkMode }) {
+  return (
+    <motion.div 
+      className={clsx(
+        'flex-1 w-full rounded-2xl shadow-xl p-6 overflow-y-auto',
+        isDarkMode ? 'bg-slate-800 bg-opacity-50 text-white' : 'bg-white text-gray-800'
+      )}
+      initial={{ opacity: 0, y: 50 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -50 }}
+      transition={{ duration: 0.4 }}
+    >
+      <div className="flex justify-between items-center mb-4">
+        <button 
+          onClick={onBack} 
+          className={clsx(
+            'px-4 py-2 rounded text-sm font-semibold transition-colors',
+            isDarkMode ? 'bg-gray-700 hover:bg-gray-600 text-white' : 'bg-gray-300 hover:bg-gray-400 text-gray-800'
+          )}
+        >Back to Overview</button>
+        <a 
+          href="https://cadexlaw.com/pricing" 
+          target="_blank" rel="noopener noreferrer"
+          className={clsx(
+            'px-4 py-2 rounded text-sm font-semibold transition-colors',
+            isDarkMode ? 'bg-blue-700 hover:bg-blue-600 text-white' : 'bg-blue-300 hover:bg-blue-400 text-gray-800'
+          )}
+        >Suggestions</a>
+      </div>
+      <h2 className="text-2xl font-bold my-4">Disorderly Conduct</h2>
+      <section className="mb-6 text-sm leading-relaxed">
+        <p>
+          Disorderly conduct encompasses actions that disturb public peace or order, often resulting in minor charges such as fines or brief incarceration.
+        </p>
+      </section>
+    </motion.div>
+  );
+}
+
+/* ------------------- Defenses Subcategory Views ------------------- */
+function DetailedInsanityContent({ onBack, isDarkMode }) {
+  return (
+    <motion.div 
+      className={clsx('flex-1 w-full rounded-2xl shadow-xl p-6 overflow-y-auto', 
+        isDarkMode ? 'bg-slate-800 bg-opacity-50 text-white' : 'bg-white text-gray-800'
+      )}
+      initial={{ opacity: 0, y: 50 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -50 }}
+      transition={{ duration: 0.4 }}
+    >
+      <div className="flex justify-between items-center mb-4">
+        <button 
+          onClick={onBack} 
+          className={clsx(
+            'px-4 py-2 rounded text-sm font-semibold transition-colors',
+            isDarkMode ? 'bg-gray-700 hover:bg-gray-600 text-white' : 'bg-gray-300 hover:bg-gray-400 text-gray-800'
+          )}
+        >Back to Overview</button>
+        <a 
+          href="https://cadexlaw.com/pricing" 
+          target="_blank" rel="noopener noreferrer"
+          className={clsx(
+            'px-4 py-2 rounded text-sm font-semibold transition-colors',
+            isDarkMode ? 'bg-blue-700 hover:bg-blue-600 text-white' : 'bg-blue-300 hover:bg-blue-400 text-gray-800'
+          )}
+        >Suggestions</a>
+      </div>
+      <h2 className="text-2xl font-bold my-4">Insanity</h2>
+      <section className="mb-6 text-sm leading-relaxed">
+        <p>
+          The insanity defense asserts that due to a severe mental disorder, the defendant lacked the capacity to form the intent required for a crime. It is used only when the mental state substantially impairs the defendant&apos;s ability to distinguish right from wrong.
+        </p>
+      </section>
+    </motion.div>
+  );
+}
+
+function DetailedSelfDefenseContent({ onBack, isDarkMode }) {
+  return (
+    <motion.div 
+      className={clsx('flex-1 w-full rounded-2xl shadow-xl p-6 overflow-y-auto', 
+        isDarkMode ? 'bg-slate-800 bg-opacity-50 text-white' : 'bg-white text-gray-800'
+      )}
+      initial={{ opacity: 0, y: 50 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -50 }}
+      transition={{ duration: 0.4 }}
+    >
+      <div className="flex justify-between items-center mb-4">
+        <button 
+          onClick={onBack} 
+          className={clsx(
+            'px-4 py-2 rounded text-sm font-semibold transition-colors',
+            isDarkMode ? 'bg-gray-700 hover:bg-gray-600 text-white' : 'bg-gray-300 hover:bg-gray-400 text-gray-800'
+          )}
+        >Back to Overview</button>
+        <a 
+          href="https://cadexlaw.com/pricing" 
+          target="_blank" rel="noopener noreferrer"
+          className={clsx(
+            'px-4 py-2 rounded text-sm font-semibold transition-colors',
+            isDarkMode ? 'bg-blue-700 hover:bg-blue-600 text-white' : 'bg-blue-300 hover:bg-blue-400 text-gray-800'
+          )}
+        >Suggestions</a>
+      </div>
+      <h2 className="text-2xl font-bold my-4">Self-Defense</h2>
+      <section className="mb-6 text-sm leading-relaxed">
+        <p>
+          Self-defense permits the use of reasonable force to protect oneself from an imminent threat. The force must be both necessary and proportionate to the threat faced.
+        </p>
+      </section>
+    </motion.div>
+  );
+}
+
+function DetailedDuressContent({ onBack, isDarkMode }) {
+  return (
+    <motion.div 
+      className={clsx('flex-1 w-full rounded-2xl shadow-xl p-6 overflow-y-auto', 
+        isDarkMode ? 'bg-slate-800 bg-opacity-50 text-white' : 'bg-white text-gray-800'
+      )}
+      initial={{ opacity: 0, y: 50 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -50 }}
+      transition={{ duration: 0.4 }}
+    >
+      <div className="flex justify-between items-center mb-4">
+        <button 
+          onClick={onBack} 
+          className={clsx(
+            'px-4 py-2 rounded text-sm font-semibold transition-colors',
+            isDarkMode ? 'bg-gray-700 hover:bg-gray-600 text-white' : 'bg-gray-300 hover:bg-gray-400 text-gray-800'
+          )}
+        >Back to Overview</button>
+        <a 
+          href="https://cadexlaw.com/pricing" 
+          target="_blank" rel="noopener noreferrer"
+          className={clsx(
+            'px-4 py-2 rounded text-sm font-semibold transition-colors',
+            isDarkMode ? 'bg-blue-700 hover:bg-blue-600 text-white' : 'bg-blue-300 hover:bg-blue-400 text-gray-800'
+          )}
+        >Suggestions</a>
+      </div>
+      <h2 className="text-2xl font-bold my-4">Duress</h2>
+      <section className="mb-6 text-sm leading-relaxed">
+        <p>
+          Duress is used as a defense when a defendant claims that they were compelled to commit a crime under threat or coercion that overrode their free will.
+        </p>
+      </section>
+    </motion.div>
+  );
+}
+
+function DetailedEntrapmentContent({ onBack, isDarkMode }) {
+  return (
+    <motion.div 
+      className={clsx('flex-1 w-full rounded-2xl shadow-xl p-6 overflow-y-auto', 
+        isDarkMode ? 'bg-slate-800 bg-opacity-50 text-white' : 'bg-white text-gray-800'
+      )}
+      initial={{ opacity: 0, y: 50 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -50 }}
+      transition={{ duration: 0.4 }}
+    >
+      <div className="flex justify-between items-center mb-4">
+        <button 
+          onClick={onBack} 
+          className={clsx(
+            'px-4 py-2 rounded text-sm font-semibold transition-colors',
+            isDarkMode ? 'bg-gray-700 hover:bg-gray-600 text-white' : 'bg-gray-300 hover:bg-gray-400 text-gray-800'
+          )}
+        >Back to Overview</button>
+        <a 
+          href="https://cadexlaw.com/pricing" 
+          target="_blank" rel="noopener noreferrer"
+          className={clsx(
+            'px-4 py-2 rounded text-sm font-semibold transition-colors',
+            isDarkMode ? 'bg-blue-700 hover:bg-blue-600 text-white' : 'bg-blue-300 hover:bg-blue-400 text-gray-800'
+          )}
+        >Suggestions</a>
+      </div>
+      <h2 className="text-2xl font-bold my-4">Entrapment</h2>
+      <section className="mb-6 text-sm leading-relaxed">
+        <p>
+          Entrapment occurs when law enforcement induces an otherwise law-abiding person to commit a criminal act that they would not have committed without such influence.
+        </p>
+      </section>
+    </motion.div>
+  );
+}
+
+function DetailedMistakeOfFactContent({ onBack, isDarkMode }) {
+  return (
+    <motion.div 
+      className={clsx('flex-1 w-full rounded-2xl shadow-xl p-6 overflow-y-auto', 
+         isDarkMode ? 'bg-slate-800 bg-opacity-50 text-white' : 'bg-white text-gray-800'
+      )}
+      initial={{ opacity: 0, y: 50 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -50 }}
+      transition={{ duration: 0.4 }}
+    >
+      <div className="flex justify-between items-center mb-4">
+        <button 
+          onClick={onBack} 
+          className={clsx(
+            'px-4 py-2 rounded text-sm font-semibold transition-colors',
+            isDarkMode ? 'bg-gray-700 hover:bg-gray-600 text-white' : 'bg-gray-300 hover:bg-gray-400 text-gray-800'
+          )}
+        >Back to Overview</button>
+        <a 
+          href="https://cadexlaw.com/pricing" 
+          target="_blank" rel="noopener noreferrer"
+          className={clsx(
+            'px-4 py-2 rounded text-sm font-semibold transition-colors',
+            isDarkMode ? 'bg-blue-700 hover:bg-blue-600 text-white' : 'bg-blue-300 hover:bg-blue-400 text-gray-800'
+          )}
+        >Suggestions</a>
+      </div>
+      <h2 className="text-2xl font-bold my-4">Mistake of Fact</h2>
+      <section className="mb-6 text-sm leading-relaxed">
+        <p>
+          Mistake of fact is asserted when a defendant’s honest but mistaken belief about a factual matter negates the requisite criminal intent.
+        </p>
+      </section>
+    </motion.div>
+  );
+}
+
+/* ------------------- Sentencing Subcategory Views ------------------- */
+function DetailedIncarcerationContent({ onBack, isDarkMode }) {
+  return (
+    <motion.div 
+      className={clsx('flex-1 w-full rounded-2xl shadow-xl p-6 overflow-y-auto', 
+         isDarkMode ? 'bg-slate-800 bg-opacity-50 text-white' : 'bg-white text-gray-800'
+      )}
+      initial={{ opacity: 0, y: 50 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -50 }}
+      transition={{ duration: 0.4 }}
+    >
+      <div className="flex justify-between items-center mb-4">
+        <button 
+          onClick={onBack} 
+          className={clsx(
+            'px-4 py-2 rounded text-sm font-semibold transition-colors',
+            isDarkMode ? 'bg-gray-700 hover:bg-gray-600 text-white' : 'bg-gray-300 hover:bg-gray-400 text-gray-800'
+          )}
+        >Back to Overview</button>
+        <a 
+          href="https://cadexlaw.com/pricing" 
+          target="_blank" rel="noopener noreferrer"
+          className={clsx(
+            'px-4 py-2 rounded text-sm font-semibold transition-colors',
+            isDarkMode ? 'bg-blue-700 hover:bg-blue-600 text-white' : 'bg-blue-300 hover:bg-blue-400 text-gray-800'
+          )}
+        >Suggestions</a>
+      </div>
+      <h2 className="text-2xl font-bold my-4">Incarceration</h2>
+      <section className="mb-6 text-sm leading-relaxed">
+        <p>
+          Incarceration involves confining a defendant in jail or prison as punishment for their crimes.
+        </p>
+      </section>
+    </motion.div>
+  );
+}
+
+function DetailedProbationContent({ onBack, isDarkMode }) {
+  return (
+    <motion.div 
+      className={clsx('flex-1 w-full rounded-2xl shadow-xl p-6 overflow-y-auto', 
+         isDarkMode ? 'bg-slate-800 bg-opacity-50 text-white' : 'bg-white text-gray-800'
+      )}
+      initial={{ opacity: 0, y: 50 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -50 }}
+      transition={{ duration: 0.4 }}
+    >
+      <div className="flex justify-between items-center mb-4">
+        <button 
+          onClick={onBack} 
+          className={clsx(
+            'px-4 py-2 rounded text-sm font-semibold transition-colors',
+            isDarkMode ? 'bg-gray-700 hover:bg-gray-600 text-white' : 'bg-gray-300 hover:bg-gray-400 text-gray-800'
+          )}
+        >Back to Overview</button>
+        <a 
+          href="https://cadexlaw.com/pricing" 
+          target="_blank" rel="noopener noreferrer"
+          className={clsx(
+            'px-4 py-2 rounded text-sm font-semibold transition-colors',
+            isDarkMode ? 'bg-blue-700 hover:bg-blue-600 text-white' : 'bg-blue-300 hover:bg-blue-400 text-gray-800'
+          )}
+        >Suggestions</a>
+      </div>
+      <h2 className="text-2xl font-bold my-4">Probation</h2>
+      <section className="mb-6 text-sm leading-relaxed">
+        <p>
+          Probation allows a defendant to remain in the community under strict conditions rather than being incarcerated.
+        </p>
+      </section>
+    </motion.div>
+  );
+}
+
+function DetailedFinesContent({ onBack, isDarkMode }) {
+  return (
+    <motion.div 
+      className={clsx('flex-1 w-full rounded-2xl shadow-xl p-6 overflow-y-auto', 
+         isDarkMode ? 'bg-slate-800 bg-opacity-50 text-white' : 'bg-white text-gray-800'
+      )}
+      initial={{ opacity: 0, y: 50 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -50 }}
+      transition={{ duration: 0.4 }}
+    >
+      <div className="flex justify-between items-center mb-4">
+        <button 
+          onClick={onBack} 
+          className={clsx(
+            'px-4 py-2 rounded text-sm font-semibold transition-colors',
+            isDarkMode ? 'bg-gray-700 hover:bg-gray-600 text-white' : 'bg-gray-300 hover:bg-gray-400 text-gray-800'
+          )}
+        >Back to Overview</button>
+        <a 
+          href="https://cadexlaw.com/pricing" 
+          target="_blank" rel="noopener noreferrer"
+          className={clsx(
+            'px-4 py-2 rounded text-sm font-semibold transition-colors',
+            isDarkMode ? 'bg-blue-700 hover:bg-blue-600 text-white' : 'bg-blue-300 hover:bg-blue-400 text-gray-800'
+          )}
+        >Suggestions</a>
+      </div>
+      <h2 className="text-2xl font-bold my-4">Fines</h2>
+      <section className="mb-6 text-sm leading-relaxed">
+        <p>
+          Fines are monetary penalties imposed as punishment for criminal offenses.
+        </p>
+      </section>
+    </motion.div>
+  );
+}
+
+function DetailedCommunityServiceContent({ onBack, isDarkMode }) {
+  return (
+    <motion.div 
+      className={clsx('flex-1 w-full rounded-2xl shadow-xl p-6 overflow-y-auto', 
+         isDarkMode ? 'bg-slate-800 bg-opacity-50 text-white' : 'bg-white text-gray-800'
+      )}
+      initial={{ opacity: 0, y: 50 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -50 }}
+      transition={{ duration: 0.4 }}
+    >
+      <div className="flex justify-between items-center mb-4">
+        <button 
+          onClick={onBack} 
+          className={clsx(
+            'px-4 py-2 rounded text-sm font-semibold transition-colors',
+            isDarkMode ? 'bg-gray-700 hover:bg-gray-600 text-white' : 'bg-gray-300 hover:bg-gray-400 text-gray-800'
+          )}
+        >Back to Overview</button>
+        <a 
+          href="https://cadexlaw.com/pricing" 
+          target="_blank" rel="noopener noreferrer"
+          className={clsx(
+            'px-4 py-2 rounded text-sm font-semibold transition-colors',
+            isDarkMode ? 'bg-blue-700 hover:bg-blue-600 text-white' : 'bg-blue-300 hover:bg-blue-400 text-gray-800'
+          )}
+        >Suggestions</a>
+      </div>
+      <h2 className="text-2xl font-bold my-4">Community Service</h2>
+      <section className="mb-6 text-sm leading-relaxed">
+        <p>
+          Community service requires the defendant to perform unpaid work for the benefit of the community as part of their sentence.
+        </p>
+      </section>
+    </motion.div>
+  );
+}
+
+function DetailedRestitutionContent({ onBack, isDarkMode }) {
+  return (
+    <motion.div 
+      className={clsx('flex-1 w-full rounded-2xl shadow-xl p-6 overflow-y-auto', 
+         isDarkMode ? 'bg-slate-800 bg-opacity-50 text-white' : 'bg-white text-gray-800'
+      )}
+      initial={{ opacity: 0, y: 50 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -50 }}
+      transition={{ duration: 0.4 }}
+    >
+      <div className="flex justify-between items-center mb-4">
+        <button 
+          onClick={onBack} 
+          className={clsx(
+            'px-4 py-2 rounded text-sm font-semibold transition-colors',
+            isDarkMode ? 'bg-gray-700 hover:bg-gray-600 text-white' : 'bg-gray-300 hover:bg-gray-400 text-gray-800'
+          )}
+        >Back to Overview</button>
+        <a 
+          href="https://cadexlaw.com/pricing" 
+          target="_blank" rel="noopener noreferrer"
+          className={clsx(
+            'px-4 py-2 rounded text-sm font-semibold transition-colors',
+            isDarkMode ? 'bg-blue-700 hover:bg-blue-600 text-white' : 'bg-blue-300 hover:bg-blue-400 text-gray-800'
+          )}
+        >Suggestions</a>
+      </div>
+      <h2 className="text-2xl font-bold my-4">Restitution</h2>
+      <section className="mb-6 text-sm leading-relaxed">
+        <p>
+          Restitution is designed to prevent the defendant from profiting by their wrongful conduct by requiring them to return any benefits obtained at the expense of the victim.
+        </p>
+      </section>
+    </motion.div>
+  );
+}
+
+/* ============================== Overview & Navigation ============================== */
 export default function CriminalSubjectGuide() {
   const router = useRouter();
-  const { currentUser, userDataObj } = useAuth();
+  const { userDataObj } = useAuth();
   const isDarkMode = userDataObj?.darkMode || false;
 
   const [isSidebarVisible, setIsSidebarVisible] = useState(true);
   const toggleSidebar = () => setIsSidebarVisible(!isSidebarVisible);
 
+  // "overview" is the default; currentView holds the exact subcategory (e.g., "Murder") when clicked.
   const [currentView, setCurrentView] = useState('overview');
   const [currentSlide, setCurrentSlide] = useState(0);
 
@@ -344,6 +909,7 @@ export default function CriminalSubjectGuide() {
       setCurrentSlide(currentSlide + 1);
     }
   };
+
   const handlePrevSlide = () => {
     if (currentSlide > 0) {
       setCurrentSlide(currentSlide - 1);
@@ -355,11 +921,12 @@ export default function CriminalSubjectGuide() {
 
   const TimelineProgressBar = () => (
     <div className="flex items-center mb-4">
-      <button
-        onClick={handlePrevSlide}
+      <button onClick={handlePrevSlide}
         className={clsx(
           'mr-4 p-2 rounded-full transition-colors',
-          isDarkMode ? 'bg-gray-700 hover:bg-gray-600 text-white' : 'bg-gray-300 hover:bg-gray-400 text-gray-800',
+          isDarkMode
+            ? 'bg-gray-700 hover:bg-gray-600 text-white'
+            : 'bg-gray-300 hover:bg-gray-400 text-gray-800',
           { 'opacity-50 pointer-events-none': currentSlide === 0 }
         )}
       >
@@ -389,8 +956,7 @@ export default function CriminalSubjectGuide() {
             >
               <div
                 onClick={() => { if (canJump) setCurrentSlide(index); }}
-                className={clsx(
-                  'w-3 h-3 rounded-full border-2 border-white cursor-pointer',
+                className={clsx('w-3 h-3 rounded-full border-2 border-white cursor-pointer',
                   index <= currentSlide ? 'bg-white' : 'bg-gray-400'
                 )}
                 title={slide.title}
@@ -399,11 +965,12 @@ export default function CriminalSubjectGuide() {
           );
         })}
       </div>
-      <button
-        onClick={handleNextSlide}
+      <button onClick={handleNextSlide}
         className={clsx(
           'ml-4 p-2 rounded-full transition-colors',
-          isDarkMode ? 'bg-gray-700 hover:bg-gray-600 text-white' : 'bg-gray-300 hover:bg-gray-400 text-gray-800',
+          isDarkMode
+            ? 'bg-gray-700 hover:bg-gray-600 text-white'
+            : 'bg-gray-300 hover:bg-gray-400 text-gray-800',
           { 'opacity-50 pointer-events-none': currentSlide === slides.length - 1 }
         )}
       >
@@ -412,11 +979,14 @@ export default function CriminalSubjectGuide() {
     </div>
   );
 
+  // OverviewContent now maps over the subcategory items and sets currentView when an item is clicked.
   const OverviewContent = () => (
-    <motion.div
+    <motion.div 
       className={clsx(
         'flex-1 w-full rounded-2xl shadow-xl p-6 overflow-y-auto',
-        isDarkMode ? 'bg-slate-800 bg-opacity-50 text-white' : 'bg-white text-gray-800'
+        isDarkMode 
+          ? 'bg-slate-800 bg-opacity-50 text-white'
+          : 'bg-white text-gray-800'
       )}
       initial={{ opacity: 0, y: 50 }}
       animate={{ opacity: 1, y: 0 }}
@@ -425,13 +995,13 @@ export default function CriminalSubjectGuide() {
       <TimelineProgressBar />
       <div className="space-y-4 leading-relaxed">
         <p>
-          Welcome to the <strong>Criminal Law</strong> Subject Guide! This resource highlights major doctrines, key cases, and practical tools to help you master each area of criminal law: felonies, misdemeanors, defenses, and sentencing.
+          Welcome to the <strong>Criminal Law</strong> Subject Guide! This resource highlights major doctrines, key cases, and practical tools to help you master criminal law subtopics: Felonies, Misdemeanors, Defenses, and Sentencing.
         </p>
         <ul className="list-disc ml-6">
           {slides[currentSlide].items.map((item, idx) => (
-            <li
+            <li 
               key={idx}
-              onClick={() => setCurrentView(slides[currentSlide].title)}
+              onClick={() => setCurrentView(item)}
               className="cursor-pointer hover:underline text-blue-400"
             >
               {item}
@@ -439,7 +1009,7 @@ export default function CriminalSubjectGuide() {
           ))}
         </ul>
         <p className="mt-8">
-          Each slide covers a distinct area of criminal law. Explore interactive quizzes, scenario builders, and case analysis to deepen your understanding.
+          Each slide covers a distinct area of criminal law. Explore interactive quizzes, scenario builders, and case analyses to deepen your understanding.
         </p>
         <StaticFeatures isDarkMode={isDarkMode} />
       </div>
@@ -448,25 +1018,46 @@ export default function CriminalSubjectGuide() {
 
   const renderContent = () => {
     if (currentView === 'overview') return <OverviewContent />;
-    if (currentView === 'Felonies')
-      return <DetailedFelonies onBack={() => setCurrentView('overview')} isDarkMode={isDarkMode} />;
-    if (currentView === 'Misdemeanors')
-      return <DetailedMisdemeanors onBack={() => setCurrentView('overview')} isDarkMode={isDarkMode} />;
-    if (currentView === 'Defenses')
-      return <DetailedDefenses onBack={() => setCurrentView('overview')} isDarkMode={isDarkMode} />;
-    if (currentView === 'Sentencing')
-      return <DetailedSentencing onBack={() => setCurrentView('overview')} isDarkMode={isDarkMode} />;
+
+    // Felonies
+    if (currentView === 'Murder') return <DetailedMurderContent onBack={() => setCurrentView('overview')} isDarkMode={isDarkMode} />;
+    if (currentView === 'Rape') return <DetailedRapeContent onBack={() => setCurrentView('overview')} isDarkMode={isDarkMode} />;
+    if (currentView === 'Robbery') return <DetailedRobberyContent onBack={() => setCurrentView('overview')} isDarkMode={isDarkMode} />;
+    if (currentView === 'Arson') return <DetailedArsonContent onBack={() => setCurrentView('overview')} isDarkMode={isDarkMode} />;
+    if (currentView === 'Kidnapping') return <DetailedKidnappingContent onBack={() => setCurrentView('overview')} isDarkMode={isDarkMode} />;
+
+    // Misdemeanors
+    if (currentView === 'Petty Theft') return <DetailedPettyTheftContent onBack={() => setCurrentView('overview')} isDarkMode={isDarkMode} />;
+    if (currentView === 'Public Intoxication') return <DetailedPublicIntoxicationContent onBack={() => setCurrentView('overview')} isDarkMode={isDarkMode} />;
+    if (currentView === 'Vandalism') return <DetailedVandalismContent onBack={() => setCurrentView('overview')} isDarkMode={isDarkMode} />;
+    if (currentView === 'Disorderly Conduct') return <DetailedDisorderlyConductContent onBack={() => setCurrentView('overview')} isDarkMode={isDarkMode} />;
+
+    // Defenses
+    if (currentView === 'Insanity') return <DetailedInsanityContent onBack={() => setCurrentView('overview')} isDarkMode={isDarkMode} />;
+    if (currentView === 'Self-Defense') return <DetailedSelfDefenseContent onBack={() => setCurrentView('overview')} isDarkMode={isDarkMode} />;
+    if (currentView === 'Duress') return <DetailedDuressContent onBack={() => setCurrentView('overview')} isDarkMode={isDarkMode} />;
+    if (currentView === 'Entrapment') return <DetailedEntrapmentContent onBack={() => setCurrentView('overview')} isDarkMode={isDarkMode} />;
+    if (currentView === 'Mistake of Fact') return <DetailedMistakeOfFactContent onBack={() => setCurrentView('overview')} isDarkMode={isDarkMode} />;
+
+    // Sentencing
+    if (currentView === 'Incarceration') return <DetailedIncarcerationContent onBack={() => setCurrentView('overview')} isDarkMode={isDarkMode} />;
+    if (currentView === 'Probation') return <DetailedProbationContent onBack={() => setCurrentView('overview')} isDarkMode={isDarkMode} />;
+    if (currentView === 'Fines') return <DetailedFinesContent onBack={() => setCurrentView('overview')} isDarkMode={isDarkMode} />;
+    if (currentView === 'Community Service') return <DetailedCommunityServiceContent onBack={() => setCurrentView('overview')} isDarkMode={isDarkMode} />;
+    if (currentView === 'Restitution') return <DetailedRestitutionContent onBack={() => setCurrentView('overview')} isDarkMode={isDarkMode} />;
     return <OverviewContent />;
   };
 
   return (
-    <div className={clsx('relative flex h-screen transition-colors duration-500', isDarkMode ? 'text-white' : 'text-gray-800')}>
+    <div className={clsx('relative flex h-screen transition-colors duration-500',
+      isDarkMode ? 'text-white' : 'text-gray-800'
+    )}>
       <AnimatePresence>
         {isSidebarVisible && (
           <>
-            <Sidebar activeLink="/subjects/criminal" isSidebarVisible={isSidebarVisible} toggleSidebar={toggleSidebar} isDarkMode={isDarkMode} />
-            <motion.div
-              className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
+            <Sidebar activeLink="/subjects/criminal" isSidebarVisible={isSidebarVisible}
+              toggleSidebar={toggleSidebar} isDarkMode={isDarkMode} />
+            <motion.div className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
               initial={{ opacity: 0 }}
               animate={{ opacity: 0.5 }}
               exit={{ opacity: 0 }}

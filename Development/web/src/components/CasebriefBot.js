@@ -124,7 +124,7 @@ export default function CaseChatbot({
                 <FaTimes className="text-gray-600 dark:text-gray-300" />
               </button>
             </div>
-            <p className="text-gray-500 italic text-xs">
+            <p className="text-gray-500 italic text-xs mt-2">
               This feature is currently in beta and subject to ongoing enhancements.
             </p>
           </div>

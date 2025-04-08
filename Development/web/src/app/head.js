@@ -35,7 +35,7 @@ function SEOHead() {
       />
       <meta
         name="keywords"
-        content="Cadex, CadexLaw, law student study aid, legal simulation, court simulation, Quimbee, legal practice, LSAT prep, legal education, mock trials, courtroom training, legal training, bar exam prep, legal scenarios, legal technology, AI legal simulations, online law courses, virtual courtroom, legal tech, legal case simulations, law simulation software, realistic court cases, legal industry innovation, advanced legal training, legal research, case studies, interactive legal practice, exam prep, legal study resources, legal analysis, legal reasoning, legal interactive tools"
+        content="Cadex, CadexLaw, law student study aid, legal simulation, court simulation, Quimbee, legal practice, LSAT prep, legal education, mock trials, courtroom training, legal training, bar exam prep, legal scenarios, legal technology, legal simulations, online law courses, virtual courtroom, legal tech, legal case simulations, law simulation software, realistic court cases, legal industry innovation, advanced legal training, legal research, case studies, interactive legal practice, exam prep, legal study resources, legal analysis, legal reasoning, legal interactive tools"
       />
       <meta property="og:title" content="CadexLaw - Law Student Study Aid, Legal Simulation, Court Case Practice" />
       <meta

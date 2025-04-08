@@ -56,260 +56,7 @@ function CaseCards({ collectionName, isDarkMode }) {
   );
 }
 
-function DetailedJudicialReview({ onBack, isDarkMode }) {
-  return (
-    <motion.div
-      className={clsx(
-        'flex-1 w-full rounded-2xl shadow-xl p-6 overflow-y-auto',
-        isDarkMode ? 'bg-slate-800 bg-opacity-50 text-white' : 'bg-white text-gray-800'
-      )}
-      initial={{ opacity: 0, y: 50 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -50 }}
-      transition={{ duration: 0.4 }}
-    >
-      <div className="flex justify-between items-center mb-4">
-        <button 
-          onClick={onBack} 
-          className={clsx(
-            'px-4 py-2 rounded text-sm font-semibold transition-colors',
-            isDarkMode ? 'bg-gray-700 hover:bg-gray-600 text-white' : 'bg-gray-300 hover:bg-gray-400 text-gray-800'
-          )}
-        >
-          Back to Overview
-        </button>
-        <a 
-          href="https://cadexlaw.com/pricing" 
-          target="_blank" 
-          rel="noopener noreferrer"
-          className={clsx(
-            'px-4 py-2 rounded text-sm font-semibold transition-colors',
-            isDarkMode ? 'bg-blue-700 hover:bg-blue-600 text-white' : 'bg-blue-300 hover:bg-blue-400 text-gray-800'
-          )}
-        >
-          Suggestions
-        </a>
-      </div>
-      <h2 className="text-2xl font-bold my-4">Judicial Review</h2>
-      <section className="mb-6 space-y-2 text-sm leading-relaxed">
-        <p>
-          Judicial review is the power of the courts to examine legislative and executive actions and determine whether they comply with the Constitution. Landmark cases, such as Marbury v. Madison, established this essential principle.
-        </p>
-        <p>
-          <strong>Constitutional Interpretation:</strong> Methods include originalism, textualism, and the living Constitution approach.
-        </p>
-        <p>
-          <strong>Checks and Balances:</strong> Judicial review acts as a check on the other branches.
-        </p>
-      </section>
-      <section className="mb-6">
-        <h3 className="text-xl font-semibold">Case Examples</h3>
-        <CaseCards collectionName="capCases" isDarkMode={isDarkMode} />
-      </section>
-      <section className="mb-6 space-y-2 text-sm leading-relaxed">
-        <h3 className="text-xl font-semibold">Practice Tools & Features</h3>
-        <ul className="list-disc ml-6">
-          <li>Interactive Flowchart: Map the process of judicial review.</li>
-          <li>Quiz: Test your understanding of key cases and doctrines.</li>
-          <li>Practice Scenarios: Analyze hypothetical constitutional challenges.</li>
-        </ul>
-      </section>
-    </motion.div>
-  );
-}
-
-function DetailedSeparationOfPowers({ onBack, isDarkMode }) {
-  return (
-    <motion.div
-      className={clsx(
-        'flex-1 w-full rounded-2xl shadow-xl p-6 overflow-y-auto',
-        isDarkMode ? 'bg-slate-800 bg-opacity-50 text-white' : 'bg-white text-gray-800'
-      )}
-      initial={{ opacity: 0, y: 50 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -50 }}
-      transition={{ duration: 0.4 }}
-    >
-      <div className="flex justify-between items-center mb-4">
-        <button 
-          onClick={onBack} 
-          className={clsx(
-            'px-4 py-2 rounded text-sm font-semibold transition-colors',
-            isDarkMode ? 'bg-gray-700 hover:bg-gray-600 text-white' : 'bg-gray-300 hover:bg-gray-400 text-gray-800'
-          )}
-        >
-          Back to Overview
-        </button>
-        <a 
-          href="https://cadexlaw.com/pricing" 
-          target="_blank" 
-          rel="noopener noreferrer"
-          className={clsx(
-            'px-4 py-2 rounded text-sm font-semibold transition-colors',
-            isDarkMode ? 'bg-blue-700 hover:bg-blue-600 text-white' : 'bg-blue-300 hover:bg-blue-400 text-gray-800'
-          )}
-        >
-          Suggestions
-        </a>
-      </div>
-      <h2 className="text-2xl font-bold my-4">Separation of Powers</h2>
-      <section className="mb-6 space-y-2 text-sm leading-relaxed">
-        <p>
-          The Constitution divides government into three branches—legislative, executive, and judicial—to ensure that no single branch becomes too powerful.
-        </p>
-        <p>
-          <strong>Legislative:</strong> Responsible for making laws.
-        </p>
-        <p>
-          <strong>Executive:</strong> Implements and enforces laws.
-        </p>
-        <p>
-          <strong>Judicial:</strong> Interprets laws and resolves disputes.
-        </p>
-      </section>
-      <section className="mb-6">
-        <h3 className="text-xl font-semibold">Case Examples</h3>
-        <CaseCards collectionName="capCases" isDarkMode={isDarkMode} />
-      </section>
-      <section className="mb-6 space-y-2 text-sm leading-relaxed">
-        <h3 className="text-xl font-semibold">Practice Tools & Features</h3>
-        <ul className="list-disc ml-6">
-          <li>Interactive Diagram: Visualize the roles of the three branches.</li>
-          <li>Quiz: Test your knowledge on checks and balances.</li>
-          <li>Case Analysis: Review landmark cases on the division of governmental power.</li>
-        </ul>
-      </section>
-    </motion.div>
-  );
-}
-
-function DetailedFederalism({ onBack, isDarkMode }) {
-  return (
-    <motion.div
-      className={clsx(
-        'flex-1 w-full rounded-2xl shadow-xl p-6 overflow-y-auto',
-        isDarkMode ? 'bg-slate-800 bg-opacity-50 text-white' : 'bg-white text-gray-800'
-      )}
-      initial={{ opacity: 0, y: 50 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -50 }}
-      transition={{ duration: 0.4 }}
-    >
-      <div className="flex justify-between items-center mb-4">
-        <button 
-          onClick={onBack} 
-          className={clsx(
-            'px-4 py-2 rounded text-sm font-semibold transition-colors',
-            isDarkMode ? 'bg-gray-700 hover:bg-gray-600 text-white' : 'bg-gray-300 hover:bg-gray-400 text-gray-800'
-          )}
-        >
-          Back to Overview
-        </button>
-        <a 
-          href="https://cadexlaw.com/pricing" 
-          target="_blank" 
-          rel="noopener noreferrer"
-          className={clsx(
-            'px-4 py-2 rounded text-sm font-semibold transition-colors',
-            isDarkMode ? 'bg-blue-700 hover:bg-blue-600 text-white' : 'bg-blue-300 hover:bg-blue-400 text-gray-800'
-          )}
-        >
-          Suggestions
-        </a>
-      </div>
-      <h2 className="text-2xl font-bold my-4">Federalism</h2>
-      <section className="mb-6 space-y-2 text-sm leading-relaxed">
-        <p>
-          Federalism divides power between the national government and the states. The Constitution specifies federal authority while reserving other powers for the states.
-        </p>
-        <p>
-          <strong>Supremacy Clause:</strong> Establishes that federal law is the supreme law of the land.
-        </p>
-        <p>
-          <strong>Tenth Amendment:</strong> Reserves undelegated powers for the states.
-        </p>
-      </section>
-      <section className="mb-6">
-        <h3 className="text-xl font-semibold">Case Examples</h3>
-        <CaseCards collectionName="capCases" isDarkMode={isDarkMode} />
-      </section>
-      <section className="mb-6 space-y-2 text-sm leading-relaxed">
-        <h3 className="text-xl font-semibold">Practice Tools & Features</h3>
-        <ul className="list-disc ml-6">
-          <li>Flowchart: Outline the division of powers in a federal system.</li>
-          <li>Quiz: Test your understanding of federal versus state authority.</li>
-          <li>Scenario Builder: Analyze hypothetical federalism disputes.</li>
-        </ul>
-      </section>
-    </motion.div>
-  );
-}
-
-function DetailedIndividualRights({ onBack, isDarkMode }) {
-  return (
-    <motion.div
-      className={clsx(
-        'flex-1 w-full rounded-2xl shadow-xl p-6 overflow-y-auto',
-        isDarkMode ? 'bg-slate-800 bg-opacity-50 text-white' : 'bg-white text-gray-800'
-      )}
-      initial={{ opacity: 0, y: 50 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -50 }}
-      transition={{ duration: 0.4 }}
-    >
-      <div className="flex justify-between items-center mb-4">
-        <button 
-          onClick={onBack} 
-          className={clsx(
-            'px-4 py-2 rounded text-sm font-semibold transition-colors',
-            isDarkMode ? 'bg-gray-700 hover:bg-gray-600 text-white' : 'bg-gray-300 hover:bg-gray-400 text-gray-800'
-          )}
-        >
-          Back to Overview
-        </button>
-        <a 
-          href="https://cadexlaw.com/pricing" 
-          target="_blank" 
-          rel="noopener noreferrer"
-          className={clsx(
-            'px-4 py-2 rounded text-sm font-semibold transition-colors',
-            isDarkMode ? 'bg-blue-700 hover:bg-blue-600 text-white' : 'bg-blue-300 hover:bg-blue-400 text-gray-800'
-          )}
-        >
-          Suggestions
-        </a>
-      </div>
-      <h2 className="text-2xl font-bold my-4">Individual Rights</h2>
-      <section className="mb-6 space-y-2 text-sm leading-relaxed">
-        <p>
-          Individual rights protect citizens from government overreach. These rights, such as freedom of speech and due process, are enshrined in the Constitution.
-        </p>
-        <p>
-          <strong>First Amendment:</strong> Protects freedoms of speech, religion, assembly, and the press.
-        </p>
-        <p>
-          <strong>Due Process:</strong> Guarantees fair legal procedures.
-        </p>
-        <p>
-          <strong>Equal Protection:</strong> Ensures equal treatment under the law.
-        </p>
-      </section>
-      <section className="mb-6">
-        <h3 className="text-xl font-semibold">Case Examples</h3>
-        <CaseCards collectionName="capCases" isDarkMode={isDarkMode} />
-      </section>
-      <section className="mb-6 space-y-2 text-sm leading-relaxed">
-        <h3 className="text-xl font-semibold">Practice Tools & Features</h3>
-        <ul className="list-disc ml-6">
-          <li>Interactive Timeline: Review landmark individual rights cases.</li>
-          <li>Quiz: Test your understanding of constitutional protections.</li>
-          <li>Case Analyzer: Evaluate hypothetical scenarios involving individual rights.</li>
-        </ul>
-      </section>
-    </motion.div>
-  );
-}
-
+/* -------------------- StaticFeatures Component -------------------- */
 function StaticFeatures({ isDarkMode }) {
   return (
     <section className="mt-6">
@@ -356,6 +103,231 @@ function StaticFeatures({ isDarkMode }) {
   );
 }
 
+/* -------------------- Detailed Subcategory Components -------------------- */
+
+/* Judicial Review */
+function DetailedJudicialReview({ onBack, isDarkMode }) {
+  return (
+    <motion.div 
+      className={clsx('flex-1 w-full rounded-2xl shadow-xl p-6 overflow-y-auto',
+        isDarkMode ? 'bg-slate-800 bg-opacity-50 text-white' : 'bg-white text-gray-800'
+      )}
+      initial={{ opacity: 0, y: 50 }} animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -50 }} transition={{ duration: 0.4 }}
+    >
+      <div className="flex justify-between items-center mb-4">
+        <button 
+          onClick={onBack} 
+          className={clsx('px-4 py-2 rounded text-sm font-semibold transition-colors',
+            isDarkMode ? 'bg-gray-700 hover:bg-gray-600 text-white'
+                      : 'bg-gray-300 hover:bg-gray-400 text-gray-800'
+          )}
+        >Back to Overview</button>
+        <a 
+          href="https://cadexlaw.com/pricing" target="_blank" rel="noopener noreferrer"
+          className={clsx('px-4 py-2 rounded text-sm font-semibold transition-colors',
+            isDarkMode ? 'bg-blue-700 hover:bg-blue-600 text-white'
+                      : 'bg-blue-300 hover:bg-blue-400 text-gray-800'
+          )}
+        >Suggestions</a>
+      </div>
+      <h2 className="text-2xl font-bold my-4">Judicial Review</h2>
+      <section className="mb-6 space-y-2 text-sm leading-relaxed">
+        <p>
+          Judicial review is the power of the courts to examine legislative and executive actions for constitutionality. Landmark cases like <strong>Marbury v. Madison</strong> established this principle.
+        </p>
+        <p>
+          <strong>Constitutional Interpretation:</strong> Approaches include originalism, textualism, and the living Constitution method.
+        </p>
+        <p>
+          <strong>Checks and Balances:</strong> Judicial review acts as an essential check on the powers of the legislative and executive branches.
+        </p>
+      </section>
+      <section className="mb-6">
+        <h3 className="text-xl font-semibold">Case Examples</h3>
+        <CaseCards collectionName="capCases" isDarkMode={isDarkMode} />
+      </section>
+      <section className="mb-6 space-y-2 text-sm leading-relaxed">
+        <h3 className="text-xl font-semibold">Practice Tools & Features</h3>
+        <ul className="list-disc ml-6">
+          <li>Interactive Flowchart: Map the process of judicial review.</li>
+          <li>Quiz: Test your understanding of landmark constitutional cases.</li>
+          <li>Practice Scenarios: Analyze hypothetical constitutional challenges.</li>
+        </ul>
+      </section>
+    </motion.div>
+  );
+}
+
+/* Separation of Powers */
+function DetailedSeparationOfPowers({ onBack, isDarkMode }) {
+  return (
+    <motion.div 
+      className={clsx('flex-1 w-full rounded-2xl shadow-xl p-6 overflow-y-auto',
+        isDarkMode ? 'bg-slate-800 bg-opacity-50 text-white' : 'bg-white text-gray-800'
+      )}
+      initial={{ opacity: 0, y: 50 }} animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -50 }} transition={{ duration: 0.4 }}
+    >
+      <div className="flex justify-between items-center mb-4">
+        <button 
+          onClick={onBack} 
+          className={clsx('px-4 py-2 rounded text-sm font-semibold transition-colors',
+            isDarkMode ? 'bg-gray-700 hover:bg-gray-600 text-white'
+                      : 'bg-gray-300 hover:bg-gray-400 text-gray-800'
+          )}
+        >Back to Overview</button>
+        <a 
+          href="https://cadexlaw.com/pricing" target="_blank" rel="noopener noreferrer"
+          className={clsx('px-4 py-2 rounded text-sm font-semibold transition-colors',
+            isDarkMode ? 'bg-blue-700 hover:bg-blue-600 text-white'
+                      : 'bg-blue-300 hover:bg-blue-400 text-gray-800'
+          )}
+        >Suggestions</a>
+      </div>
+      <h2 className="text-2xl font-bold my-4">Separation of Powers</h2>
+      <section className="mb-6 space-y-2 text-sm leading-relaxed">
+        <p>
+          The Constitution divides government into three branches—legislative, executive, and judicial—to prevent any single branch from amassing too much power.
+        </p>
+        <p>
+          <strong>Legislative:</strong> The branch responsible for enacting laws.
+        </p>
+        <p>
+          <strong>Executive:</strong> The branch tasked with enforcing laws.
+        </p>
+        <p>
+          <strong>Judicial:</strong> The branch interpreting laws and resolving disputes.
+        </p>
+      </section>
+      <section className="mb-6">
+        <h3 className="text-xl font-semibold">Case Examples</h3>
+        <CaseCards collectionName="capCases" isDarkMode={isDarkMode} />
+      </section>
+      <section className="mb-6 space-y-2 text-sm leading-relaxed">
+        <h3 className="text-xl font-semibold">Practice Tools & Features</h3>
+        <ul className="list-disc ml-6">
+          <li>Interactive Diagram: Visualize the roles of the three branches.</li>
+          <li>Quiz: Test your understanding of checks and balances.</li>
+          <li>Case Analysis: Review landmark separation of powers cases.</li>
+        </ul>
+      </section>
+    </motion.div>
+  );
+}
+
+/* Federalism */
+function DetailedFederalism({ onBack, isDarkMode }) {
+  return (
+    <motion.div 
+      className={clsx('flex-1 w-full rounded-2xl shadow-xl p-6 overflow-y-auto',
+        isDarkMode ? 'bg-slate-800 bg-opacity-50 text-white' : 'bg-white text-gray-800'
+      )}
+      initial={{ opacity: 0, y: 50 }} animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -50 }} transition={{ duration: 0.4 }}
+    >
+      <div className="flex justify-between items-center mb-4">
+        <button 
+          onClick={onBack} 
+          className={clsx('px-4 py-2 rounded text-sm font-semibold transition-colors',
+            isDarkMode ? 'bg-gray-700 hover:bg-gray-600 text-white'
+                      : 'bg-gray-300 hover:bg-gray-400 text-gray-800'
+          )}
+        >Back to Overview</button>
+        <a 
+          href="https://cadexlaw.com/pricing" target="_blank" rel="noopener noreferrer"
+          className={clsx('px-4 py-2 rounded text-sm font-semibold transition-colors',
+            isDarkMode ? 'bg-blue-700 hover:bg-blue-600 text-white'
+                      : 'bg-blue-300 hover:bg-blue-400 text-gray-800'
+          )}
+        >Suggestions</a>
+      </div>
+      <h2 className="text-2xl font-bold my-4">Federalism</h2>
+      <section className="mb-6 space-y-2 text-sm leading-relaxed">
+        <p>
+          Federalism divides power between the national government and the states. The Constitution delineates federal authority while reserving all other powers to the states.
+        </p>
+        <p>
+          <strong>Supremacy Clause:</strong> Establishes that federal law is the supreme law of the land.
+        </p>
+        <p>
+          <strong>Tenth Amendment:</strong> Reserves undelegated powers to the states.
+        </p>
+      </section>
+      <section className="mb-6">
+        <h3 className="text-xl font-semibold">Case Examples</h3>
+        <CaseCards collectionName="capCases" isDarkMode={isDarkMode} />
+      </section>
+      <section className="mb-6 space-y-2 text-sm leading-relaxed">
+        <h3 className="text-xl font-semibold">Practice Tools & Features</h3>
+        <ul className="list-disc ml-6">
+          <li>Flowchart: Outline federal vs. state powers.</li>
+          <li>Quiz: Test your knowledge of constitutional allocation of power.</li>
+          <li>Scenario Builder: Analyze hypothetical federalism issues.</li>
+        </ul>
+      </section>
+    </motion.div>
+  );
+}
+
+/* Individual Rights */
+function DetailedIndividualRights({ onBack, isDarkMode }) {
+  return (
+    <motion.div 
+      className={clsx('flex-1 w-full rounded-2xl shadow-xl p-6 overflow-y-auto',
+        isDarkMode ? 'bg-slate-800 bg-opacity-50 text-white' : 'bg-white text-gray-800'
+      )}
+      initial={{ opacity: 0, y: 50 }} animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -50 }} transition={{ duration: 0.4 }}
+    >
+      <div className="flex justify-between items-center mb-4">
+        <button 
+          onClick={onBack} 
+          className={clsx('px-4 py-2 rounded text-sm font-semibold transition-colors',
+            isDarkMode ? 'bg-gray-700 hover:bg-gray-600 text-white'
+                      : 'bg-gray-300 hover:bg-gray-400 text-gray-800'
+          )}
+        >Back to Overview</button>
+        <a 
+          href="https://cadexlaw.com/pricing" target="_blank" rel="noopener noreferrer"
+          className={clsx('px-4 py-2 rounded text-sm font-semibold transition-colors',
+            isDarkMode ? 'bg-blue-700 hover:bg-blue-600 text-white'
+                      : 'bg-blue-300 hover:bg-blue-400 text-gray-800'
+          )}
+        >Suggestions</a>
+      </div>
+      <h2 className="text-2xl font-bold my-4">Individual Rights</h2>
+      <section className="mb-6 space-y-2 text-sm leading-relaxed">
+        <p>
+          Individual rights, as protected by the Constitution, safeguard citizens against government overreach. These rights include freedom of speech, due process, and equal protection.
+        </p>
+        <p>
+          <strong>First Amendment:</strong> Protects freedom of expression and religion.
+        </p>
+        <p>
+          <strong>Due Process:</strong> Guarantees fair legal procedures.
+        </p>
+        <p>
+          <strong>Equal Protection:</strong> Ensures that no person is denied equal protection under the law.
+        </p>
+      </section>
+      <section className="mb-6">
+        <h3 className="text-xl font-semibold">Case Examples</h3>
+        <CaseCards collectionName="capCases" isDarkMode={isDarkMode} />
+      </section>
+      <section className="mb-6 space-y-2 text-sm leading-relaxed">
+        <h3 className="text-xl font-semibold">Practice Tools & Features</h3>
+        <ul className="list-disc ml-6">
+          <li>Interactive Timeline: Review landmark cases on individual rights.</li>
+          <li>Quiz: Test your understanding of constitutional protections.</li>
+          <li>Case Analyzer: Explore hypothetical scenarios involving individual rights.</li>
+        </ul>
+      </section>
+    </motion.div>
+  );
+}
+
+/* ============================== Overview & Navigation ============================== */
 export default function ConstitutionalSubjectGuide() {
   const router = useRouter();
   const { currentUser, userDataObj } = useAuth();
@@ -364,6 +336,7 @@ export default function ConstitutionalSubjectGuide() {
   const [isSidebarVisible, setIsSidebarVisible] = useState(true);
   const toggleSidebar = () => setIsSidebarVisible(!isSidebarVisible);
 
+  // "overview" is the default; currentView will be set to a specific subcategory when an item is clicked.
   const [currentView, setCurrentView] = useState('overview');
   const [currentSlide, setCurrentSlide] = useState(0);
 
@@ -387,11 +360,12 @@ export default function ConstitutionalSubjectGuide() {
 
   const TimelineProgressBar = () => (
     <div className="flex items-center mb-4">
-      <button
-        onClick={handlePrevSlide}
+      <button onClick={handlePrevSlide}
         className={clsx(
           'mr-4 p-2 rounded-full transition-colors',
-          isDarkMode ? 'bg-gray-700 hover:bg-gray-600 text-white' : 'bg-gray-300 hover:bg-gray-400 text-gray-800',
+          isDarkMode
+            ? 'bg-gray-700 hover:bg-gray-600 text-white'
+            : 'bg-gray-300 hover:bg-gray-400 text-gray-800',
           { 'opacity-50 pointer-events-none': currentSlide === 0 }
         )}
       >
@@ -431,11 +405,12 @@ export default function ConstitutionalSubjectGuide() {
           );
         })}
       </div>
-      <button
-        onClick={handleNextSlide}
+      <button onClick={handleNextSlide}
         className={clsx(
           'ml-4 p-2 rounded-full transition-colors',
-          isDarkMode ? 'bg-gray-700 hover:bg-gray-600 text-white' : 'bg-gray-300 hover:bg-gray-400 text-gray-800',
+          isDarkMode
+            ? 'bg-gray-700 hover:bg-gray-600 text-white'
+            : 'bg-gray-300 hover:bg-gray-400 text-gray-800',
           { 'opacity-50 pointer-events-none': currentSlide === slides.length - 1 }
         )}
       >
@@ -444,11 +419,15 @@ export default function ConstitutionalSubjectGuide() {
     </div>
   );
 
+  // OverviewContent displays the list of items for the current slide.
+  // (For this implementation, clicking any item sets the current view to the slide title.)
   const OverviewContent = () => (
-    <motion.div
+    <motion.div 
       className={clsx(
         'flex-1 w-full rounded-2xl shadow-xl p-6 overflow-y-auto',
-        isDarkMode ? 'bg-slate-800 bg-opacity-50 text-white' : 'bg-white text-gray-800'
+        isDarkMode
+          ? 'bg-slate-800 bg-opacity-50 text-white'
+          : 'bg-white text-gray-800'
       )}
       initial={{ opacity: 0, y: 50 }}
       animate={{ opacity: 1, y: 0 }}
@@ -457,11 +436,11 @@ export default function ConstitutionalSubjectGuide() {
       <TimelineProgressBar />
       <div className="space-y-4 leading-relaxed">
         <p>
-          Welcome to the <strong>Constitutional Law</strong> Subject Guide! This resource highlights major doctrines, key cases, and practical tools to help you master each area of constitutional law: judicial review, separation of powers, federalism, and individual rights.
+          Welcome to the <strong>Constitutional Law</strong> Subject Guide! This resource highlights major doctrines, key cases, and practical tools to help you master constitutional law topics: Judicial Review, Separation of Powers, Federalism, and Individual Rights.
         </p>
         <ul className="list-disc ml-6">
           {slides[currentSlide].items.map((item, idx) => (
-            <li
+            <li 
               key={idx}
               onClick={() => setCurrentView(slides[currentSlide].title)}
               className="cursor-pointer hover:underline text-blue-400"
@@ -471,7 +450,7 @@ export default function ConstitutionalSubjectGuide() {
           ))}
         </ul>
         <p className="mt-8">
-          Each slide covers a distinct area of constitutional law. Explore interactive quizzes, scenario builders, and case analysis to deepen your understanding.
+          Each slide covers a distinct area of constitutional law. Explore interactive quizzes, scenario builders, and case analyses to deepen your understanding.
         </p>
         <StaticFeatures isDarkMode={isDarkMode} />
       </div>
@@ -497,7 +476,7 @@ export default function ConstitutionalSubjectGuide() {
         {isSidebarVisible && (
           <>
             <Sidebar activeLink="/subjects/constitutional" isSidebarVisible={isSidebarVisible} toggleSidebar={toggleSidebar} isDarkMode={isDarkMode} />
-            <motion.div
+            <motion.div 
               className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
               initial={{ opacity: 0 }}
               animate={{ opacity: 0.5 }}
