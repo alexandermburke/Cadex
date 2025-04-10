@@ -1019,7 +1019,7 @@ export default function AllBriefs() {
                           Verified
                         </span>
                       ) : (
-                        <span className="verified-by text-gray-400 text-sm">Case Brief Verified</span>
+                        <span className="verified-by text-gray-400 text-sm">Verified</span>
                       )}
                       {isVerified ? (
                         <motion.div
