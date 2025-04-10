@@ -7,27 +7,22 @@ export async function POST(request) {
   console.log('Received request for citation generation.');
 
   try {
-    // Parse the JSON body and extract the necessary details.
-    const { title, date, jurisdiction } = await request.json();
+    const { title, date } = await request.json();
     
-    // Validate input: all three fields are required.
     if (
       !title || typeof title !== 'string' || !title.trim() ||
-      !date || typeof date !== 'string' || !date.trim() ||
-      !jurisdiction || typeof jurisdiction !== 'string' || !jurisdiction.trim()
+      !date || typeof date !== 'string' || !date.trim()
     ) {
-      console.warn('Invalid input: title, date, and jurisdiction are required.');
+      console.warn('Invalid input: title and date are required.');
       return NextResponse.json(
-        { error: 'Invalid input. Provide a non-empty title, date, and jurisdiction.' },
+        { error: 'Invalid input. Provide a non-empty title and date.' },
         { status: 400 }
       );
     }
 
     const cleanTitle = title.trim();
     const cleanDate = date.trim();
-    const cleanJurisdiction = jurisdiction.trim();
 
-    // Prepare a prompt instructing the AI to return only the reporter citation.
     const promptContent = `
 Based on the following case details, generate only the reporter citation string,
 which should include the volume number, reporter abbreviation, and page number.
@@ -37,7 +32,6 @@ or isn't publicly available, the answer must be "N/A"
 Case Details:
 Title: "${cleanTitle}"
 Date: "${cleanDate}"
-Jurisdiction: "${cleanJurisdiction}"
 
 Return your answer strictly in JSON format with a single key:
 {
