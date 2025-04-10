@@ -503,7 +503,7 @@ export default function Account() {
               <div>
                 <h4 className="text-xl font-semibold">Version 0.9.0</h4>
                 <ul className="list-disc list-inside space-y-1">
-                  <li>Advanced AI-driven legal analysis engine implemented for deeper case insights.</li>
+                  <li>Advanced legal analysis engine implemented for deeper case insights.</li>
                   <li>Integrated multiple legal databases to enhance resource indexing.</li>
                   <li>Introduced interactive case timeline visualizations.</li>
                   <li>Revamped UI with modern design elements and responsive layouts.</li>
@@ -536,7 +536,7 @@ export default function Account() {
                 <ul className="list-disc list-inside space-y-1">
                   <li>Introduced interactive study notes and collaborative features for users.</li>
                   <li>Optimized data fetching performance to accelerate legal content loading times.</li>
-                  <li>Laid the groundwork for future AI-driven legal research enhancements.</li>
+                  <li>Laid the groundwork for future legal research enhancements.</li>
                   <li>Incorporated early user feedback to enhance UI responsiveness and stability.</li>
                 </ul>
               </div>

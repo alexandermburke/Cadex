@@ -107,9 +107,9 @@ export default function Hero() {
       icon: (
         <FaGavel className={`${isDarkMode ? 'text-white' : 'text-blue-950'} text-4xl mb-4`} />
       ),
-      title: '5,000+ Case Briefs',
+      title: '20,000+ Case Briefs',
       description:
-        'Explore our detailed database of case briefs, summaries, and analyses to learn essential rulings quickly.',
+        'Explore our detailed database of case briefs, add any existing case brief in a few seconds.',
     },
     {
       icon: (

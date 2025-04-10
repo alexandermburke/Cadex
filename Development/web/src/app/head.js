@@ -31,7 +31,7 @@ function SEOHead() {
       <title>CadexLaw - Law Student Study Aid, Legal Simulation, Court Case Practice</title>
       <meta
         name="description"
-        content="CadexLaw is an innovative, AI-powered legal simulation platform tailored for law students and legal professionals. Experience realistic court scenarios, interactive mock trials, comprehensive legal training, LSAT preparation, case studies, advanced legal research tools, exam prep, and a rich library of legal resources to elevate your legal education and practice."
+        content="CadexLaw is an innovative, legal simulation platform tailored for law students and legal professionals. Experience realistic court scenarios, interactive mock trials, comprehensive legal training, LSAT preparation, case studies, advanced legal research tools, exam prep, and a rich library of legal resources to elevate your legal education and practice."
       />
       <meta
         name="keywords"
@@ -59,7 +59,7 @@ function SEOHead() {
       <meta itemProp="name" content="CadexLaw - Law Student Study Aid, Legal Simulation, Court Case Practice" />
       <meta
         itemProp="description"
-        content="CadexLaw is an innovative legal simulation platform offering AI-powered, realistic court scenarios, interactive mock trials, LSAT prep, and a comprehensive suite of legal study resources for law students and professionals."
+        content="CadexLaw is an innovative law school platform offering Case Briefs, interactive mock trials, Exam prep, and a comprehensive suite of legal study resources for law students and professionals."
       />
       <meta itemProp="image" content="https://www.cadexlaw.com/images/og-image.jpg" />
       <script type="application/ld+json">
@@ -69,7 +69,7 @@ function SEOHead() {
             "@type": "WebSite",
             "name": "CadexLaw",
             "url": "https://www.cadexlaw.com",
-            "description": "CadexLaw is an AI-powered legal simulation platform offering realistic court cases, interactive mock trials, comprehensive legal training tools, exam prep, and a rich library of legal resources designed for law students and professionals.",
+            "description": "CadexLaw is an innovative law school platform offering Case Briefs, interactive mock trials, Exam prep, and a comprehensive suite of legal study resources for law students and professionals.",
             "publisher": {
               "@type": "Organization",
               "name": "CadexLaw",

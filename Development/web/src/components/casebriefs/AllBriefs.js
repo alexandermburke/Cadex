@@ -53,8 +53,9 @@ export default function AllBriefs() {
   const [sortBy, setSortBy] = useState('');
   const [showGotoInput, setShowGotoInput] = useState(false);
   const [gotoValue, setGotoValue] = useState('');
+  // Create New Case Brief Section States
   const [newBriefTitle, setNewBriefTitle] = useState('');
-  const [newBriefJurisdiction, setNewBriefJurisdiction] = useState('');
+  // Removed newBriefJurisdiction state since we replace it with citation
   const [newBriefDate, setNewBriefDate] = useState('');
   const [newBriefCitation, setNewBriefCitation] = useState('');
   const [verificationReply, setVerificationReply] = useState('');
@@ -71,7 +72,8 @@ export default function AllBriefs() {
       const payload = {
         title: c.title,
         date: c.decisionDate || '',
-        jurisdiction: c.jurisdiction,
+        // No jurisdiction field used here as citation is preferred
+        citation: c.citation,
       };
       const res = await fetch('/api/casebrief-citation', {
         method: 'POST',
@@ -305,7 +307,8 @@ export default function AllBriefs() {
       const payload = {
         title: c.title,
         date: c.decisionDate || '',
-        jurisdiction: c.jurisdiction,
+        // Use citation instead of jurisdiction
+        citation: c.citation,
         docId: c.id
       };
       const res = await fetch('/api/casebrief-summary', {
@@ -331,7 +334,8 @@ export default function AllBriefs() {
           briefSummary: data,
           caseTitle: c.title,
           decisionDate: c.decisionDate,
-          jurisdiction: c.jurisdiction,
+          // Pass citation instead of jurisdiction
+          citation: c.citation,
         }),
       });
       const verifyData = await verifyRes.json();
@@ -374,7 +378,8 @@ export default function AllBriefs() {
               briefSummary: c.briefSummary,
               caseTitle: c.title,
               decisionDate: c.decisionDate,
-              jurisdiction: c.jurisdiction,
+              // Pass citation here as well
+              citation: c.citation,
             }),
           });
           const verifyData = await verifyRes.json();
@@ -399,7 +404,8 @@ export default function AllBriefs() {
       const payload = {
         title: c.title,
         date: c.decisionDate || '',
-        jurisdiction: c.jurisdiction,
+        // Use citation instead of jurisdiction
+        citation: c.citation,
         docId: c.id
       };
       const res = await fetch('/api/casebrief-summary', {
@@ -434,7 +440,8 @@ export default function AllBriefs() {
             briefSummary: data,
             caseTitle: c.title,
             decisionDate: c.decisionDate,
-            jurisdiction: c.jurisdiction,
+            // Use citation here as well
+            citation: c.citation,
           }),
         });
         const verifyData = await verifyRes.json();
@@ -473,14 +480,8 @@ export default function AllBriefs() {
     e.preventDefault();
     setCreateError('');
     setVerificationReply('');
-    const existingCase = capCases.find(
-      (c) => c.title?.toLowerCase() === newBriefTitle.trim().toLowerCase()
-    );
-    if (existingCase) {
-      setCreateError('A case with this title already exists in the database.');
-      return;
-    }
-    if (!newBriefTitle.trim() || !newBriefJurisdiction.trim() || !newBriefDate.trim()) {
+    // Remove jurisdiction check; require Title, Year, and Citation instead.
+    if (!newBriefTitle.trim() || !newBriefDate.trim() || !newBriefCitation.trim()) {
       setCreateError('Please fill in all fields.');
       return;
     }
@@ -489,7 +490,8 @@ export default function AllBriefs() {
       const payload = {
         title: newBriefTitle,
         date: newBriefDate,
-        jurisdiction: newBriefJurisdiction,
+        // Use citation field here instead of jurisdiction
+        citation: newBriefCitation.trim() || 'N/A',
       };
       const summaryRes = await fetch('/api/casebrief-summary', {
         method: 'POST',
@@ -510,7 +512,8 @@ export default function AllBriefs() {
             briefSummary: summaryData,
             caseTitle: newBriefTitle,
             decisionDate: newBriefDate,
-            jurisdiction: newBriefJurisdiction,
+            // Pass citation here
+            citation: newBriefCitation.trim() || 'N/A',
           }),
         });
         const verifyData = await verifyRes.json();
@@ -525,16 +528,17 @@ export default function AllBriefs() {
       }
 
       const correctedTitle = summaryData.corrections?.title || newBriefTitle;
-      const correctedJurisdiction = summaryData.corrections?.jurisdiction || newBriefJurisdiction;
+      // Removed corrected jurisdiction and use citation instead.
+      const correctedCitation = summaryData.corrections?.citation || newBriefCitation;
       const correctedDate = summaryData.corrections?.date || newBriefDate;
 
       const newCase = {
         title: correctedTitle,
-        jurisdiction: correctedJurisdiction,
         decisionDate: correctedDate,
         volume: '',
         content: '',
-        citation: newBriefCitation.trim() || 'N/A',
+        // Use the citation field value
+        citation: correctedCitation.trim() || 'N/A',
         briefSummary: { ...summaryData, verified: false },
         caseNumber: generateCaseNumber(),
       };
@@ -542,7 +546,7 @@ export default function AllBriefs() {
       alert('New case brief created successfully.');
       setCapCases([...capCases, { id: docRef.id, ...newCase }]);
       setNewBriefTitle('');
-      setNewBriefJurisdiction('');
+      // Removed setNewBriefJurisdiction since it is no longer used.
       setNewBriefDate('');
       setNewBriefCitation('');
       setActiveTab('browse');
@@ -741,20 +745,7 @@ export default function AllBriefs() {
                         placeholder="Enter case title"
                       />
                     </div>
-                    <div className="mb-4">
-                      <label className="block text-sm font-semibold mb-1">Jurisdiction</label>
-                      <input
-                        type="text"
-                        value={newBriefJurisdiction}
-                        onChange={(e) => setNewBriefJurisdiction(e.target.value)}
-                        className={`w-full px-3 py-2 border rounded-md ${
-                          isDarkMode
-                            ? 'bg-slate-700 text-white border-slate-600 placeholder-gray-300'
-                            : 'bg-white text-gray-800 border-gray-300'
-                        }`}
-                        placeholder="Enter jurisdiction"
-                      />
-                    </div>
+                    {/* Removed the Jurisdiction field */}
                     <div className="mb-4">
                       <label className="block text-sm font-semibold mb-1">Year</label>
                       <input
@@ -783,7 +774,7 @@ export default function AllBriefs() {
                             ? 'bg-slate-700 text-white border-slate-600 placeholder-gray-300'
                             : 'bg-white text-gray-800 border-gray-300'
                         }`}
-                        placeholder="Enter case citation (optional)"
+                        placeholder="Enter case citation"
                       />
                     </div>
                     {createError && (

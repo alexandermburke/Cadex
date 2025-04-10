@@ -44,7 +44,7 @@ export default function FAQ() {
               What study tools do you offer?
             </h2>
             <p className="text-sm sm:text-base text-gray-100">
-              We provide case summaries, flashcards, outlines, and AI-enhanced exam prep.
+              We provide case summaries, flashcards, outlines, and enhanced exam prep.
               Our resource library expands continuously to meet the evolving needs of law
               students.
             </p>

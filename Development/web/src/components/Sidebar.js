@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
+import { IoInfiniteOutline } from 'react-icons/io5';
 import {
   FaLock,
   FaBookOpen,
@@ -33,7 +34,7 @@ import {
   FaCog,
   FaCode,
   FaBars,
-  FaTimes
+  FaTimes,
 } from 'react-icons/fa';
 import { motion } from 'framer-motion';
 import clsx from 'clsx';
@@ -213,11 +214,9 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, i
         </button>
       </div>
       <div className="p-6 flex items-center justify-center bg-opacity-20">
-        <h1 className="text-4xl sm:text-5xl bg-white bg-clip-text text-transparent drop-shadow-lg">
-          Dashboard
-        </h1>
+        <IoInfiniteOutline className="text-7xl sm:text-7xl drop-shadow-lg" />
       </div>
-      <section className="my-4 px-6">
+      <section className=" px-6">
         <div className="relative flex items-center justify-center">
           <div
             className={clsx(

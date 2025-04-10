@@ -94,12 +94,11 @@ Constraints/Instructions:
 
     if (parsed.events.length < 8) {
       return NextResponse.json(
-        { error: 'Fewer than 8 events returned by AI.', rawContent },
+        { error: 'Fewer than 8 events returned.', rawContent },
         { status: 500 }
       );
     }
 
-    // Final success response with the AI-generated events
     return NextResponse.json(parsed, { status: 200 });
   } catch (error) {
     console.error('Error in AI event generation:', error);
