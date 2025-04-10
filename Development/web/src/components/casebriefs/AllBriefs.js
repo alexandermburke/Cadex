@@ -1016,10 +1016,10 @@ export default function AllBriefs() {
                     <div className="flex items-center text-xs mt-1">
                       {isExpert ? (
                         <span className="verified-by text-gray-400 text-sm">
-                          Verified by <span className="verified-by goldSolid font-semibold">LExAPI 4.0</span> (Beta)
+                          Verified
                         </span>
                       ) : (
-                        <span className="verified-by text-gray-400 text-sm">Verified by LExAPI 3.0</span>
+                        <span className="verified-by text-gray-400 text-sm">Case Brief Verified</span>
                       )}
                       {isVerified ? (
                         <motion.div
