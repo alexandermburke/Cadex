@@ -4,7 +4,7 @@ import Main from '@/components/Main'
 import React from 'react'
 
 export const metadata = {
-    title: "CadexLaw.com ⋅ Exam",
+    title: "CadexLaw.com ⋅ Exam Prep",
     icons: '/favicon.png'
 };
 

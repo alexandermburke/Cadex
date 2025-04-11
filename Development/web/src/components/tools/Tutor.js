@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { db } from '@/firebase';
 import { doc, collection, addDoc, getDocs, deleteDoc, query, where } from 'firebase/firestore';
 import { useAuth } from '@/context/AuthContext';
-import { FaSave, FaSyncAlt, FaBars, FaTimes } from 'react-icons/fa';
+import { FaSave, FaSyncAlt, FaBars, FaTimes, FaChevronDown } from 'react-icons/fa';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const studyMapping = {
@@ -350,10 +350,7 @@ export default function AiTutor() {
           <p className="text-gray-700 mb-4">
             Please <a href="/login" className="text-blue-900 underline">log in</a> to use the AI Law Tutor.
           </p>
-          <button
-            onClick={() => router.push('/login')}
-            className="px-4 py-2 bg-blue-900 text-white rounded hover:bg-blue-700"
-          >
+          <button onClick={() => router.push('/login')} className="px-4 py-2 bg-blue-900 text-white rounded hover:bg-blue-700">
             Go to Login
           </button>
         </div>
@@ -363,8 +360,8 @@ export default function AiTutor() {
 
   const handleConfigChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setTutorConfig((prevConfig) => ({
-      ...prevConfig,
+    setTutorConfig((prev) => ({
+      ...prev,
       [name]: type === 'checkbox' ? checked : value,
     }));
   };
@@ -378,12 +375,10 @@ export default function AiTutor() {
   const closeLoadProgressModal = () => setIsLoadProgressModalOpen(false);
   const openFinalFeedbackModal = () => setIsFinalFeedbackModalOpen(true);
   const closeFinalFeedbackModal = () => setIsFinalFeedbackModalOpen(false);
-
   const handleStartTutoringSession = () => {
     closeConfigModal();
     handleGetQuestion();
   };
-
   const handleGetQuestion = async () => {
     setIsLoading(true);
     setIsCommunicating(true);
@@ -413,7 +408,6 @@ export default function AiTutor() {
       setIsCommunicating(false);
     }
   };
-
   const handleSubmitAnswer = async () => {
     if (!inputText.trim()) return;
     setIsLoading(true);
@@ -459,7 +453,6 @@ export default function AiTutor() {
       setIsCommunicating(false);
     }
   };
-
   const handleSaveProgress = async () => {
     if (!currentUser) {
       alert('You need to be logged in to save your progress.');
@@ -483,7 +476,6 @@ export default function AiTutor() {
       alert('An error occurred while saving your progress.');
     }
   };
-
   const fetchSavedProgresses = async () => {
     if (!currentUser) {
       alert('You need to be logged in to load your progress.');
@@ -502,7 +494,6 @@ export default function AiTutor() {
       alert('Error fetching saved progresses.');
     }
   };
-
   const handleLoadProgress = (progress) => {
     if (!studyMapping[progress.tutorConfig.studyYear]) {
       alert(`Invalid studyYear "${progress.tutorConfig.studyYear}" in saved progress. Resetting to default.`);
@@ -519,7 +510,6 @@ export default function AiTutor() {
     setHighlightedSections([]);
     closeLoadProgressModal();
   };
-
   const handleDeleteProgress = async (id) => {
     if (!currentUser) {
       alert('You need to be logged in to delete your progress.');
@@ -533,40 +523,23 @@ export default function AiTutor() {
       alert('An error occurred while deleting progress.');
     }
   };
-
   const isProUser = userDataObj?.billing?.plan === 'Pro' || userDataObj?.billing?.plan === 'Developer';
   const showHighlights = tutorConfig.liveMode || answerResult;
   const highlightedReasons = highlightedSections
     .filter((s) => s.highlight && s.reason && s.reason !== 'Not crucial')
     .map((s) => ({ text: s.text, reason: s.reason }));
-
   return (
-    <div className="flex h-screen bg-transparent rounded shadow-md z-[150] relative">
+    <div className="flex h-screen bg-transparent rounded z-[150] relative">
       <AnimatePresence>
         {isSidebarVisible && (
           <>
-            <Sidebar
-              activeLink="/ailawtools/lexapi"
-              isSidebarVisible={isSidebarVisible}
-              toggleSidebar={toggleSidebar}
-              isDarkMode={isDarkMode}
-            />
-            <motion.div
-              className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 0.5 }}
-              exit={{ opacity: 0 }}
-              onClick={toggleSidebar}
-            />
+            <Sidebar activeLink="/ailawtools/lexapi" isSidebarVisible={isSidebarVisible} toggleSidebar={toggleSidebar} isDarkMode={isDarkMode} />
+            <motion.div className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden" initial={{ opacity: 0 }} animate={{ opacity: 0.5 }} exit={{ opacity: 0 }} onClick={toggleSidebar} />
           </>
         )}
       </AnimatePresence>
       <div className="absolute top-6 left-4 z-[100] md:hidden">
-        <button
-          onClick={toggleSidebar}
-          className={clsx('text-blue-900 dark:text-white p-2 rounded transition-colors hover:bg-black/10 focus:outline-none')}
-          aria-label={isSidebarVisible ? 'Hide Sidebar' : 'Show Sidebar'}
-        >
+        <button onClick={toggleSidebar} className={clsx('text-blue-900 dark:text-white p-2 rounded transition-colors hover:bg-black/10 focus:outline-none')} aria-label={isSidebarVisible ? 'Hide Sidebar' : 'Show Sidebar'}>
           <AnimatePresence mode="wait" initial={false}>
             {isSidebarVisible ? (
               <motion.div key="close-icon" initial={{ rotate: 90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: -90, opacity: 0 }} transition={{ duration: 0.3 }}>
@@ -580,284 +553,269 @@ export default function AiTutor() {
           </AnimatePresence>
         </button>
       </div>
+      <div className="absolute top-6 right-[5%] z-[100] flex flex-col items-center gap-2">
+        <div className="flex flex-col items-center">
+          <motion.button onClick={openLoadProgressModal} whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }} className="p-3 rounded-full bg-gradient-to-r from-blue-600 to-blue-800 text-white transition-all duration-200 shadow-lg" aria-label="Load Progress">
+            <FaSyncAlt size={20} />
+          </motion.button>
+          <span className="text-xs mt-1 dark:text-gray-300">Load</span>
+        </div>
+        <div className="flex flex-col items-center">
+          <motion.button onClick={openConfigModal} whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }} className="p-3 rounded-full bg-gradient-to-r from-blue-600 to-blue-800 text-white transition-all duration-200 shadow-lg" aria-label="Configure Tutor">
+            <FaChevronDown size={20} />
+          </motion.button>
+          <span className="text-xs mt-1 dark:text-gray-300">Config</span>
+        </div>
+      </div>
       <main className="flex-1 flex flex-col items-center justify-center px-6 relative z-200 h-screen">
-        <motion.div className={`flex-1 w-full rounded-2xl shadow-xl p-6 overflow-y-auto ${isDarkMode ? 'bg-slate-800 bg-opacity-50 text-white' : 'bg-white text-gray-800'} flex flex-col items-center justify-center`}>
-          <div className="w-full max-w-5xl flex flex-col items-center gap-4 mb-10">
-            <div className="inline-flex flex-row items-center gap-4">
-              <button
-                onClick={openLoadProgressModal}
-                className="relative h-10 sm:h-12 w-28 sm:w-40 overflow-hidden rounded bg-blue-700 text-white shadow-lg transition-colors duration-200"
-                aria-label="Load Progress"
-              >
-                Load Progress
-              </button>
-              <button
-                onClick={openConfigModal}
-                className="relative h-10 sm:h-12 w-28 sm:w-40 overflow-hidden rounded bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white shadow-lg transition-colors duration-200"
-                aria-label="Configure AI Tutor"
-              >
-                Configure
-              </button>
-            </div>
-          </div>
-          {isSessionActive && (
-            <div className="w-full max-w-5xl mb-4 p-4 bg-white bg-opacity-20 backdrop-blur-md rounded-lg shadow-md flex flex-col items-center">
-              <span className="text-white mb-2">Questions Answered: {currentQuestionCount} / {tutorConfig.questionLimit}</span>
-              <span className="px-3 py-1 rounded-full text-sm font-semibold uppercase bg-blue-500 text-white">
-                {isProUser ? 'Pro User' : 'Base User'}
-              </span>
+        <motion.div className={clsx('flex-1 w-full rounded-2xl shadow-xl p-6 overflow-y-auto', isDarkMode ? 'bg-slate-800 bg-opacity-50 text-white' : 'bg-white text-gray-800', 'flex flex-col items-center justify-center')}>
+          <AnimatePresence>
+            {!isSessionActive && (
+              <motion.div className="relative w-full h-64 sm:h-80 md:h-96 mb-6 flex items-center justify-center" initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.5 }} transition={{ duration: 0.3 }}>
+                <canvas ref={visualizerCanvas} className="absolute top-0 left-0 w-full h-full rounded" aria-label="Background Animation Canvas" />
+                <div className="absolute inset-0 flex flex-col items-center justify-center">
+                  {!questionStem && !questionText && (
+            <div className="w-full max-w-5xl p-6 bg-white bg-opacity-50 dark:bg-slate-800 backdrop-blur-md rounded-lg shadow-md text-center">
+              <p className="text-slate-700 dark:text-white mb-4">Click <span className="font-semibold">&quot;Config&quot;</span> to start.</p>
+              <p className="text-slate-700 dark:text-gray-400 text-sm">
+                <strong>Note:</strong> This Exam Prep Tool helps you practice law school concepts, offers structured feedback, and references key principles or statutes.
+                It’s not a substitute for professional legal advice.
+              </p>
             </div>
           )}
-          <div className="w-full max-w-5xl flex flex-col items-center">
-            <AnimatePresence>
-              {!isSessionActive && (
-                <motion.div className="relative w-full h-64 sm:h-80 md:h-96 mb-6 flex items-center justify-center" initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.5 }} transition={{ duration: 0.3 }}>
-                  <canvas ref={visualizerCanvas} className="absolute top-0 left-0 w-full h-full rounded" aria-label="Background Animation Canvas" />
-                  <div className="absolute inset-0 flex flex-col items-center justify-center">
-                    <textarea className="w-48 sm:w-64 h-14 bg-transparent text-center p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-white font-semibold text-4xl" value={isCommunicating ? 'AI is communicating...' : 'LExAPI'} readOnly aria-label="AI Communication Status" style={{ resize: 'none' }} />
-                    <small className="text-gray-300 italic">Version 3.0</small>
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-            <div className="w-full max-w-5xl mb-6">
-              <textarea className="w-full h-48 p-4 rounded resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-200 text-white bg-transparent" value={answerResult || ''} readOnly aria-label="AI Feedback" style={{ resize: 'none' }} />
-            </div>
-            {questionStem && (
-              <div className="w-full max-w-5xl mb-6 p-6 bg-white bg-opacity-20 backdrop-blur-md rounded-lg shadow-md overflow-y-scroll text-center">
-                <h3 className="text-2xl font-semibold text-white mb-2">Law Question</h3>
-                <h3 className="text-sm font-medium text-gray-200 mb-1">LExAPI</h3>
-                <small className="text-gray-300 italic">Version 3.0</small>
-                <div className="text-gray-100 mb-4 whitespace-pre-wrap">
-                  {showHighlights && highlightedSections?.length
-                    ? highlightedSections.map((section, idx) =>
-                        section.highlight ? (
-                          <motion.span key={idx} style={{ backgroundColor: `hsla(${tutorConfig.highlightHue}, 100%, 50%, ${tutorConfig.highlightOpacity})`, display: 'inline-block', transformOrigin: 'left center' }} title={section.reason} initial={{ scaleX: 0 }} animate={{ scaleX: 1 }} transition={{ duration: 1 }}>
-                            {section.text}
-                          </motion.span>
-                        ) : (
-                          <span key={idx}>{section.text}</span>
-                        )
-                      )
-                    : questionStem}
                 </div>
-                {showHighlights && highlightedReasons.length > 0 && (
-                  <div className="mt-4 p-4 bg-gray-900 bg-opacity-50 rounded">
-                    <h4 className="text-lg text-blue-300 font-semibold mb-2">Why These Areas Are Highlighted</h4>
-                    <ul className="list-disc list-inside text-gray-200">
-                      {highlightedReasons.map((hr, i) => (
-                        <li key={i}>
-                          <span className="font-semibold">&quot;{hr.text.trim()}&quot;</span>: {hr.reason}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-              </div>
-            )}
-            {questionStem && currentQuestionCount < tutorConfig.questionLimit && (
-              <div className="w-full max-w-5xl mb-6 text-center">
-                {!answerResult && (
-                  <textarea className={`w-full p-4 border ${isDarkMode ? 'border-gray-600 bg-gray-700 text-white' : 'border-gray-300 bg-white text-gray-800'} rounded resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-200`} value={inputText} onChange={(e) => setInputText(e.target.value)} placeholder="Enter your answer here..." rows={6} disabled={isLoading} aria-label="Answer Input" />
-                )}
-                <div className="flex flex-col items-center gap-4 mt-4">
-                  {!answerResult ? (
-                    <button onClick={handleSubmitAnswer} className={`flex-1 px-4 py-3 rounded font-semibold text-white transition-colors duration-200 shadow-lg ${isLoading || !inputText.trim() ? 'bg-gray-500 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'}`} disabled={isLoading || !inputText.trim()} aria-label="Submit Answer">
-                      {isLoading ? 'Submitting...' : 'Submit Answer'}
-                    </button>
-                  ) : (
-                    <button onClick={handleGetQuestion} className="flex-1 px-4 py-3 rounded font-semibold text-white bg-blue-600 hover:bg-blue-700 transition-colors duration-200 shadow-lg" disabled={isLoading} aria-label="Continue to Next Question">
-                      {isLoading ? 'Loading...' : 'Continue'}
-                    </button>
-                  )}
-                  <div className="flex flex-row gap-4">
-                    <button onClick={handleSaveProgress} className="flex items-center justify-center px-4 py-3 bg-transparent text-blue-300 rounded font-semibold duration-200 hover:text-blue-500" disabled={!currentUser} aria-label="Save Progress">
-                      <motion.div whileHover={{ scale: 1.2, rotate: 360 }} transition={{ duration: 0.5 }}>
-                        <FaSave size={24} />
-                      </motion.div>
-                    </button>
-                    <button onClick={handleGetQuestion} className="flex items-center justify-center px-4 py-3 bg-transparent text-blue-300 rounded font-semibold duration-200 hover:text-blue-500" disabled={isLoading} aria-label="Generate New Question">
-                      <motion.div whileHover={{ scale: 1.2, rotate: -360 }} transition={{ duration: 0.5 }}>
-                        <FaSyncAlt size={24} />
-                      </motion.div>
-                    </button>
-                  </div>
-                </div>
-              </div>
-            )}
-            {!questionStem && !questionText && (
-              <div className="w-full max-w-5xl p-6 bg-white bg-opacity-20 backdrop-blur-md rounded-lg shadow-md text-center">
-                <p className="text-gray-200 mb-4">Click <span className="font-semibold">Configure AI Tutor</span> to start.</p>
-                <p className="text-gray-400 text-sm">
-                  <strong>Note:</strong> This AI Tutor helps you practice law school concepts, offers structured feedback, and references key principles or statutes.
-                  It’s not a substitute for professional legal advice.
-                </p>
-              </div>
-            )}
-            {isConfigModalOpen && (
-              <motion.div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-70 z-50" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-                <motion.div className="bg-gray-800 p-8 rounded-lg w-11/12 max-w-md shadow-lg overflow-y-auto max-h-screen" initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.8, opacity: 0 }} transition={{ duration: 0.3 }}>
-                  <h2 className="text-2xl font-semibold text-white mb-6">Configure AI Tutor</h2>
-                  <form>
-                    <div className="mb-4">
-                      <label className="block text-gray-300 mb-2">Custom Prompt / Topic (Optional):</label>
-                      <input type="text" name="userPrompt" value={tutorConfig.userPrompt} onChange={handleConfigChange} placeholder="e.g. 'Negligence in Torts' or 'Offer & Acceptance'" className="w-full p-3 border border-gray-500 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-200 bg-gray-700 text-white" aria-label="Custom Prompt" />
-                    </div>
-                    <div className="mb-4">
-                      <label className="block text-gray-300 mb-2">Law School Year:</label>
-                      <select name="studyYear" value={tutorConfig.studyYear} onChange={handleConfigChange} className="w-full p-3 border border-gray-500 rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500" aria-label="Select Law School Year">
-                        {Object.keys(studyMapping).map((year) => (
-                          <option key={year} value={year}>
-                            {year}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                    <div className="mb-4">
-                      <label className="block text-gray-300 mb-2">Course:</label>
-                      <select name="course" value={tutorConfig.course} onChange={handleConfigChange} className="w-full p-3 border border-gray-500 rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500" aria-label="Select Course">
-                        {topicOptions.map((t, idx) => (
-                          <option key={idx} value={t.value}>
-                            {t.label}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                    <div className="mb-4">
-                      <label className="block text-gray-300 mb-2">Sub-Topic:</label>
-                      <select name="subTopic" value={tutorConfig.subTopic} onChange={handleConfigChange} className="w-full p-3 border border-gray-500 rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500" aria-label="Select Sub-topic">
-                        {subTopicOptions.map((sub, idx) => (
-                          <option key={idx} value={sub.value}>
-                            {sub.label}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                    <div className="mb-4">
-                      <label className="block text-gray-300 mb-2">Complexity Level:</label>
-                      <select name="complexity" value={tutorConfig.complexity} onChange={handleConfigChange} className="w-full p-3 border border-gray-500 rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500" aria-label="Select Complexity">
-                        {complexityOptions.map((opt) => (
-                          <option key={opt.value} value={opt.value}>
-                            {opt.label}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                    <div className="mb-4">
-                      <label className="block text-gray-300 mb-2 font-semibold">Additional Aids for Law Students:</label>
-                      <div className="flex items-center mb-2">
-                        <input type="checkbox" id="showLegalReferences" name="showLegalReferences" checked={tutorConfig.showLegalReferences} onChange={handleConfigChange} className="h-5 w-5 text-blue-500 focus:ring-blue-500 border-gray-300 rounded" />
-                        <label htmlFor="showLegalReferences" className="ml-3 text-gray-300">Show references to relevant legal principles</label>
-                      </div>
-                      <div className="flex items-center mb-2">
-                        <input type="checkbox" id="provideApproach" name="provideApproach" checked={tutorConfig.provideApproach} onChange={handleConfigChange} className="h-5 w-5 text-blue-500 focus:ring-blue-500 border-gray-300 rounded" />
-                        <label htmlFor="provideApproach" className="ml-3 text-gray-300">Provide a structured approach to solving the problem</label>
-                      </div>
-                      <div className="flex items-center mb-2">
-                        <input type="checkbox" id="includeKeyCases" name="includeKeyCases" checked={tutorConfig.includeKeyCases} onChange={handleConfigChange} className="h-5 w-5 text-blue-500 focus:ring-blue-500 border-gray-300 rounded" />
-                        <label htmlFor="includeKeyCases" className="ml-3 text-gray-300">Include references to key cases</label>
-                      </div>
-                      <div className="flex items-center mb-2">
-                        <input type="checkbox" id="includeStatutes" name="includeStatutes" checked={tutorConfig.includeStatutes} onChange={handleConfigChange} className="h-5 w-5 text-blue-500 focus:ring-blue-500 border-gray-300 rounded" />
-                        <label htmlFor="includeStatutes" className="ml-3 text-gray-300">Include relevant statutes or code sections</label>
-                      </div>
-                      <div className="flex items-center mb-2">
-                        <input type="checkbox" id="liveMode" name="liveMode" checked={tutorConfig.liveMode} onChange={handleConfigChange} className="h-5 w-5 text-blue-500 focus:ring-blue-500 border-gray-300 rounded" />
-                        <label htmlFor="liveMode" className="ml-3 text-gray-300">Live Mode (Show highlights before answering)</label>
-                      </div>
-                    </div>
-                    <div className="mb-6">
-                      <label className="block text-gray-300 mb-2">Highlight Color Hue:</label>
-                      <div className="flex items-center space-x-4">
-                        <input type="range" min="0" max="360" value={tutorConfig.highlightHue} onChange={(e) => setTutorConfig((prev) => ({ ...prev, highlightHue: parseInt(e.target.value, 10) }))} className="h-2 w-full bg-blue-400 rounded-lg appearance-none cursor-pointer" />
-                        <div className="w-10 h-10 rounded" style={{ backgroundColor: `hsl(${tutorConfig.highlightHue}, 100%, 50%)` }} />
-                      </div>
-                      <p className="text-sm mt-2 text-gray-300">Adjust the hue to change the highlight color (default is neon yellow).</p>
-                    </div>
-                    <div className="mb-6">
-                      <label className="block text-gray-300 mb-2">Number of Questions per Session:</label>
-                      <div className="flex items-center">
-                        <input type="range" min="1" max="20" value={tutorConfig.questionLimit} onChange={(e) => setTutorConfig((prev) => ({ ...prev, questionLimit: parseInt(e.target.value, 10) }))} className="w-full h-2 bg-blue-400 rounded-lg appearance-none cursor-pointer" aria-label="Set Number of Questions" />
-                        <span className="ml-4 text-gray-300">{tutorConfig.questionLimit}</span>
-                      </div>
-                    </div>
-                    <div className="flex justify-end space-x-4">
-                      <button type="button" onClick={handleStartTutoringSession} className="relative h-12 w-full sm:w-56 overflow-hidden rounded bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white shadow-lg transition-colors duration-200" aria-label="Start Tutoring Session">
-                        Start Tutoring
-                      </button>
-                      <button type="button" onClick={closeConfigModal} className="px-6 py-3 bg-gray-600 text-gray-200 rounded hover:bg-gray-700 transition-colors duration-200" aria-label="Cancel Configuration">
-                        Cancel
-                      </button>
-                    </div>
-                  </form>
-                </motion.div>
               </motion.div>
             )}
-            {isFinalFeedbackModalOpen && (
-              <motion.div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-70 z-50 overflow-y-auto" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-                <motion.div className="bg-gray-800 p-8 rounded-lg w-11/12 max-w-3xl shadow-lg max-h-[80vh] overflow-y-auto" initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.8, opacity: 0 }} transition={{ duration: 0.3 }}>
-                  <h2 className="text-2xl font-semibold text-white mb-6">Session Feedback</h2>
-                  <ul className="space-y-4">
-                    {answeredQuestions.map((item, idx) => (
-                      <li key={idx} className="p-4 border border-gray-700 rounded">
-                        <p className="font-semibold text-blue-300">Question {idx + 1}:</p>
-                        <p className="text-gray-200 mb-2">{item.question}</p>
-                        <p className="text-gray-200 mb-1"><span className="font-semibold">Your Answer:</span> {item.answer}</p>
-                        <p className="text-gray-200 mb-1"><span className="font-semibold">Feedback:</span> {item.feedback}</p>
-                        <p className={`font-semibold ${item.correct ? 'text-emerald-400' : 'text-red-400'}`}>{item.correct ? 'Correct ✅' : 'Incorrect ❌'}</p>
+            
+          </AnimatePresence>
+          <div className="w-full max-w-5xl mb-6">
+            <textarea className="w-full h-48 p-4 rounded resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-200 text-white bg-transparent" value={answerResult || ''} readOnly aria-label="AI Feedback" style={{ resize: 'none' }} />
+          </div>
+          {questionStem && (
+            <div className="w-full max-w-5xl mb-6 p-6 bg-white bg-opacity-20 backdrop-blur-md rounded-lg shadow-md overflow-y-scroll text-center">
+              <h3 className="text-2xl font-semibold text-white mb-2">Law Question</h3>
+              <h3 className="text-sm font-medium text-gray-200 mb-1">LExAPI</h3>
+              <small className="text-gray-300 italic">Version 3.0</small>
+              <div className="text-gray-100 mb-4 whitespace-pre-wrap">
+                {showHighlights && highlightedSections?.length
+                  ? highlightedSections.map((section, idx) =>
+                      section.highlight ? (
+                        <motion.span key={idx} style={{ backgroundColor: `hsla(${tutorConfig.highlightHue}, 100%, 50%, ${tutorConfig.highlightOpacity})`, display: 'inline-block', transformOrigin: 'left center' }} title={section.reason} initial={{ scaleX: 0 }} animate={{ scaleX: 1 }} transition={{ duration: 1 }}>
+                          {section.text}
+                        </motion.span>
+                      ) : (
+                        <span key={idx}>{section.text}</span>
+                      )
+                    )
+                  : questionStem}
+              </div>
+              {showHighlights && highlightedReasons.length > 0 && (
+                <div className="mt-4 p-4 bg-gray-900 bg-opacity-50 rounded">
+                  <h4 className="text-lg text-blue-300 font-semibold mb-2">Why These Areas Are Highlighted</h4>
+                  <ul className="list-disc list-inside text-gray-200">
+                    {highlightedReasons.map((hr, i) => (
+                      <li key={i}>
+                        <span className="font-semibold">&quot;{hr.text.trim()}&quot;</span>: {hr.reason}
                       </li>
                     ))}
                   </ul>
-                  <div className="flex justify-center mt-6">
-                    <button type="button" onClick={closeFinalFeedbackModal} className="px-6 py-3 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors duration-200" aria-label="Close Final Feedback Modal">
-                      Close
-                    </button>
+                </div>
+              )}
+            </div>
+          )}
+          {questionStem && currentQuestionCount < tutorConfig.questionLimit && (
+            <div className="w-full max-w-5xl mb-6 text-center">
+              {!answerResult && (
+                <textarea className={clsx('w-full p-4 border', isDarkMode ? 'border-gray-600 bg-gray-700 text-white' : 'border-gray-300 bg-white text-gray-800', 'rounded resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-200')} value={inputText} onChange={(e) => setInputText(e.target.value)} placeholder="Enter your answer here..." rows={6} disabled={isLoading} aria-label="Answer Input" />
+              )}
+              <div className="flex flex-col items-center gap-4 mt-4">
+                {!answerResult ? (
+                  <button onClick={handleSubmitAnswer} className={clsx('flex-1 px-4 py-3 rounded font-semibold text-white transition-colors duration-200 shadow-lg', isLoading || !inputText.trim() ? isDarkMode ? 'bg-gray-500 cursor-not-allowed' : 'bg-gray-500 cursor-not-allowed' : isDarkMode ? 'bg-blue-600 hover:bg-blue-700' : 'bg-blue-600 hover:bg-blue-700')} disabled={isLoading || !inputText.trim()} aria-label="Submit Answer">
+                    {isLoading ? 'Submitting...' : 'Submit Answer'}
+                  </button>
+                ) : (
+                  <button onClick={handleGetQuestion} className="flex-1 px-4 py-3 rounded font-semibold text-white bg-blue-600 hover:bg-blue-700 transition-colors duration-200 shadow-lg" disabled={isLoading} aria-label="Continue to Next Question">
+                    {isLoading ? 'Loading...' : 'Continue'}
+                  </button>
+                )}
+                <div className="flex flex-row gap-4">
+                  <button onClick={handleSaveProgress} className="flex items-center justify-center px-4 py-3 bg-transparent text-blue-300 rounded font-semibold duration-200 hover:text-blue-500" disabled={!currentUser} aria-label="Save Progress">
+                    <motion.div whileHover={{ scale: 1.2, rotate: 360 }} transition={{ duration: 0.5 }}>
+                      <FaSave size={24} />
+                    </motion.div>
+                  </button>
+                  <button onClick={handleGetQuestion} className="flex items-center justify-center px-4 py-3 bg-transparent text-blue-300 rounded font-semibold duration-200 hover:text-blue-500" disabled={isLoading} aria-label="Generate New Question">
+                    <motion.div whileHover={{ scale: 1.2, rotate: -360 }} transition={{ duration: 0.5 }}>
+                      <FaSyncAlt size={24} />
+                    </motion.div>
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+          {isConfigModalOpen && (
+            <motion.div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-70 z-50" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+              <motion.div className="bg-gray-800 p-8 rounded-lg w-11/12 max-w-md shadow-lg overflow-y-auto max-h-screen" initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.8, opacity: 0 }} transition={{ duration: 0.3 }}>
+                <h2 className="text-2xl font-semibold text-white mb-6">Configure Exam</h2>
+                <form>
+                  <div className="mb-4">
+                    <label className="block text-gray-300 mb-2">Custom Prompt / Topic (Optional):</label>
+                    <input type="text" name="userPrompt" value={tutorConfig.userPrompt} onChange={handleConfigChange} placeholder="e.g. 'Negligence in Torts' or 'Offer & Acceptance'" className="w-full p-3 border border-gray-500 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-200 bg-gray-700 text-white" aria-label="Custom Prompt" />
                   </div>
-                </motion.div>
-              </motion.div>
-            )}
-            {isLoadProgressModalOpen && (
-              <motion.div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-70 z-[151]" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-                <motion.div className="bg-gray-800 p-8 rounded-lg w-11/12 max-w-3xl shadow-lg overflow-y-auto max-h-full" initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.8, opacity: 0 }} transition={{ duration: 0.3 }}>
-                  <h2 className="text-2xl font-semibold text-white mb-6">Load Saved Progress</h2>
-                  {savedProgresses.length === 0 ? (
-                    <p className="text-gray-200">No saved progress found.</p>
-                  ) : (
-                    <ul className="space-y-4">
-                      {savedProgresses.map((progress) => (
-                        <li key={progress.id} className="p-4 border border-gray-700 rounded">
-                          <div className="flex flex-col sm:flex-row sm:justify-between items-center">
-                            <div className="text-center">
-                              <p className="font-semibold text-blue-300">Law Year: {progress.tutorConfig?.studyYear}</p>
-                              <p className="text-sm text-gray-400">Course: {progress.tutorConfig?.course}</p>
-                              <p className="text-sm text-gray-400">Sub-Topic: {progress.tutorConfig?.subTopic}</p>
-                              <p className="text-sm text-gray-400">Complexity: {progress.tutorConfig?.complexity}</p>
-                              <p className="text-sm text-gray-400">Questions: {progress.tutorConfig?.questionLimit}</p>
-                              <p className="text-sm text-gray-400">Current Question: {progress.currentQuestionCount}</p>
-                              <p className="text-sm text-gray-400">Saved on: {new Date(progress.timestamp).toLocaleString()}</p>
-                            </div>
-                            <div className="flex flex-col gap-2 mt-2 sm:mt-0">
-                              <button onClick={() => handleLoadProgress(progress)} className="h-10 w-24 rounded bg-blue-600 text-white text-sm flex items-center justify-center transition-colors duration-200">
-                                Load
-                              </button>
-                              <button onClick={() => handleDeleteProgress(progress.id)} className="h-10 w-24 rounded bg-red-600 text-white text-sm flex items-center justify-center transition-colors duration-200 hover:bg-red-700">
-                                Delete
-                              </button>
-                            </div>
-                          </div>
-                        </li>
+                  <div className="mb-4">
+                    <label className="block text-gray-300 mb-2">Law School Year:</label>
+                    <select name="studyYear" value={tutorConfig.studyYear} onChange={handleConfigChange} className="w-full p-3 border border-gray-500 rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500" aria-label="Select Law School Year">
+                      {Object.keys(studyMapping).map((year) => (
+                        <option key={year} value={year}>
+                          {year}
+                        </option>
                       ))}
-                    </ul>
-                  )}
-                  <div className="text-center mt-6">
-                    <button onClick={closeLoadProgressModal} className="h-10 sm:h-12 px-4 py-2 rounded bg-gray-600 text-gray-200 hover:bg-gray-700 transition-colors duration-200">
-                      Close
+                    </select>
+                  </div>
+                  <div className="mb-4">
+                    <label className="block text-gray-300 mb-2">Course:</label>
+                    <select name="course" value={tutorConfig.course} onChange={handleConfigChange} className="w-full p-3 border border-gray-500 rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500" aria-label="Select Course">
+                      {topicOptions.map((t, idx) => (
+                        <option key={idx} value={t.value}>
+                          {t.label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="mb-4">
+                    <label className="block text-gray-300 mb-2">Sub-Topic:</label>
+                    <select name="subTopic" value={tutorConfig.subTopic} onChange={handleConfigChange} className="w-full p-3 border border-gray-500 rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500" aria-label="Select Sub-topic">
+                      {subTopicOptions.map((sub, idx) => (
+                        <option key={idx} value={sub.value}>
+                          {sub.label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="mb-4">
+                    <label className="block text-gray-300 mb-2">Complexity Level:</label>
+                    <select name="complexity" value={tutorConfig.complexity} onChange={handleConfigChange} className="w-full p-3 border border-gray-500 rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500" aria-label="Select Complexity">
+                      {complexityOptions.map((opt) => (
+                        <option key={opt.value} value={opt.value}>
+                          {opt.label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="mb-4">
+                    <label className="block text-gray-300 mb-2 font-semibold">Additional Aids for Law Students:</label>
+                    <div className="flex items-center mb-2">
+                      <input type="checkbox" id="showLegalReferences" name="showLegalReferences" checked={tutorConfig.showLegalReferences} onChange={handleConfigChange} className="h-5 w-5 text-blue-500 focus:ring-blue-500 border-gray-300 rounded" />
+                      <label htmlFor="showLegalReferences" className="ml-3 text-gray-300">Show references to relevant legal principles</label>
+                    </div>
+                    <div className="flex items-center mb-2">
+                      <input type="checkbox" id="provideApproach" name="provideApproach" checked={tutorConfig.provideApproach} onChange={handleConfigChange} className="h-5 w-5 text-blue-500 focus:ring-blue-500 border-gray-300 rounded" />
+                      <label htmlFor="provideApproach" className="ml-3 text-gray-300">Provide a structured approach to solving the problem</label>
+                    </div>
+                    <div className="flex items-center mb-2">
+                      <input type="checkbox" id="includeKeyCases" name="includeKeyCases" checked={tutorConfig.includeKeyCases} onChange={handleConfigChange} className="h-5 w-5 text-blue-500 focus:ring-blue-500 border-gray-300 rounded" />
+                      <label htmlFor="includeKeyCases" className="ml-3 text-gray-300">Include references to key cases</label>
+                    </div>
+                    <div className="flex items-center mb-2">
+                      <input type="checkbox" id="includeStatutes" name="includeStatutes" checked={tutorConfig.includeStatutes} onChange={handleConfigChange} className="h-5 w-5 text-blue-500 focus:ring-blue-500 border-gray-300 rounded" />
+                      <label htmlFor="includeStatutes" className="ml-3 text-gray-300">Include relevant statutes or code sections</label>
+                    </div>
+                    <div className="flex items-center mb-2">
+                      <input type="checkbox" id="liveMode" name="liveMode" checked={tutorConfig.liveMode} onChange={handleConfigChange} className="h-5 w-5 text-blue-500 focus:ring-blue-500 border-gray-300 rounded" />
+                      <label htmlFor="liveMode" className="ml-3 text-gray-300">Live Mode (Show highlights before answering)</label>
+                    </div>
+                  </div>
+                  <div className="mb-6">
+                    <label className="block text-gray-300 mb-2">Highlight Color Hue:</label>
+                    <div className="flex items-center space-x-4">
+                      <input type="range" min="0" max="360" value={tutorConfig.highlightHue} onChange={(e) => setTutorConfig((prev) => ({ ...prev, highlightHue: parseInt(e.target.value, 10) }))} className="h-2 w-full bg-blue-400 rounded-lg appearance-none cursor-pointer" />
+                      <div className="w-10 h-10 rounded" style={{ backgroundColor: `hsl(${tutorConfig.highlightHue}, 100%, 50%)` }} />
+                    </div>
+                    <p className="text-sm mt-2 text-gray-300">Adjust the hue to change the highlight color (default is neon yellow).</p>
+                  </div>
+                  <div className="mb-6">
+                    <label className="block text-gray-300 mb-2">Number of Questions per Session:</label>
+                    <div className="flex items-center">
+                      <input type="range" min="1" max="20" value={tutorConfig.questionLimit} onChange={(e) => setTutorConfig((prev) => ({ ...prev, questionLimit: parseInt(e.target.value, 10) }))} className="w-full h-2 bg-blue-400 rounded-lg appearance-none cursor-pointer" aria-label="Set Number of Questions" />
+                      <span className="ml-4 text-gray-300">{tutorConfig.questionLimit}</span>
+                    </div>
+                  </div>
+                  <div className="flex justify-end space-x-4">
+                    <button type="button" onClick={handleStartTutoringSession} className="relative h-12 w-full sm:w-56 overflow-hidden rounded bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white shadow-lg transition-colors duration-200" aria-label="Start Tutoring Session">
+                      Start Tutoring
+                    </button>
+                    <button type="button" onClick={closeConfigModal} className="px-6 py-3 bg-gray-600 text-gray-200 rounded hover:bg-gray-700 transition-colors duration-200" aria-label="Cancel Configuration">
+                      Cancel
                     </button>
                   </div>
-                </motion.div>
+                </form>
               </motion.div>
-            )}
-          </div>
+            </motion.div>
+          )}
+          {isFinalFeedbackModalOpen && (
+            <motion.div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-70 z-50 overflow-y-auto" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+              <motion.div className="bg-gray-800 p-8 rounded-lg w-11/12 max-w-3xl shadow-lg max-h-[80vh] overflow-y-auto" initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.8, opacity: 0 }} transition={{ duration: 0.3 }}>
+                <h2 className="text-2xl font-semibold text-white mb-6">Session Feedback</h2>
+                <ul className="space-y-4">
+                  {answeredQuestions.map((item, idx) => (
+                    <li key={idx} className="p-4 border border-gray-700 rounded">
+                      <p className="font-semibold text-blue-300">Question {idx + 1}:</p>
+                      <p className="text-gray-200 mb-2">{item.question}</p>
+                      <p className="text-gray-200 mb-1"><span className="font-semibold">Your Answer:</span> {item.answer}</p>
+                      <p className="text-gray-200 mb-1"><span className="font-semibold">Feedback:</span> {item.feedback}</p>
+                      <p className={`font-semibold ${item.correct ? 'text-emerald-400' : 'text-red-400'}`}>{item.correct ? 'Correct ✅' : 'Incorrect ❌'}</p>
+                    </li>
+                  ))}
+                </ul>
+                <div className="flex justify-center mt-6">
+                  <button type="button" onClick={closeFinalFeedbackModal} className="px-6 py-3 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors duration-200" aria-label="Close Final Feedback Modal">
+                    Close
+                  </button>
+                </div>
+              </motion.div>
+            </motion.div>
+          )}
+          {isLoadProgressModalOpen && (
+            <motion.div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-70 z-[151]" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+              <motion.div className="bg-gray-800 p-8 rounded-lg w-11/12 max-w-3xl shadow-lg overflow-y-auto max-h-full" initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.8, opacity: 0 }} transition={{ duration: 0.3 }}>
+                <h2 className="text-2xl font-semibold text-white mb-6">Load Saved Progress</h2>
+                {savedProgresses.length === 0 ? (
+                  <p className="text-gray-200">No saved progress found.</p>
+                ) : (
+                  <ul className="space-y-4">
+                    {savedProgresses.map((progress) => (
+                      <li key={progress.id} className="p-4 border border-gray-700 rounded">
+                        <div className="flex flex-col sm:flex-row sm:justify-between items-center">
+                          <div className="text-center">
+                            <p className="font-semibold text-blue-300">Law Year: {progress.tutorConfig?.studyYear}</p>
+                            <p className="text-sm text-gray-400">Course: {progress.tutorConfig?.course}</p>
+                            <p className="text-sm text-gray-400">Sub-Topic: {progress.tutorConfig?.subTopic}</p>
+                            <p className="text-sm text-gray-400">Complexity: {progress.tutorConfig?.complexity}</p>
+                            <p className="text-sm text-gray-400">Questions: {progress.tutorConfig?.questionLimit}</p>
+                            <p className="text-sm text-gray-400">Current Question: {progress.currentQuestionCount}</p>
+                            <p className="text-sm text-gray-400">Saved on: {new Date(progress.timestamp).toLocaleString()}</p>
+                          </div>
+                          <div className="flex flex-col gap-2 mt-2 sm:mt-0">
+                            <button onClick={() => handleLoadProgress(progress)} className="h-10 w-24 rounded bg-blue-600 text-white text-sm flex items-center justify-center transition-colors duration-200">
+                              Load
+                            </button>
+                            <button onClick={() => handleDeleteProgress(progress.id)} className="h-10 w-24 rounded bg-red-600 text-white text-sm flex items-center justify-center transition-colors duration-200 hover:bg-red-700">
+                              Delete
+                            </button>
+                          </div>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+                <div className="text-center mt-6">
+                  <button onClick={closeLoadProgressModal} className="h-10 sm:h-12 px-4 py-2 rounded bg-gray-600 text-gray-200 hover:bg-gray-700 transition-colors duration-200">
+                    Close
+                  </button>
+                </div>
+              </motion.div>
+            </motion.div>
+          )}
         </motion.div>
       </main>
     </div>
