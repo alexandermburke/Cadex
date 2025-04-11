@@ -528,18 +528,37 @@ export default function AiTutor() {
   const highlightedReasons = highlightedSections
     .filter((s) => s.highlight && s.reason && s.reason !== 'Not crucial')
     .map((s) => ({ text: s.text, reason: s.reason }));
+
   return (
-    <div className="flex h-screen bg-transparent rounded z-[150] relative">
+    <div className={clsx(
+      'flex h-screen bg-transparent rounded shadow-md z-[150] relative',
+      isDarkMode && 'dark'
+    )}>
       <AnimatePresence>
         {isSidebarVisible && (
           <>
-            <Sidebar activeLink="/ailawtools/lexapi" isSidebarVisible={isSidebarVisible} toggleSidebar={toggleSidebar} isDarkMode={isDarkMode} />
-            <motion.div className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden" initial={{ opacity: 0 }} animate={{ opacity: 0.5 }} exit={{ opacity: 0 }} onClick={toggleSidebar} />
+            <Sidebar
+              activeLink="/ailawtools/lexapi"
+              isSidebarVisible={isSidebarVisible}
+              toggleSidebar={toggleSidebar}
+              isDarkMode={isDarkMode}
+            />
+            <motion.div
+              className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 0.5 }}
+              exit={{ opacity: 0 }}
+              onClick={toggleSidebar}
+            />
           </>
         )}
       </AnimatePresence>
       <div className="absolute top-6 left-4 z-[100] md:hidden">
-        <button onClick={toggleSidebar} className={clsx('text-blue-900 dark:text-white p-2 rounded transition-colors hover:bg-black/10 focus:outline-none')} aria-label={isSidebarVisible ? 'Hide Sidebar' : 'Show Sidebar'}>
+        <button
+          onClick={toggleSidebar}
+          className={clsx('text-blue-900 dark:text-white p-2 rounded transition-colors hover:bg-black/10 focus:outline-none')}
+          aria-label={isSidebarVisible ? 'Hide Sidebar' : 'Show Sidebar'}
+        >
           <AnimatePresence mode="wait" initial={false}>
             {isSidebarVisible ? (
               <motion.div key="close-icon" initial={{ rotate: 90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: -90, opacity: 0 }} transition={{ duration: 0.3 }}>
@@ -555,41 +574,59 @@ export default function AiTutor() {
       </div>
       <div className="absolute top-6 right-[5%] z-[100] flex flex-col items-center gap-2">
         <div className="flex flex-col items-center">
-          <motion.button onClick={openLoadProgressModal} whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }} className="p-3 rounded-full bg-gradient-to-r from-blue-600 to-blue-800 text-white transition-all duration-200 shadow-lg" aria-label="Load Progress">
+          <motion.button
+            onClick={openLoadProgressModal}
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.95 }}
+            className="p-3 rounded-full bg-gradient-to-r from-blue-600 to-blue-800 text-white transition-all duration-200 shadow-lg"
+            aria-label="Load Progress"
+          >
             <FaSyncAlt size={20} />
           </motion.button>
           <span className="text-xs mt-1 dark:text-gray-300">Load</span>
         </div>
         <div className="flex flex-col items-center">
-          <motion.button onClick={openConfigModal} whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }} className="p-3 rounded-full bg-gradient-to-r from-blue-600 to-blue-800 text-white transition-all duration-200 shadow-lg" aria-label="Configure Tutor">
+          <motion.button
+            onClick={openConfigModal}
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.95 }}
+            className="p-3 rounded-full bg-gradient-to-r from-blue-600 to-blue-800 text-white transition-all duration-200 shadow-lg"
+            aria-label="Configure Tutor"
+          >
             <FaChevronDown size={20} />
           </motion.button>
           <span className="text-xs mt-1 dark:text-gray-300">Config</span>
         </div>
       </div>
       <main className="flex-1 flex flex-col items-center justify-center px-6 relative z-200 h-screen">
-        <motion.div className={clsx('flex-1 w-full rounded-2xl shadow-xl p-6 overflow-y-auto', isDarkMode ? 'bg-slate-800 bg-opacity-50 text-white' : 'bg-white text-gray-800', 'flex flex-col items-center justify-center')}>
+        <motion.div
+          className={clsx(
+            'flex-1 w-full rounded-2xl shadow-xl p-6 overflow-y-auto',
+            isDarkMode ? 'bg-slate-800 bg-opacity-50 text-white' : 'bg-white text-gray-800',
+            'flex flex-col items-center justify-center'
+          )}
+        >
           <AnimatePresence>
             {!isSessionActive && (
-              <motion.div className="relative w-full h-64 sm:h-80 md:h-96 mb-6 flex items-center justify-center" initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.5 }} transition={{ duration: 0.3 }}>
+              <motion.div
+                className="relative w-full h-64 sm:h-80 md:h-96 mb-6 flex items-center justify-center"
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.5 }}
+                transition={{ duration: 0.3 }}
+              >
                 <canvas ref={visualizerCanvas} className="absolute top-0 left-0 w-full h-full rounded" aria-label="Background Animation Canvas" />
-                <div className="absolute inset-0 flex flex-col items-center justify-center">
-                  {!questionStem && !questionText && (
-            <div className="w-full max-w-5xl p-6 bg-white bg-opacity-50 dark:bg-slate-800 backdrop-blur-md rounded-lg shadow-md text-center">
-              <p className="text-slate-700 dark:text-white mb-4">Click <span className="font-semibold">&quot;Config&quot;</span> to start.</p>
-              <p className="text-slate-700 dark:text-gray-400 text-sm">
-                <strong>Note:</strong> This Exam Prep Tool helps you practice law school concepts, offers structured feedback, and references key principles or statutes.
-                It’s not a substitute for professional legal advice.
-              </p>
-            </div>
-          )}
-                </div>
               </motion.div>
             )}
-            
           </AnimatePresence>
           <div className="w-full max-w-5xl mb-6">
-            <textarea className="w-full h-48 p-4 rounded resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-200 text-white bg-transparent" value={answerResult || ''} readOnly aria-label="AI Feedback" style={{ resize: 'none' }} />
+            <textarea
+              className="w-full h-48 p-4 rounded resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-200 text-white bg-transparent"
+              value={answerResult || ''}
+              readOnly
+              aria-label="AI Feedback"
+              style={{ resize: 'none' }}
+            />
           </div>
           {questionStem && (
             <div className="w-full max-w-5xl mb-6 p-6 bg-white bg-opacity-20 backdrop-blur-md rounded-lg shadow-md overflow-y-scroll text-center">
@@ -600,7 +637,18 @@ export default function AiTutor() {
                 {showHighlights && highlightedSections?.length
                   ? highlightedSections.map((section, idx) =>
                       section.highlight ? (
-                        <motion.span key={idx} style={{ backgroundColor: `hsla(${tutorConfig.highlightHue}, 100%, 50%, ${tutorConfig.highlightOpacity})`, display: 'inline-block', transformOrigin: 'left center' }} title={section.reason} initial={{ scaleX: 0 }} animate={{ scaleX: 1 }} transition={{ duration: 1 }}>
+                        <motion.span
+                          key={idx}
+                          style={{
+                            backgroundColor: `hsla(${tutorConfig.highlightHue}, 100%, 50%, ${tutorConfig.highlightOpacity})`,
+                            display: 'inline-block',
+                            transformOrigin: 'left center'
+                          }}
+                          title={section.reason}
+                          initial={{ scaleX: 0 }}
+                          animate={{ scaleX: 1 }}
+                          transition={{ duration: 1 }}
+                        >
                           {section.text}
                         </motion.span>
                       ) : (
@@ -625,38 +673,72 @@ export default function AiTutor() {
           )}
           {questionStem && currentQuestionCount < tutorConfig.questionLimit && (
             <div className="w-full max-w-5xl mb-6 text-center">
-              {!answerResult && (
-                <textarea className={clsx('w-full p-4 border', isDarkMode ? 'border-gray-600 bg-gray-700 text-white' : 'border-gray-300 bg-white text-gray-800', 'rounded resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-200')} value={inputText} onChange={(e) => setInputText(e.target.value)} placeholder="Enter your answer here..." rows={6} disabled={isLoading} aria-label="Answer Input" />
+              {!answerResult ? (
+                <textarea
+                  className={clsx(
+                    'w-full p-4 border',
+                    isDarkMode ? 'border-gray-600 bg-gray-700 text-white' : 'border-gray-300 bg-white text-gray-800',
+                    'rounded resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-200'
+                  )}
+                  value={inputText}
+                  onChange={(e) => setInputText(e.target.value)}
+                  placeholder="Enter your answer here..."
+                  rows={6}
+                  disabled={isLoading}
+                  aria-label="Answer Input"
+                />
+              ) : (
+                <button
+                  onClick={handleGetQuestion}
+                  className="flex-1 px-4 py-3 rounded font-semibold text-white bg-blue-600 hover:bg-blue-700 transition-colors duration-200 shadow-lg"
+                  disabled={isLoading}
+                  aria-label="Continue to Next Question"
+                >
+                  {isLoading ? 'Loading...' : 'Continue'}
+                </button>
               )}
-              <div className="flex flex-col items-center gap-4 mt-4">
-                {!answerResult ? (
-                  <button onClick={handleSubmitAnswer} className={clsx('flex-1 px-4 py-3 rounded font-semibold text-white transition-colors duration-200 shadow-lg', isLoading || !inputText.trim() ? isDarkMode ? 'bg-gray-500 cursor-not-allowed' : 'bg-gray-500 cursor-not-allowed' : isDarkMode ? 'bg-blue-600 hover:bg-blue-700' : 'bg-blue-600 hover:bg-blue-700')} disabled={isLoading || !inputText.trim()} aria-label="Submit Answer">
-                    {isLoading ? 'Submitting...' : 'Submit Answer'}
-                  </button>
-                ) : (
-                  <button onClick={handleGetQuestion} className="flex-1 px-4 py-3 rounded font-semibold text-white bg-blue-600 hover:bg-blue-700 transition-colors duration-200 shadow-lg" disabled={isLoading} aria-label="Continue to Next Question">
-                    {isLoading ? 'Loading...' : 'Continue'}
-                  </button>
-                )}
-                <div className="flex flex-row gap-4">
-                  <button onClick={handleSaveProgress} className="flex items-center justify-center px-4 py-3 bg-transparent text-blue-300 rounded font-semibold duration-200 hover:text-blue-500" disabled={!currentUser} aria-label="Save Progress">
-                    <motion.div whileHover={{ scale: 1.2, rotate: 360 }} transition={{ duration: 0.5 }}>
-                      <FaSave size={24} />
-                    </motion.div>
-                  </button>
-                  <button onClick={handleGetQuestion} className="flex items-center justify-center px-4 py-3 bg-transparent text-blue-300 rounded font-semibold duration-200 hover:text-blue-500" disabled={isLoading} aria-label="Generate New Question">
-                    <motion.div whileHover={{ scale: 1.2, rotate: -360 }} transition={{ duration: 0.5 }}>
-                      <FaSyncAlt size={24} />
-                    </motion.div>
-                  </button>
-                </div>
+              <div className="flex flex-row gap-4 mt-4">
+                <button
+                  onClick={handleSaveProgress}
+                  className="flex items-center justify-center px-4 py-3 bg-transparent text-blue-300 rounded font-semibold duration-200 hover:text-blue-500"
+                  disabled={!currentUser}
+                  aria-label="Save Progress"
+                >
+                  <motion.div whileHover={{ scale: 1.2, rotate: 360 }} transition={{ duration: 0.5 }}>
+                    <FaSave size={24} />
+                  </motion.div>
+                </button>
+                <button
+                  onClick={handleGetQuestion}
+                  className="flex items-center justify-center px-4 py-3 bg-transparent text-blue-300 rounded font-semibold duration-200 hover:text-blue-500"
+                  disabled={isLoading}
+                  aria-label="Generate New Question"
+                >
+                  <motion.div whileHover={{ scale: 1.2, rotate: -360 }} transition={{ duration: 0.5 }}>
+                    <FaSyncAlt size={24} />
+                  </motion.div>
+                </button>
               </div>
+            </div>
+          )}
+          {!questionStem && !questionText && (
+            <div className={clsx(
+              "w-full max-w-5xl p-6 backdrop-blur-md rounded-lg shadow-md text-center",
+              isDarkMode ? "bg-slate-800 bg-opacity-50" : "bg-white bg-opacity-50"
+            )}>
+              <p className={clsx("mb-4", isDarkMode ? "text-white" : "text-slate-700")}>
+                Click <span className="font-semibold">&quot;Configure AI Tutor&quot;</span> to start.
+              </p>
+              <p className={clsx("text-sm", isDarkMode ? "text-gray-300" : "text-gray-600")}>
+                <strong>Note:</strong> This AI Tutor helps you practice law school concepts, offers structured feedback, and references key principles or statutes.
+                It’s not a substitute for professional legal advice.
+              </p>
             </div>
           )}
           {isConfigModalOpen && (
             <motion.div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-70 z-50" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
               <motion.div className="bg-gray-800 p-8 rounded-lg w-11/12 max-w-md shadow-lg overflow-y-auto max-h-screen" initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.8, opacity: 0 }} transition={{ duration: 0.3 }}>
-                <h2 className="text-2xl font-semibold text-white mb-6">Configure Exam</h2>
+                <h2 className="text-2xl font-semibold text-white mb-6">Configure AI Tutor</h2>
                 <form>
                   <div className="mb-4">
                     <label className="block text-gray-300 mb-2">Custom Prompt / Topic (Optional):</label>
@@ -753,7 +835,12 @@ export default function AiTutor() {
             </motion.div>
           )}
           {isFinalFeedbackModalOpen && (
-            <motion.div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-70 z-50 overflow-y-auto" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+            <motion.div
+              className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-70 z-50 overflow-y-auto"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+            >
               <motion.div className="bg-gray-800 p-8 rounded-lg w-11/12 max-w-3xl shadow-lg max-h-[80vh] overflow-y-auto" initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.8, opacity: 0 }} transition={{ duration: 0.3 }}>
                 <h2 className="text-2xl font-semibold text-white mb-6">Session Feedback</h2>
                 <ul className="space-y-4">
@@ -768,7 +855,7 @@ export default function AiTutor() {
                   ))}
                 </ul>
                 <div className="flex justify-center mt-6">
-                  <button type="button" onClick={closeFinalFeedbackModal} className="px-6 py-3 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors duration-200" aria-label="Close Final Feedback Modal">
+                  <button type="button" onClick={() => setIsFinalFeedbackModalOpen(false)} className="px-6 py-3 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors duration-200" aria-label="Close Final Feedback Modal">
                     Close
                   </button>
                 </div>
@@ -776,30 +863,46 @@ export default function AiTutor() {
             </motion.div>
           )}
           {isLoadProgressModalOpen && (
-            <motion.div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-70 z-[151]" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-              <motion.div className="bg-gray-800 p-8 rounded-lg w-11/12 max-w-3xl shadow-lg overflow-y-auto max-h-full" initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.8, opacity: 0 }} transition={{ duration: 0.3 }}>
+            <motion.div
+              className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-70 z-[151]"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+            >
+              <motion.div
+                className={clsx('bg-gray-800 p-8 rounded-lg w-11/12 max-w-3xl shadow-lg overflow-y-auto max-h-full', isDarkMode ? 'text-white' : 'text-gray-800')}
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.8, opacity: 0 }}
+                transition={{ duration: 0.3 }}
+              >
                 <h2 className="text-2xl font-semibold text-white mb-6">Load Saved Progress</h2>
                 {savedProgresses.length === 0 ? (
-                  <p className="text-gray-200">No saved progress found.</p>
+                  <p className="text-center">No saved progress found.</p>
                 ) : (
                   <ul className="space-y-4">
-                    {savedProgresses.map((progress) => (
-                      <li key={progress.id} className="p-4 border border-gray-700 rounded">
+                    {savedProgresses.map((prog) => (
+                      <li
+                        key={prog.id}
+                        className={clsx('p-4 border rounded', isDarkMode ? 'border-gray-700' : 'border-gray-300')}
+                      >
                         <div className="flex flex-col sm:flex-row sm:justify-between items-center">
                           <div className="text-center">
-                            <p className="font-semibold text-blue-300">Law Year: {progress.tutorConfig?.studyYear}</p>
-                            <p className="text-sm text-gray-400">Course: {progress.tutorConfig?.course}</p>
-                            <p className="text-sm text-gray-400">Sub-Topic: {progress.tutorConfig?.subTopic}</p>
-                            <p className="text-sm text-gray-400">Complexity: {progress.tutorConfig?.complexity}</p>
-                            <p className="text-sm text-gray-400">Questions: {progress.tutorConfig?.questionLimit}</p>
-                            <p className="text-sm text-gray-400">Current Question: {progress.currentQuestionCount}</p>
-                            <p className="text-sm text-gray-400">Saved on: {new Date(progress.timestamp).toLocaleString()}</p>
+                            <p className="font-semibold text-blue-300 mb-1">
+                              Law Year: {prog.tutorConfig?.studyYear}
+                            </p>
+                            <p className="text-sm text-gray-400">Course: {prog.tutorConfig?.course}</p>
+                            <p className="text-sm text-gray-400">Sub-Topic: {prog.tutorConfig?.subTopic}</p>
+                            <p className="text-sm text-gray-400">Complexity: {prog.tutorConfig?.complexity}</p>
+                            <p className="text-sm text-gray-400">Questions: {prog.tutorConfig?.questionLimit}</p>
+                            <p className="text-sm text-gray-400">Current Question: {prog.currentQuestionCount}</p>
+                            <p className="text-sm text-gray-400">Saved on: {new Date(prog.timestamp).toLocaleString()}</p>
                           </div>
                           <div className="flex flex-col gap-2 mt-2 sm:mt-0">
-                            <button onClick={() => handleLoadProgress(progress)} className="h-10 w-24 rounded bg-blue-600 text-white text-sm flex items-center justify-center transition-colors duration-200">
+                            <button onClick={() => handleLoadProgress(prog)} className="h-10 w-24 rounded bg-blue-600 text-white text-sm flex items-center justify-center transition-colors duration-200">
                               Load
                             </button>
-                            <button onClick={() => handleDeleteProgress(progress.id)} className="h-10 w-24 rounded bg-red-600 text-white text-sm flex items-center justify-center transition-colors duration-200 hover:bg-red-700">
+                            <button onClick={() => handleDeleteProgress(prog.id)} className="h-10 w-24 rounded bg-red-600 text-white text-sm flex items-center justify-center transition-colors duration-200 hover:bg-red-700">
                               Delete
                             </button>
                           </div>
@@ -809,7 +912,10 @@ export default function AiTutor() {
                   </ul>
                 )}
                 <div className="text-center mt-6">
-                  <button onClick={closeLoadProgressModal} className="h-10 sm:h-12 px-4 py-2 rounded bg-gray-600 text-gray-200 hover:bg-gray-700 transition-colors duration-200">
+                  <button
+                    onClick={closeLoadProgressModal}
+                    className={clsx('h-10 sm:h-12 px-4 py-2 rounded', isDarkMode ? 'bg-gray-700 hover:bg-gray-600 text-white' : 'bg-gray-300 hover:bg-gray-400 text-gray-800')}
+                  >
                     Close
                   </button>
                 </div>
