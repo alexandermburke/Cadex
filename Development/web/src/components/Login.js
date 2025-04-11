@@ -98,7 +98,7 @@ export default function Login() {
         </div>
         <div
           className={
-            'flex items-stretch gap-4 max-w-[600px] mx-auto w-full duration-200 ' +
+            'flex items-stretch gap-4 max-w-[600px] mx-auto w-full duration-200 my-2' +
             (authenticating ? ' cursor-not-allowed opacity-60 ' : ' ')
           }
         >
@@ -106,10 +106,11 @@ export default function Login() {
             text={'Submit'}
             saving={authenticating ? 'Submitting' : ''}
             clickHandler={handleSubmit}
+            className="my-2"
           />
         </div>
         <p className="mx-auto text-sm sm:text-base">
-          Don&#39;t have an account?{' '}
+          Don&apos;t have an account?{' '}
           <Link className="goldGradient pl-2 hover:opacity-50" href={'/register'}>
             Sign up
           </Link>

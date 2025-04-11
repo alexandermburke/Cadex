@@ -1,7 +1,10 @@
 'use client';
-
 import React, { useState, useEffect } from 'react';
+import clsx from 'clsx';
+import { motion, AnimatePresence } from 'framer-motion';
+import { FaBars, FaSyncAlt, FaSave, FaChevronDown } from 'react-icons/fa';
 import Sidebar from '../Sidebar';
+import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
 import { db } from '@/firebase';
 import {
@@ -12,31 +15,33 @@ import {
   deleteDoc,
   query,
   where,
+  updateDoc,
 } from 'firebase/firestore';
-import { useAuth } from '@/context/AuthContext';
-import { FaBars, FaTimes, FaSave, FaSyncAlt } from 'react-icons/fa';
-import { motion, AnimatePresence } from 'framer-motion';
 
 export default function ExamPrep() {
-
   const { currentUser, userDataObj } = useAuth();
   const router = useRouter();
   const isDarkMode = userDataObj?.darkMode || false;
+
+  // -----------------------------
+  // Exam question and answer states
+  // -----------------------------
   const [inputText, setInputText] = useState('');
   const [questionText, setQuestionText] = useState('');
   const [questionStem, setQuestionStem] = useState('');
   const [options, setOptions] = useState([]);
   const [answerResult, setAnswerResult] = useState('');
-  const [isSidebarVisible, setIsSidebarVisible] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
-  const [isConfigModalOpen, setIsConfigModalOpen] = useState(false);
   const [isResultModalOpen, setIsResultModalOpen] = useState(false);
-  const [isLoadProgressModalOpen, setIsLoadProgressModalOpen] = useState(false);
   const [isFinalFeedbackModalOpen, setIsFinalFeedbackModalOpen] = useState(false);
   const [savedProgresses, setSavedProgresses] = useState([]);
   const [currentQuestionCount, setCurrentQuestionCount] = useState(0);
   const [answeredQuestions, setAnsweredQuestions] = useState([]);
   const [isExamStarted, setIsExamStarted] = useState(false);
+
+  // -----------------------------
+  // Score and category tracking
+  // -----------------------------
   const initialCategories = {
     Contracts: { correct: 0, total: 0 },
     Torts: { correct: 0, total: 0 },
@@ -47,20 +52,25 @@ export default function ExamPrep() {
     CivilProcedure: { correct: 0, total: 0 },
     BusinessAssociations: { correct: 0, total: 0 },
   };
- const [categories, setCategories] = useState(initialCategories);
- const [overallCorrect, setOverallCorrect] = useState(0);
- const [overallTotal, setOverallTotal] = useState(0);
- const [examConfig, setExamConfig] = useState({
-    examType: 'Practice Exam', 
-    lawSubject: 'Contracts',   
+  const [categories, setCategories] = useState(initialCategories);
+  const [overallCorrect, setOverallCorrect] = useState(0);
+  const [overallTotal, setOverallTotal] = useState(0);
+
+  // -----------------------------
+  // Exam configuration state and options
+  // -----------------------------
+  const [examConfig, setExamConfig] = useState({
+    examType: 'Practice Exam',
+    lawSubject: 'Contracts',
     difficulty: 'Basic',
     questionLimit: 5,
     instantFeedback: false,
     selectedQuestionTypes: [],
-    timeLimit: 0,     
+    timeLimit: 0, // in minutes; 0 means no time limit
     includeCurveBalls: false,
     allowMultipleChoice: true,
     preferEssayStyle: false,
+    extraInstructions: '',
   });
   const [answerMode, setAnswerMode] = useState('written');
   const examTypeOptions = ['Practice Exam', 'Bar Practice', 'Midterm Prep', 'Final Prep'];
@@ -82,15 +92,28 @@ export default function ExamPrep() {
     'Multiple-Choice Format',
     'Short-Answer/Essay',
   ];
-  const toggleSidebarVisibility = () => {
-    setIsSidebarVisible(!isSidebarVisible);
+
+  // -----------------------------
+  // Sidebar toggle (unused in new design since sidebar is always visible)
+  // -----------------------------
+  const toggleSidebar = () => {
+    // Sidebar toggle function exists if needed.
+    // (In this version, the sidebar is always visible.)
   };
+
+  const containerVariants = {
+    hidden: { opacity: 0, y: 50 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: 'easeInOut' } },
+  };
+
+  // -----------------------------
+  // Helper function: Parse exam question into stem and choices.
+  // -----------------------------
   const parseQuestion = (text) => {
     const lines = text.split('\n');
     let stemLines = [];
     let choiceLines = [];
     let inOptionSection = false;
-
     for (let line of lines) {
       const trimmed = line.trim();
       if (/^\(?[A-E]\)?[).:]?\s/.test(trimmed)) {
@@ -109,10 +132,15 @@ export default function ExamPrep() {
       choices: choiceLines,
     };
   };
+
   const getOptionLetter = (option) => {
     const match = option.match(/^\(?([A-E])\)?[).:]/i);
     return match ? match[1].toUpperCase() : null;
   };
+
+  // -----------------------------
+  // Fetch a new exam question
+  // -----------------------------
   const handleGetQuestion = async () => {
     setIsLoading(true);
     setQuestionText('');
@@ -120,7 +148,6 @@ export default function ExamPrep() {
     setOptions([]);
     setAnswerResult('');
     setInputText('');
-
     try {
       const response = await fetch('/api/examprep/get-exam-question', {
         method: 'POST',
@@ -129,10 +156,8 @@ export default function ExamPrep() {
       });
       if (!response.ok) throw new Error('Failed to get exam question');
       const data = await response.json();
-
       const { question } = data;
       const { stem, choices } = parseQuestion(question);
-
       setQuestionStem(stem);
       setOptions(choices);
       setQuestionText(question);
@@ -144,11 +169,14 @@ export default function ExamPrep() {
       setIsLoading(false);
     }
   };
+
+  // -----------------------------
+  // Submit exam answer for evaluation
+  // -----------------------------
   const handleSubmitAnswer = async () => {
     if (!inputText.trim()) return;
     setIsLoading(true);
     setAnswerResult('');
-
     try {
       const response = await fetch('/api/examprep/submit-exam-answer', {
         method: 'POST',
@@ -161,10 +189,8 @@ export default function ExamPrep() {
         }),
       });
       if (!response.ok) throw new Error('Failed to submit answer');
-
       const { feedback, correct } = await response.json();
       setAnswerResult(feedback || 'No feedback provided.');
-
       setAnsweredQuestions((prev) => [
         ...prev,
         {
@@ -174,28 +200,18 @@ export default function ExamPrep() {
           correct: correct || false,
         },
       ]);
-
       setCurrentQuestionCount((c) => c + 1);
-
       const subj = examConfig.lawSubject || 'Contracts';
       setCategories((prev) => {
         const newCat = { ...prev[subj] };
         newCat.total += 1;
         if (correct) newCat.correct += 1;
-
-        return {
-          ...prev,
-          [subj]: newCat,
-        };
+        return { ...prev, [subj]: newCat };
       });
-
       setOverallTotal((prev) => prev + 1);
-      if (correct) {
-        setOverallCorrect((prev) => prev + 1);
-      }
-
+      if (correct) setOverallCorrect((prev) => prev + 1);
       if (examConfig.instantFeedback) {
-        openResultModal();
+        setIsResultModalOpen(true);
       } else {
         setTimeout(() => {
           handleGetQuestion();
@@ -204,26 +220,22 @@ export default function ExamPrep() {
     } catch (err) {
       console.error('Error submitting answer:', err);
       setAnswerResult('Error evaluating your answer.');
-      openResultModal();
+      setIsResultModalOpen(true);
     } finally {
       setIsLoading(false);
     }
   };
-  function handleConfigChange(e) {
-    const { name, value, type, checked } = e.target;
-    if (type === 'checkbox') {
-      setExamConfig((prev) => ({ ...prev, [name]: checked }));
-    } else {
-      setExamConfig((prev) => ({ ...prev, [name]: value }));
-    }
-  }
+
   useEffect(() => {
-    if (currentQuestionCount >= examConfig.questionLimit && questionText !== '') {
+    if (currentQuestionCount >= Number(examConfig.questionLimit) && questionText !== '') {
       setCurrentQuestionCount(0);
-      openFinalFeedbackModal();
+      setIsFinalFeedbackModalOpen(true);
     }
   }, [currentQuestionCount, examConfig.questionLimit, questionText]);
 
+  // -----------------------------
+  // Save exam progress to Firestore
+  // -----------------------------
   const handleSaveProgress = async () => {
     if (!currentUser) {
       alert('You must be logged in to save progress.');
@@ -239,12 +251,10 @@ export default function ExamPrep() {
         currentQuestionCount,
         answeredQuestions: answeredQuestions.map((q) => ({ ...q })),
         timestamp: new Date().toISOString(),
-
         categories: { ...categories },
         overallCorrect,
         overallTotal,
       };
-
       await addDoc(collection(db, 'examProgress'), docData);
       alert('Progress saved. You can view it in Insights or reload it later.');
     } catch (err) {
@@ -253,6 +263,9 @@ export default function ExamPrep() {
     }
   };
 
+  // -----------------------------
+  // Load saved progress from Firestore
+  // -----------------------------
   const fetchSavedProgresses = async () => {
     if (!currentUser) {
       alert('Log in to load progress');
@@ -262,8 +275,8 @@ export default function ExamPrep() {
       const q = query(collection(db, 'examProgress'), where('userId', '==', currentUser.uid));
       const snap = await getDocs(q);
       const loaded = [];
-      snap.forEach((doc) => {
-        loaded.push({ id: doc.id, ...doc.data() });
+      snap.forEach((docSnap) => {
+        loaded.push({ id: docSnap.id, ...docSnap.data() });
       });
       setSavedProgresses(loaded);
     } catch (err) {
@@ -279,18 +292,13 @@ export default function ExamPrep() {
     setAnswerResult(progress.answerResult);
     setCurrentQuestionCount(progress.currentQuestionCount);
     setAnsweredQuestions(progress.answeredQuestions || []);
-
     setCategories(progress.categories || initialCategories);
-
     setOverallCorrect(progress.overallCorrect || 0);
     setOverallTotal(progress.overallTotal || 0);
-
     setIsExamStarted(true);
-
     const { stem, choices } = parseQuestion(progress.questionText);
     setQuestionStem(stem);
     setOptions(choices);
-
     closeLoadProgressModal();
   };
 
@@ -308,20 +316,23 @@ export default function ExamPrep() {
     }
   };
 
+  // -----------------------------
+  // Check for authentication after all hooks
+  // -----------------------------
   if (!currentUser) {
     return (
-      <div className={`flex items-center justify-center h-screen ${isDarkMode ? 'bg-gray-800' : 'bg-gray-100'}`}>
-        <div className={`text-center p-6 ${isDarkMode ? 'bg-gray-700 text-white' : 'bg-white text-gray-700'} rounded shadow-md`}>
+      <div className={clsx('flex items-center justify-center h-screen', isDarkMode ? 'bg-gray-800' : 'bg-gray-100')}>
+        <div className={clsx('text-center p-6', isDarkMode ? 'bg-gray-700 text-white' : 'bg-white text-gray-700', 'rounded shadow-md')}>
           <p className="mb-4">
             Please{' '}
-            <a href="/login" className={`underline ${isDarkMode ? 'text-blue-400' : 'text-blue-900'}`}>
+            <a href="/login" className={clsx('underline', isDarkMode ? 'text-blue-400' : 'text-blue-900')}>
               log in
             </a>{' '}
             to use the Practice Exam tool.
           </p>
           <button
             onClick={() => router.push('/login')}
-            className={`px-4 py-2 rounded ${isDarkMode ? 'bg-blue-600 text-white hover:bg-blue-500' : 'bg-blue-900 text-white hover:bg-blue-700'}`}
+            className={clsx('px-4 py-2 rounded', isDarkMode ? 'bg-blue-600 text-white hover:bg-blue-500' : 'bg-blue-900 text-white hover:bg-blue-700')}
           >
             Go to Login
           </button>
@@ -330,798 +341,560 @@ export default function ExamPrep() {
     );
   }
 
-  // Subscription plan
+  // -----------------------------
+  // Additional modal state handlers
+  // -----------------------------
   const isProUser = userDataObj?.billing?.plan === 'Pro' || userDataObj?.billing?.plan === 'Developer';
-
-  // --- Modal triggers ---
+  const [isConfigModalOpen, setIsConfigModalOpen] = useState(false);
+  const [isLoadProgressModalOpen, setIsLoadProgressModalOpen] = useState(false);
   const openConfigModal = () => setIsConfigModalOpen(true);
   const closeConfigModal = () => setIsConfigModalOpen(false);
-
-  const openResultModal = () => setIsResultModalOpen(true);
-  const closeResultModal = () => setIsResultModalOpen(false);
-
   const openLoadProgressModal = () => {
     fetchSavedProgresses();
     setIsLoadProgressModalOpen(true);
   };
   const closeLoadProgressModal = () => setIsLoadProgressModalOpen(false);
-
-  const openFinalFeedbackModal = () => setIsFinalFeedbackModalOpen(true);
-  const closeFinalFeedbackModal = () => setIsFinalFeedbackModalOpen(false);
+  const openResultModal = () => setIsResultModalOpen(true);
+  const closeResultModal = () => setIsResultModalOpen(false);
 
   return (
-    <div className={`flex h-screen ${isDarkMode ? 'bg-slate-800' : 'bg-transparent'} rounded shadow-md`}>
-      {/* Sidebar */}
-      <AnimatePresence>
-        {isSidebarVisible && (
-          <>
-            <Sidebar
-              activeLink="/ailawtools/examprep"
-              isSidebarVisible={isSidebarVisible}
-              toggleSidebar={toggleSidebarVisibility}
-            />
-            <motion.div
-              className={`fixed inset-0 ${
-                isDarkMode ? 'bg-black bg-opacity-50' : 'bg-black bg-opacity-30'
-              } z-40 md:hidden`}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 0.5 }}
-              exit={{ opacity: 0 }}
-              onClick={toggleSidebarVisibility}
-            />
-          </>
-        )}
-      </AnimatePresence>
-     
-      <main className="flex-1 flex flex-col p-4 overflow-auto">
-       <div className="flex items-center justify-between mb-6">
-          <button
-            onClick={toggleSidebarVisibility}
-            className={`${isDarkMode ? 'text-white' : 'text-gray-600'} hover:text-slate-500`}
-            aria-label={isSidebarVisible ? 'Hide Sidebar' : 'Show Sidebar'}
-          >
-            <AnimatePresence mode="wait" initial={false}>
-              {isSidebarVisible ? (
-                <motion.div
-                  key="close-icon"
-                  initial={{ rotate: 90, opacity: 0 }}
-                  animate={{ rotate: 0, opacity: 1 }}
-                  exit={{ rotate: -90, opacity: 0 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  <FaTimes size={24} />
-                </motion.div>
-              ) : (
-                <motion.div
-                  key="menu-icon"
-                  initial={{ rotate: -90, opacity: 0 }}
-                  animate={{ rotate: 0, opacity: 1 }}
-                  exit={{ rotate: 90, opacity: 0 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  <FaBars size={24} />
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </button>
-        </div>
-        <div className="w-full flex flex-row flex-nowrap justify-end mb-4 gap-2 sm:gap-4">
-          <button
+    <div className={clsx('relative flex h-screen transition-colors duration-500', isDarkMode ? 'text-white' : 'text-gray-800')}>
+      {/* Sidebar is always visible */}
+      <Sidebar activeLink="/ailawtools/examprep" isSidebarVisible={true} isDarkMode={isDarkMode} />
+
+      {/* Floating Top-Right Controls */}
+      <div className="absolute top-6 right-[5%] z-[100] flex flex-col items-center gap-2">
+        <div className="flex flex-col items-center">
+          <motion.button
             onClick={openLoadProgressModal}
-            className={`group relative h-10 sm:h-12 w-28 sm:w-40 overflow-hidden rounded ${
-              isDarkMode ? 'bg-blue-700' : 'bg-blue-950'
-            } text-white duration-200 before:absolute before:right-0 before:top-0 before:h-full before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-56 text-sm sm:text-base shadow-md`}
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.95 }}
+            className="p-3 rounded-full bg-gradient-to-r from-blue-600 to-blue-800 text-white transition-all duration-200 shadow-lg"
             aria-label="Load Progress"
           >
-            Load Progress
-          </button>
-          <button
+            <FaSyncAlt size={20} />
+          </motion.button>
+          <span className="text-xs mt-1">Load Saves</span>
+        </div>
+        <div className="flex flex-col items-center">
+          <motion.button
             onClick={openConfigModal}
-            className={`group relative h-10 sm:h-12 w-28 sm:w-40 overflow-hidden rounded ${
-              isDarkMode ? 'bg-blue-700' : 'bg-blue-950'
-            } text-white duration-200 before:absolute before:right-0 before:top-0 before:h-full before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-56 text-sm sm:text-base shadow-md`}
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.95 }}
+            className="p-3 rounded-full bg-gradient-to-r from-blue-600 to-blue-800 text-white transition-all duration-200 shadow-lg"
             aria-label="Configure Exam"
           >
-            Configure
-          </button>
+            <FaChevronDown size={20} />
+          </motion.button>
+          <span className="text-xs mt-1">Configure</span>
         </div>
+      </div>
 
-        {/* Question Counter */}
-        {isExamStarted && (
-          <div
-            className={`w-full max-w-5xl mb-4 p-4 ${
-              isDarkMode ? 'bg-gray-700' : 'bg-white'
-            } rounded-lg shadow-md flex justify-between items-center`}
-          >
-            <span className={`${isDarkMode ? 'text-white' : 'text-gray-700'}`}>
-              Questions Answered: {currentQuestionCount} / {examConfig.questionLimit}
-            </span>
-            <span
-              className={`px-3 py-1 rounded-full text-sm font-semibold uppercase ${
-                isProUser ? 'bg-blue-100 text-blue-700' : 'bg-emerald-100 text-emerald-700'
-              }`}
-            >
-              {isProUser ? 'Pro User' : 'Base User'}
-            </span>
-          </div>
-        )}
-        
-        <div className="flex-1 flex flex-col items-center justify-center w-full max-w-3xl mx-auto">
-        {/* Question + Options Display */}
-        {questionStem && (
-          <div
-            className={`w-full max-w-5xl mb-6 p-6 ${
-              isDarkMode ? 'bg-gray-700' : 'bg-white'
-            } rounded-lg shadow-md overflow-y-scroll`}
-          >
-            <h3 className={`text-2xl font-semibold mb-2 ${isDarkMode ? 'text-blue-400' : 'text-blue-900'}`}>
-              Practice Question
-            </h3>
-            <h3 className={`text-sm font-medium mb-6 ${isDarkMode ? 'text-white' : 'text-slate-400'}`}>
-              Built on LExAPI Version 0.3.6
-            </h3>
-            <p className={`mb-4 ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>{questionStem}</p>
-            {options.length > 0 && (
-              <ul className="list-none">
-                {options.map((option, idx) => (
-                  <li key={idx} className={`mb-2 ${isDarkMode ? 'text-white' : 'text-gray-700'}`}>
-                    {option}
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
-        )}
-
-        {/* Answer Mode Toggle */}
-        {(questionStem || questionText) && (
-          <div className="w-full max-w-5xl mb-2 flex items-center justify-center">
-            <div className="relative flex bg-gray-200 rounded-full p-0.5">
-              <motion.div
-                className="absolute top-0 left-0 w-1/2 h-full bg-blue-900 rounded-full"
-                initial={false}
-                animate={{ x: answerMode === 'written' ? 0 : '100%' }}
-                transition={{ type: 'spring', stiffness: 700, damping: 30 }}
-              />
-              <button
-                onClick={() => setAnswerMode('written')}
-                className={`relative w-1/2 px-2 py-1 text-sm rounded-full focus:outline-none ${
-                  answerMode === 'written' ? 'text-white' : 'text-gray-700'
-                }`}
-              >
-                Written
-              </button>
-              <button
-                onClick={() => setAnswerMode('multiple-choice')}
-                className={`relative w-1/2 px-2 py-1 text-sm rounded-full focus:outline-none ${
-                  answerMode === 'multiple-choice' ? 'text-white' : 'text-gray-700'
-                }`}
-              >
-                Multiple Choice
-              </button>
+      <main className="flex-1 flex flex-col px-6 relative z-200 h-screen">
+        <motion.div
+          className={clsx(
+            'flex-1 w-full rounded-xl shadow-lg p-6 overflow-y-auto mx-auto my-4',
+            isDarkMode ? 'bg-slate-800 bg-opacity-50 text-white' : 'bg-white text-gray-800'
+          )}
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+        >
+          {/* Exam Progress Header */}
+          {isExamStarted && (
+            <div className={clsx('w-full max-w-5xl mb-4 p-4 rounded-lg shadow-md flex justify-between items-center', isDarkMode ? 'bg-gray-700' : 'bg-white')}>
+              <span className={isDarkMode ? 'text-white' : 'text-gray-700'}>
+                Questions Answered: {currentQuestionCount} / {examConfig.questionLimit}
+              </span>
+              <span className={clsx('px-3 py-1 rounded-full text-sm font-semibold uppercase', isProUser ? 'bg-blue-100 text-blue-700' : 'bg-emerald-100 text-emerald-700')}>
+                {isProUser ? 'Pro User' : 'Base User'}
+              </span>
             </div>
-          </div>
-        )}
+          )}
 
-        {/* Answer Input */}
-        {(questionStem || questionText) && (
-          <div className="w-full max-w-5xl mb-6">
-            {answerMode === 'written' ? (
-              <textarea
-                className={`w-full p-4 border ${
-                  isDarkMode
-                    ? 'border-gray-600 bg-gray-700 text-white'
-                    : 'border-gray-300 bg-white text-gray-800'
-                } rounded resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-200`}
-                value={inputText}
-                onChange={(e) => setInputText(e.target.value)}
-                placeholder="Enter your essay/short-answer response..."
-                rows={6}
-                disabled={isLoading}
-              />
-            ) : (
-              <div className="flex flex-col space-y-2">
-                {options.map((option, index) => {
-                  const letter = getOptionLetter(option);
-                  if (!letter) return null;
-                  return (
-                    <label
-                      key={index}
-                      className={`flex items-center ${isDarkMode ? 'text-white' : 'text-gray-700'}`}
-                    >
-                      <input
-                        type="radio"
-                        name="multipleChoiceAnswer"
-                        value={letter}
-                        checked={inputText === letter}
-                        onChange={(e) => setInputText(e.target.value)}
-                        className={`form-radio h-4 w-4 ${
-                          isDarkMode ? 'text-blue-900' : 'text-blue-900'
-                        } focus:ring-blue-500 border-gray-300 rounded`}
-                        disabled={isLoading}
-                      />
-                      <span className="ml-2">{option}</span>
-                    </label>
-                  );
-                })}
+          {/* Exam Question Card */}
+          {(questionStem || questionText) && (
+            <motion.div
+              className={clsx('relative w-full max-w-xl p-6 mx-auto rounded-xl shadow-md', isDarkMode ? 'bg-gray-700' : 'bg-white')}
+              initial={{ opacity: 0, y: 50 }}
+              animate={{ opacity: 1, y: 0 }}
+            >
+              <h2 className="text-2xl font-semibold mb-2 text-center">Practice Question</h2>
+              {questionStem && <p className="mb-4 text-center">{questionStem}</p>}
+              {options.length > 0 && (
+                <ul className="list-none mb-4">
+                  {options.map((option, idx) => (
+                    <li key={idx} className={clsx('mb-2 text-center', isDarkMode ? 'text-white' : 'text-gray-800')}>
+                      {option}
+                    </li>
+                  ))}
+                </ul>
+              )}
+              <div className="flex justify-center mb-4">
+                <div className="relative flex bg-gray-200 rounded-full p-0.5">
+                  <motion.div
+                    className="absolute top-0 left-0 w-1/2 h-full bg-blue-900 rounded-full"
+                    initial={false}
+                    animate={{ x: answerMode === 'written' ? 0 : '100%' }}
+                    transition={{ type: 'spring', stiffness: 700, damping: 30 }}
+                  />
+                  <button
+                    onClick={() => setAnswerMode('written')}
+                    className={clsx('relative w-1/2 px-2 py-1 text-sm rounded-full focus:outline-none', answerMode === 'written' ? 'text-white' : 'text-gray-700')}
+                  >
+                    Written
+                  </button>
+                  <button
+                    onClick={() => setAnswerMode('multiple-choice')}
+                    className={clsx('relative w-1/2 px-2 py-1 text-sm rounded-full focus:outline-none', answerMode === 'multiple-choice' ? 'text-white' : 'text-gray-700')}
+                  >
+                    Multiple Choice
+                  </button>
+                </div>
               </div>
-            )}
-          </div>
-        )}
-
-        {/* Action Buttons */}
-        {(questionStem || questionText) && (
-          <div className="w-full max-w-5xl flex space-x-4">
-            <button
-              onClick={handleSubmitAnswer}
-              className={`flex-1 px-4 py-3 rounded font-semibold transition-colors duration-200 shadow-md ${
-                isLoading || !inputText.trim()
-                  ? `${
-                      isDarkMode
+              <div>
+                {answerMode === 'written' ? (
+                  <textarea
+                    className={clsx('w-full p-4 border rounded resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-200', isDarkMode ? 'border-gray-600 bg-gray-700 text-white' : 'border-gray-300 bg-white text-gray-800')}
+                    value={inputText}
+                    onChange={(e) => setInputText(e.target.value)}
+                    placeholder="Enter your essay/short-answer response..."
+                    rows={6}
+                    disabled={isLoading}
+                    aria-label="Answer Input"
+                  />
+                ) : (
+                  <div className="flex flex-col space-y-2">
+                    {options.map((option, index) => {
+                      const letter = getOptionLetter(option);
+                      if (!letter) return null;
+                      return (
+                        <label key={index} className={clsx('flex items-center', isDarkMode ? 'text-white' : 'text-gray-700')}>
+                          <input
+                            type="radio"
+                            name="multipleChoiceAnswer"
+                            value={letter}
+                            checked={inputText === letter}
+                            onChange={(e) => setInputText(e.target.value)}
+                            className={clsx('form-radio h-4 w-4', isDarkMode ? 'text-blue-900' : 'text-blue-900', 'focus:ring-blue-500 border-gray-300 rounded')}
+                            disabled={isLoading}
+                          />
+                          <span className="ml-2">{option}</span>
+                        </label>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+              <div className="flex space-x-4 mt-6">
+                <button
+                  onClick={handleSubmitAnswer}
+                  className={clsx(
+                    'flex-1 px-4 py-3 rounded font-semibold transition-colors duration-200 shadow-md',
+                    isLoading || !inputText.trim()
+                      ? isDarkMode
                         ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
                         : 'bg-gray-300 text-gray-600 cursor-not-allowed'
-                    }`
-                  : `${
-                      isDarkMode
-                        ? 'bg-blue-600 hover:bg-blue-700 text-white'
-                        : 'bg-blue-900 hover:bg-blue-950 text-white'
-                    }`
-              }`}
-              disabled={isLoading || !inputText.trim()}
-              aria-label="Submit Answer"
-            >
-              {isLoading ? 'Submitting...' : 'Submit Answer'}
-            </button>
-            <button
-              onClick={handleSaveProgress}
-              className={`flex items-center justify-center px-4 py-3 rounded ${
-                isDarkMode
-                  ? 'bg-transparent text-white hover:text-slate-500'
-                  : 'bg-transparent text-blue-950 hover:text-slate-500'
-              } transition-colors duration-200`}
-              disabled={!currentUser}
-              aria-label="Save Progress"
-            >
-              <motion.div whileHover={{ scale: 1.2, rotate: 360 }} transition={{ duration: 0.5 }}>
-                <FaSave size={24} />
-              </motion.div>
-            </button>
-            <button
-              onClick={handleGetQuestion}
-              className={`flex items-center justify-center px-4 py-3 rounded ${
-                isDarkMode
-                  ? 'bg-transparent text-white hover:text-slate-500'
-                  : 'bg-transparent text-blue-950 hover:text-slate-500'
-              } transition-colors duration-200`}
-              disabled={isLoading}
-              aria-label="Generate New Question"
-            >
-              <motion.div whileHover={{ scale: 1.2, rotate: -360 }} transition={{ duration: 0.5 }}>
-                <FaSyncAlt size={24} />
-              </motion.div>
-            </button>
-          </div>
-        )}
+                      : isDarkMode
+                      ? 'bg-blue-600 hover:bg-blue-700 text-white'
+                      : 'bg-blue-900 hover:bg-blue-950 text-white'
+                  )}
+                  disabled={isLoading || !inputText.trim()}
+                  aria-label="Submit Answer"
+                >
+                  {isLoading ? 'Submitting...' : 'Submit Answer'}
+                </button>
+                <button
+                  onClick={handleSaveProgress}
+                  className={clsx(
+                    'flex items-center justify-center px-4 py-3 rounded',
+                    isDarkMode ? 'bg-transparent text-white hover:text-slate-500' : 'bg-transparent text-blue-950 hover:text-slate-500',
+                    'transition-colors duration-200'
+                  )}
+                  disabled={!currentUser}
+                  aria-label="Save Progress"
+                >
+                  <motion.div whileHover={{ scale: 1.2, rotate: 360 }} transition={{ duration: 0.5 }}>
+                    <FaSave size={24} />
+                  </motion.div>
+                </button>
+                <button
+                  onClick={handleGetQuestion}
+                  className={clsx(
+                    'flex items-center justify-center px-4 py-3 rounded',
+                    isDarkMode ? 'bg-transparent text-white hover:text-slate-500' : 'bg-transparent text-blue-950 hover:text-slate-500',
+                    'transition-colors duration-200'
+                  )}
+                  disabled={isLoading}
+                  aria-label="Generate New Question"
+                >
+                  <motion.div whileHover={{ scale: 1.2, rotate: -360 }} transition={{ duration: 0.5 }}>
+                    <FaSyncAlt size={24} />
+                  </motion.div>
+                </button>
+              </div>
+            </motion.div>
+          )}
 
-        {/* If no question is loaded yet */}
-        {!questionStem && !questionText && (
-          <div
-            className={`w-full max-w-5xl p-6 rounded-lg shadow-md text-center ${
-              isDarkMode ? 'bg-slate-700 text-white' : 'bg-white text-black'
-            }`}
-          >
-            <p className={`mb-4 ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
-              Click <span className="font-semibold">Configure</span> to begin your Practice Exam.
-            </p>
-            <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-              <strong>Note:</strong> This is intended for law students to practice essay/MC questions.
-            </p>
-          </div>
-        )}
+          {!questionStem && !questionText && (
+            <div className={clsx('w-full max-w-5xl p-6 rounded-lg shadow-md text-center mx-auto', isDarkMode ? 'bg-slate-700 text-white' : 'bg-white text-black')}>
+              <p className={clsx('mb-4', isDarkMode ? 'text-gray-300' : 'text-gray-600')}>
+                Click <span className="font-semibold">Configure</span> to begin your Practice Exam.
+              </p>
+              <p className={clsx('text-sm', isDarkMode ? 'text-gray-400' : 'text-gray-500')}>
+                <strong>Note:</strong> This tool is intended for law students to practice essay/MC questions.
+              </p>
+            </div>
+          )}
 
-        {/* Configuration Modal */}
+          {/* Result Modal */}
+          <AnimatePresence>
+            {isResultModalOpen && (
+              <motion.div
+                className={clsx('fixed inset-0 flex items-center justify-center', isDarkMode ? 'bg-black bg-opacity-70' : 'bg-black bg-opacity-50', 'z-50')}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+              >
+                <motion.div
+                  className={clsx('p-8 rounded-lg w-11/12 max-w-md shadow-lg overflow-y-auto', isDarkMode ? 'bg-gray-700 text-white' : 'bg-white text-black')}
+                  initial={{ scale: 0.8, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  exit={{ scale: 0.8, opacity: 0 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <h2 className={clsx('text-2xl font-semibold mb-6', isDarkMode ? 'text-white' : 'text-gray-800')}>
+                    Answer Feedback
+                  </h2>
+                  <p className={clsx('mb-6', isDarkMode ? 'text-gray-300' : 'text-gray-800')}>{answerResult}</p>
+                  <div className="flex justify-end space-x-4">
+                    <button
+                      type="button"
+                      onClick={closeResultModal}
+                      className={clsx('h-10 sm:h-12 px-4 py-2 rounded', isDarkMode ? 'bg-red-600 text-white hover:bg-red-700' : 'bg-red-600 text-white hover:bg-red-700', 'transition-colors duration-200 text-sm sm:text-base')}
+                      aria-label="Close Feedback Modal"
+                    >
+                      Close
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        closeResultModal();
+                        handleGetQuestion();
+                      }}
+                      className={clsx('h-10 sm:h-12 px-4 py-2 rounded', isDarkMode ? 'bg-blue-600 hover:bg-blue-700 text-white' : 'bg-blue-900 hover:bg-blue-950 text-white', 'transition-colors duration-200 text-sm sm:text-base')}
+                      disabled={isLoading}
+                      aria-label="Next Question"
+                    >
+                      {isLoading ? 'Loading...' : 'Next Question'}
+                    </button>
+                  </div>
+                </motion.div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* Final Feedback Modal */}
+          <AnimatePresence>
+            {isFinalFeedbackModalOpen && (
+              <motion.div
+                className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+              >
+                <motion.div
+                  className={clsx('p-6 rounded-lg w-11/12 max-w-2xl shadow-lg max-h-[80vh] overflow-y-auto', isDarkMode ? 'bg-gray-700 text-white' : 'bg-white text-gray-800')}
+                  initial={{ scale: 0.8, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  exit={{ scale: 0.8, opacity: 0 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <h2 className="text-2xl mb-4 text-center">Final Feedback</h2>
+                  {answeredQuestions.map((card, idx) => (
+                    <div key={idx} className={clsx('mb-4 p-4 rounded border', isDarkMode ? 'border-gray-700' : 'border-gray-800')}>
+                      <p className="mb-1 text-blue-300 text-center">Question {idx + 1}</p>
+                      <p className="text-center"><strong>Question:</strong> {card.question}</p>
+                      <p className="text-center"><strong>Your Answer:</strong> {card.answer}</p>
+                      <p className="text-center"><strong>Feedback:</strong> {card.feedback}</p>
+                      <p className={clsx('font-bold mt-1 text-center', card.correct ? 'text-emerald-500' : 'text-red-500')}>
+                        {card.correct ? '✓ Correct' : '✗ Incorrect'}
+                      </p>
+                    </div>
+                  ))}
+                  <div className="text-center mt-4">
+                    <button
+                      onClick={() => setIsFinalFeedbackModalOpen(false)}
+                      className={clsx('h-10 sm:h-12 px-4 py-2 rounded', isDarkMode ? 'bg-blue-700 hover:bg-blue-600 text-white' : 'bg-blue-600 hover:bg-blue-700 text-white')}
+                    >
+                      Close
+                    </button>
+                  </div>
+                </motion.div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* Load Progress Modal */}
+          <AnimatePresence>
+            {isLoadProgressModalOpen && (
+              <motion.div
+                className={clsx('fixed inset-0 bg-black bg-opacity-50 z-[151] flex items-center justify-center')}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+              >
+                <motion.div
+                  className={clsx('p-8 rounded-lg w-11/12 max-w-3xl shadow-lg overflow-y-auto max-h-screen', isDarkMode ? 'bg-gray-700 text-white' : 'bg-white text-black')}
+                  initial={{ scale: 0.8, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  exit={{ scale: 0.8, opacity: 0 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <h2 className={clsx('text-2xl font-semibold mb-6', isDarkMode ? 'text-white' : 'text-gray-800')}>Load Saved Progress</h2>
+                  {savedProgresses.length === 0 ? (
+                    <p className={clsx(isDarkMode ? 'text-gray-300' : 'text-gray-700')}>No saved progress found.</p>
+                  ) : (
+                    <ul className="space-y-4">
+                      {savedProgresses.map((progress) => (
+                        <li key={progress.id} className={clsx('p-4 border rounded', isDarkMode ? 'border-gray-600' : 'border-gray-200')}>
+                          <div className="flex justify-between items-start">
+                            <div>
+                              <p className={clsx('font-semibold', isDarkMode ? 'text-blue-300' : 'text-blue-900')}>
+                                Exam Type: {progress.examConfig.examType}
+                              </p>
+                              <p className="text-sm">Subject: {progress.examConfig.lawSubject}</p>
+                              <p className="text-sm">Difficulty: {progress.examConfig.difficulty}</p>
+                              <p className="text-sm">Questions: {progress.examConfig.questionLimit}</p>
+                              <p className="text-sm">Saved on: {new Date(progress.timestamp).toLocaleString()}</p>
+                            </div>
+                            <div className="flex space-x-2 mt-2">
+                              <button
+                                onClick={() => handleLoadProgress(progress)}
+                                className="h-10 w-20 sm:w-24 rounded bg-gradient-to-r from-blue-600 to-blue-800 text-white text-sm sm:text-base flex items-center justify-center transition-all duration-200"
+                                aria-label="Load Progress"
+                              >
+                                Load
+                              </button>
+                              <button
+                                onClick={() => handleDeleteProgress(progress.id)}
+                                className="h-10 w-20 sm:w-24 rounded bg-red-600 text-white text-sm sm:text-base flex items-center justify-center transition-colors duration-200 hover:bg-red-700"
+                                aria-label="Delete Progress"
+                              >
+                                Delete
+                              </button>
+                            </div>
+                          </div>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                  <div className="text-center mt-6">
+                    <button
+                      onClick={closeLoadProgressModal}
+                      className={clsx('h-10 sm:h-12 px-4 py-2 rounded', isDarkMode ? 'bg-gray-700 hover:bg-gray-600 text-white' : 'bg-gray-300 hover:bg-gray-400 text-gray-800')}
+                    >
+                      Close
+                    </button>
+                  </div>
+                </motion.div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </motion.div>
+      </main>
+
+      {/* -----------------------------
+           Configure Exam Modal 
+           (Style copied from the AI Tutor component)
+      ----------------------------- */}
+      <AnimatePresence>
         {isConfigModalOpen && (
           <motion.div
-            className={`fixed inset-0 flex items-center justify-center ${
-              isDarkMode ? 'bg-black bg-opacity-70' : 'bg-black bg-opacity-50'
-            } z-[151]`}
+            className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-70 z-50"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
           >
             <motion.div
-              className={`p-8 rounded-lg w-11/12 max-w-md shadow-lg overflow-y-auto max-h-screen ${
-                isDarkMode ? 'bg-gray-700 text-white' : 'bg-white text-black'
-              }`}
+              className="bg-gray-800 p-8 rounded-lg w-11/12 max-w-md shadow-2xl overflow-y-auto max-h-screen"
               initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.8, opacity: 0 }}
               transition={{ duration: 0.3 }}
             >
-              <h2
-                className={`text-2xl font-semibold mb-6 ${
-                  isDarkMode ? 'text-white' : 'text-gray-800'
-                }`}
-              >
-                Configure Practice Exam
-              </h2>
+              <div className="flex justify-between items-center mb-6 border-b pb-2">
+                <h2 className="text-2xl font-bold w-full text-center text-white">Configure Exam</h2>
+                <button onClick={closeConfigModal} className="text-xl font-semibold text-gray-400 hover:text-gray-200">&times;</button>
+              </div>
               <form>
-                {/* Exam Type */}
                 <div className="mb-4">
-                  <label className={`block mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                    Exam Type / Purpose:
-                  </label>
+                  <label className="block mb-2 text-white">Exam Type</label>
                   <select
                     name="examType"
                     value={examConfig.examType}
-                    onChange={handleConfigChange}
-                    className={`w-full p-3 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                      isDarkMode ? 'bg-gray-600 border-gray-500 text-white' : 'bg-white border-gray-300 text-gray-800'
-                    }`}
+                    onChange={(e) =>
+                      setExamConfig((prev) => ({ ...prev, examType: e.target.value }))
+                    }
+                    className="w-full p-3 rounded border focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-700 text-white"
                   >
-                    {examTypeOptions.map((type) => (
-                      <option key={type} value={type}>
-                        {type}
+                    {examTypeOptions.map((option) => (
+                      <option key={option} value={option}>
+                        {option}
                       </option>
                     ))}
                   </select>
                 </div>
-
-                {/* Law Subject */}
                 <div className="mb-4">
-                  <label className={`block mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                    Law Subject:
-                  </label>
+                  <label className="block mb-2 text-white">Law Subject</label>
                   <select
                     name="lawSubject"
                     value={examConfig.lawSubject}
-                    onChange={handleConfigChange}
-                    className={`w-full p-3 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                      isDarkMode ? 'bg-gray-600 border-gray-500 text-white' : 'bg-white border-gray-300 text-gray-800'
-                    }`}
+                    onChange={(e) =>
+                      setExamConfig((prev) => ({ ...prev, lawSubject: e.target.value }))
+                    }
+                    className="w-full p-3 rounded border focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-700 text-white"
                   >
-                    {lawSubjectOptions.map((subject) => (
-                      <option key={subject} value={subject}>
-                        {subject}
+                    {lawSubjectOptions.map((option) => (
+                      <option key={option} value={option}>
+                        {option}
                       </option>
                     ))}
                   </select>
                 </div>
-
-                {/* Difficulty */}
-                <div className="mb-4">
-                  <label className={`block mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                    Difficulty:
-                  </label>
-                  <select
-                    name="difficulty"
-                    value={examConfig.difficulty}
-                    onChange={handleConfigChange}
-                    className={`w-full p-3 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                      isDarkMode ? 'bg-gray-600 border-gray-500 text-white' : 'bg-white border-gray-300 text-gray-800'
-                    }`}
-                  >
-                    {difficultyOptions.map((diff) => (
-                      <option key={diff} value={diff}>
-                        {diff}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                {/* Question Types */}
-                <div className="mb-4">
-                  <label className={`block mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                    Question Types:
-                  </label>
-                  {questionTypeOptions.map((qt) => (
-                    <div key={qt} className="flex items-center mb-1">
-                      <input
-                        type="checkbox"
-                        name="selectedQuestionTypes"
-                        id={`qt-${qt}`}
-                        checked={examConfig.selectedQuestionTypes.includes(qt)}
-                        onChange={(e) => {
-                          const { checked } = e.target;
-                          setExamConfig((prev) => {
-                            let updated = [...prev.selectedQuestionTypes];
-                            if (checked) updated.push(qt);
-                            else updated = updated.filter((t) => t !== qt);
-                            return { ...prev, selectedQuestionTypes: updated };
-                          });
-                        }}
-                        className={`h-5 w-5 ${
-                          isDarkMode ? 'text-blue-900 bg-gray-600 border-gray-500' : 'text-blue-900 bg-white border-gray-300'
-                        } focus:ring-blue-500 rounded`}
-                      />
-                      <label
-                        htmlFor={`qt-${qt}`}
-                        className={`ml-3 block ${isDarkMode ? 'text-white' : 'text-gray-700'}`}
-                      >
-                        {qt}
-                      </label>
-                    </div>
-                  ))}
-                </div>
-
-                {/* More Options */}
-                <div className="mb-4 flex items-center">
-                  <input
-                    type="checkbox"
-                    id="includeCurveBalls"
-                    name="includeCurveBalls"
-                    checked={examConfig.includeCurveBalls}
-                    onChange={handleConfigChange}
-                    className={`h-5 w-5 ${
-                      isDarkMode ? 'text-blue-900 bg-gray-600 border-gray-500' : 'text-blue-900 bg-white border-gray-300'
-                    } focus:ring-blue-500 rounded`}
-                  />
-                  <label
-                    htmlFor="includeCurveBalls"
-                    className={`ml-3 block ${isDarkMode ? 'text-white' : 'text-gray-700'}`}
-                  >
-                    Include tricky/curve-ball questions
-                  </label>
-                </div>
-
-                <div className="mb-4 flex items-center">
-                  <input
-                    type="checkbox"
-                    id="allowMultipleChoice"
-                    name="allowMultipleChoice"
-                    checked={examConfig.allowMultipleChoice}
-                    onChange={handleConfigChange}
-                    className={`h-5 w-5 ${
-                      isDarkMode ? 'text-blue-900 bg-gray-600 border-gray-500' : 'text-blue-900 bg-white border-gray-300'
-                    } focus:ring-blue-500 rounded`}
-                  />
-                  <label
-                    htmlFor="allowMultipleChoice"
-                    className={`ml-3 block ${isDarkMode ? 'text-white' : 'text-gray-700'}`}
-                  >
-                    Allow multiple-choice style questions
-                  </label>
-                </div>
-
-                <div className="mb-4 flex items-center">
-                  <input
-                    type="checkbox"
-                    id="preferEssayStyle"
-                    name="preferEssayStyle"
-                    checked={examConfig.preferEssayStyle}
-                    onChange={handleConfigChange}
-                    className={`h-5 w-5 ${
-                      isDarkMode ? 'text-blue-900 bg-gray-600 border-gray-500' : 'text-blue-900 bg-white border-gray-300'
-                    } focus:ring-blue-500 rounded`}
-                  />
-                  <label
-                    htmlFor="preferEssayStyle"
-                    className={`ml-3 block ${isDarkMode ? 'text-white' : 'text-gray-700'}`}
-                  >
-                    Prefer essay-style scenario
-                  </label>
-                </div>
-
-                {/* Instant Feedback */}
-                <div className="mb-4 flex items-center">
-                  <input
-                    type="checkbox"
-                    id="instantFeedback"
-                    name="instantFeedback"
-                    checked={examConfig.instantFeedback}
-                    onChange={handleConfigChange}
-                    className={`h-5 w-5 ${
-                      isDarkMode ? 'text-blue-900 bg-gray-600 border-gray-500' : 'text-blue-900 bg-white border-gray-300'
-                    } focus:ring-blue-500 rounded`}
-                  />
-                  <label
-                    htmlFor="instantFeedback"
-                    className={`ml-3 block ${isDarkMode ? 'text-white' : 'text-gray-700'}`}
-                  >
-                    Enable Instant Feedback
-                  </label>
-                </div>
-
-                {/* Time Limit */}
-                <div className="mb-4">
-                  <label className={`block mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                    Time Limit (minutes):
-                  </label>
-                  <input
-                    type="number"
-                    name="timeLimit"
-                    value={examConfig.timeLimit}
-                    onChange={handleConfigChange}
-                    min={0}
-                    max={180}
-                    className={`w-full p-3 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                      isDarkMode ? 'bg-gray-600 border-gray-500 text-white' : 'bg-white border-gray-300 text-gray-800'
-                    }`}
-                    placeholder="0 means no time limit"
-                  />
-                </div>
-
-                {/* Question Limit Range */}
-                <div className="mb-6">
-                  <label className={`block mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                    Number of Questions:
-                  </label>
-                  <div className="flex items-center">
+                <div className="mb-4 grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block mb-2 text-white">Difficulty</label>
+                    <select
+                      name="difficulty"
+                      value={examConfig.difficulty}
+                      onChange={(e) =>
+                        setExamConfig((prev) => ({ ...prev, difficulty: e.target.value }))
+                      }
+                      className="w-full p-3 rounded border focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-700 text-white"
+                    >
+                      {difficultyOptions.map((option) => (
+                        <option key={option} value={option}>
+                          {option}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block mb-2 text-white">Question Limit</label>
                     <input
-                      type="range"
-                      min="1"
-                      max="20"
+                      type="number"
+                      name="questionLimit"
                       value={examConfig.questionLimit}
                       onChange={(e) =>
-                        setExamConfig((prev) => ({
-                          ...prev,
-                          questionLimit: parseInt(e.target.value, 10),
-                        }))
+                        setExamConfig((prev) => ({ ...prev, questionLimit: e.target.value }))
                       }
-                      className={`w-full h-2 ${
-                        isDarkMode ? 'bg-blue-700' : 'bg-blue-200'
-                      } rounded-lg appearance-none cursor-pointer`}
+                      className="w-full p-3 rounded border focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-700 text-white"
+                      min="1"
                     />
-                    <span className={`ml-4 ${isDarkMode ? 'text-white' : 'text-gray-700'}`}>
-                      {examConfig.questionLimit}
-                    </span>
                   </div>
                 </div>
-
-                {/* Action Buttons */}
-                <div className="flex justify-end space-x-4">
+                <div className="mb-4 grid grid-cols-2 gap-4">
+                  <div className="flex items-center justify-between">
+                    <label className="text-white font-medium">Instant Feedback</label>
+                    <input
+                      type="checkbox"
+                      name="instantFeedback"
+                      checked={examConfig.instantFeedback}
+                      onChange={(e) =>
+                        setExamConfig((prev) => ({ ...prev, instantFeedback: e.target.checked }))
+                      }
+                      className="h-5 w-5 text-blue-500 focus:ring-blue-500 border-gray-300 rounded"
+                    />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <label className="text-white font-medium">Time Limit (min)</label>
+                    <input
+                      type="number"
+                      name="timeLimit"
+                      value={examConfig.timeLimit}
+                      onChange={(e) =>
+                        setExamConfig((prev) => ({ ...prev, timeLimit: e.target.value }))
+                      }
+                      className="h-8 w-16 p-1 rounded border focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-700 text-white"
+                      min="0"
+                    />
+                  </div>
+                </div>
+                <div className="mb-4 grid grid-cols-2 gap-4">
+                  <div className="flex items-center justify-between">
+                    <label className="text-white font-medium">Include Curve Balls</label>
+                    <input
+                      type="checkbox"
+                      name="includeCurveBalls"
+                      checked={examConfig.includeCurveBalls}
+                      onChange={(e) =>
+                        setExamConfig((prev) => ({ ...prev, includeCurveBalls: e.target.checked }))
+                      }
+                      className="h-5 w-5 text-blue-500 focus:ring-blue-500 border-gray-300 rounded"
+                    />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <label className="text-white font-medium">Allow Multiple Choice</label>
+                    <input
+                      type="checkbox"
+                      name="allowMultipleChoice"
+                      checked={examConfig.allowMultipleChoice}
+                      onChange={(e) =>
+                        setExamConfig((prev) => ({ ...prev, allowMultipleChoice: e.target.checked }))
+                      }
+                      className="h-5 w-5 text-blue-500 focus:ring-blue-500 border-gray-300 rounded"
+                    />
+                  </div>
+                </div>
+                <div className="flex items-center justify-between mb-4">
+                  <label className="text-white font-medium">Prefer Essay Style</label>
+                  <input
+                    type="checkbox"
+                    name="preferEssayStyle"
+                    checked={examConfig.preferEssayStyle}
+                    onChange={(e) =>
+                      setExamConfig((prev) => ({ ...prev, preferEssayStyle: e.target.checked }))
+                    }
+                    className="h-5 w-5 text-blue-500 focus:ring-blue-500 border-gray-300 rounded"
+                  />
+                </div>
+                <div className="mb-6">
+                  <label className="block mb-2 text-white font-medium">Extra Instructions</label>
+                  <textarea
+                    name="extraInstructions"
+                    value={examConfig.extraInstructions}
+                    onChange={(e) =>
+                      setExamConfig((prev) => ({ ...prev, extraInstructions: e.target.value }))
+                    }
+                    placeholder="Additional notes or instructions..."
+                    className="w-full p-3 rounded border focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-700 text-white"
+                    rows={3}
+                  />
+                </div>
+                <div className="flex justify-end gap-4">
                   <button
                     type="button"
-                    onClick={() => {
-                      closeConfigModal();
-                      handleGetQuestion();
-                    }}
-                    className="relative h-12 w-full sm:w-56 overflow-hidden rounded bg-blue-950 text-white shadow-lg transition-colors duration-200 before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-56"
-                    aria-label="Start Practice"
+                    onClick={closeConfigModal}
+                    className="px-6 py-2 rounded bg-red-600 text-white hover:bg-red-700 transition-colors duration-200"
                   >
-                    Start Practice
-                    <motion.span
-                      className="absolute right-4 top-3"
-                      initial={{ x: -10, opacity: 0 }}
-                      animate={{ x: 0, opacity: 1 }}
-                      transition={{ delay: 0.3, duration: 0.3 }}
-                    >
-                      <i className="fa-solid fa-arrow-right"></i>
-                    </motion.span>
+                    Cancel
                   </button>
                   <button
                     type="button"
                     onClick={closeConfigModal}
-                    className={`h-10 sm:h-12 px-6 py-2 rounded ${
-                      isDarkMode ? 'bg-gray-600 text-gray-300 hover:bg-gray-500' : 'bg-gray-300 text-gray-700 hover:bg-gray-400'
-                    } transition-colors duration-200 text-sm sm:text-base`}
-                    aria-label="Cancel Configuration"
+                    className="px-6 py-2 rounded bg-blue-900 text-white hover:bg-blue-950 transition-colors duration-200"
                   >
-                    Cancel
+                    Save
                   </button>
                 </div>
               </form>
             </motion.div>
           </motion.div>
         )}
-
-        {/* Result Modal */}
-        {isResultModalOpen && (
-          <motion.div
-            className={`fixed inset-0 flex items-center justify-center ${
-              isDarkMode ? 'bg-black bg-opacity-70' : 'bg-black bg-opacity-50'
-            } z-50`}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-          >
-            <motion.div
-              className={`p-8 rounded-lg w-11/12 max-w-md shadow-lg overflow-y-auto ${
-                isDarkMode ? 'bg-gray-700 text-white' : 'bg-white text-black'
-              }`}
-              initial={{ scale: 0.8, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.8, opacity: 0 }}
-              transition={{ duration: 0.3 }}
-            >
-              <h2 className={`text-2xl font-semibold mb-6 ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>
-                Answer Feedback
-              </h2>
-              <p className={`mb-6 ${isDarkMode ? 'text-gray-300' : 'text-gray-800'}`}>{answerResult}</p>
-              <div className="flex justify-end space-x-4">
-                <button
-                  type="button"
-                  onClick={closeResultModal}
-                  className={`h-10 sm:h-12 px-4 py-2 rounded ${
-                    isDarkMode ? 'bg-red-600 text-white hover:bg-red-700' : 'bg-red-600 text-white hover:bg-red-700'
-                  } transition-colors duration-200 text-sm sm:text-base`}
-                  aria-label="Close Feedback Modal"
-                >
-                  Close
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    closeResultModal();
-                    handleGetQuestion();
-                  }}
-                  className={`h-10 sm:h-12 px-4 py-2 rounded ${
-                    isDarkMode ? 'bg-blue-600 hover:bg-blue-700 text-white' : 'bg-blue-900 hover:bg-blue-950 text-white'
-                  } transition-colors duration-200 text-sm sm:text-base`}
-                  disabled={isLoading}
-                  aria-label="Next Question"
-                >
-                  {isLoading ? 'Loading...' : 'Next Question'}
-                </button>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-
-        {/* Final Feedback Modal */}
-        {isFinalFeedbackModalOpen && (
-          <motion.div
-            className={`fixed inset-0 flex items-center justify-center ${
-              isDarkMode ? 'bg-black bg-opacity-70' : 'bg-black bg-opacity-50'
-            } z-50 overflow-y-auto`}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-          >
-            <motion.div
-              className={`p-8 rounded-lg w-11/12 max-w-3xl shadow-lg max-h-[80vh] overflow-y-auto ${
-                isDarkMode ? 'bg-gray-700 text-white' : 'bg-white text-black'
-              }`}
-              initial={{ scale: 0.8, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.8, opacity: 0 }}
-              transition={{ duration: 0.3 }}
-            >
-              <h2 className={`text-2xl font-semibold mb-6 ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>
-                Session Feedback
-              </h2>
-              <ul className="space-y-4">
-                {answeredQuestions.map((item, idx) => (
-                  <li
-                    key={idx}
-                    className={`p-4 border ${isDarkMode ? 'border-gray-600' : 'border-gray-200'} rounded`}
-                  >
-                    <p className={`font-semibold mb-2 ${isDarkMode ? 'text-blue-400' : 'text-blue-900'}`}>
-                      Question {idx + 1}:
-                    </p>
-                    <p className={`mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                      {item.question}
-                    </p>
-                    <p className={`mb-1 ${isDarkMode ? 'text-gray-300' : 'text-gray-800'}`}>
-                      <span className="font-semibold">Your Answer:</span> {item.answer}
-                    </p>
-                    <p className={`mb-1 ${isDarkMode ? 'text-gray-300' : 'text-gray-800'}`}>
-                      <span className="font-semibold">Feedback:</span> {item.feedback}
-                    </p>
-                    <p className={`font-semibold ${item.correct ? 'text-emerald-500' : 'text-red-500'}`}>
-                      {item.correct ? 'Correct ✅' : 'Incorrect ❌'}
-                    </p>
-                  </li>
-                ))}
-              </ul>
-              <div className="flex justify-end mt-6">
-                <button
-                  type="button"
-                  onClick={closeFinalFeedbackModal}
-                  className={`h-10 sm:h-12 px-6 py-2 rounded ${
-                    isDarkMode ? 'bg-blue-600 hover:bg-blue-700 text-white' : 'bg-blue-900 hover:bg-blue-700 text-white'
-                  } transition-colors duration-200 text-sm sm:text-base`}
-                  aria-label="Close Final Feedback Modal"
-                >
-                  Close
-                </button>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </div>
-      </main>
-  
-        {/* Load Progress Modal */}
-        {isLoadProgressModalOpen && (
-          <motion.div
-            className={`fixed inset-0 flex items-center justify-center ${
-              isDarkMode ? 'bg-black bg-opacity-70' : 'bg-black bg-opacity-50'
-            } z-[151]`}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-          >
-            <motion.div
-              className={`p-8 rounded-lg w-11/12 max-w-3xl shadow-lg overflow-y-auto max-h-screen ${
-                isDarkMode ? 'bg-gray-700 text-white' : 'bg-white text-black'
-              }`}
-              initial={{ scale: 0.8, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.8, opacity: 0 }}
-              transition={{ duration: 0.3 }}
-            >
-              <h2 className={`text-2xl font-semibold mb-6 ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>
-                Load Saved Progress
-              </h2>
-              {savedProgresses.length === 0 ? (
-                <p className={`${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>No saved progresses found.</p>
-              ) : (
-                <ul className="space-y-4">
-                  {savedProgresses.map((progress) => (
-                    <li
-                      key={progress.id}
-                      className={`p-4 border ${isDarkMode ? 'border-gray-600' : 'border-gray-200'} rounded`}
-                    >
-                      <div className="flex justify-between items-start">
-                        <div>
-                          <p
-                            className={`font-semibold ${
-                              isDarkMode ? 'text-blue-400' : 'text-blue-900'
-                            }`}
-                          >
-                            Exam Type: {progress.examConfig?.examType || 'Practice Exam'}
-                          </p>
-                          <p className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
-                            Subject: {progress.examConfig?.lawSubject}
-                          </p>
-                          <p className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
-                            Difficulty: {progress.examConfig?.difficulty}
-                          </p>
-                          <p className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
-                            Number of Questions: {progress.examConfig?.questionLimit}
-                          </p>
-                          <p className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
-                            Current Question: {progress.currentQuestionCount}
-                          </p>
-                          <p className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
-                            Saved on: {new Date(progress.timestamp).toLocaleString()}
-                          </p>
-                        </div>
-                        <div className="flex space-x-2 mt-2">
-                          <button
-                            onClick={() => handleLoadProgress(progress)}
-                            className={`h-10 w-20 sm:w-24 overflow-hidden rounded ${
-                              isDarkMode
-                                ? 'bg-blue-600 hover:bg-blue-700 text-white'
-                                : 'bg-blue-900 hover:bg-blue-700 text-white'
-                            } transition-colors duration-200 text-sm sm:text-base`}
-                            aria-label="Load Progress"
-                          >
-                            Load
-                          </button>
-                          <button
-                            onClick={() => handleDeleteProgress(progress.id)}
-                            className={`h-10 w-20 sm:w-24 overflow-hidden rounded ${
-                              isDarkMode
-                                ? 'bg-red-600 hover:bg-red-700 text-white'
-                                : 'bg-red-600 hover:bg-red-700 text-white'
-                            } transition-colors duration-200 text-sm sm:text-base`}
-                            aria-label="Delete Progress"
-                          >
-                            Delete
-                          </button>
-                        </div>
-                      </div>
-                    </li>
-                  ))}
-                </ul>
-              )}
-              <div className="flex justify-end mt-6">
-                <button
-                  type="button"
-                  onClick={closeLoadProgressModal}
-                  className={`h-10 sm:h-12 px-6 py-2 rounded ${
-                    isDarkMode ? 'bg-gray-600 hover:bg-gray-500 text-gray-300' : 'bg-gray-300 hover:bg-gray-400 text-gray-700'
-                  } transition-colors duration-200 text-sm sm:text-base`}
-                  aria-label="Close Load Progress Modal"
-                >
-                  Close
-                </button>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
+      </AnimatePresence>
     </div>
   );
 }
+
+export { ExamPrep };

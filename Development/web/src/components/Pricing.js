@@ -26,7 +26,7 @@ const plans = [
     promotion: 'First 7 days free',
     features: [
       {
-        text: 'Instant Access to 5,000+ Briefs',
+        text: 'Instant Access to 20,000+ Briefs',
         info: 'Practice issue-spotting and drafting in real-life legal scenarios.',
       },
       {
@@ -101,7 +101,7 @@ const plans = [
       },
       {
         text: 'Access to Career & Internship Resources',
-        info: 'Schedule 1:1 AI assisted sessions to refine study strategy and address weak areas.',
+        info: 'Collection of career opportunities updated bi-weekly.',
       },
     ],
     recommended: false,
@@ -398,7 +398,7 @@ export default function Plans() {
               Which plan should I choose?
             </h3>
             <p className={isDarkMode ? 'text-gray-300' : 'text-gray-700'}>
-              Basic is great if you want essential AI powered tools and case simulations at a low cost. Pro is ideal for students who need advanced features like IRAC generation and deeper analytics. Expert is for those aiming for top class performance, offering the highest level of AI assistance and exclusive study communities.
+              Basic is great if you want essential tools and case briefs at a low cost. Pro is ideal for students who need advanced features like IRAC generation and deeper analytics. Expert is for those aiming for top class performance, offering the highest level of assistance & exclusive study communities.
             </p>
           </div>
 
@@ -463,7 +463,7 @@ export default function Plans() {
               Is this cheaper than other services?
             </h3>
             <p className={isDarkMode ? 'text-gray-300' : 'text-gray-700'}>
-              Absolutely. Our plans range from $8 to $30 per month, which is significantly lower than our competitor&apos;s average of $19–$29 tiers. We aim to provide high-quality, AI driven study tools at an even more affordable rate.
+              Absolutely. Our plans range from $8 to $30 per month, which is significantly lower than our competitor&apos;s average of $19–$29 tiers. We aim to provide high-quality study tools at an even more affordable rate.
             </p>
           </div>
         </div>

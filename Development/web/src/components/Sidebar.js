@@ -329,17 +329,11 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, i
         >
           {(isPro || isExpert) ? (
             <>
-              <NavLink
-                href="/ailawtools/examprep"
-                icon={<FaClipboardCheck className="text-sm" />}
+             <NavLink
+                href="/ailawtools/lexapi"
+                icon={<FaBrain className="text-sm" />}
                 label="Practice Exams"
-                active={activeLink === '/ailawtools/examprep'}
-              />
-              <NavLink
-                href="/ailawtools/examprep/timemanagement"
-                icon={<FaClock className="text-sm" />}
-                label="Time Management"
-                active={activeLink === '/ailawtools/examprep/timemanagement'}
+                active={activeLink === '/ailawtools/lexapi'}
               />
               <NavLink
                 href="/ailawtools/insights"
@@ -353,17 +347,10 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, i
                 label="MBE Practice"
                 active={activeLink === '/ailawtools/examprep/mbe'}
               />
-              <NavLink
-                href="/ailawtools/lexapi"
-                icon={<FaBrain className="text-sm" />}
-                label="Curated Practice Quiz"
-                active={activeLink === '/ailawtools/lexapi'}
-              />
             </>
           ) : showAllApps ? (
             <>
               <LockedNavLink icon={<FaClipboardCheck className="text-sm" />} label="Practice Exams" />
-              <LockedNavLink icon={<FaClock className="text-sm" />} label="Time Management" />
               <LockedNavLink icon={<FaChartBar className="text-sm" />} label="Exam Insights" />
               <LockedNavLink icon={<FaListOl className="text-sm" />} label="MBE Practice" />
               <LockedNavLink icon={<FaBrain className="text-sm" />} label="LExAPI Tutor" />

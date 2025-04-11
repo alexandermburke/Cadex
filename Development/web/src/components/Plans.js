@@ -33,7 +33,7 @@ const plans = [
     promotion: 'First 7 days free',
     features: [
       {
-        text: 'Instant Access to 5,000+ Briefs',
+        text: 'Instant Access to 20,000+ Briefs',
         info: 'Practice issue-spotting and drafting in real-life legal scenarios.',
       },
       {
