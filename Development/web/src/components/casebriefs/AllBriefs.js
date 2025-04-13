@@ -503,7 +503,7 @@ export default function AllBriefs() {
       setNewBriefDate('');
       setNewBriefCitation('');
       setActiveTab('browse');
-      router.push(`/casebriefs/summaries?caseId=${docRef.id}`);
+      router.push(`/casebriefs/summaries/${docRef.id}`);
     } catch (error) {
       console.error('Error creating new case brief:', error);
       setCreateError('Error creating new case brief. Please check spelling & try again.');
@@ -520,7 +520,7 @@ export default function AllBriefs() {
       "item": {
         "@type": "LegalCase",
         "name": c.title,
-        "url": `https://www.cadexlaw.com/casebriefs/summaries?caseId=${c.id}`,
+        "url": `https://www.cadexlaw.com/casebriefs/summaries/${c.id}`,
         "datePublished": c.decisionDate || "",
         "citation": c.citation || "",
         "jurisdiction": c.jurisdiction || ""
@@ -1145,7 +1145,7 @@ export default function AllBriefs() {
                         <motion.a
                           whileHover={{ scale: 1.0, x: 1 }}
                           whileTap={{ scale: 1 }}
-                          href={`/casebriefs/summaries?caseId=${selectedCase.id}`}
+                          href={`/casebriefs/summaries/${selectedCase.id}`}
                           className={`mt-3 inline-flex items-center gap-1 text-sm font-semibold rounded px-2 py-1 gradientShadowHoverWhite ${
                             isDarkMode
                               ? 'bg-blue-100 border border-blue-600 text-blue-600'

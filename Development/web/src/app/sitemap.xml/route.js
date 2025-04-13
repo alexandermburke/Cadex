@@ -1,7 +1,6 @@
 import { collection, getDocs } from "firebase/firestore"
 import { db } from "@/firebase"
 
-// (Optional) Force static generation if you don't need SSR
 export const dynamic = "force-static"
 
 export async function GET(request) {
@@ -11,7 +10,7 @@ export async function GET(request) {
   snapshot.forEach(doc => {
     dynamicXmlArr.push(`
       <url>
-        <loc>https://www.cadexlaw.com/casebriefs/summaries?caseId=${doc.id}</loc>
+        <loc>https://www.cadexlaw.com/casebriefs/summaries/${doc.id}</loc>
         <lastmod>${now}</lastmod>
         <priority>0.80</priority>
       </url>
