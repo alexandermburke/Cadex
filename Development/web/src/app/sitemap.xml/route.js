@@ -1,8 +1,23 @@
 import { collection, getDocs } from "firebase/firestore"
 import { db } from "@/firebase"
 
+// (Optional) Force static generation if you don't need SSR
+export const dynamic = "force-static"
+
 export async function GET(request) {
   const now = new Date().toISOString()
+  const snapshot = await getDocs(collection(db, "capCases"))
+  const dynamicXmlArr = []
+  snapshot.forEach(doc => {
+    dynamicXmlArr.push(`
+      <url>
+        <loc>https://www.cadexlaw.com/casebriefs/summaries?caseId=${doc.id}</loc>
+        <lastmod>${now}</lastmod>
+        <priority>0.80</priority>
+      </url>
+    `)
+  })
+
   const staticUrls = [
     "https://www.cadexlaw.com/",
     "https://www.cadexlaw.com/ailawtools/splash",
@@ -32,18 +47,25 @@ export async function GET(request) {
     "https://www.cadexlaw.com/lawtools/interviewprep",
     "https://www.cadexlaw.com/lawtools/networking",
     "https://discord.gg/wKgH9ussWc"
-  ]
-  const staticXml = staticUrls.map(url => `<url><loc>${url}</loc><lastmod>${now}</lastmod><priority>0.80</priority></url>`).join("\n")
-  const snapshot = await getDocs(collection(db, "capCases"))
-  const dynamicXmlArr = []
-  snapshot.forEach(doc => {
-    dynamicXmlArr.push(`<url><loc>https://www.cadexlaw.com/casebriefs/summaries?caseId=${doc.id}</loc><lastmod>${now}</lastmod><priority>0.80</priority></url>`)
-  })
-  const dynamicXml = dynamicXmlArr.join("\n")
+  ].map(url => `
+    <url>
+      <loc>${url}</loc>
+      <lastmod>${now}</lastmod>
+      <priority>0.80</priority>
+    </url>
+  `)
+
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
-${staticXml}
-${dynamicXml}
+<urlset 
+  xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" 
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+  xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 
+  http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
+  ${staticUrls.join("\n")}
+  ${dynamicXmlArr.join("\n")}
 </urlset>`
-  return new Response(xml, { headers: { "Content-Type": "text/xml" } })
+
+  return new Response(xml, {
+    headers: { "Content-Type": "application/xml" },
+  })
 }
