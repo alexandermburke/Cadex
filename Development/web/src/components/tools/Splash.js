@@ -1,5 +1,4 @@
 'use client';
-
 import React, { useState, useEffect } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useAuth } from '@/context/AuthContext';
@@ -32,28 +31,6 @@ export default function Splash() {
   const [isSidebarVisible, setIsSidebarVisible] = useState(true);
   const toggleSidebar = () => setIsSidebarVisible(!isSidebarVisible);
 
-  if (!currentUser) {
-    return (
-      <div className="flex items-center justify-center h-screen bg-white text-gray-700">
-        <div className="text-center p-6 bg-white rounded shadow-md">
-          <p className="text-gray-700 mb-4">
-            Please{' '}
-            <a href="/login" className="text-blue-900 underline">
-              log in
-            </a>{' '}
-            to use the Dashboard.
-          </p>
-          <button
-            onClick={() => router.push('/login')}
-            className="px-4 py-2 bg-blue-900 text-white rounded hover:bg-blue-700"
-          >
-            Go to Login
-          </button>
-        </div>
-      </div>
-    );
-  }
-
   const headlineVariants = {
     hidden: { opacity: 0, y: 30 },
     visible: { opacity: 1, y: 0, transition: { duration: 0.8 } },
@@ -64,24 +41,20 @@ export default function Splash() {
   const formatDate = (isoString) => {
     if (!isoString) return null;
     const d = new Date(isoString);
-
     const dateStr = d.toLocaleDateString(undefined, {
       year: 'numeric',
       month: 'long',
       day: 'numeric',
     });
-
     const timeStr = d.toLocaleTimeString(undefined, {
       hour: '2-digit',
       minute: '2-digit',
     });
-
     return { dateStr, timeStr };
   };
 
   return (
     <div className="relative flex h-screen text-white">
-      {/* Snowflake container remains on the outer container */}
       <div className="snowflake-container">
         {snowflakeData.map((flake) => (
           <span
@@ -99,8 +72,6 @@ export default function Splash() {
           </span>
         ))}
       </div>
-
-      {/* Sidebar */}
       <AnimatePresence>
         {isSidebarVisible && (
           <>
@@ -110,7 +81,6 @@ export default function Splash() {
               toggleSidebar={toggleSidebar}
               isAiTutor={false}
             />
-            {/* Overlay for mobile */}
             <motion.div
               className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
               initial={{ opacity: 0 }}
@@ -121,13 +91,9 @@ export default function Splash() {
           </>
         )}
       </AnimatePresence>
-
-      {/* Main content area with updated container size/position */}
       <main className="flex-1 flex flex-col px-6 relative z-200 h-screen">
         <div className="relative flex-1 w-full bg-transparent rounded-2xl shadow-xl p-6 overflow-y-auto overflow-x-auto flex flex-col items-center">
-          {/* Animated background applied only to this inner div */}
           <div className="animatedBackground absolute inset-0" />
-          {/* Updated container now centers its content */}
           <div className="relative z-10 w-full flex flex-col items-center">
             <div className="absolute top-4 left-4 md:hidden">
               <button
@@ -137,8 +103,6 @@ export default function Splash() {
                 {isSidebarVisible ? <FaTimes size={24} /> : <FaBars size={24} />}
               </button>
             </div>
-
-            {/* Hero */}
             <motion.div
               className="max-w-4xl text-center"
               initial="hidden"
@@ -149,12 +113,9 @@ export default function Splash() {
                 className="text-4xl sm:text-5xl font-bold mb-6 drop-shadow-lg mt-20"
                 variants={headlineVariants}
               >
-                Welcome to Your Dashboard,{' '}
-                <span>{currentUser?.displayName || 'User'}</span>
+                Welcome to Your Dashboard, <span>{currentUser?.displayName || 'User'}</span>
               </motion.h1>
             </motion.div>
-
-            {/* Recent Activity Section */}
             {recentActivity.length > 0 && (
               <motion.div
                 className="w-full max-w-2xl mt-8"
@@ -179,16 +140,12 @@ export default function Splash() {
                               {activity.type === 'brief' ? (
                                 <div className="font-semibold text-sm mb-1">
                                   Viewed a case brief:
-                                  <span className="ml-1 italic">
-                                    {activity.name}
-                                  </span>
+                                  <span className="ml-1 italic">{activity.name}</span>
                                 </div>
                               ) : (
                                 <div className="font-semibold text-sm mb-1">
                                   Some other activity:
-                                  <span className="ml-1 italic">
-                                    {activity.name}
-                                  </span>
+                                  <span className="ml-1 italic">{activity.name}</span>
                                 </div>
                               )}
                             </div>

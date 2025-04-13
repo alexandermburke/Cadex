@@ -216,7 +216,7 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, i
       <div className="p-6 flex items-center justify-center bg-opacity-20">
         <IoInfiniteOutline className="text-7xl sm:text-7xl drop-shadow-lg" />
       </div>
-      <section className=" px-6">
+      <section className="px-6">
         <div className="relative flex items-center justify-center">
           <div
             className={clsx(
@@ -257,7 +257,18 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, i
           title="Case Briefs"
           icon={<FaFolderOpen className="text-lg" />}
         >
-          {(isBasic || isPro || isExpert) ? (
+          {plan === 'free' ? (
+            <>
+              <NavLink
+                href="/casebriefs/allbriefs"
+                icon={<FaListAlt className="text-sm" />}
+                label="All Briefs"
+                active={activeLink === '/casebriefs/allbriefs'}
+              />
+              <LockedNavLink icon={<FaFileAlt className="text-sm" />} label="Case Analysis" />
+              <LockedNavLink icon={<FaBookOpen className="text-sm" />} label="Case Summaries" />
+            </>
+          ) : (
             <>
               <NavLink
                 href="/casebriefs/allbriefs"
@@ -278,13 +289,7 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, i
                 active={activeLink === '/casebriefs/summaries'}
               />
             </>
-          ) : showAllApps ? (
-            <>
-              <LockedNavLink icon={<FaBookOpen className="text-sm" />} label="Case Summaries" />
-              <LockedNavLink icon={<FaFileAlt className="text-sm" />} label="Case Analysis" />
-              <LockedNavLink icon={<FaListAlt className="text-sm" />} label="All Briefs" />
-            </>
-          ) : null}
+          )}
         </ToggleSection>
         <ToggleSection
           isOpen={isStudyToolsOpen}
@@ -329,7 +334,7 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, i
         >
           {(isPro || isExpert) ? (
             <>
-             <NavLink
+              <NavLink
                 href="/ailawtools/lexapi"
                 icon={<FaBrain className="text-sm" />}
                 label="Practice Exams"
@@ -363,7 +368,7 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, i
           title="Subject Outlines"
           icon={<FaBookReader className="text-lg" />}
         >
-          {isPro || isExpert ? (
+          {(isPro || isExpert) ? (
             <>
               <NavLink
                 href="/subjects/contracts"

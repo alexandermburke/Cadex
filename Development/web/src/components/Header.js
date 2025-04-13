@@ -33,7 +33,6 @@ export default function Header() {
     return () => window.removeEventListener("resize", checkDesktop);
   }, []);
 
-  // Determine if the header should render
   const shouldRenderHeader = !(hideHeaderDesktop && isDesktop);
 
   useEffect(() => {
@@ -54,7 +53,6 @@ export default function Header() {
 
   let shareBtn = (
     <div className="flex flex-col relative">
-      {/* Your share button content here */}
     </div>
   );
 

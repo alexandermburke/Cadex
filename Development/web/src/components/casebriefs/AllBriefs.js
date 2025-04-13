@@ -1,5 +1,6 @@
 'use client';
 import React, { useState, useEffect } from 'react';
+import Head from 'next/head';
 import Sidebar from '../Sidebar';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -55,7 +56,6 @@ export default function AllBriefs() {
   const [gotoValue, setGotoValue] = useState('');
   // Create New Case Brief Section States
   const [newBriefTitle, setNewBriefTitle] = useState('');
-  // Removed newBriefJurisdiction state since we replace it with citation
   const [newBriefDate, setNewBriefDate] = useState('');
   const [newBriefCitation, setNewBriefCitation] = useState('');
   const [verificationReply, setVerificationReply] = useState('');
@@ -72,7 +72,6 @@ export default function AllBriefs() {
       const payload = {
         title: c.title,
         date: c.decisionDate || '',
-        // No jurisdiction field used here as citation is preferred
         citation: c.citation,
       };
       const res = await fetch('/api/casebrief-citation', {
@@ -100,6 +99,17 @@ export default function AllBriefs() {
   }, [userDataObj]);
 
   const toggleFavorite = async (caseId) => {
+    // If no user is logged in, update local state only.
+    if (!currentUser) {
+      if (favorites.includes(caseId)) {
+        setFavorites(favorites.filter((id) => id !== caseId));
+        setIsFavorited(false);
+      } else {
+        setFavorites([...favorites, caseId]);
+        setIsFavorited(true);
+      }
+      return;
+    }
     try {
       const userDocRef = doc(db, 'users', currentUser.uid);
       let updatedFavorites;
@@ -155,7 +165,6 @@ export default function AllBriefs() {
   }, []);
 
   useEffect(() => {
-    if (!currentUser) return;
     const fetchCapCases = async () => {
       setIsLoading(true);
       try {
@@ -188,23 +197,7 @@ export default function AllBriefs() {
     }
   }, [searchParams, capCases]);
 
-  if (!currentUser) {
-    return (
-      <div className={`flex items-center justify-center h-full transition-colors ${isDarkMode ? 'bg-slate-900 text-white' : 'bg-gray-50 text-gray-800'}`}>
-        <div className="p-6 bg-white dark:bg-slate-800 rounded-2xl shadow-xl text-center">
-          <p className="mb-4 text-lg font-semibold">Please log in to access the case database.</p>
-          <button
-            onClick={() => router.push('/login')}
-            className={`px-4 py-2 rounded-md text-sm font-semibold transition-colors duration-300 ${
-              isDarkMode ? 'bg-blue-600 hover:bg-blue-500 text-white' : 'bg-blue-950 hover:bg-blue-800 text-white'
-            }`}
-          >
-            Go to Login
-          </button>
-        </div>
-      </div>
-    );
-  }
+  // The login check has been removed so all users may view the briefs.
 
   const filteredCases = capCases.filter((item) => {
     const s = searchTerm.toLowerCase();
@@ -278,6 +271,8 @@ export default function AllBriefs() {
 
   const logCaseView = async (c) => {
     try {
+      // If no user is logged in, skip logging recent activity.
+      if (!currentUser) return;
       const userDocRef = doc(db, 'users', currentUser.uid);
       const userSnap = await getDoc(userDocRef);
       if (!userSnap.exists()) {
@@ -307,7 +302,6 @@ export default function AllBriefs() {
       const payload = {
         title: c.title,
         date: c.decisionDate || '',
-        // Use citation instead of jurisdiction
         citation: c.citation,
         docId: c.id
       };
@@ -334,7 +328,6 @@ export default function AllBriefs() {
           briefSummary: data,
           caseTitle: c.title,
           decisionDate: c.decisionDate,
-          // Pass citation instead of jurisdiction
           citation: c.citation,
         }),
       });
@@ -378,7 +371,6 @@ export default function AllBriefs() {
               briefSummary: c.briefSummary,
               caseTitle: c.title,
               decisionDate: c.decisionDate,
-              // Pass citation here as well
               citation: c.citation,
             }),
           });
@@ -404,7 +396,6 @@ export default function AllBriefs() {
       const payload = {
         title: c.title,
         date: c.decisionDate || '',
-        // Use citation instead of jurisdiction
         citation: c.citation,
         docId: c.id
       };
@@ -440,7 +431,6 @@ export default function AllBriefs() {
             briefSummary: data,
             caseTitle: c.title,
             decisionDate: c.decisionDate,
-            // Use citation here as well
             citation: c.citation,
           }),
         });
@@ -480,7 +470,6 @@ export default function AllBriefs() {
     e.preventDefault();
     setCreateError('');
     setVerificationReply('');
-    // Remove jurisdiction check; require Title, Year, and Citation instead.
     if (!newBriefTitle.trim() || !newBriefDate.trim() || !newBriefCitation.trim()) {
       setCreateError('Please fill in all fields.');
       return;
@@ -490,7 +479,6 @@ export default function AllBriefs() {
       const payload = {
         title: newBriefTitle,
         date: newBriefDate,
-        // Use citation field here instead of jurisdiction
         citation: newBriefCitation.trim() || 'N/A',
       };
       const summaryRes = await fetch('/api/casebrief-summary', {
@@ -512,7 +500,6 @@ export default function AllBriefs() {
             briefSummary: summaryData,
             caseTitle: newBriefTitle,
             decisionDate: newBriefDate,
-            // Pass citation here
             citation: newBriefCitation.trim() || 'N/A',
           }),
         });
@@ -528,7 +515,6 @@ export default function AllBriefs() {
       }
 
       const correctedTitle = summaryData.corrections?.title || newBriefTitle;
-      // Removed corrected jurisdiction and use citation instead.
       const correctedCitation = summaryData.corrections?.citation || newBriefCitation;
       const correctedDate = summaryData.corrections?.date || newBriefDate;
 
@@ -537,7 +523,6 @@ export default function AllBriefs() {
         decisionDate: correctedDate,
         volume: '',
         content: '',
-        // Use the citation field value
         citation: correctedCitation.trim() || 'N/A',
         briefSummary: { ...summaryData, verified: false },
         caseNumber: generateCaseNumber(),
@@ -546,7 +531,6 @@ export default function AllBriefs() {
       alert('New case brief created successfully.');
       setCapCases([...capCases, { id: docRef.id, ...newCase }]);
       setNewBriefTitle('');
-      // Removed setNewBriefJurisdiction since it is no longer used.
       setNewBriefDate('');
       setNewBriefCitation('');
       setActiveTab('browse');
@@ -559,169 +543,194 @@ export default function AllBriefs() {
     }
   };
 
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    "itemListElement": filteredCases.map((c, index) => ({
+      "@type": "ListItem",
+      "position": index + 1,
+      "item": {
+        "@type": "LegalCase",
+        "name": c.title,
+        "url": `https://www.cadexlaw.com/casebriefs/summaries?caseId=${c.id}`,
+        "datePublished": c.decisionDate || "",
+        "citation": c.citation || "",
+        "jurisdiction": c.jurisdiction || ""
+      }
+    }))
+  };
+
   return (
-    <div className="relative flex h-screen transition-colors duration-500 bg-transparent">
-      <AnimatePresence>
-        {isSidebarVisible && (
-          <>
-            <Sidebar
-              activeLink="/casebriefs/allbriefs"
-              isSidebarVisible={isSidebarVisible}
-              toggleSidebar={toggleSidebar}
-              isDarkMode={isDarkMode}
-            />
-            <motion.div
-              className="fixed inset-0 bg-black bg-opacity-40 z-40 md:hidden"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 0.5 }}
-              exit={{ opacity: 0 }}
-              onClick={toggleSidebar}
-            />
-          </>
-        )}
-      </AnimatePresence>
-
-      <main className="flex-1 flex flex-col px-6 relative z-200 h-screen">
-        <div
-          className={`flex-1 w-full rounded-2xl shadow-xl p-6 overflow-y-auto overflow-x-auto ${
-            isDarkMode
-              ? 'bg-slate-800 bg-opacity-50 text-white'
-              : 'bg-white text-gray-800'
-          } flex flex-col items-center`}
-        >
-          <div className="w-full max-w-md mx-auto mb-4 flex justify-around">
-            <motion.button
-              className={`px-4 py-2 font-semibold transition-colors duration-300 ${
-                activeTab === 'browse'
-                  ? isDarkMode
-                    ? 'text-white border-b-2 border-blue-400'
-                    : 'text-blue-900 border-b-2 border-blue-900'
-                  : isDarkMode
-                  ? 'text-gray-400'
-                  : 'text-gray-600'
-              }`}
-              onClick={() => setActiveTab('browse')}
-            >
-              Browse
-            </motion.button>
-            <motion.button
-              className={`px-4 py-2 font-semibold transition-colors duration-300 ${
-                activeTab === 'favorites'
-                  ? isDarkMode
-                    ? 'text-white border-b-2 border-blue-400'
-                    : 'text-blue-900 border-b-2 border-blue-900'
-                  : isDarkMode
-                  ? 'text-gray-400'
-                  : 'text-gray-600'
-              }`}
-              onClick={() => setActiveTab('favorites')}
-            >
-              Favorites
-            </motion.button>
-            <motion.button
-              className={`px-4 py-2 font-semibold transition-colors duration-300 ${
-                activeTab === 'create'
-                  ? isDarkMode
-                    ? 'text-white border-b-2 border-blue-400'
-                    : 'text-blue-900 border-b-2 border-blue-900'
-                  : isDarkMode
-                  ? 'text-gray-400'
-                  : 'text-gray-600'
-              }`}
-              onClick={() => setActiveTab('create')}
-            >
-              Create
-            </motion.button>
-          </div>
-
-          {(activeTab === 'browse' || activeTab === 'favorites') && (
+    <>
+      <Head>
+        <title>All Case Briefs - CadexLaw</title>
+        <meta name="description" content="Discover all case briefs and detailed legal summaries on CadexLaw. Explore a comprehensive listing of landmark legal cases." />
+        <meta name="keywords" content="case briefs, legal summaries, legal cases, case law, CadexLaw" />
+        <script type="application/ld+json">
+          {JSON.stringify(structuredData)}
+        </script>
+      </Head>
+      <div className="relative flex h-screen transition-colors duration-500 bg-transparent">
+        <AnimatePresence>
+          {isSidebarVisible && (
             <>
-              <div className="mb-6 w-full flex justify-center items-center gap-4">
-                <div
-                  className={`relative flex items-center ${
-                    isDarkMode ? 'bg-slate-700' : 'bg-gray-50'
-                  } rounded-full px-3 py-2 w-full max-w-md`}
-                >
-                  <FaSearch className="text-gray-700 dark:text-white/70 mr-2" />
-                  <input
-                    type="text"
-                    placeholder="Search Cases..."
-                    className={`bg-transparent placeholder-gray-500 dark:placeholder-white/70 text-gray-500 dark:text-white focus:outline-none text-sm flex-1`}
-                    value={searchTerm}
-                    onChange={(e) => {
-                      setSearchTerm(e.target.value);
-                      setCurrentPage(1);
-                    }}
-                  />
-                </div>
-                <button
-                  onClick={() => setShowAdvanced(!showAdvanced)}
-                  className="flex items-center space-x-2 text-blue-600 hover:text-blue-800 transition-colors"
-                >
-                  <span className="text-sm font-medium">Sort By</span>
-                  {showAdvanced ? <FaChevronUp /> : <FaChevronDown />}
-                </button>
-              </div>
-
-              <AnimatePresence>
-                {showAdvanced && (
-                  <motion.div
-                    className="mb-6 w-full flex justify-center"
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: 'auto' }}
-                    exit={{ opacity: 0, height: 0 }}
-                    transition={{ duration: 0.3 }}
-                  >
-                    <div className="bg-transparent p-4 rounded-2xl shadow-md flex flex-row gap-4 w-full max-w-md justify-center">
-                      <button
-                        onClick={() => setSortBy('')}
-                        className={`px-3 py-1 rounded-md transition-colors duration-300 ${
-                          sortBy === '' 
-                            ? isDarkMode ? 'bg-blue-600 text-white' : 'bg-blue-900 text-white' 
-                            : isDarkMode ? 'bg-slate-700 text-white' : 'bg-white text-gray-800 border border-gray-300'
-                        }`}
-                      >
-                        Default
-                      </button>
-                      <button
-                        onClick={() => setSortBy('citation')}
-                        className={`px-3 py-1 rounded-md transition-colors duration-300 ${
-                          sortBy === 'citation' 
-                            ? isDarkMode ? 'bg-blue-600 text-white' : 'bg-blue-900 text-white' 
-                            : isDarkMode ? 'bg-slate-700 text-white' : 'bg-white text-gray-800 border border-gray-300'
-                        }`}
-                      >
-                        Citation
-                      </button>
-                      <button
-                        onClick={() => setSortBy('date')}
-                        className={`px-3 py-1 rounded-md transition-colors duration-300 ${
-                          sortBy === 'date' 
-                            ? isDarkMode ? 'bg-blue-600 text-white' : 'bg-blue-900 text-white' 
-                            : isDarkMode ? 'bg-slate-700 text-white' : 'bg-white text-gray-800 border border-gray-300'
-                        }`}
-                      >
-                        Date
-                      </button>
-                      <button
-                        onClick={() => setSortBy('jurisdiction')}
-                        className={`px-3 py-1 rounded-md transition-colors duration-300 ${
-                          sortBy === 'jurisdiction' 
-                            ? isDarkMode ? 'bg-blue-600 text-white' : 'bg-blue-900 text-white' 
-                            : isDarkMode ? 'bg-slate-700 text-white' : 'bg-white text-gray-800 border border-gray-300'
-                        }`}
-                      >
-                        Jurisdiction
-                      </button>
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
+              <Sidebar
+                activeLink="/casebriefs/allbriefs"
+                isSidebarVisible={isSidebarVisible}
+                toggleSidebar={toggleSidebar}
+                isDarkMode={isDarkMode}
+              />
+              <motion.div
+                className="fixed inset-0 bg-black bg-opacity-40 z-40 md:hidden"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 0.5 }}
+                exit={{ opacity: 0 }}
+                onClick={toggleSidebar}
+              />
             </>
           )}
+        </AnimatePresence>
 
-          {activeTab === 'create' ? (
-            isFree || isPro || isExpert ? (
+        <main className="flex-1 flex flex-col px-6 relative z-200 h-screen">
+          <div
+            className={`flex-1 w-full rounded-2xl shadow-xl p-6 overflow-y-auto overflow-x-auto ${
+              isDarkMode
+                ? 'bg-slate-800 bg-opacity-50 text-white'
+                : 'bg-white text-gray-800'
+            } flex flex-col items-center`}
+          >
+            <div className="w-full max-w-md mx-auto mb-4 flex justify-around">
+              <motion.button
+                className={`px-4 py-2 font-semibold transition-colors duration-300 ${
+                  activeTab === 'browse'
+                    ? isDarkMode
+                      ? 'text-white border-b-2 border-blue-400'
+                      : 'text-blue-900 border-b-2 border-blue-900'
+                    : isDarkMode
+                    ? 'text-gray-400'
+                    : 'text-gray-600'
+                }`}
+                onClick={() => setActiveTab('browse')}
+              >
+                Browse
+              </motion.button>
+              <motion.button
+                className={`px-4 py-2 font-semibold transition-colors duration-300 ${
+                  activeTab === 'favorites'
+                    ? isDarkMode
+                      ? 'text-white border-b-2 border-blue-400'
+                      : 'text-blue-900 border-b-2 border-blue-900'
+                    : isDarkMode
+                    ? 'text-gray-400'
+                    : 'text-gray-600'
+                }`}
+                onClick={() => setActiveTab('favorites')}
+              >
+                Favorites
+              </motion.button>
+              <motion.button
+                className={`px-4 py-2 font-semibold transition-colors duration-300 ${
+                  activeTab === 'create'
+                    ? isDarkMode
+                      ? 'text-white border-b-2 border-blue-400'
+                      : 'text-blue-900 border-b-2 border-blue-900'
+                    : isDarkMode
+                    ? 'text-gray-400'
+                    : 'text-gray-600'
+                }`}
+                onClick={() => setActiveTab('create')}
+              >
+                Create
+              </motion.button>
+            </div>
+
+            {(activeTab === 'browse' || activeTab === 'favorites') && (
+              <>
+                <div className="mb-6 w-full flex justify-center items-center gap-4">
+                  <div
+                    className={`relative flex items-center ${
+                      isDarkMode ? 'bg-slate-700' : 'bg-gray-50'
+                    } rounded-full px-3 py-2 w-full max-w-md`}
+                  >
+                    <FaSearch className="text-gray-700 dark:text-white/70 mr-2" />
+                    <input
+                      type="text"
+                      placeholder="Search Cases..."
+                      className={`bg-transparent placeholder-gray-500 dark:placeholder-white/70 text-gray-500 dark:text-white focus:outline-none text-sm flex-1`}
+                      value={searchTerm}
+                      onChange={(e) => {
+                        setSearchTerm(e.target.value);
+                        setCurrentPage(1);
+                      }}
+                    />
+                  </div>
+                  <button
+                    onClick={() => setShowAdvanced(!showAdvanced)}
+                    className="flex items-center space-x-2 text-blue-600 hover:text-blue-800 transition-colors"
+                  >
+                    <span className="text-sm font-medium">Sort By</span>
+                    {showAdvanced ? <FaChevronUp /> : <FaChevronDown />}
+                  </button>
+                </div>
+
+                <AnimatePresence>
+                  {showAdvanced && (
+                    <motion.div
+                      className="mb-6 w-full flex justify-center"
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: 'auto' }}
+                      exit={{ opacity: 0, height: 0 }}
+                      transition={{ duration: 0.3 }}
+                    >
+                      <div className="bg-transparent p-4 rounded-2xl shadow-md flex flex-row gap-4 w-full max-w-md justify-center">
+                        <button
+                          onClick={() => setSortBy('')}
+                          className={`px-3 py-1 rounded-md transition-colors duration-300 ${
+                            sortBy === ''
+                              ? isDarkMode ? 'bg-blue-600 text-white' : 'bg-blue-900 text-white'
+                              : isDarkMode ? 'bg-slate-700 text-white' : 'bg-white text-gray-800 border border-gray-300'
+                          }`}
+                        >
+                          Default
+                        </button>
+                        <button
+                          onClick={() => setSortBy('citation')}
+                          className={`px-3 py-1 rounded-md transition-colors duration-300 ${
+                            sortBy === 'citation'
+                              ? isDarkMode ? 'bg-blue-600 text-white' : 'bg-blue-900 text-white'
+                              : isDarkMode ? 'bg-slate-700 text-white' : 'bg-white text-gray-800 border border-gray-300'
+                          }`}
+                        >
+                          Citation
+                        </button>
+                        <button
+                          onClick={() => setSortBy('date')}
+                          className={`px-3 py-1 rounded-md transition-colors duration-300 ${
+                            sortBy === 'date'
+                              ? isDarkMode ? 'bg-blue-600 text-white' : 'bg-blue-900 text-white'
+                              : isDarkMode ? 'bg-slate-700 text-white' : 'bg-white text-gray-800 border border-gray-300'
+                          }`}
+                        >
+                          Date
+                        </button>
+                        <button
+                          onClick={() => setSortBy('jurisdiction')}
+                          className={`px-3 py-1 rounded-md transition-colors duration-300 ${
+                            sortBy === 'jurisdiction'
+                              ? isDarkMode ? 'bg-blue-600 text-white' : 'bg-blue-900 text-white'
+                              : isDarkMode ? 'bg-slate-700 text-white' : 'bg-white text-gray-800 border border-gray-300'
+                          }`}
+                        >
+                          Jurisdiction
+                        </button>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </>
+            )}
+
+            {activeTab === 'create' ? (
               <div className="w-full flex justify-center">
                 <div className="max-w-md w-full">
                   <form
@@ -745,7 +754,6 @@ export default function AllBriefs() {
                         placeholder="Enter case title"
                       />
                     </div>
-                    {/* Removed the Jurisdiction field */}
                     <div className="mb-4">
                       <label className="block text-sm font-semibold mb-1">Year</label>
                       <input
@@ -800,425 +808,400 @@ export default function AllBriefs() {
                 </div>
               </div>
             ) : (
-              <div className="w-full flex justify-center">
-                <div
-                  className={`max-w-md w-full p-6 rounded-2xl shadow-md ${
-                    isDarkMode ? 'bg-slate-800 text-white' : 'bg-white text-gray-800'
-                  }`}
-                >
-                  <h2 className="text-2xl font-bold mb-4 text-center">Upgrade Required</h2>
-                  <p className="text-center text-lg font-semibold mb-4">
-                    Please upgrade to a Pro or Expert plan to access the case brief creation feature.
-                  </p>
-                  <div className="flex justify-center">
-                    <a
-                      href="https://cadexlaw.com/admin/billing"
-                      className={`px-4 py-2 rounded-md font-semibold transition-colors duration-300 ${
-                        isDarkMode
-                          ? 'bg-blue-600 hover:bg-blue-500 text-white'
-                          : 'bg-blue-950 hover:bg-blue-800 text-white'
-                      }`}
-                    >
-                      Upgrade Now
-                    </a>
-                  </div>
-                </div>
-              </div>
-            )
-          ) : (
-            <>
-              {isLoading ? (
-                <div className="w-full h-1 bg-blue-500 animate-pulse" />
-              ) : (
-                <>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 w-full relative">
-                    {paginatedCases.map((c) => (
-                      <div
-                        key={c.id}
-                        onClick={() => openCase(c)}
-                        className={`p-4 rounded-xl shadow-lg transition-transform transform hover:scale-105 cursor-pointer group flex flex-col ${
-                          isDarkMode
-                            ? 'bg-slate-800 bg-opacity-50 border border-slate-700 text-white'
-                            : 'bg-white border border-gray-300 text-gray-800'
-                        }`}
-                      >
-                        <div className="flex justify-between items-center mb-2">
-                          <h3 className="text-md font-semibold line-clamp-1">{c.title}</h3>
-                          <div className="flex items-center space-x-2">
-                            <span
-                              className={`text-xs py-1 px-2 rounded-full ${
-                                isDarkMode ? 'bg-blue-200 text-blue-900' : 'bg-blue-900 text-white'
-                              }`}
-                            >
-                              {c.jurisdiction || 'Unknown'}
-                            </span>
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                toggleFavorite(c.id);
-                              }}
-                              aria-label="Toggle Favorite"
-                            >
-                              {favorites.includes(c.id) ? (
-                                <FaHeart className="text-red-500" size={16} />
-                              ) : (
-                                <FaRegHeart className="text-gray-400" size={16} />
-                              )}
-                            </button>
-                          </div>
-                        </div>
-                        <p className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
-                          Date: {c.decisionDate || 'N/A'}
-                        </p>
-                        <p className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
-                          Citation: {c.citation || 'N/A'}
-                        </p>
-                        <p
-                          className={`text-xs mt-2 line-clamp-2 italic ${
-                            isDarkMode ? 'text-gray-500' : 'text-gray-600'
+              <>
+                {isLoading ? (
+                  <div className="w-full h-1 bg-blue-500 animate-pulse" />
+                ) : (
+                  <>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 w-full relative">
+                      {paginatedCases.map((c) => (
+                        <div
+                          key={c.id}
+                          onClick={() => openCase(c)}
+                          className={`p-4 rounded-xl shadow-lg transition-transform transform hover:scale-105 cursor-pointer group flex flex-col ${
+                            isDarkMode
+                              ? 'bg-slate-800 bg-opacity-50 border border-slate-700 text-white'
+                              : 'bg-white border border-gray-300 text-gray-800'
                           }`}
                         >
-                          {c.briefSummary?.facts?.slice(0, 100) || 'no description available'}...
-                        </p>
-                      </div>
-                    ))}
-                  </div>
+                          <div className="flex justify-between items-center mb-2">
+                            <h3 className="text-md font-semibold line-clamp-1">{c.title}</h3>
+                            <div className="flex items-center space-x-2">
+                              <span
+                                className={`text-xs py-1 px-2 rounded-full ${
+                                  isDarkMode ? 'bg-blue-200 text-blue-900' : 'bg-blue-900 text-white'
+                                }`}
+                              >
+                                {c.jurisdiction || 'Unknown'}
+                              </span>
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  toggleFavorite(c.id);
+                                }}
+                                aria-label="Toggle Favorite"
+                              >
+                                {favorites.includes(c.id) ? (
+                                  <FaHeart className="text-red-500" size={16} />
+                                ) : (
+                                  <FaRegHeart className="text-gray-400" size={16} />
+                                )}
+                              </button>
+                            </div>
+                          </div>
+                          <p className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                            Date: {c.decisionDate || 'N/A'}
+                          </p>
+                          <p className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                            Citation: {c.citation || 'N/A'}
+                          </p>
+                          <p
+                            className={`text-xs mt-2 line-clamp-2 italic ${
+                              isDarkMode ? 'text-gray-500' : 'text-gray-600'
+                            }`}
+                          >
+                            {c.briefSummary?.facts?.slice(0, 100) || 'no description available'}...
+                          </p>
+                        </div>
+                      ))}
+                    </div>
 
-                  <div className="mt-6 flex items-center justify-center gap-2">
-                    <motion.button
-                      onClick={goToPrevPage}
-                      disabled={currentPage === 1}
-                      whileHover={{ scale: currentPage !== 1 ? 1.1 : 1 }}
-                      whileTap={{ scale: currentPage !== 1 ? 0.9 : 1 }}
-                      className={`px-4 py-2 font-semibold transition-colors duration-300 ${
-                        currentPage === 1
-                          ? isDarkMode
-                            ? 'text-gray-400'
-                            : 'text-gray-400'
-                          : isDarkMode
-                          ? 'text-white'
-                          : 'text-blue-900'
-                      }`}
-                    >
-                      <FaChevronLeft />
-                    </motion.button>
-
-                    {paginationNumbers().map((num) => (
+                    <div className="mt-6 flex items-center justify-center gap-2">
                       <motion.button
-                        key={num}
-                        onClick={() => goToPage(num)}
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
+                        onClick={goToPrevPage}
+                        disabled={currentPage === 1}
+                        whileHover={{ scale: currentPage !== 1 ? 1.1 : 1 }}
+                        whileTap={{ scale: currentPage !== 1 ? 0.9 : 1 }}
                         className={`px-4 py-2 font-semibold transition-colors duration-300 ${
-                          num === currentPage
+                          currentPage === 1
                             ? isDarkMode
-                              ? 'text-white border-b-2 border-blue-400'
-                              : 'text-blue-900 border-b-2 border-blue-900'
+                              ? 'text-gray-400'
+                              : 'text-gray-400'
                             : isDarkMode
-                            ? 'text-gray-400'
-                            : 'text-gray-600'
+                            ? 'text-white'
+                            : 'text-blue-900'
                         }`}
                       >
-                        {num}
+                        <FaChevronLeft />
                       </motion.button>
-                    ))}
 
-                    {totalPages > 5 && (
+                      {paginationNumbers().map((num) => (
+                        <motion.button
+                          key={num}
+                          onClick={() => goToPage(num)}
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                          className={`px-4 py-2 font-semibold transition-colors duration-300 ${
+                            num === currentPage
+                              ? isDarkMode
+                                ? 'text-white border-b-2 border-blue-400'
+                                : 'text-blue-900 border-b-2 border-blue-900'
+                              : isDarkMode
+                              ? 'text-gray-400'
+                              : 'text-gray-600'
+                          }`}
+                        >
+                          {num}
+                        </motion.button>
+                      ))}
+
+                      {totalPages > 5 && (
+                        <motion.button
+                          onClick={() => setShowGotoInput(!showGotoInput)}
+                          whileHover={{ scale: 1.1 }}
+                          whileTap={{ scale: 0.9 }}
+                          className={`px-2 py-2 font-semibold transition-colors duration-300 ${
+                            isDarkMode ? 'text-gray-200' : 'text-gray-800'
+                          }`}
+                        >
+                          ...
+                        </motion.button>
+                      )}
+
+                      {showGotoInput && (
+                        <form onSubmit={handleGotoSubmit} className="flex items-center space-x-2">
+                          <input
+                            type="number"
+                            className={`w-16 px-2 py-1 border rounded-md ${
+                              isDarkMode
+                                ? 'bg-slate-700 text-white border-slate-600'
+                                : 'bg-white text-gray-800 border-gray-300'
+                            }`}
+                            value={gotoValue}
+                            onChange={(e) => setGotoValue(e.target.value)}
+                            placeholder="Page #"
+                          />
+                          <button
+                            type="submit"
+                            className={`px-3 py-1 rounded-md font-semibold transition-colors duration-300 ${
+                              isDarkMode
+                                ? 'bg-blue-600 hover:bg-blue-500 text-white'
+                                : 'bg-blue-950 hover:bg-blue-800 text-white'
+                            }`}
+                          >
+                            Go
+                          </button>
+                        </form>
+                      )}
+
                       <motion.button
-                        onClick={() => setShowGotoInput(!showGotoInput)}
-                        whileHover={{ scale: 1.1 }}
-                        whileTap={{ scale: 0.9 }}
-                        className={`px-2 py-2 font-semibold transition-colors duration-300 ${
+                        onClick={goToNextPage}
+                        disabled={currentPage === totalPages || totalPages === 0}
+                        whileHover={{
+                          scale: currentPage === totalPages || totalPages === 0 ? 1 : 1.1,
+                        }}
+                        whileTap={{
+                          scale: currentPage === totalPages || totalPages === 0 ? 1 : 0.9,
+                        }}
+                        className={`px-4 py-2 font-semibold transition-colors duration-300 ${
+                          currentPage === totalPages || totalPages === 0
+                            ? isDarkMode
+                              ? 'text-gray-400'
+                              : 'text-gray-400'
+                            : isDarkMode
+                            ? 'text-white'
+                            : 'text-blue-900'
+                        }`}
+                      >
+                        <FaChevronRight />
+                      </motion.button>
+                    </div>
+                  </>
+                )}
+              </>
+            )}
+
+            {selectedCase && (
+              <div className="fixed inset-0 z-[190] flex items-center justify-center bg-black bg-opacity-40">
+                <motion.div
+                  className={`relative w-11/12 max-w-full sm:max-w-5xl p-6 rounded-2xl shadow-2xl ${
+                    isDarkMode ? 'bg-slate-800 text-gray-100' : 'bg-gradient-to-br from-gray-50 to-gray-100 text-gray-900'
+                  } overflow-y-auto max-h-[90vh]`}
+                  initial={{ scale: 0.7, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  exit={{ scale: 0.7, opacity: 0 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <div className="flex justify-between items-start mb-4">
+                    <div>
+                      <h2 className="text-2xl font-bold">{selectedCase.title}</h2>
+                      <p className={`text-sm mt-1 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                        {selectedCase.jurisdiction || 'Unknown'} | Volume: {selectedCase.volume || 'N/A'} | Date: {selectedCase.decisionDate || 'N/A'}
+                      </p>
+                      <p
+                        className={`text-sm mt-1 font-semibold ${
                           isDarkMode ? 'text-gray-200' : 'text-gray-800'
                         }`}
                       >
-                        ...
-                      </motion.button>
-                    )}
-
-                    {showGotoInput && (
-                      <form onSubmit={handleGotoSubmit} className="flex items-center space-x-2">
-                        <input
-                          type="number"
-                          className={`w-16 px-2 py-1 border rounded-md ${
-                            isDarkMode
-                              ? 'bg-slate-700 text-white border-slate-600'
-                              : 'bg-white text-gray-800 border-gray-300'
-                          }`}
-                          value={gotoValue}
-                          onChange={(e) => setGotoValue(e.target.value)}
-                          placeholder="Page #"
-                        />
-                        <button
-                          type="submit"
-                          className={`px-3 py-1 rounded-md font-semibold transition-colors duration-300 ${
-                            isDarkMode
-                              ? 'bg-blue-600 hover:bg-blue-500 text-white'
-                              : 'bg-blue-950 hover:bg-blue-800 text-white'
-                          }`}
-                        >
-                          Go
-                        </button>
-                      </form>
-                    )}
-
-                    <motion.button
-                      onClick={goToNextPage}
-                      disabled={currentPage === totalPages || totalPages === 0}
-                      whileHover={{
-                        scale: currentPage === totalPages || totalPages === 0 ? 1 : 1.1,
-                      }}
-                      whileTap={{
-                        scale: currentPage === totalPages || totalPages === 0 ? 1 : 0.9,
-                      }}
-                      className={`px-4 py-2 font-semibold transition-colors duration-300 ${
-                        currentPage === totalPages || totalPages === 0
-                          ? isDarkMode
-                            ? 'text-gray-400'
-                            : 'text-gray-400'
-                          : isDarkMode
-                          ? 'text-white'
-                          : 'text-blue-900'
-                      }`}
-                    >
-                      <FaChevronRight />
-                    </motion.button>
-                  </div>
-                </>
-              )}
-            </>
-          )}
-
-          {selectedCase && (
-            <div className="fixed inset-0 z-[190] flex items-center justify-center bg-black bg-opacity-40">
-              <motion.div
-                className={`relative w-11/12 max-w-full sm:max-w-5xl p-6 rounded-2xl shadow-2xl ${
-                  isDarkMode ? 'bg-slate-800 text-gray-100' : 'bg-gradient-to-br from-gray-50 to-gray-100 text-gray-900'
-                } overflow-y-auto max-h-[90vh]`}
-                initial={{ scale: 0.7, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                exit={{ scale: 0.7, opacity: 0 }}
-                transition={{ duration: 0.3 }}
-              >
-                <div className="flex justify-between items-start mb-4">
-                  <div>
-                    <h2 className="text-2xl font-bold">{selectedCase.title}</h2>
-                    <p className={`text-sm mt-1 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                      {selectedCase.jurisdiction || 'Unknown'} | Volume: {selectedCase.volume || 'N/A'} | Date: {selectedCase.decisionDate || 'N/A'}
-                    </p>
-                    <p
-                      className={`text-sm mt-1 font-semibold ${
-                        isDarkMode ? 'text-gray-200' : 'text-gray-800'
-                      }`}
-                    >
-                      Citation: <span className="font-normal">{selectedCase.citation || 'N/A'}</span>
-                    </p>
-                    <div className="flex items-center text-xs mt-1">
-                      {isExpert ? (
-                        <span className="verified-by text-gray-400 text-sm">
-                          Verified by LExAPI
-                        </span>
-                      ) : (
-                        <span className="verified-by text-gray-400 text-sm">Verified by LExAPI</span>
-                      )}
-                      {isVerified ? (
-                        <motion.div
-                          initial={{ opacity: 0, scale: 0 }}
-                          animate={{ opacity: 1, scale: 1 }}
-                          transition={{ duration: 0.5 }}
-                          className="ml-2 flex items-center justify-center w-6 h-6 border-2 border-emerald-500 rounded-full"
-                        >
-                          <span className="text-emerald-500 font-bold text-lg">✓</span>
-                        </motion.div>
-                      ) : (
-                        <motion.div
-                          initial={{ opacity: 0, scale: 0 }}
-                          animate={{ opacity: 1, scale: 1 }}
-                          transition={{ duration: 0.5 }}
-                          className="ml-2 flex items-center justify-center w-6 h-6 border-2 border-red-500 rounded-full"
-                        >
-                          <span className="text-red-500 font-bold text-lg">✕</span>
-                        </motion.div>
-                      )}
-                      {(isPro || isExpert) && (
+                        Citation: <span className="font-normal">{selectedCase.citation || 'N/A'}</span>
+                      </p>
+                      <div className="flex items-center text-xs mt-1">
+                        {isExpert ? (
+                          <span className="verified-by text-gray-400 text-sm">
+                            Verified by LExAPI
+                          </span>
+                        ) : (
+                          <span className="verified-by text-gray-400 text-sm">Verified by LExAPI</span>
+                        )}
+                        {isVerified ? (
+                          <motion.div
+                            initial={{ opacity: 0, scale: 0 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            transition={{ duration: 0.5 }}
+                            className="ml-2 flex items-center justify-center w-6 h-6 border-2 border-emerald-500 rounded-full"
+                          >
+                            <span className="text-emerald-500 font-bold text-lg">✓</span>
+                          </motion.div>
+                        ) : (
+                          <motion.div
+                            initial={{ opacity: 0, scale: 0 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            transition={{ duration: 0.5 }}
+                            className="ml-2 flex items-center justify-center w-6 h-6 border-2 border-red-500 rounded-full"
+                          >
+                            <span className="text-red-500 font-bold text-lg">✕</span>
+                          </motion.div>
+                        )}
+                        {(isPro || isExpert) && (
+                          <motion.button
+                            onClick={() => reRunSummary(selectedCase)}
+                            whileHover={{ scale: 1.1 }}
+                            whileTap={{ scale: 0.9 }}
+                            className="ml-4"
+                            aria-label="Re-generate Brief"
+                          >
+                            <FaSync size={20} className="text-gray-400" />
+                          </motion.button>
+                        )}
                         <motion.button
-                          onClick={() => reRunSummary(selectedCase)}
+                          onClick={() => toggleFavorite(selectedCase.id)}
                           whileHover={{ scale: 1.1 }}
                           whileTap={{ scale: 0.9 }}
                           className="ml-4"
-                          aria-label="Re-generate Brief"
+                          aria-label="Toggle Favorite"
                         >
-                          <FaSync size={20} className="text-gray-400" />
+                          {favorites.includes(selectedCase.id) ? (
+                            <FaHeart size={20} className="text-red-500" />
+                          ) : (
+                            <FaRegHeart size={20} className="text-gray-400" />
+                          )}
                         </motion.button>
-                      )}
-                      <motion.button
-                        onClick={() => toggleFavorite(selectedCase.id)}
-                        whileHover={{ scale: 1.1 }}
-                        whileTap={{ scale: 0.9 }}
-                        className="ml-4"
-                        aria-label="Toggle Favorite"
-                      >
-                        {favorites.includes(selectedCase.id) ? (
-                          <FaHeart size={20} className="text-red-500" />
-                        ) : (
-                          <FaRegHeart size={20} className="text-gray-400" />
-                        )}
-                      </motion.button>
+                      </div>
                     </div>
-                  </div>
-                  <button
-                    onClick={closeCase}
-                    className={`inline-block px-4 py-2 rounded-full font-semibold text-sm transition-colors duration-300 ${
-                      isDarkMode ? 'bg-blue-600 gradientShadowHoverBlue text-white' : 'bg-blue-950 gradientShadowHoverWhite text-white'
-                    }`}
-                    aria-label="Close Brief Modal"
-                  >
-                    <FaClose />
-                  </button>
-                </div>
-                <div
-                  className={`max-h-60 overflow-auto border-b pb-3 mb-4 ${
-                    isDarkMode ? 'border-gray-600 text-gray-200' : 'border-gray-300 text-gray-800'
-                  }`}
-                >
-                  <p className="leading-relaxed whitespace-pre-wrap text-sm">
-                    {selectedCase.content && selectedCase.content.trim() !== '' ? selectedCase.content : 'No detailed content available for this case.'}
-                  </p>
-                </div>
-                <div className="flex items-center gap-3 mb-4">
-                  <label className="font-semibold text-sm">{bulletpointView ? 'Bullet Points' : 'Classic View'}</label>
-                  <div className="relative inline-block w-14 h-8 select-none transition duration-200 ease-in">
-                    <input
-                      type="checkbox"
-                      id="bulletPointsToggle"
-                      checked={bulletpointView}
-                      onChange={handleBulletpointToggle}
-                      className="toggle-checkbox absolute h-0 w-0 opacity-0"
-                    />
-                    <label htmlFor="bulletPointsToggle" className="toggle-label block overflow-hidden h-8 rounded-full bg-gray-300 cursor-pointer"></label>
-                  </div>
-                </div>
-                {isSummaryLoading ? (
-                  <div className="flex flex-col items-center justify-center space-y-3">
-                    <div className="relative w-16 h-16">
-                      <svg className="transform -rotate-90" viewBox="0 0 36 36">
-                        <path
-                          className="text-gray-300"
-                          strokeWidth="4"
-                          fill="none"
-                          d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                        />
-                        <path
-                          className="text-blue-500 animate-progress"
-                          strokeWidth="4"
-                          strokeLinecap="round"
-                          fill="none"
-                          strokeDasharray="25, 100"
-                          d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                        />
-                      </svg>
-                    </div>
-                    <div className="text-sm text-gray-400">We are verifying the Case Brief, please wait...</div>
-                  </div>
-                ) : caseBrief ? (
-                  caseBrief.error ? (
-                    <div className="text-sm text-red-500">
-                      {caseBrief.error || 'No summary available.'}
-                    </div>
-                  ) : (
-                    <div
-                      className={`p-3 rounded-md ${
-                        isDarkMode
-                          ? 'bg-slate-700 border border-blue-600'
-                          : 'bg-gradient-to-br from-gray-50 to-gray-100 text-gray-900 border border-blue-200'
+                    <button
+                      onClick={closeCase}
+                      className={`inline-block px-4 py-2 rounded-full font-semibold text-sm transition-colors duration-300 ${
+                        isDarkMode ? 'bg-blue-600 gradientShadowHoverBlue text-white' : 'bg-blue-950 gradientShadowHoverWhite text-white'
                       }`}
+                      aria-label="Close Brief Modal"
                     >
-                      <h3 className={`font-bold mb-2 ${isDarkMode ? 'text-blue-300' : 'text-blue-600'}`}>Case Brief</h3>
-                      <div className="mb-3">
-                        <strong>Rule of Law:</strong>
-                        {bulletpointView ? (
-                          <ul className="list-disc list-inside text-sm mt-1">
-                            <li>{caseBrief.ruleOfLaw || 'Not provided.'}</li>
-                          </ul>
-                        ) : (
-                          <p className="text-sm mt-1">{caseBrief.ruleOfLaw || 'Not provided.'}</p>
-                        )}
+                      <FaClose />
+                    </button>
+                  </div>
+                  <div
+                    className={`max-h-60 overflow-auto border-b pb-3 mb-4 ${
+                      isDarkMode ? 'border-gray-600 text-gray-200' : 'border-gray-300 text-gray-800'
+                    }`}
+                  >
+                    <p className="leading-relaxed whitespace-pre-wrap text-sm">
+                      {selectedCase.content && selectedCase.content.trim() !== '' ? selectedCase.content : 'No detailed content available for this case.'}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-3 mb-4">
+                    <label className="font-semibold text-sm">{bulletpointView ? 'Bullet Points' : 'Classic View'}</label>
+                    <div className="relative inline-block w-14 h-8 select-none transition duration-200 ease-in">
+                      <input
+                        type="checkbox"
+                        id="bulletPointsToggle"
+                        checked={bulletpointView}
+                        onChange={handleBulletpointToggle}
+                        className="toggle-checkbox absolute h-0 w-0 opacity-0"
+                      />
+                      <label htmlFor="bulletPointsToggle" className="toggle-label block overflow-hidden h-8 rounded-full bg-gray-300 cursor-pointer"></label>
+                    </div>
+                  </div>
+                  {isSummaryLoading ? (
+                    <div className="flex flex-col items-center justify-center space-y-3">
+                      <div className="relative w-16 h-16">
+                        <svg className="transform -rotate-90" viewBox="0 0 36 36">
+                          <path
+                            className="text-gray-300"
+                            strokeWidth="4"
+                            fill="none"
+                            d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                          />
+                          <path
+                            className="text-blue-500 animate-progress"
+                            strokeWidth="4"
+                            strokeLinecap="round"
+                            fill="none"
+                            strokeDasharray="25, 100"
+                            d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                          />
+                        </svg>
                       </div>
-                      <div className="mb-3">
-                        <strong>Facts:</strong>
-                        {bulletpointView ? (
-                          <ul className="list-disc list-inside text-sm mt-1">
-                            <li>{caseBrief.facts || 'Not provided.'}</li>
-                          </ul>
-                        ) : (
-                          <p className="text-sm mt-1">{caseBrief.facts || 'Not provided.'}</p>
-                        )}
+                      <div className="text-sm text-gray-400">We are verifying the Case Brief, please wait...</div>
+                    </div>
+                  ) : caseBrief ? (
+                    caseBrief.error ? (
+                      <div className="text-sm text-red-500">
+                        {caseBrief.error || 'No summary available.'}
                       </div>
-                      <div className="mb-3">
-                        <strong>Issue:</strong>
-                        {bulletpointView ? (
-                          <ul className="list-disc list-inside text-sm mt-1">
-                            <li>{caseBrief.issue || 'Not provided.'}</li>
-                          </ul>
-                        ) : (
-                          <p className="text-sm mt-1">{caseBrief.issue || 'Not provided.'}</p>
-                        )}
-                      </div>
-                      <div className="mb-3">
-                        <strong>Holding:</strong>
-                        {bulletpointView ? (
-                          <ul className="list-disc list-inside text-sm mt-1">
-                            <li>{caseBrief.holding || 'Not provided.'}</li>
-                          </ul>
-                        ) : (
-                          <p className="text-sm mt-1">{caseBrief.holding || 'Not provided.'}</p>
-                        )}
-                      </div>
-                      <div className="mb-3">
-                        <strong>Reasoning:</strong>
-                        {bulletpointView ? (
-                          <ul className="list-disc list-inside text-sm mt-1">
-                            <li>{caseBrief.reasoning || 'Not provided.'}</li>
-                          </ul>
-                        ) : (
-                          <p className="text-sm mt-1">{caseBrief.reasoning || 'Not provided.'}</p>
-                        )}
-                      </div>
-                      <div>
-                        <strong>Dissent:</strong>
-                        {bulletpointView ? (
-                          <ul className="list-disc list-inside text-sm mt-1">
-                            <li>{caseBrief.dissent || 'Not provided.'}</li>
-                          </ul>
-                        ) : (
-                          <p className="text-sm mt-1">{caseBrief.dissent || 'Not provided.'}</p>
-                        )}
-                      </div>
-                      <div className="text-xs italic text-gray-400">Still in development, information may not be fully accurate.</div>
-                      <motion.a
-                        whileHover={{ scale: 1.0, x: 1 }}
-                        whileTap={{ scale: 1 }}
-                        href={`/casebriefs/summaries?caseId=${selectedCase.id}`}
-                        className={`mt-3 inline-flex items-center gap-1 text-sm font-semibold rounded px-2 py-1 gradientShadowHoverWhite ${
+                    ) : (
+                      <div
+                        className={`p-3 rounded-md ${
                           isDarkMode
-                            ? 'bg-blue-100 border border-blue-600 text-blue-600'
-                            : 'bg-blue-100 border border-blue-600 text-blue-600'
+                            ? 'bg-slate-700 border border-blue-600'
+                            : 'bg-gradient-to-br from-gray-50 to-gray-100 text-gray-900 border border-blue-200'
                         }`}
                       >
-                        See full Case Brief
-                        <FaArrowRight />
-                      </motion.a>
-                    </div>
-                  )
-                ) : (
-                  <div className="text-sm text-gray-400">No summary available.</div>
-                )}
-              </motion.div>
-            </div>
-          )}
-        </div>
-      </main>
-    </div>
+                        <h3 className={`font-bold mb-2 ${isDarkMode ? 'text-blue-300' : 'text-blue-600'}`}>Case Brief</h3>
+                        <div className="mb-3">
+                          <strong>Rule of Law:</strong>
+                          {bulletpointView ? (
+                            <ul className="list-disc list-inside text-sm mt-1">
+                              <li>{caseBrief.ruleOfLaw || 'Not provided.'}</li>
+                            </ul>
+                          ) : (
+                            <p className="text-sm mt-1">{caseBrief.ruleOfLaw || 'Not provided.'}</p>
+                          )}
+                        </div>
+                        <div className="mb-3">
+                          <strong>Facts:</strong>
+                          {bulletpointView ? (
+                            <ul className="list-disc list-inside text-sm mt-1">
+                              <li>{caseBrief.facts || 'Not provided.'}</li>
+                            </ul>
+                          ) : (
+                            <p className="text-sm mt-1">{caseBrief.facts || 'Not provided.'}</p>
+                          )}
+                        </div>
+                        <div className="mb-3">
+                          <strong>Issue:</strong>
+                          {bulletpointView ? (
+                            <ul className="list-disc list-inside text-sm mt-1">
+                              <li>{caseBrief.issue || 'Not provided.'}</li>
+                            </ul>
+                          ) : (
+                            <p className="text-sm mt-1">{caseBrief.issue || 'Not provided.'}</p>
+                          )}
+                        </div>
+                        <div className="mb-3">
+                          <strong>Holding:</strong>
+                          {bulletpointView ? (
+                            <ul className="list-disc list-inside text-sm mt-1">
+                              <li>{caseBrief.holding || 'Not provided.'}</li>
+                            </ul>
+                          ) : (
+                            <p className="text-sm mt-1">{caseBrief.holding || 'Not provided.'}</p>
+                          )}
+                        </div>
+                        <div className="mb-3">
+                          <strong>Reasoning:</strong>
+                          {bulletpointView ? (
+                            <ul className="list-disc list-inside text-sm mt-1">
+                              <li>{caseBrief.reasoning || 'Not provided.'}</li>
+                            </ul>
+                          ) : (
+                            <p className="text-sm mt-1">{caseBrief.reasoning || 'Not provided.'}</p>
+                          )}
+                        </div>
+                        <div>
+                          <strong>Dissent:</strong>
+                          {bulletpointView ? (
+                            <ul className="list-disc list-inside text-sm mt-1">
+                              <li>{caseBrief.dissent || 'Not provided.'}</li>
+                            </ul>
+                          ) : (
+                            <p className="text-sm mt-1">{caseBrief.dissent || 'Not provided.'}</p>
+                          )}
+                        </div>
+                        <div className="text-xs italic text-gray-400">Still in development, information may not be fully accurate.</div>
+                        <motion.a
+                          whileHover={{ scale: 1.0, x: 1 }}
+                          whileTap={{ scale: 1 }}
+                          href={`/casebriefs/summaries?caseId=${selectedCase.id}`}
+                          className={`mt-3 inline-flex items-center gap-1 text-sm font-semibold rounded px-2 py-1 gradientShadowHoverWhite ${
+                            isDarkMode
+                              ? 'bg-blue-100 border border-blue-600 text-blue-600'
+                              : 'bg-blue-100 border border-blue-600 text-blue-600'
+                          }`}
+                        >
+                          See full Case Brief
+                          <FaArrowRight />
+                        </motion.a>
+                      </div>
+                    )
+                  ) : (
+                    <div className="text-sm text-gray-400">No summary available.</div>
+                  )}
+                </motion.div>
+              </div>
+            )}
+          </div>
+        </main>
+      </div>
+    </>
   );
 }
 
