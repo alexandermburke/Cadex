@@ -34,7 +34,6 @@ export default function AllBriefs() {
   const isDarkMode = userDataObj?.darkMode || false;
   const [isSidebarVisible, setIsSidebarVisible] = useState(true);
   const toggleSidebar = () => setIsSidebarVisible(!isSidebarVisible);
-
   const [capCases, setCapCases] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
@@ -54,19 +53,16 @@ export default function AllBriefs() {
   const [sortBy, setSortBy] = useState('');
   const [showGotoInput, setShowGotoInput] = useState(false);
   const [gotoValue, setGotoValue] = useState('');
-  // Create New Case Brief Section States
   const [newBriefTitle, setNewBriefTitle] = useState('');
   const [newBriefDate, setNewBriefDate] = useState('');
   const [newBriefCitation, setNewBriefCitation] = useState('');
   const [verificationReply, setVerificationReply] = useState('');
   const [createLoading, setCreateLoading] = useState(false);
   const [createError, setCreateError] = useState('');
-
   const generateCaseNumber = () => {
     const num = Math.floor(Math.random() * 1000000);
     return num.toString().padStart(6, '0');
   };
-
   const updateCitationForCase = async (c) => {
     try {
       const payload = {
@@ -91,15 +87,12 @@ export default function AllBriefs() {
       console.error('Error updating citation:', error);
     }
   };
-
   useEffect(() => {
     if (userDataObj && userDataObj.favorites) {
       setFavorites(userDataObj.favorites);
     }
   }, [userDataObj]);
-
   const toggleFavorite = async (caseId) => {
-    // If no user is logged in, update local state only.
     if (!currentUser) {
       if (favorites.includes(caseId)) {
         setFavorites(favorites.filter((id) => id !== caseId));
@@ -127,7 +120,6 @@ export default function AllBriefs() {
       console.error('Error updating favorites:', error);
     }
   };
-
   const shareCase = async () => {
     if (!selectedCase) return;
     const shareData = {
@@ -146,7 +138,6 @@ export default function AllBriefs() {
       alert('URL copied to clipboard');
     }
   };
-
   useEffect(() => {
     const updateItemsPerPage = () => {
       let numCols = 2;
@@ -163,7 +154,6 @@ export default function AllBriefs() {
     window.addEventListener('resize', updateItemsPerPage);
     return () => window.removeEventListener('resize', updateItemsPerPage);
   }, []);
-
   useEffect(() => {
     const fetchCapCases = async () => {
       setIsLoading(true);
@@ -183,7 +173,6 @@ export default function AllBriefs() {
     };
     fetchCapCases();
   }, [currentUser]);
-
   useEffect(() => {
     const caseIdParam = searchParams.get('caseId');
     if (caseIdParam && capCases.length > 0) {
@@ -196,9 +185,6 @@ export default function AllBriefs() {
       }
     }
   }, [searchParams, capCases]);
-
-  // The login check has been removed so all users may view the briefs.
-
   const filteredCases = capCases.filter((item) => {
     const s = searchTerm.toLowerCase();
     const title = item.title?.toLowerCase() || '';
@@ -211,7 +197,6 @@ export default function AllBriefs() {
     const matchesJurisdiction = filterJurisdiction ? jurisdiction.includes(filterJurisdiction.toLowerCase()) : true;
     return matchesSearch && matchesDate && matchesJurisdiction;
   });
-
   const displayCases = activeTab === 'favorites' ? filteredCases.filter((c) => favorites.includes(c.id)) : filteredCases;
   const sortedCases = [...displayCases].sort((a, b) => {
     if (sortBy === 'citation') return (a.citation || '').localeCompare(b.citation || '');
@@ -219,13 +204,11 @@ export default function AllBriefs() {
     if (sortBy === 'jurisdiction') return (a.jurisdiction || '').localeCompare(b.jurisdiction || '');
     return 0;
   });
-
   const totalPages = Math.ceil(sortedCases.length / itemsPerPage);
   const validCurrentPage = Math.min(currentPage, totalPages || 1);
   const startIndex = (validCurrentPage - 1) * itemsPerPage;
   const endIndex = validCurrentPage * itemsPerPage;
   const paginatedCases = sortedCases.slice(startIndex, endIndex);
-
   const paginationNumbers = () => {
     let startPage, endPage;
     if (totalPages <= 5) {
@@ -245,7 +228,6 @@ export default function AllBriefs() {
     }
     return Array.from({ length: endPage - startPage + 1 }, (_, i) => startPage + i);
   };
-
   const goToPage = (num) => {
     if (num >= 1 && num <= totalPages) {
       setCurrentPage(num);
@@ -268,10 +250,8 @@ export default function AllBriefs() {
       setShowGotoInput(false);
     }
   };
-
   const logCaseView = async (c) => {
     try {
-      // If no user is logged in, skip logging recent activity.
       if (!currentUser) return;
       const userDocRef = doc(db, 'users', currentUser.uid);
       const userSnap = await getDoc(userDocRef);
@@ -295,7 +275,6 @@ export default function AllBriefs() {
       console.error('Error logging activity:', error);
     }
   };
-
   const reRunSummary = async (c) => {
     setIsSummaryLoading(true);
     try {
@@ -320,7 +299,6 @@ export default function AllBriefs() {
         briefSummary: { ...data, verified: false },
       });
       setCaseBrief(data);
-
       const verifyRes = await fetch('/api/casebrief-verification', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -347,7 +325,6 @@ export default function AllBriefs() {
       setIsSummaryLoading(false);
     }
   };
-
   const openCase = async (c) => {
     setSelectedCase(c);
     setCaseBrief(null);
@@ -390,7 +367,6 @@ export default function AllBriefs() {
       }
       return;
     }
-
     setIsSummaryLoading(true);
     try {
       const payload = {
@@ -422,7 +398,6 @@ export default function AllBriefs() {
         },
       });
       setCaseBrief(data);
-
       try {
         const verifyRes = await fetch('/api/casebrief-verification', {
           method: 'POST',
@@ -454,18 +429,15 @@ export default function AllBriefs() {
       setIsSummaryLoading(false);
     }
   };
-
   const closeCase = () => {
     setSelectedCase(null);
     setCaseBrief(null);
     setIsVerified(false);
     setIsFavorited(false);
   };
-
   const handleBulletpointToggle = (e) => {
     setBulletpointView(e.target.checked);
   };
-
   const createNewCaseBrief = async (e) => {
     e.preventDefault();
     setCreateError('');
@@ -491,7 +463,6 @@ export default function AllBriefs() {
         throw new Error(errData.error || 'Summary generation failed.');
       }
       let summaryData = await summaryRes.json();
-
       try {
         const verifyRes = await fetch('/api/casebrief-verification', {
           method: 'POST',
@@ -513,11 +484,9 @@ export default function AllBriefs() {
         console.error('Error verifying new case brief:', verifyError);
         setVerificationReply('Error during verification.');
       }
-
       const correctedTitle = summaryData.corrections?.title || newBriefTitle;
       const correctedCitation = summaryData.corrections?.citation || newBriefCitation;
       const correctedDate = summaryData.corrections?.date || newBriefDate;
-
       const newCase = {
         title: correctedTitle,
         decisionDate: correctedDate,
@@ -542,7 +511,6 @@ export default function AllBriefs() {
       setCreateLoading(false);
     }
   };
-
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "ItemList",
@@ -559,13 +527,22 @@ export default function AllBriefs() {
       }
     }))
   };
-
   return (
     <>
       <Head>
         <title>All Case Briefs - CadexLaw</title>
-        <meta name="description" content="Discover all case briefs and detailed legal summaries on CadexLaw. Explore a comprehensive listing of landmark legal cases." />
-        <meta name="keywords" content="case briefs, legal summaries, legal cases, case law, CadexLaw" />
+        <meta name="description" content="Discover all case briefs and detailed legal summaries on CadexLaw. Explore a comprehensive listing of landmark legal cases with expert analysis including rule of law, facts, issues, holding and more." />
+        <meta name="keywords" content="case brief, legal summary, CadexLaw, legal cases, landmark cases, legal analysis, case law, detailed legal summaries" />
+        <meta name="robots" content="index, follow" />
+        <link rel="canonical" href="https://www.cadexlaw.com/casebriefs/allbriefs" />
+        <meta property="og:title" content="All Case Briefs - CadexLaw" />
+        <meta property="og:description" content="Explore a comprehensive listing of legal case briefs and summaries on CadexLaw. Your gateway to understanding landmark legal cases through expert analysis." />
+        <meta property="og:url" content={typeof window !== 'undefined' ? window.location.href : "https://www.cadexlaw.com/casebriefs/allbriefs"} />
+        <meta property="og:type" content="website" />
+        <meta property="og:site_name" content="CadexLaw" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="All Case Briefs - CadexLaw" />
+        <meta name="twitter:description" content="Browse and discover detailed case briefs and legal summaries on CadexLaw. Gain insights into landmark cases and comprehensive legal analysis." />
         <script type="application/ld+json">
           {JSON.stringify(structuredData)}
         </script>
@@ -590,7 +567,6 @@ export default function AllBriefs() {
             </>
           )}
         </AnimatePresence>
-
         <main className="flex-1 flex flex-col px-6 relative z-200 h-screen">
           <div
             className={`flex-1 w-full rounded-2xl shadow-xl p-6 overflow-y-auto overflow-x-auto ${
@@ -643,7 +619,6 @@ export default function AllBriefs() {
                 Create
               </motion.button>
             </div>
-
             {(activeTab === 'browse' || activeTab === 'favorites') && (
               <>
                 <div className="mb-6 w-full flex justify-center items-center gap-4">
@@ -672,7 +647,6 @@ export default function AllBriefs() {
                     {showAdvanced ? <FaChevronUp /> : <FaChevronDown />}
                   </button>
                 </div>
-
                 <AnimatePresence>
                   {showAdvanced && (
                     <motion.div
@@ -729,7 +703,6 @@ export default function AllBriefs() {
                 </AnimatePresence>
               </>
             )}
-
             {activeTab === 'create' ? (
               <div className="w-full flex justify-center">
                 <div className="max-w-md w-full">
@@ -865,7 +838,6 @@ export default function AllBriefs() {
                         </div>
                       ))}
                     </div>
-
                     <div className="mt-6 flex items-center justify-center gap-2">
                       <motion.button
                         onClick={goToPrevPage}
@@ -884,7 +856,6 @@ export default function AllBriefs() {
                       >
                         <FaChevronLeft />
                       </motion.button>
-
                       {paginationNumbers().map((num) => (
                         <motion.button
                           key={num}
@@ -904,7 +875,6 @@ export default function AllBriefs() {
                           {num}
                         </motion.button>
                       ))}
-
                       {totalPages > 5 && (
                         <motion.button
                           onClick={() => setShowGotoInput(!showGotoInput)}
@@ -917,7 +887,6 @@ export default function AllBriefs() {
                           ...
                         </motion.button>
                       )}
-
                       {showGotoInput && (
                         <form onSubmit={handleGotoSubmit} className="flex items-center space-x-2">
                           <input
@@ -943,7 +912,6 @@ export default function AllBriefs() {
                           </button>
                         </form>
                       )}
-
                       <motion.button
                         onClick={goToNextPage}
                         disabled={currentPage === totalPages || totalPages === 0}
@@ -970,7 +938,6 @@ export default function AllBriefs() {
                 )}
               </>
             )}
-
             {selectedCase && (
               <div className="fixed inset-0 z-[190] flex items-center justify-center bg-black bg-opacity-40">
                 <motion.div
@@ -989,9 +956,7 @@ export default function AllBriefs() {
                         {selectedCase.jurisdiction || 'Unknown'} | Volume: {selectedCase.volume || 'N/A'} | Date: {selectedCase.decisionDate || 'N/A'}
                       </p>
                       <p
-                        className={`text-sm mt-1 font-semibold ${
-                          isDarkMode ? 'text-gray-200' : 'text-gray-800'
-                        }`}
+                        className={`text-sm mt-1 font-semibold ${isDarkMode ? 'text-gray-200' : 'text-gray-800'}`}
                       >
                         Citation: <span className="font-normal">{selectedCase.citation || 'N/A'}</span>
                       </p>

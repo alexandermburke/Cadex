@@ -10,7 +10,7 @@ import { doc, getDoc, updateDoc, collection, query, where, limit, getDocs } from
 import { useAuth } from '@/context/AuthContext'
 import html2canvas from 'html2canvas'
 import { jsPDF } from 'jspdf'
-import CaseChatbot from '../CasebriefBot' // Adjust the path as needed
+import CaseChatbot from '../CasebriefBot'
 
 const simplifyText = (text = '', maxLength = 400) => {
   if (!text) return 'Not provided.'
@@ -200,18 +200,12 @@ export default function CaseSummaries() {
       setCaseBrief({ error: 'Error fetching favorite case summary.' })
     }
   }
-  // Updated renderFactsContent function
   const renderFactsContent = (factsText) => {
     if (!factsText) return <p className="text-base mt-2">Not provided.</p>
     const factsStr = typeof factsText === 'string' ? factsText : String(factsText)
-  
     if (viewMode === 'simplified')
       return <p className={`text-base mt-2 ${!isLoggedIn ? 'blur-sm' : ''}`}>{simplifyText(factsStr)}</p>
-  
-    // Attempt to match already enumerated facts (e.g., "1. First fact 2. Second fact...")
     let enumeratedFacts = factsStr.match(/(\d+\.\s[\s\S]*?)(?=\d+\.\s|$)/g)
-  
-    // If no enumerated facts, split by commas and treat each segment as a fact
     if (!enumeratedFacts) {
       const commaFacts = factsStr.split(',').map(fact => fact.trim()).filter(fact => fact.length > 0)
       if (commaFacts.length > 1) {
@@ -220,11 +214,9 @@ export default function CaseSummaries() {
         return <p className={`text-base mt-2 ${!isLoggedIn ? 'blur-sm' : ''}`}>{factsStr}</p>
       }
     }
-  
     return (
       <ul className={`list-disc list-inside text-base mt-2 ${!isLoggedIn ? 'blur-sm' : ''}`}>
         {enumeratedFacts.map((fact, index) => {
-          // Remove any leading numbering (e.g., "1. ") if present.
           const strippedFact = fact.replace(/^\d+\.\s*/, '')
           return <li key={index}>{strippedFact.trim()}</li>
         })}
@@ -510,17 +502,24 @@ export default function CaseSummaries() {
     : null
   return (
     <>
-      {capCase && (
-        <Head>
-          <title>{capCase.title} | CadexLaw Case Brief Summary</title>
-          <meta name="description" content={`${capCase.title} case brief summary from ${capCase.jurisdiction || 'Unknown jurisdiction'}. Preview the case details and subscribe for full access.`} />
-          <meta name="keywords" content="case brief, legal summary, CadexLaw, legal cases, case law" />
-          {/* Additional meta tags omitted for brevity */}
-          {structuredData && (
-            <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
-          )}
-        </Head>
-      )}
+      <Head>
+        <title>{capCase ? `${capCase.title} | CadexLaw Case Brief Summary` : "CadexLaw Case Brief Summary"}</title>
+        <meta name="description" content={capCase ? `${capCase.title} case brief summary from ${capCase.jurisdiction || 'Unknown jurisdiction'}. Review key legal details such as rule of law, facts, issue, holding, reasoning, and dissent. CadexLaw provides expert legal analysis and summaries for landmark cases.` : "Explore comprehensive legal case briefs and summaries on CadexLaw."} />
+        <meta name="keywords" content={capCase ? `${capCase.title}, ${capCase.jurisdiction}, legal case brief, case summary, rule of law, facts, legal issue, holding, legal reasoning, dissent, landmark case, legal analysis` : "case brief, legal summary, CadexLaw, legal cases, case law"} />
+        <meta name="robots" content="index, follow" />
+        <link rel="canonical" href={typeof window !== 'undefined' ? window.location.href : "https://www.cadexlaw.com/casebriefs/summaries"} />
+        <meta property="og:title" content={capCase ? `${capCase.title} | CadexLaw Case Brief Summary` : "CadexLaw Case Brief Summary"} />
+        <meta property="og:description" content={capCase ? `${capCase.title} case brief summary with detailed legal analysis from ${capCase.jurisdiction || 'Unknown jurisdiction'}. Explore in-depth insights on rule of law, facts, and legal reasoning.` : "Explore legal case briefs with in-depth analysis on CadexLaw."} />
+        <meta property="og:url" content={typeof window !== 'undefined' ? window.location.href : "https://www.cadexlaw.com/casebriefs/summaries"} />
+        <meta property="og:type" content="website" />
+        <meta property="og:site_name" content="CadexLaw" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={capCase ? `${capCase.title} | CadexLaw Case Brief Summary` : "CadexLaw Case Brief Summary"} />
+        <meta name="twitter:description" content={capCase ? `${capCase.title} case brief summary with expert legal insights and comprehensive analysis. Discover key legal elements and profound insights on case law.` : "Explore comprehensive legal summaries and case briefs on CadexLaw."} />
+        {structuredData && (
+          <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
+        )}
+      </Head>
       <div ref={pdfRef} className={`relative flex h-screen transition-colors duration-500 ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>
         <AnimatePresence>
           {isSidebarVisible && (
@@ -752,7 +751,6 @@ export default function CaseSummaries() {
           </div>
         </main>
       </div>
-      {/* Chatbot integration: Non-logged in users cannot access the chatbot */}
       {isLoggedIn && (
         <CaseChatbot caseName={capCase?.title || 'this case'} caseId={capCase?.id || ''} />
       )}
