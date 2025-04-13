@@ -129,7 +129,7 @@ export default function Chatbot() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 10 }}
             transition={{ duration: 0.5 }}
-            className="fixed bottom-16 right-4 bg-white bg-opacity-90 dark:bg-gray-800 dark:bg-opacity-90 text-blue-600 text-sm px-3 py-2 rounded shadow-lg z-50"
+            className="fixed bottom-16 right-4 text-blue-600 text-sm px-3 py-2 rounded shadow-lg z-50"
           >
             Need assistance? Click to chat.
           </motion.div>
