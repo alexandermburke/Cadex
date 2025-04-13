@@ -8,7 +8,7 @@ import {
   FaSearch,
   FaTasks,
   FaFileAlt,
-  FaRobot,
+  FaInfinity,
   FaChartLine,
   FaFileContract,
   FaBalanceScale,
@@ -45,12 +45,9 @@ export default function Hero() {
     newUsers: 0,
     statsProvided: 0,
   });
-
-  // Animate stats counters
   const animateStats = (start, end, setter) => {
     let startTime;
-    const duration = 5000; // Faster animation
-
+    const duration = 5000;
     const step = (timestamp) => {
       if (!startTime) startTime = timestamp;
       const progress = Math.min((timestamp - startTime) / duration, 1);
@@ -59,25 +56,17 @@ export default function Hero() {
         window.requestAnimationFrame(step);
       }
     };
-
     window.requestAnimationFrame(step);
   };
-
   const [animationTrigger, setAnimationTrigger] = useState(0);
   const animationInterval = 12;
-
-  // Disclaimer Popup
   const [showDisclaimer, setShowDisclaimer] = useState(false);
-
   useEffect(() => {
     const hasSeenDisclaimer = localStorage.getItem('hasSeenDisclaimer');
     if (!hasSeenDisclaimer) {
       setShowDisclaimer(true);
     }
-
     setLoaded(true);
-
-    // Animate stats when component mounts
     animateStats(0, 400, (value) =>
       setStats((prevStats) => ({ ...prevStats, cases: value }))
     );
@@ -87,21 +76,16 @@ export default function Hero() {
     animateStats(0, 45, (value) =>
       setStats((prevStats) => ({ ...prevStats, statsProvided: value }))
     );
-
     const interval = setInterval(() => {
       setAnimationTrigger((prev) => prev + 1);
     }, animationInterval * 1000);
-
     return () => clearInterval(interval);
   }, []);
-
   const handleCloseDisclaimer = () => {
     setShowDisclaimer(false);
     localStorage.setItem('hasSeenDisclaimer', 'true');
   };
-
   const animatedWord = 'Future';
-
   const features = [
     {
       icon: (
@@ -121,7 +105,7 @@ export default function Hero() {
     },
     {
       icon: (
-        <FaRobot className={`${isDarkMode ? 'text-white' : 'text-blue-950'} text-4xl mb-4`} />
+        <FaInfinity className={`${isDarkMode ? 'text-white' : 'text-blue-950'} text-4xl mb-4`} />
       ),
       title: 'Infinitely Variable Exam Prep',
       description:
@@ -152,8 +136,6 @@ export default function Hero() {
         'Review your resume, prepare for interviews, and find networking opportunities to advance your professional goals.',
     },
   ];
-
-  // Framer Motion Variants for Advanced Animations
   const cardVariants = {
     hidden: {},
     visible: {
@@ -162,23 +144,18 @@ export default function Hero() {
       },
     },
   };
-
   const iconVariants = {
     hidden: { opacity: 0, scale: 0.5 },
     visible: { opacity: 1, scale: 1, transition: { duration: 0.5 } },
   };
-
   const titleVariants = {
     hidden: { opacity: 0, y: 20 },
     visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
   };
-
   const descriptionVariants = {
     hidden: { opacity: 0 },
     visible: { opacity: 1, transition: { duration: 0.5 } },
   };
-
-  // Vertical divider (spacing remains unchanged)
   const VerticalDivider = () => (
     <div
       className={`mx-auto w-[2px] my-2 ${
@@ -190,20 +167,15 @@ export default function Hero() {
       }`}
     />
   );
-
-  // Intersection Observer for the features section
   const [featuresRef, featuresInView] = useInView({
     threshold: 0.1,
     triggerOnce: true,
   });
-
   return (
     <section className="w-full bg-transparent relative">
       <div className="absolute inset-0 top-[100px] left-0 w-full h-[800px] z-0 pointer-events-none">
         <HeroBackground />
       </div>
-
-      {/* Disclaimer Popup */}
       {showDisclaimer && (
         <div className="fixed inset-0 z-[151] flex items-center justify-center bg-black bg-opacity-50">
           <div className="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-lg mx-auto">
@@ -235,9 +207,7 @@ export default function Hero() {
           </div>
         </div>
       )}
-
       <div className="mx-auto px-4 py-0 relative z-10 mt-8">
-        {/* Hero Section */}
         <div
           className={`flex flex-col items-center text-center mx-auto transform transition-transform duration-700 ${
             loaded ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'
@@ -275,11 +245,9 @@ export default function Hero() {
               Welcome to the future of Legal Education
             </span>
           </h2>
-
           <p className={`text-center text-2xl sm:text-2xl md:text-2xl ${isDarkMode ? 'text-white' : 'text-slate-700'} max-w-2xl mb-10`}>
-           Created by law students, for law students, CadexLaw is your trusted hub for practical insights and an extensive suite of resources, all at a fraction of traditional costs.
+            Affordable legal study tools made by law students, for law students. Join CadexLaw to study smarter and succeed in law.
           </p>
-
           <div className="flex justify-center mt-6 mb-6 w-full">
             <Link
               href="/pricing"
@@ -296,15 +264,12 @@ export default function Hero() {
             </Link>
           </div>
         </div>
-
-        {/* Redesigned Sections Container */}
         <div
           ref={featuresRef}
           className={`flex flex-col items-center px-4 md:px-8 lg:px-16 mt-10 transition-all duration-1000 ${
             featuresInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
           }`}
         >
-          {/* See How It Works Section */}
           <div className="relative w-full max-w-3xl mx-auto mt-4">
             <div className="relative w-full h-0 pb-[50%] overflow-hidden rounded-lg shadow-xl">
               <video
@@ -317,8 +282,6 @@ export default function Hero() {
               ></video>
             </div>
           </div>
-
-          {/* What We Offer Section */}
           <h3
             className={`text-4xl sm:text-5xl font-bold text-center ${
               isDarkMode ? 'text-white' : 'text-blue-950'
@@ -367,7 +330,6 @@ export default function Hero() {
             ))}
           </div>
         </div>
-
         <VerticalDivider />
       </div>
     </section>
