@@ -45,8 +45,7 @@ export async function GET(request) {
     "https://www.cadexlaw.com/lawtools/resumereview",
     "https://www.cadexlaw.com/lawtools/applicationreview",
     "https://www.cadexlaw.com/lawtools/interviewprep",
-    "https://www.cadexlaw.com/lawtools/networking",
-    "https://discord.gg/wKgH9ussWc"
+    "https://www.cadexlaw.com/lawtools/networking"
   ].map(url => `
     <url>
       <loc>${url}</loc>
