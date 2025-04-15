@@ -249,7 +249,7 @@ export default function Hero() {
           </p>
           <div className="flex justify-center mt-6 mb-6 w-full">
             <Link
-              href="/register"
+              href="/casebriefs/allbriefs"
               className="
                 block group relative h-12 w-full sm:w-56 overflow-hidden rounded 
                 bg-gradient-to-r from-blue-600 to-blue-800 text-white 
@@ -258,7 +258,7 @@ export default function Hero() {
               "
             >
               <div className="font-semibold flex items-center">
-                Start Learning <FaArrowRight className="ml-4" />
+                View Case Briefs <FaArrowRight className="ml-4" />
               </div>
             </Link>
           </div>
