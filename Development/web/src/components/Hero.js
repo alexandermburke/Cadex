@@ -19,8 +19,8 @@ import {
   FaLightbulb,
   FaBook,
   FaLaptopCode,
+  FaArrowRight
 } from 'react-icons/fa';
-
 import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css';
 import { Autoplay, FreeMode } from 'swiper/modules';
@@ -28,7 +28,6 @@ import { useInView } from 'react-intersection-observer';
 import { useAuth } from '@/context/AuthContext';
 import { motion } from 'framer-motion';
 import clsx from 'clsx';
-
 import HeroBackground from './HeroBackground';
 
 const poppins = Poppins({
@@ -245,12 +244,12 @@ export default function Hero() {
               Welcome to the future of Legal Education
             </span>
           </h2>
-          <p className={`text-center text-2xl sm:text-2xl md:text-2xl ${isDarkMode ? 'text-white' : 'text-slate-700'} max-w-2xl mb-10`}>
-            Affordable legal study tools made by law students, for law students. Join CadexLaw to study smarter and succeed in law.
+          <p className={`text-center text-2xl sm:text-2xl md:text-2xl ${isDarkMode ? 'text-white' : 'text-slate-700'} max-w-2xl mt-4 mb-14`}>
+            Affordable legal study tools made by law students, for law students. Join CadexLaw to study smarter & succeed in law.
           </p>
           <div className="flex justify-center mt-6 mb-6 w-full">
             <Link
-              href="/pricing"
+              href="/register"
               className="
                 block group relative h-12 w-full sm:w-56 overflow-hidden rounded 
                 bg-gradient-to-r from-blue-600 to-blue-800 text-white 
@@ -258,8 +257,8 @@ export default function Hero() {
                 flex items-center justify-center gradientShadowHoverBlue
               "
             >
-              <div className="font-semibold">
-                Explore Our Plans
+              <div className="font-semibold flex items-center">
+                Start Learning <FaArrowRight className="ml-4" />
               </div>
             </Link>
           </div>
@@ -303,11 +302,7 @@ export default function Hero() {
                 transition={{ delay: index * 0.1 }}
                 whileHover={{ scale: 1.05 }}
               >
-                <motion.div
-                  className="flex justify-center"
-                  variants={iconVariants}
-                  whileHover={{ scale: 1.1, rotate: 5 }}
-                >
+                <motion.div className="flex justify-center" variants={iconVariants} whileHover={{ scale: 1.1, rotate: 5 }}>
                   {feature.icon}
                 </motion.div>
                 <motion.h4
@@ -335,3 +330,7 @@ export default function Hero() {
     </section>
   );
 }
+
+const VerticalDivider = () => (
+  <div className="mx-auto w-[2px] my-4 bg-gray-400" />
+);

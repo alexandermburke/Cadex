@@ -217,7 +217,7 @@ export default function Home() {
             </Swiper>
             <div className="flex justify-center mt-6">
               <button
-                onClick={() => router.push('/register')}
+                onClick={() => router.push('/pricing')}
                 className="
                   group relative h-12 w-full sm:w-56 overflow-hidden rounded 
                   bg-gradient-to-r from-blue-600 to-blue-800 text-white 
@@ -225,7 +225,7 @@ export default function Home() {
                   flex items-center justify-center gradientShadowHoverBlue
                 "
               >
-                <span className="font-semibold">Create an Account</span>
+                <span className="font-semibold">Explore Our Plans</span>
               </button>
             </div>
           </div>
