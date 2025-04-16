@@ -1,10 +1,11 @@
 'use client'
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { FaTwitter, FaInstagram, FaDiscord, FaYoutube } from 'react-icons/fa';
+import { FaInstagram, FaDiscord, FaYoutube, FaLinkedin } from 'react-icons/fa';
+import { FaXTwitter } from 'react-icons/fa6';
 import { Poppins } from 'next/font/google';
 import { doc, getDoc } from 'firebase/firestore';
-import { db } from '@/firebase'; 
+import { db } from '@/firebase';
 
 const poppins = Poppins({
   subsets: ['latin'],
@@ -41,7 +42,6 @@ export default function Footer() {
   return (
     <footer className="flex flex-col bg-gradient-to-r from-blue-950 to-slate-950 text-white py-4">
       <div className="flex flex-col sm:flex-row items-center justify-center flex-wrap gap-6 sm:gap-8 md:gap-10 mx-auto py-4 px-8 text-sm">
-        {/* Left Column: App Info */}
         <div className="flex flex-col w-fit shrink-0 gap-2 whitespace-nowrap text-center">
           <div className="flex flex-col mx-auto w-fit">
             <Link href={'/'}>
@@ -50,7 +50,6 @@ export default function Footer() {
               </h1>
             </Link>
           </div>
-          {/* Dynamically loaded from Firestore */}
           <p className="mx-auto text-xs">
             © {firestoreData.copyright || 'Loading...'}
           </p>
@@ -58,10 +57,7 @@ export default function Footer() {
             Version {firestoreData.versionNumber || '0.0.0'} Build
           </p>
         </div>
-
-        {/* Middle Links */}
         <div className="flex flex-col sm:flex-row gap-6 sm:gap-8 md:gap-10">
-          {/* Contact Section */}
           <div className="flex flex-col gap-2 w-fit">
             <h3 className="font-bold">Contact</h3>
             <div className="flex flex-col gap-1 text-sm">
@@ -75,7 +71,6 @@ export default function Footer() {
               </div>
             </div>
           </div>
-          {/* Legal Section */}
           <div className="flex flex-col gap-2 w-fit">
             <h3 className="font-bold">Legal</h3>
             <div className="flex flex-col gap-1 text-sm">
@@ -87,7 +82,6 @@ export default function Footer() {
               </Link>
             </div>
           </div>
-          {/* Careers Section */}
           <div className="flex flex-col gap-2 w-fit">
             <h3 className="font-bold">Careers</h3>
             <div className="flex flex-col gap-1 text-sm">
@@ -99,7 +93,6 @@ export default function Footer() {
               </Link>
             </div>
           </div>
-          {/* Investors Section */}
           <div className="flex flex-col gap-2 w-fit">
             <h3 className="font-bold">Investors</h3>
             <div className="flex flex-col gap-1 text-sm">
@@ -122,8 +115,6 @@ export default function Footer() {
             </div>
           </div>
         </div>
-
-        {/* Right Column: Socials */}
         <div className="flex flex-col gap-2 w-fit">
           <h3 className="font-bold">Join Our Community</h3>
           <div className="flex gap-1">
@@ -133,7 +124,7 @@ export default function Footer() {
               rel="noopener noreferrer"
               className="hover:text-blue-400"
             >
-              <FaTwitter size={24} />
+              <FaXTwitter size={24} />
             </Link>
             <Link
               href="https://www.instagram.com/cadexlaw/"
@@ -158,6 +149,14 @@ export default function Footer() {
               className="hover:text-red-500"
             >
               <FaYoutube size={24} />
+            </Link>
+            <Link
+              href="https://www.linkedin.com/company/cadexlaw?trk=public_profile_experience-item_profile-section-card_image-click"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-blue-700"
+            >
+              <FaLinkedin size={24} />
             </Link>
           </div>
         </div>
