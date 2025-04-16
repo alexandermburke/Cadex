@@ -151,7 +151,7 @@ export default function Footer() {
               <FaYoutube size={24} />
             </Link>
             <Link
-              href="https://www.linkedin.com/company/cadexlaw?trk=public_profile_experience-item_profile-section-card_image-click"
+              href="https://www.linkedin.com/company/cadexlaw"
               target="_blank"
               rel="noopener noreferrer"
               className="hover:text-blue-700"

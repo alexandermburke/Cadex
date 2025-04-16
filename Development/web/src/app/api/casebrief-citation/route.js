@@ -62,7 +62,7 @@ in a valid JSON object with the key "citation". Do NOT include the case name or 
        });
    
        const response = await openai.chat.completions.create({
-         model: 'gpt-4-turbo',
+         model: 'gpt-3.5-turbo',
          messages: messages,
       max_tokens: 200,
       temperature: 0.5,

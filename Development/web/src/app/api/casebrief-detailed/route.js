@@ -7,17 +7,11 @@ export async function POST(request) {
     const { title, citation, detailed } = await request.json()
     if (!title || typeof title !== 'string' || !title.trim()) {
       console.warn('Invalid or missing "title" in request body.')
-      return NextResponse.json(
-        { error: 'Invalid or missing "title" in request body.' },
-        { status: 400 }
-      )
+      return NextResponse.json({ error: 'Invalid or missing "title" in request body.' }, { status: 400 })
     }
     if (!citation || typeof citation !== 'string' || !citation.trim()) {
       console.warn('Invalid or missing "citation" in request body.')
-      return NextResponse.json(
-        { error: 'Invalid or missing "citation" in request body.' },
-        { status: 400 }
-      )
+      return NextResponse.json({ error: 'Invalid or missing "citation" in request body.' }, { status: 400 })
     }
     const inputTitle = title.trim()
     const inputCitation = citation.trim()
@@ -25,13 +19,13 @@ export async function POST(request) {
     let prompt
     if (detailed) {
       prompt = `
-Generate an extremely comprehensive and detailed case summary for the following case title and citation. The summary should be as in-depth and accurate as Quimbee case briefs, and must include the following sections:
-1. Rule of Law: Provide a comprehensive explanation of the general legal principles, including detailed references to relevant statutory law, landmark cases, and legal doctrines. Your explanation should be at least six sentences long to ensure a full understanding of the applicable legal framework.
-2. Facts: Enumerate and elaborate on at least eight key facts or events that are crucial for understanding the case. Each fact should be clearly stated and explained in detail.
-3. Issue: Analyze and describe the primary legal question(s) in at least five sentences, delving into any complexities or alternative interpretations.
-4. Holding: Summarize the court's decision in three to four sentences, clearly outlining the legal outcome.
-5. Reasoning: Provide an in-depth discussion of the court's rationale in at least seven sentences. Explain how legal principles, statutory interpretations, and precedents influenced the decision.
-6. Dissent: If applicable, summarize any dissenting opinions in at least three sentences, highlighting the key points of disagreement. If no dissent exists, simply state "None."
+Generate an extremely comprehensive and detailed case summary for the following case title and citation. The summary should exceed typical expectations in accuracy and detail, containing more sentences than the stated minimum. It must be written in a professional legal style that avoids repetitive or AI-generated phrasing, and instead reflects the expertise of a seasoned lawyer. The summary must include the following sections:
+1. Rule of Law: Provide a comprehensive explanation of the general legal principles, including detailed references to relevant statutory law, landmark cases, and legal doctrines. Your explanation should be at least ten sentences long to ensure a full understanding of the applicable legal framework.
+2. Facts: Enumerate and elaborate on at least five key facts, ideally more or events that are crucial for understanding the case. Each fact should be clearly stated and explained in detail.
+3. Issue: Analyze and describe the primary legal question(s) in at least eight sentences, delving into any complexities or alternative interpretations.
+4. Holding: Summarize the court's decision in four to five sentences, clearly outlining the legal outcome.
+5. Reasoning: Provide an in-depth discussion of the court's rationale in at least ten sentences. Explain how legal principles, statutory interpretations, and precedents influenced the decision.
+6. Dissent: If applicable, summarize any dissenting opinions in at least two sentences, highlighting the key points of disagreement. If no dissent exists, simply state "Not Provided."
 Return the summary strictly in JSON format with the following keys:
 {
   "ruleOfLaw": "",
@@ -49,13 +43,13 @@ Case Citation:
       `
     } else {
       prompt = `
-Generate a comprehensive case summary based on the following case title and citation. The summary should include:
-1. Rule of Law: Provide a succinct explanation of the legal principles and applicable case law in at least three sentences.
-2. Facts: List and explain at least five key facts or events that are crucial for understanding the case.
-3. Issue: Describe the primary legal question(s) in at least three sentences.
-4. Holding: Summarize the court's decision in three sentences.
-5. Reasoning: Explain the court's rationale in at least four sentences.
-6. Dissent: If applicable, provide a brief summary of any dissenting opinions in at least two sentences; otherwise, state "None."
+Generate a comprehensive and highly detailed case summary based on the following case title and citation. The summary should be exceptionally accurate and include more sentences than the usual minimum, written in a professional legal style that avoids repetitive, AI-like language. The summary should include:
+1. Rule of Law: Provide a succinct yet detailed explanation of the legal principles and applicable case law in at least four sentences.
+2. Facts: List and explain at least six key facts or events that are crucial for understanding the case.
+3. Issue: Describe the primary legal question(s) in at least four sentences.
+4. Holding: Summarize the court's decision in four sentences.
+5. Reasoning: Explain the court's rationale in at least five sentences.
+6. Dissent: If applicable, provide a brief summary of any dissenting opinions in at least three sentences; otherwise, state "None."
 Return the summary in JSON format with the keys:
 {
   "ruleOfLaw": "",
@@ -83,7 +77,7 @@ Case Citation:
       }
     ]
     const openai = new OpenAI({
-    apiKey: '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',
+      apiKey: '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'
     })
     let attemptCount = 0
     let parsedResponse = null
@@ -96,13 +90,7 @@ Case Citation:
           max_tokens: detailed ? 3000 : 1500,
           temperature: 0.7
         })
-        if (
-          !response ||
-          !response.choices ||
-          !Array.isArray(response.choices) ||
-          response.choices.length === 0 ||
-          !response.choices[0].message
-        ) {
+        if (!response || !response.choices || !Array.isArray(response.choices) || response.choices.length === 0 || !response.choices[0].message) {
           console.error('Invalid response structure from OpenAI:', response)
           throw new Error('Invalid OpenAI response structure.')
         }
@@ -132,10 +120,7 @@ Case Citation:
       } catch (err) {
         console.error(`Attempt ${attemptCount} failed:`, err)
         if (attemptCount >= 10) {
-          return NextResponse.json(
-            { error: 'Failed to retrieve and parse a valid GPT response after 10 attempts.' },
-            { status: 500 }
-          )
+          return NextResponse.json({ error: 'Failed to retrieve and parse a valid GPT response after 10 attempts.' }, { status: 500 })
         }
       }
     }

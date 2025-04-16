@@ -70,7 +70,7 @@ ONLY return the JSON object. DO NOT include any additional text or commentary.
     });
 
     const response = await openai.chat.completions.create({
-      model: 'gpt-4-turbo',
+      model: 'gpt-3.5-turbo',
       messages: messages,
       max_tokens: 1500,
       temperature: 0.7,
