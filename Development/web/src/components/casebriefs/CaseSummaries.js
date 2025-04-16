@@ -122,7 +122,7 @@ export default function CaseSummaries() {
           {simplifyText(factsStr)}
         </p>
       )
-    let enumeratedFacts = factsStr.match(/(\d+\.\s[\s\S]*?)(?=\d+\.\s|$)/g)
+      let enumeratedFacts = factsStr.match(/(\d+[\.\)]\s[\s\S]*?)(?=\d+[\.\)]\s|$)/g)
     if (!enumeratedFacts) {
       const commaFacts = factsStr
         .split(',')
@@ -141,7 +141,7 @@ export default function CaseSummaries() {
     return (
       <ul className={`list-disc list-inside text-base mt-2 ${!isLoggedIn ? 'blur-sm' : ''}`}>
         {enumeratedFacts.map((fact, index) => {
-          const strippedFact = fact.replace(/^\d+\.\s*/, '')
+         const strippedFact = fact.replace(/^\d+[\.\)]\s*/, '')
           return <li key={index}>{strippedFact.trim()}</li>
         })}
       </ul>
