@@ -143,7 +143,7 @@ export default function CaseChatbot({
                   </span>
                 ) : (
                   <div className="max-w-xs relative">
-                    <div className="inline-block w-full px-4 py-3 rounded-2xl whitespace-pre-wrap break-words bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 shadow-md pr-10 pb-8 text-sm">
+                    <div className="inline-block w-full px-4 py-3 rounded-2xl whitespace-pre-wrap break-words bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 pr-10 pb-8 text-sm">
                       <p>{msg.answer || msg.text}</p>
                         {!msg.nonSavable && (
                         <>
