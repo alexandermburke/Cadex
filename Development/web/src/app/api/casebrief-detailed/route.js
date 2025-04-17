@@ -19,14 +19,18 @@ export async function POST(request) {
     let prompt
     if (detailed) {
       prompt = `
-Generate an extremely comprehensive and detailed case summary for the following case title and citation. The summary should exceed typical expectations in accuracy and detail, containing more sentences than the stated minimum. It must be written in a professional legal style that avoids repetitive or AI-generated phrasing, and instead reflects the expertise of a seasoned lawyer. The summary must include the following sections:
-1. Rule of Law: Provide a comprehensive explanation of the general legal principles, including detailed references to relevant statutory law, landmark cases, and legal doctrines. Your explanation should be at least ten sentences long to ensure a full understanding of the applicable legal framework.
-2. Facts: Enumerate and elaborate on at least five key facts, ideally more or events that are crucial for understanding the case. Each fact should be clearly stated and explained in detail.
-3. Issue: Analyze and describe the primary legal question(s) in at least eight sentences, delving into any complexities or alternative interpretations.
-4. Holding: Summarize the court's decision in four to five sentences, clearly outlining the legal outcome.
-5. Reasoning: Provide an in-depth discussion of the court's rationale in at least ten sentences. Explain how legal principles, statutory interpretations, and precedents influenced the decision.
-6. Dissent: If applicable, summarize any dissenting opinions in at least two sentences, highlighting the key points of disagreement. If no dissent exists, simply state "Not Provided."
-Return the summary strictly in JSON format with the following keys:
+Generate an extremely comprehensive and detailed case summary for the following case title and citation. The summary should:
+- Exceed typical expectations in accuracy and detail, with more sentences than the stated minimum.
+- Be written in a professional legal style; avoid repetitive or AI-generated phrasing and reflect the expertise of a seasoned lawyer.
+Include the following sections:
+1. Rule of Law: Provide a comprehensive explanation of the general legal principles, including detailed references to relevant statutory law, landmark cases, and legal doctrines. Your explanation should be at least ten sentences long.
+2. Facts: Enumerate at least five key facts. **List them as a numbered list** starting with "1." then "2.", etc., each fact on its own line, clearly stated and explained in detail.
+3. Issue: Analyze and describe the primary legal question(s) in at least eight sentences.
+4. Holding: Summarize the court's decision in four to five sentences.
+5. Reasoning: Provide an in-depth discussion of the court's rationale in at least ten sentences.
+6. Dissent: If applicable, summarize any dissenting opinions in at least two sentences; if no dissent exists, state "Not Provided."
+
+Return the summary strictly in JSON format with these keys (do not include any additional text):
 {
   "ruleOfLaw": "",
   "facts": "",
@@ -35,7 +39,7 @@ Return the summary strictly in JSON format with the following keys:
   "reasoning": "",
   "dissent": ""
 }
-Do not include any additional text.
+
 Case Title:
 "${inputTitle}"
 Case Citation:
@@ -43,14 +47,19 @@ Case Citation:
       `
     } else {
       prompt = `
-Generate a comprehensive and highly detailed case summary based on the following case title and citation. The summary should be exceptionally accurate and include more sentences than the usual minimum, written in a professional legal style that avoids repetitive, AI-like language. The summary should include:
+Generate a comprehensive and highly detailed case summary for the following case title and citation. The summary should:
+- Be exceptionally accurate, with more sentences than the usual minimum.
+- Be written in a professional legal style; avoid repetitive, AI-like language.
+
+Include the following sections:
 1. Rule of Law: Provide a succinct yet detailed explanation of the legal principles and applicable case law in at least four sentences.
-2. Facts: List and explain at least six key facts or events that are crucial for understanding the case.
+2. Facts: List at least six key facts as a **numbered list** starting with "1." then "2.", etc., each on its own line.
 3. Issue: Describe the primary legal question(s) in at least four sentences.
 4. Holding: Summarize the court's decision in four sentences.
 5. Reasoning: Explain the court's rationale in at least five sentences.
 6. Dissent: If applicable, provide a brief summary of any dissenting opinions in at least three sentences; otherwise, state "None."
-Return the summary in JSON format with the keys:
+
+Return the summary in JSON format with these keys (do not include any additional text):
 {
   "ruleOfLaw": "",
   "facts": "",
@@ -59,13 +68,14 @@ Return the summary in JSON format with the keys:
   "reasoning": "",
   "dissent": ""
 }
-Do not include any additional text.
+
 Case Title:
 "${inputTitle}"
 Case Citation:
 "${inputCitation}"
       `
     }
+
     const messages = [
       {
         role: 'system',
@@ -76,11 +86,12 @@ Case Citation:
         content: prompt
       }
     ]
-    const openai = new OpenAI({
-      apiKey: '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'
-    })
+
+    const openai = new OpenAI({ apiKey: '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' })
+
     let attemptCount = 0
     let parsedResponse = null
+
     while (attemptCount < 10) {
       attemptCount++
       try {
@@ -90,15 +101,18 @@ Case Citation:
           max_tokens: detailed ? 3000 : 1500,
           temperature: 0.7
         })
-        if (!response || !response.choices || !Array.isArray(response.choices) || response.choices.length === 0 || !response.choices[0].message) {
+
+        if (!response?.choices?.length || !response.choices[0].message) {
           console.error('Invalid response structure from OpenAI:', response)
           throw new Error('Invalid OpenAI response structure.')
         }
+
         let rawContent = response.choices[0].message.content.trim()
         console.log('RAW GPT CONTENT =>', rawContent)
+
         try {
           parsedResponse = JSON.parse(rawContent)
-        } catch (err) {
+        } catch {
           console.warn('Direct JSON parse failed. Attempting substring extraction...')
           const firstCurly = rawContent.indexOf('{')
           const lastCurly = rawContent.lastIndexOf('}')
@@ -106,13 +120,13 @@ Case Citation:
             const jsonSubstring = rawContent.substring(firstCurly, lastCurly + 1)
             try {
               parsedResponse = JSON.parse(jsonSubstring)
-              console.log('Successfully parsed JSON substring:', jsonSubstring)
-            } catch (innerErr) {
+              console.log('Parsed JSON substring successfully.')
+            } catch {
               console.error('Failed to parse JSON substring:', jsonSubstring)
               throw new Error('Could not parse JSON from GPT.')
             }
           } else {
-            console.error('No JSON object found in GPT response:', rawContent)
+            console.error('No JSON object found in GPT response')
             throw new Error('Could not parse JSON from GPT.')
           }
         }
@@ -120,10 +134,14 @@ Case Citation:
       } catch (err) {
         console.error(`Attempt ${attemptCount} failed:`, err)
         if (attemptCount >= 10) {
-          return NextResponse.json({ error: 'Failed to retrieve and parse a valid GPT response after 10 attempts.' }, { status: 500 })
+          return NextResponse.json(
+            { error: 'Failed to retrieve and parse a valid GPT response after 10 attempts.' },
+            { status: 500 }
+          )
         }
       }
     }
+
     const result = {
       ruleOfLaw: parsedResponse.ruleOfLaw || '',
       facts: parsedResponse.facts || '',
@@ -133,6 +151,7 @@ Case Citation:
       dissent: parsedResponse.dissent || '',
       verified: false
     }
+
     console.log('FINAL PARSED RESULT =>', result)
     return NextResponse.json(result, { status: 200 })
   } catch (err) {
