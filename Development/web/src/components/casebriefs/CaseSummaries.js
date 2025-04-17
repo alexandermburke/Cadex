@@ -148,8 +148,6 @@ export default function CaseSummaries() {
     )
   }
 
-  // (Other helper functions like fetchFavoriteCaseSummary, reGenerateSummary, etc. are defined below.)
-
   const toggleFavoriteCase = async () => {
     if (!capCase) return
     if (!isLoggedIn) {
