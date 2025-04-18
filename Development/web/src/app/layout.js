@@ -12,7 +12,6 @@ export const metadata = {
 };
 
 export default function RootLayout({ children }) {
-  // if home path and user logged in then route to /admin (dashboard) but do it from the authcontext logic
 
 
   return (

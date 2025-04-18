@@ -1,97 +1,103 @@
-import Head from 'next/head';
-import React from 'react';
+// app/head.js
+import Script from "next/script";
 
-function SEOHead() {
+export default function Head() {
   return (
-    <Head>
-      <meta name="viewport" content="width=device-width, initial-scale=1" />
-      <meta httpEquiv="Content-Language" content="en" />
-      <meta name="robots" content="index, follow" />
-      <meta name="theme-color" content="#ffffff" />
-      <meta name="revisit-after" content="7 days" />
-      <meta name="author" content="CadexLaw" />
-      <meta name="distribution" content="global" />
-      <meta name="identifier-url" content="https://www.cadexlaw.com" />
-      <meta name="language" content="English" />
-      <meta name="classification" content="Legal Education, Case Briefs, Exam Prep" />
-      <link rel="icon" href="/favicon.png" sizes="any" />
-      <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
-      <link rel="canonical" href="https://www.cadexlaw.com" />
+    <>
+      <link rel="icon" href="/favicon.ico" sizes="any" />
+      <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+        integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
+        crossOrigin="anonymous"
+        referrerPolicy="no-referrer"
+      />
 
-      <title>CadexLaw – #1 Case Briefs Platform | Best Quimbee &amp; LexPlug Alternative</title>
+      <title>CadexLaw – Law School Case Briefs, Outlines &amp; Exam Prep</title>
       <meta
         name="description"
-        content="CadexLaw offers 20,000+ expert case briefs, IRAC outlines, and practice exams. The top Quimbee & LexPlug alternative for law students mastering issue-spotting and exam prep."
+        content="Affordable legal study tools for law students. Access 20,000+ case briefs, 1L course outlines, practice exams and more with CadexLaw – study smarter and excel in law school."
       />
       <meta
         name="keywords"
-        content="CadexLaw, case briefs, IRAC outlines, exam prep, law student study aid, Quimbee alternative, LexPlug alternative, best case briefs, legal analysis tool"
+        content="law school case briefs, law school outlines, free law school case briefs, law school practice exams, free law school outlines, law school study aids, Contracts practice exam questions, Torts case briefs, 1L case briefs, 1L law school outlines, 1L practice exams"
       />
+      <link rel="canonical" href="https://www.cadexlaw.com" />
 
-      <meta property="og:title" content="CadexLaw – Case Briefs &amp; Exam Prep for Law Students" />
+      {/* Open Graph */}
+      <meta
+        property="og:title"
+        content="CadexLaw – Law School Case Briefs, Outlines &amp; Exam Prep"
+      />
       <meta
         property="og:description"
-        content="Discover CadexLaw’s extensive library of case briefs and practice exams—your premier alternative to Quimbee and LexPlug."
+        content="Affordable legal study tools for law students. Access 20,000+ case briefs, 1L course outlines, practice exams and more with CadexLaw – study smarter and excel in law school."
       />
       <meta property="og:type" content="website" />
       <meta property="og:url" content="https://www.cadexlaw.com" />
-      <meta property="og:image" content="https://www.cadexlaw.com/images/favicon.png" />
+      <meta
+        property="og:image"
+        content="https://www.cadexlaw.com/images/og-image.jpg"
+      />
       <meta property="og:site_name" content="CadexLaw" />
       <meta property="og:locale" content="en_US" />
 
+      {/* Twitter */}
       <meta name="twitter:card" content="summary_large_image" />
-      <meta name="twitter:title" content="CadexLaw – Case Briefs &amp; Exam Prep for Law Students" />
+      <meta name="twitter:site" content="@CadexLaw" />
+      <meta name="twitter:creator" content="@CadexLaw" />
+      <meta
+        name="twitter:title"
+        content="CadexLaw – Law School Case Briefs, Outlines &amp; Exam Prep"
+      />
       <meta
         name="twitter:description"
-        content="Access thousands of expertly crafted case briefs and practice exams at CadexLaw—your go‑to Quimbee & LexPlug alternative."
+        content="Affordable legal study tools for law students. Access 20,000+ case briefs, 1L course outlines, practice exams and more with CadexLaw – study smarter and excel in law school."
       />
-      <meta name="twitter:image" content="https://www.cadexlaw.com/images/twitter-card.jpg" />
-      <meta name="twitter:creator" content="@CadexLaw" />
-      <meta name="twitter:site" content="@CadexLaw" />
+      <meta
+        name="twitter:image"
+        content="https://www.cadexlaw.com/images/twitter-card.jpg"
+      />
 
-      <script type="application/ld+json">
-        {`
-        {
-          "@context": "https://schema.org",
-          "@graph": [
-            {
-              "@type": "WebSite",
-              "@id": "https://www.cadexlaw.com/#website",
-              "url": "https://www.cadexlaw.com",
-              "name": "CadexLaw",
-              "description": "CadexLaw offers expert case briefs, IRAC outlines, and practice exams as the leading Quimbee & LexPlug alternative for law students.",
-              "publisher": {
-                "@type": "Organization",
-                "name": "CadexLaw",
-                "logo": {
-                  "@type": "ImageObject",
-                  "url": "https://www.cadexlaw.com/favicon.png"
-                }
-              },
-              "potentialAction": {
-                "@type": "SearchAction",
-                "target": "https://www.cadexlaw.com/search?query={search_term_string}",
-                "query-input": "required name=search_term_string"
-              }
-            },
-            {
-              "@type": "BreadcrumbList",
-              "@id": "https://www.cadexlaw.com/#breadcrumb",
-              "itemListElement": [
-                {
-                  "@type": "ListItem",
-                  "position": 1,
-                  "name": "Home",
-                  "item": "https://www.cadexlaw.com"
-                }
-              ]
-            }
-          ]
+      <Script id="ld-json" type="application/ld+json">
+        {`{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebSite",
+      "@id": "https://www.cadexlaw.com/#website",
+      "url": "https://www.cadexlaw.com",
+      "name": "CadexLaw",
+      "description": "Affordable legal study tools for law students. Access 20,000+ case briefs, 1L course outlines, practice exams and more with CadexLaw – study smarter and excel in law school.",
+      "publisher": {
+        "@type": "Organization",
+        "name": "CadexLaw",
+        "logo": {
+          "@type": "ImageObject",
+          "url": "https://www.cadexlaw.com/favicon.ico"
         }
-        `}
-      </script>
-    </Head>
+      },
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": "https://www.cadexlaw.com/search?query={search_term_string}",
+        "query-input": "required name=search_term_string"
+      }
+    },
+    {
+      "@type": "BreadcrumbList",
+      "@id": "https://www.cadexlaw.com/#breadcrumb",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Home",
+          "item": "https://www.cadexlaw.com"
+        }
+      ]
+    }
+  ]
+}`}
+      </Script>
+    </>
   );
 }
-
-export default SEOHead;
