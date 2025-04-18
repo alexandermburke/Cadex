@@ -32,8 +32,10 @@ export default function AllBriefs() {
   const isPro = plan === 'pro';
   const isExpert = plan === 'expert';
   const isDarkMode = userDataObj?.darkMode || false;
+
   const [isSidebarVisible, setIsSidebarVisible] = useState(true);
   const toggleSidebar = () => setIsSidebarVisible(!isSidebarVisible);
+
   const [capCases, setCapCases] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
@@ -59,112 +61,24 @@ export default function AllBriefs() {
   const [verificationReply, setVerificationReply] = useState('');
   const [createLoading, setCreateLoading] = useState(false);
   const [createError, setCreateError] = useState('');
+
   const generateCaseNumber = () => {
     const num = Math.floor(Math.random() * 1000000);
     return num.toString().padStart(6, '0');
   };
-  const updateCitationForCase = async (c) => {
-    try {
-      const payload = {
-        title: c.title,
-        date: c.decisionDate || '',
-        citation: c.citation,
-      };
-      const res = await fetch('/api/casebrief-citation', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      });
-      if (!res.ok) {
-        const errorData = await res.json();
-        console.error('Citation API error:', errorData.error);
-        return;
-      }
-      const data = await res.json();
-      await updateDoc(doc(db, 'capCases', c.id), { citation: data.citation });
-      console.log('Updated citation for case:', c.id, data.citation);
-    } catch (error) {
-      console.error('Error updating citation:', error);
-    }
-  };
-  useEffect(() => {
-    if (userDataObj && userDataObj.favorites) {
-      setFavorites(userDataObj.favorites);
-    }
-  }, [userDataObj]);
-  const toggleFavorite = async (caseId) => {
-    if (!currentUser) {
-      if (favorites.includes(caseId)) {
-        setFavorites(favorites.filter((id) => id !== caseId));
-        setIsFavorited(false);
-      } else {
-        setFavorites([...favorites, caseId]);
-        setIsFavorited(true);
-      }
-      return;
-    }
-    try {
-      const userDocRef = doc(db, 'users', currentUser.uid);
-      let updatedFavorites;
-      if (favorites.includes(caseId)) {
-        updatedFavorites = favorites.filter((id) => id !== caseId);
-        setIsFavorited(false);
-      } else {
-        updatedFavorites = [...favorites, caseId];
-        setIsFavorited(true);
-      }
-      setFavorites(updatedFavorites);
-      await updateDoc(userDocRef, { favorites: updatedFavorites });
-      console.log('Updated favorites:', updatedFavorites);
-    } catch (error) {
-      console.error('Error updating favorites:', error);
-    }
-  };
-  const shareCase = async () => {
-    if (!selectedCase) return;
-    const shareData = {
-      title: selectedCase.title,
-      text: 'Check out this case brief on CadexLaw',
-      url: window.location.href,
-    };
-    if (navigator.share) {
-      try {
-        await navigator.share(shareData);
-      } catch (err) {
-        console.error('Error sharing:', err);
-      }
-    } else {
-      navigator.clipboard.writeText(window.location.href);
-      alert('URL copied to clipboard');
-    }
-  };
-  useEffect(() => {
-    const updateItemsPerPage = () => {
-      let numCols = 2;
-      if (window.innerWidth >= 1024) numCols = 5;
-      else if (window.innerWidth >= 640) numCols = 3;
-      const offset = 150;
-      const availableHeight = window.innerHeight - offset;
-      const itemHeight = 220;
-      const numRows = Math.floor(availableHeight / itemHeight);
-      const newItemsPerPage = (numRows * numCols) - 3;
-      setItemsPerPage(newItemsPerPage > 0 ? newItemsPerPage : 1);
-    };
-    updateItemsPerPage();
-    window.addEventListener('resize', updateItemsPerPage);
-    return () => window.removeEventListener('resize', updateItemsPerPage);
-  }, []);
+
+  // Meta description for SEO
+  const metaDescription = `Browse ${capCases.length} case briefs on CadexLaw — expert‐written summaries including rule of law, facts, issues, holdings, reasoning & dissents.`;
+
+  // Fetch all cases
   useEffect(() => {
     const fetchCapCases = async () => {
       setIsLoading(true);
       try {
         const snap = await getDocs(collection(db, 'capCases'));
         const loaded = [];
-        snap.forEach((docSnap) => {
-          loaded.push({ id: docSnap.id, ...docSnap.data() });
-        });
+        snap.forEach((docSnap) => loaded.push({ id: docSnap.id, ...docSnap.data() }));
         setCapCases(loaded);
-        console.log(`Fetched ${loaded.length} cases from Firestore.`);
       } catch (err) {
         console.error('Error fetching capCases:', err);
       } finally {
@@ -173,350 +87,22 @@ export default function AllBriefs() {
     };
     fetchCapCases();
   }, [currentUser]);
+
+  // Initialize favorites
   useEffect(() => {
-    const caseIdParam = searchParams.get('caseId');
-    if (caseIdParam && capCases.length > 0) {
-      const found = capCases.find((c) => c.id === caseIdParam);
-      if (found) {
-        console.log(`Opening case with ID: ${caseIdParam}`);
-        openCase(found);
-      } else {
-        console.warn(`Case with ID ${caseIdParam} not found.`);
-      }
+    if (userDataObj?.favorites) {
+      setFavorites(userDataObj.favorites);
     }
-  }, [searchParams, capCases]);
-  const filteredCases = capCases.filter((item) => {
-    const s = searchTerm.toLowerCase();
-    const title = item.title?.toLowerCase() || '';
-    const jurisdiction = item.jurisdiction?.toLowerCase() || '';
-    const volume = item.volume?.toLowerCase() || '';
-    const decisionDate = item.decisionDate?.toLowerCase() || '';
-    const content = item.content?.toLowerCase() || '';
-    const matchesSearch = title.includes(s) || jurisdiction.includes(s) || volume.includes(s) || decisionDate.includes(s) || content.includes(s);
-    const matchesDate = filterDate ? decisionDate.includes(filterDate.toLowerCase()) : true;
-    const matchesJurisdiction = filterJurisdiction ? jurisdiction.includes(filterJurisdiction.toLowerCase()) : true;
-    return matchesSearch && matchesDate && matchesJurisdiction;
-  });
-  const displayCases = activeTab === 'favorites' ? filteredCases.filter((c) => favorites.includes(c.id)) : filteredCases;
-  const sortedCases = [...displayCases].sort((a, b) => {
-    if (sortBy === 'citation') return (a.citation || '').localeCompare(b.citation || '');
-    if (sortBy === 'date') return (a.decisionDate || '').localeCompare(b.decisionDate || '');
-    if (sortBy === 'jurisdiction') return (a.jurisdiction || '').localeCompare(b.jurisdiction || '');
-    return 0;
-  });
-  const totalPages = Math.ceil(sortedCases.length / itemsPerPage);
-  const validCurrentPage = Math.min(currentPage, totalPages || 1);
-  const startIndex = (validCurrentPage - 1) * itemsPerPage;
-  const endIndex = validCurrentPage * itemsPerPage;
-  const paginatedCases = sortedCases.slice(startIndex, endIndex);
-  const paginationNumbers = () => {
-    let startPage, endPage;
-    if (totalPages <= 5) {
-      startPage = 1;
-      endPage = totalPages;
-    } else {
-      if (currentPage <= 3) {
-        startPage = 1;
-        endPage = 5;
-      } else if (currentPage + 2 >= totalPages) {
-        startPage = totalPages - 4;
-        endPage = totalPages;
-      } else {
-        startPage = currentPage - 2;
-        endPage = currentPage + 2;
-      }
-    }
-    return Array.from({ length: endPage - startPage + 1 }, (_, i) => startPage + i);
-  };
-  const goToPage = (num) => {
-    if (num >= 1 && num <= totalPages) {
-      setCurrentPage(num);
-      setShowGotoInput(false);
-      setGotoValue('');
-    }
-  };
-  const goToPrevPage = () => {
-    if (currentPage > 1) setCurrentPage(currentPage - 1);
-  };
-  const goToNextPage = () => {
-    if (currentPage < totalPages) setCurrentPage(currentPage + 1);
-  };
-  const handleGotoSubmit = (e) => {
-    e.preventDefault();
-    const page = parseInt(gotoValue, 10);
-    if (!isNaN(page)) goToPage(page);
-    else {
-      setGotoValue('');
-      setShowGotoInput(false);
-    }
-  };
-  const logCaseView = async (c) => {
-    try {
-      if (!currentUser) return;
-      const userDocRef = doc(db, 'users', currentUser.uid);
-      const userSnap = await getDoc(userDocRef);
-      if (!userSnap.exists()) {
-        console.warn(`User document for UID ${currentUser.uid} does not exist.`);
-        return;
-      }
-      const userData = userSnap.data() || {};
-      let recentActivity = userData.recentActivity || [];
-      const now = new Date();
-      const activityItem = {
-        type: 'brief',
-        name: c.title,
-        itemId: c.id,
-        date: now.toISOString(),
-      };
-      recentActivity.unshift(activityItem);
-      recentActivity = recentActivity.slice(0, 3);
-      await updateDoc(userDocRef, { recentActivity });
-    } catch (error) {
-      console.error('Error logging activity:', error);
-    }
-  };
-  const reRunSummary = async (c) => {
-    setIsSummaryLoading(true);
-    try {
-      const payload = {
-        title: c.title,
-        date: c.decisionDate || '',
-        citation: c.citation,
-        docId: c.id
-      };
-      const res = await fetch('/api/casebrief-summary', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      });
-      if (!res.ok) {
-        const errorData = await res.json();
-        setCaseBrief({ error: errorData.error || 'No summary available.' });
-        return;
-      }
-      const data = await res.json();
-      await updateDoc(doc(db, 'capCases', c.id), {
-        briefSummary: { ...data, verified: false },
-      });
-      setCaseBrief(data);
-      const verifyRes = await fetch('/api/casebrief-verification', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          briefSummary: data,
-          caseTitle: c.title,
-          decisionDate: c.decisionDate,
-          citation: c.citation,
-        }),
-      });
-      const verifyData = await verifyRes.json();
-      if (verifyData.verified === true) {
-        await updateDoc(doc(db, 'capCases', c.id), {
-          'briefSummary.verified': true,
-        });
-        setIsVerified(true);
-      } else {
-        setIsVerified(false);
-        await reRunSummary(c);
-      }
-    } catch (error) {
-      console.error('Error re-running summary:', error);
-    } finally {
-      setIsSummaryLoading(false);
-    }
-  };
-  const openCase = async (c) => {
-    setSelectedCase(c);
-    setCaseBrief(null);
-    setIsVerified(false);
-    setIsFavorited(false);
-    await logCaseView(c);
-    updateCitationForCase(c);
-    if (favorites.includes(c.id)) {
-      setIsFavorited(true);
-    }
-    if (c.briefSummary) {
-      setCaseBrief(c.briefSummary);
-      if (c.briefSummary.verified === true) {
-        setIsVerified(true);
-      } else {
-        try {
-          const verifyRes = await fetch('/api/casebrief-verification', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              briefSummary: c.briefSummary,
-              caseTitle: c.title,
-              decisionDate: c.decisionDate,
-              citation: c.citation,
-            }),
-          });
-          const verifyData = await verifyRes.json();
-          if (verifyData.verified === true) {
-            await updateDoc(doc(db, 'capCases', c.id), {
-              'briefSummary.verified': true,
-            });
-            setIsVerified(true);
-          } else {
-            await reRunSummary(c);
-          }
-        } catch (verifyError) {
-          console.error('Error verifying summary:', verifyError);
-          setIsVerified(false);
-        }
-      }
-      return;
-    }
-    setIsSummaryLoading(true);
-    try {
-      const payload = {
-        title: c.title,
-        date: c.decisionDate || '',
-        citation: c.citation,
-        docId: c.id
-      };
-      const res = await fetch('/api/casebrief-summary', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      });
-      if (!res.ok) {
-        const errorData = await res.json();
-        setCaseBrief({ error: errorData.error || 'No summary available.' });
-        return;
-      }
-      const data = await res.json();
-      await updateDoc(doc(db, 'capCases', c.id), {
-        briefSummary: {
-          ruleOfLaw: data.ruleOfLaw || '',
-          facts: data.facts || '',
-          issue: data.issue || '',
-          holding: data.holding || '',
-          reasoning: data.reasoning || '',
-          dissent: data.dissent || '',
-          verified: false,
-        },
-      });
-      setCaseBrief(data);
-      try {
-        const verifyRes = await fetch('/api/casebrief-verification', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            briefSummary: data,
-            caseTitle: c.title,
-            decisionDate: c.decisionDate,
-            citation: c.citation,
-          }),
-        });
-        const verifyData = await verifyRes.json();
-        if (verifyData.verified === true) {
-          await updateDoc(doc(db, 'capCases', c.id), {
-            'briefSummary.verified': true,
-          });
-          setIsVerified(true);
-        } else {
-          await reRunSummary(c);
-        }
-      } catch (verifyError) {
-        console.error('Error verifying summary:', verifyError);
-        setIsVerified(false);
-      }
-    } catch (error) {
-      console.error('Error fetching summary:', error);
-      setCaseBrief({ error: 'Error fetching summary.' });
-    } finally {
-      setIsSummaryLoading(false);
-    }
-  };
-  const closeCase = () => {
-    setSelectedCase(null);
-    setCaseBrief(null);
-    setIsVerified(false);
-    setIsFavorited(false);
-  };
-  const handleBulletpointToggle = (e) => {
-    setBulletpointView(e.target.checked);
-  };
-  const createNewCaseBrief = async (e) => {
-    e.preventDefault();
-    setCreateError('');
-    setVerificationReply('');
-    if (!newBriefTitle.trim() || !newBriefDate.trim() || !newBriefCitation.trim()) {
-      setCreateError('Please fill in all fields.');
-      return;
-    }
-    setCreateLoading(true);
-    try {
-      const payload = {
-        title: newBriefTitle,
-        date: newBriefDate,
-        citation: newBriefCitation.trim() || 'N/A',
-      };
-      const summaryRes = await fetch('/api/casebrief-summary', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      });
-      if (!summaryRes.ok) {
-        const errData = await summaryRes.json();
-        throw new Error(errData.error || 'Summary generation failed.');
-      }
-      let summaryData = await summaryRes.json();
-      try {
-        const verifyRes = await fetch('/api/casebrief-verification', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            briefSummary: summaryData,
-            caseTitle: newBriefTitle,
-            decisionDate: newBriefDate,
-            citation: newBriefCitation.trim() || 'N/A',
-          }),
-        });
-        const verifyData = await verifyRes.json();
-        if (!verifyData.verified) {
-          setVerificationReply(verifyData.explanation || 'Verification failed without explanation.');
-        } else {
-          setVerificationReply('');
-        }
-      } catch (verifyError) {
-        console.error('Error verifying new case brief:', verifyError);
-        setVerificationReply('Error during verification.');
-      }
-      const correctedTitle = summaryData.corrections?.title || newBriefTitle;
-      const correctedCitation = summaryData.corrections?.citation || newBriefCitation;
-      const correctedDate = summaryData.corrections?.date || newBriefDate;
-      const newCase = {
-        title: correctedTitle,
-        decisionDate: correctedDate,
-        volume: '',
-        content: '',
-        citation: correctedCitation.trim() || 'N/A',
-        briefSummary: { ...summaryData, verified: false },
-        caseNumber: generateCaseNumber(),
-      };
-      const docRef = await addDoc(collection(db, 'capCases'), newCase);
-      alert('New case brief created successfully.');
-      setCapCases([...capCases, { id: docRef.id, ...newCase }]);
-      setNewBriefTitle('');
-      setNewBriefDate('');
-      setNewBriefCitation('');
-      setActiveTab('browse');
-      router.push(`/casebriefs/summaries/${docRef.id}`);
-    } catch (error) {
-      console.error('Error creating new case brief:', error);
-      setCreateError('Error creating new case brief. Please check spelling & try again.');
-    } finally {
-      setCreateLoading(false);
-    }
-  };
+  }, [userDataObj]);
+
+  // Structured data for SEO
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "ItemList",
-    "itemListElement": filteredCases.map((c, index) => ({
+    "itemListElement": capCases.map((c, idx) => ({
       "@type": "ListItem",
-      "position": index + 1,
+      "position": idx + 1,
+      "url": `https://www.cadexlaw.com/casebriefs/summaries/${c.id}`,
       "item": {
         "@type": "LegalCase",
         "name": c.title,
@@ -527,26 +113,278 @@ export default function AllBriefs() {
       }
     }))
   };
+
+  // Update citation for a case
+  const updateCitationForCase = async (c) => {
+    try {
+      const payload = { title: c.title, date: c.decisionDate || '', citation: c.citation };
+      const res = await fetch('/api/casebrief-citation', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      if (!res.ok) {
+        console.error('Citation API error:', (await res.json()).error);
+        return;
+      }
+      const data = await res.json();
+      await updateDoc(doc(db, 'capCases', c.id), { citation: data.citation });
+    } catch (error) {
+      console.error('Error updating citation:', error);
+    }
+  };
+
+  // Toggle favorite
+  const toggleFavorite = async (caseId) => {
+    if (!currentUser) {
+      const updated = favorites.includes(caseId)
+        ? favorites.filter((id) => id !== caseId)
+        : [...favorites, caseId];
+      setFavorites(updated);
+      return;
+    }
+    try {
+      const userDocRef = doc(db, 'users', currentUser.uid);
+      const updated = favorites.includes(caseId)
+        ? favorites.filter((id) => id !== caseId)
+        : [...favorites, caseId];
+      setFavorites(updated);
+      await updateDoc(userDocRef, { favorites: updated });
+    } catch (error) {
+      console.error('Error updating favorites:', error);
+    }
+  };
+
+  // Share case URL
+  const shareCase = async () => {
+    if (!selectedCase) return;
+    const shareData = {
+      title: selectedCase.title,
+      text: 'Check out this case brief on CadexLaw',
+      url: window.location.href,
+    };
+    if (navigator.share) {
+      await navigator.share(shareData).catch(console.error);
+    } else {
+      navigator.clipboard.writeText(window.location.href);
+      alert('URL copied to clipboard');
+    }
+  };
+
+  // Adjust items per page
+  useEffect(() => {
+    const updateItems = () => {
+      let cols = window.innerWidth >= 1024 ? 5 : window.innerWidth >= 640 ? 3 : 2;
+      const rows = Math.floor((window.innerHeight - 150) / 220);
+      setItemsPerPage(Math.max((rows * cols) - 3, 1));
+    };
+    updateItems();
+    window.addEventListener('resize', updateItems);
+    return () => window.removeEventListener('resize', updateItems);
+  }, []);
+
+  // Filter, sort, paginate
+  const filteredCases = capCases.filter((c) => {
+    const s = searchTerm.toLowerCase();
+    return (
+      c.title.toLowerCase().includes(s) ||
+      c.jurisdiction?.toLowerCase().includes(s) ||
+      c.volume?.toLowerCase().includes(s) ||
+      c.decisionDate?.toLowerCase().includes(s) ||
+      c.content?.toLowerCase().includes(s)
+    ) && (!filterDate || c.decisionDate?.includes(filterDate))
+      && (!filterJurisdiction || c.jurisdiction?.toLowerCase().includes(filterJurisdiction.toLowerCase()));
+  });
+  const displayCases = activeTab === 'favorites'
+    ? filteredCases.filter((c) => favorites.includes(c.id))
+    : filteredCases;
+  const sortedCases = [...displayCases].sort((a, b) => {
+    if (sortBy === 'citation') return (a.citation || '').localeCompare(b.citation || '');
+    if (sortBy === 'date') return (a.decisionDate || '').localeCompare(b.decisionDate || '');
+    if (sortBy === 'jurisdiction') return (a.jurisdiction || '').localeCompare(b.jurisdiction || '');
+    return 0;
+  });
+  const totalPages = Math.ceil(sortedCases.length / itemsPerPage);
+  const page = Math.min(currentPage, totalPages || 1);
+  const paginatedCases = sortedCases.slice((page - 1) * itemsPerPage, page * itemsPerPage);
+
+  const paginationNumbers = () => {
+    let start = 1, end = totalPages;
+    if (totalPages > 5) {
+      if (page <= 3) end = 5;
+      else if (page + 2 >= totalPages) start = totalPages - 4;
+      else { start = page - 2; end = page + 2; }
+    }
+    return Array.from({ length: end - start + 1 }, (_, i) => start + i);
+  };
+
+  const goToPage = (n) => { if (n >= 1 && n <= totalPages) { setCurrentPage(n); setShowGotoInput(false); setGotoValue(''); } };
+  const goPrev = () => page > 1 && setCurrentPage(page - 1);
+  const goNext = () => page < totalPages && setCurrentPage(page + 1);
+
+  // Open a case
+  const openCase = async (c) => {
+    setSelectedCase(c);
+    setCaseBrief(null);
+    setIsVerified(false);
+    setIsFavorited(favorites.includes(c.id));
+    updateCitationForCase(c);
+
+    if (c.briefSummary) {
+      setCaseBrief(c.briefSummary);
+      if (c.briefSummary.verified) setIsVerified(true);
+      else reRunSummary(c);
+    } else {
+      setIsSummaryLoading(true);
+      try {
+        const res = await fetch('/api/casebrief-summary', {
+          method:'POST', headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({ title:c.title, date:c.decisionDate, citation:c.citation, docId:c.id })
+        });
+        const data = await res.json();
+        await updateDoc(doc(db,'capCases',c.id), { briefSummary: { ...data, verified:false } });
+        setCaseBrief(data);
+        const vres = await fetch('/api/casebrief-verification',{
+          method:'POST', headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({ briefSummary:data, caseTitle:c.title, decisionDate:c.decisionDate, citation:c.citation })
+        });
+        const vdata = await vres.json();
+        if (vdata.verified) {
+          await updateDoc(doc(db,'capCases',c.id), { 'briefSummary.verified': true });
+          setIsVerified(true);
+        }
+      } catch (e) {
+        console.error(e);
+        setCaseBrief({ error: 'Error fetching summary.' });
+      } finally {
+        setIsSummaryLoading(false);
+      }
+    }
+  };
+
+  const reRunSummary = async (c) => {
+    setIsSummaryLoading(true);
+    try {
+      const res = await fetch('/api/casebrief-summary', {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({ title:c.title, date:c.decisionDate, citation:c.citation, docId:c.id })
+      });
+      const data = await res.json();
+      await updateDoc(doc(db,'capCases',c.id), { briefSummary: { ...data, verified:false } });
+      setCaseBrief(data);
+      const vres = await fetch('/api/casebrief-verification',{
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({ briefSummary:data, caseTitle:c.title, decisionDate:c.decisionDate, citation:c.citation })
+      });
+      const vdata = await vres.json();
+      if (vdata.verified) {
+        await updateDoc(doc(db,'capCases',c.id), { 'briefSummary.verified': true });
+        setIsVerified(true);
+      }
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setIsSummaryLoading(false);
+    }
+  };
+
+  const closeCase = () => {
+    setSelectedCase(null);
+    setCaseBrief(null);
+    setIsVerified(false);
+    setIsFavorited(false);
+  };
+
+  const handleBulletpointToggle = (e) => setBulletpointView(e.target.checked);
+
+  // Create new brief
+  const createNewCaseBrief = async (e) => {
+    e.preventDefault();
+    setCreateError('');
+    setVerificationReply('');
+    if (!newBriefTitle.trim() || !newBriefDate.trim() || !newBriefCitation.trim()) {
+      setCreateError('Please fill in all fields.');
+      return;
+    }
+    setCreateLoading(true);
+    try {
+      const payload = { title:newBriefTitle, date:newBriefDate, citation:newBriefCitation.trim()||'N/A' };
+      const summaryRes = await fetch('/api/casebrief-summary',{
+        method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload)
+      });
+      if (!summaryRes.ok) throw new Error((await summaryRes.json()).error||'Summary generation failed.');
+      let summaryData = await summaryRes.json();
+      const verifyRes = await fetch('/api/casebrief-verification',{
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({ briefSummary:summaryData, caseTitle:newBriefTitle, decisionDate:newBriefDate, citation:newBriefCitation })
+      });
+      const verifyData = await verifyRes.json();
+      if (!verifyData.verified) setVerificationReply(verifyData.explanation||'Verification failed.');
+
+      const newCase = {
+        title: summaryData.corrections?.title || newBriefTitle,
+        decisionDate: summaryData.corrections?.date || newBriefDate,
+        volume: '',
+        content: '',
+        citation: summaryData.corrections?.citation || newBriefCitation,
+        briefSummary:{ ...summaryData, verified:false },
+        caseNumber: generateCaseNumber(),
+      };
+      const docRef = await addDoc(collection(db,'capCases'), newCase);
+      setCapCases((prev)=>[...prev,{ id: docRef.id, ...newCase }]);
+      setNewBriefTitle('');
+      setNewBriefDate('');
+      setNewBriefCitation('');
+      setActiveTab('browse');
+      router.push(`/casebriefs/summaries/${docRef.id}`);
+    } catch (error) {
+      console.error('Error creating new case brief:', error);
+      setCreateError('Error creating new case brief. Please check inputs.');
+    } finally {
+      setCreateLoading(false);
+    }
+  };
+
+  // Listen for caseId param
+  useEffect(() => {
+    const caseIdParam = searchParams.get('caseId');
+    if (caseIdParam && capCases.length) {
+      const found = capCases.find((c) => c.id === caseIdParam);
+      if (found) openCase(found);
+    }
+  }, [searchParams, capCases]);
+
   return (
     <>
       <Head>
-        <title>All Case Briefs - CadexLaw</title>
-        <meta name="description" content="Discover all case briefs and detailed legal summaries on CadexLaw. Explore a comprehensive listing of landmark legal cases with expert analysis including rule of law, facts, issues, holding and more." />
-        <meta name="keywords" content="case brief, legal summary, CadexLaw, legal cases, landmark cases, legal analysis, case law, detailed legal summaries" />
+        <title>All Case Briefs – CadexLaw</title>
+        <meta name="description" content={metaDescription} />
+        <meta name="keywords" content="case brief, legal summary, IRAC, law student aid, landmark cases" />
+        <meta name="author" content="CadexLaw" />
         <meta name="robots" content="index, follow" />
         <link rel="canonical" href="https://www.cadexlaw.com/casebriefs/allbriefs" />
-        <meta property="og:title" content="All Case Briefs - CadexLaw" />
-        <meta property="og:description" content="Explore a comprehensive listing of legal case briefs and summaries on CadexLaw. Your gateway to understanding landmark legal cases through expert analysis." />
-        <meta property="og:url" content={typeof window !== 'undefined' ? window.location.href : "https://www.cadexlaw.com/casebriefs/allbriefs"} />
+
+        {/* Open Graph */}
+        <meta property="og:title" content="All Case Briefs – CadexLaw" />
+        <meta property="og:description" content={metaDescription} />
+        <meta property="og:url" content="https://www.cadexlaw.com/casebriefs/allbriefs" />
         <meta property="og:type" content="website" />
         <meta property="og:site_name" content="CadexLaw" />
+        <meta property="og:image" content="https://www.cadexlaw.com/images/all-briefs-og.jpg" />
+
+        {/* Twitter Card */}
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="All Case Briefs - CadexLaw" />
-        <meta name="twitter:description" content="Browse and discover detailed case briefs and legal summaries on CadexLaw. Gain insights into landmark cases and comprehensive legal analysis." />
-        <script type="application/ld+json">
-          {JSON.stringify(structuredData)}
-        </script>
+        <meta name="twitter:title" content="All Case Briefs – CadexLaw" />
+        <meta name="twitter:description" content={metaDescription} />
+        <meta name="twitter:image" content="https://www.cadexlaw.com/images/all-briefs-og.jpg" />
+
+        {/* JSON-LD Structured Data */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+        />
       </Head>
+
       <div className="relative flex h-screen transition-colors duration-500 bg-transparent">
         <AnimatePresence>
           {isSidebarVisible && (
@@ -567,58 +405,34 @@ export default function AllBriefs() {
             </>
           )}
         </AnimatePresence>
-        <main className="flex-1 flex flex-col px-6 relative z-200 h-screen">
+        <main className="flex-1 flex flex-col px-6 relative z-50 h-screen">
           <div
             className={`flex-1 w-full rounded-2xl shadow-xl p-6 overflow-y-auto overflow-x-auto ${
-              isDarkMode
-                ? 'bg-slate-800 bg-opacity-50 text-white'
-                : 'bg-white text-gray-800'
+              isDarkMode ? 'bg-slate-800 bg-opacity-50 text-white' : 'bg-white text-gray-800'
             } flex flex-col items-center`}
           >
+            {/* Tab Buttons */}
             <div className="w-full max-w-md mx-auto mb-4 flex justify-around">
-              <motion.button
-                className={`px-4 py-2 font-semibold transition-colors duration-300 ${
-                  activeTab === 'browse'
-                    ? isDarkMode
-                      ? 'text-white border-b-2 border-blue-400'
-                      : 'text-blue-900 border-b-2 border-blue-900'
-                    : isDarkMode
-                    ? 'text-gray-400'
-                    : 'text-gray-600'
-                }`}
-                onClick={() => setActiveTab('browse')}
-              >
-                Browse
-              </motion.button>
-              <motion.button
-                className={`px-4 py-2 font-semibold transition-colors duration-300 ${
-                  activeTab === 'favorites'
-                    ? isDarkMode
-                      ? 'text-white border-b-2 border-blue-400'
-                      : 'text-blue-900 border-b-2 border-blue-900'
-                    : isDarkMode
-                    ? 'text-gray-400'
-                    : 'text-gray-600'
-                }`}
-                onClick={() => setActiveTab('favorites')}
-              >
-                Favorites
-              </motion.button>
-              <motion.button
-                className={`px-4 py-2 font-semibold transition-colors duration-300 ${
-                  activeTab === 'create'
-                    ? isDarkMode
-                      ? 'text-white border-b-2 border-blue-400'
-                      : 'text-blue-900 border-b-2 border-blue-900'
-                    : isDarkMode
-                    ? 'text-gray-400'
-                    : 'text-gray-600'
-                }`}
-                onClick={() => setActiveTab('create')}
-              >
-                Create
-              </motion.button>
+              {['browse','favorites','create'].map((tab) => (
+                <motion.button
+                  key={tab}
+                  className={`px-4 py-2 font-semibold transition-colors duration-300 ${
+                    activeTab === tab
+                      ? isDarkMode
+                        ? 'text-white border-b-2 border-blue-400'
+                        : 'text-blue-900 border-b-2 border-blue-900'
+                      : isDarkMode
+                      ? 'text-gray-400'
+                      : 'text-gray-600'
+                  }`}
+                  onClick={() => setActiveTab(tab)}
+                >
+                  {tab.charAt(0).toUpperCase() + tab.slice(1)}
+                </motion.button>
+              ))}
             </div>
+
+            {/* Search + Sort */}
             {(activeTab === 'browse' || activeTab === 'favorites') && (
               <>
                 <div className="mb-6 w-full flex justify-center items-center gap-4">
@@ -657,52 +471,31 @@ export default function AllBriefs() {
                       transition={{ duration: 0.3 }}
                     >
                       <div className="bg-transparent p-4 rounded-2xl shadow-md flex flex-row gap-4 w-full max-w-md justify-center">
-                        <button
-                          onClick={() => setSortBy('')}
-                          className={`px-3 py-1 rounded-md transition-colors duration-300 ${
-                            sortBy === ''
-                              ? isDarkMode ? 'bg-blue-600 text-white' : 'bg-blue-900 text-white'
-                              : isDarkMode ? 'bg-slate-700 text-white' : 'bg-white text-gray-800 border border-gray-300'
-                          }`}
-                        >
-                          Default
-                        </button>
-                        <button
-                          onClick={() => setSortBy('citation')}
-                          className={`px-3 py-1 rounded-md transition-colors duration-300 ${
-                            sortBy === 'citation'
-                              ? isDarkMode ? 'bg-blue-600 text-white' : 'bg-blue-900 text-white'
-                              : isDarkMode ? 'bg-slate-700 text-white' : 'bg-white text-gray-800 border border-gray-300'
-                          }`}
-                        >
-                          Citation
-                        </button>
-                        <button
-                          onClick={() => setSortBy('date')}
-                          className={`px-3 py-1 rounded-md transition-colors duration-300 ${
-                            sortBy === 'date'
-                              ? isDarkMode ? 'bg-blue-600 text-white' : 'bg-blue-900 text-white'
-                              : isDarkMode ? 'bg-slate-700 text-white' : 'bg-white text-gray-800 border border-gray-300'
-                          }`}
-                        >
-                          Date
-                        </button>
-                        <button
-                          onClick={() => setSortBy('jurisdiction')}
-                          className={`px-3 py-1 rounded-md transition-colors duration-300 ${
-                            sortBy === 'jurisdiction'
-                              ? isDarkMode ? 'bg-blue-600 text-white' : 'bg-blue-900 text-white'
-                              : isDarkMode ? 'bg-slate-700 text-white' : 'bg-white text-gray-800 border border-gray-300'
-                          }`}
-                        >
-                          Jurisdiction
-                        </button>
+                        {['','citation','date','jurisdiction'].map((key) => (
+                          <button
+                            key={key}
+                            onClick={() => setSortBy(key)}
+                            className={`px-3 py-1 rounded-md transition-colors duration-300 ${
+                              sortBy === key
+                                ? isDarkMode
+                                  ? 'bg-blue-600 text-white'
+                                  : 'bg-blue-900 text-white'
+                                : isDarkMode
+                                ? 'bg-slate-700 text-white'
+                                : 'bg-white text-gray-800 border border-gray-300'
+                            }`}
+                          >
+                            {key === '' ? 'Default' : key.charAt(0).toUpperCase() + key.slice(1)}
+                          </button>
+                        ))}
                       </div>
                     </motion.div>
                   )}
                 </AnimatePresence>
               </>
             )}
+
+            {/* Create Tab */}
             {activeTab === 'create' ? (
               <div className="w-full flex justify-center">
                 <div className="max-w-md w-full">
@@ -786,6 +579,7 @@ export default function AllBriefs() {
                   <div className="w-full h-1 bg-blue-500 animate-pulse" />
                 ) : (
                   <>
+                    {/* Case Cards Grid */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 w-full relative">
                       {paginatedCases.map((c) => (
                         <div
@@ -838,17 +632,17 @@ export default function AllBriefs() {
                         </div>
                       ))}
                     </div>
+
+                    {/* Pagination */}
                     <div className="mt-6 flex items-center justify-center gap-2">
                       <motion.button
-                        onClick={goToPrevPage}
-                        disabled={currentPage === 1}
-                        whileHover={{ scale: currentPage !== 1 ? 1.1 : 1 }}
-                        whileTap={{ scale: currentPage !== 1 ? 0.9 : 1 }}
+                        onClick={goPrev}
+                        disabled={page === 1}
+                        whileHover={{ scale: page !== 1 ? 1.1 : 1 }}
+                        whileTap={{ scale: page !== 1 ? 0.9 : 1 }}
                         className={`px-4 py-2 font-semibold transition-colors duration-300 ${
-                          currentPage === 1
-                            ? isDarkMode
-                              ? 'text-gray-400'
-                              : 'text-gray-400'
+                          page === 1
+                            ? 'text-gray-400'
                             : isDarkMode
                             ? 'text-white'
                             : 'text-blue-900'
@@ -863,7 +657,7 @@ export default function AllBriefs() {
                           whileHover={{ scale: 1.05 }}
                           whileTap={{ scale: 0.95 }}
                           className={`px-4 py-2 font-semibold transition-colors duration-300 ${
-                            num === currentPage
+                            num === page
                               ? isDarkMode
                                 ? 'text-white border-b-2 border-blue-400'
                                 : 'text-blue-900 border-b-2 border-blue-900'
@@ -888,7 +682,7 @@ export default function AllBriefs() {
                         </motion.button>
                       )}
                       {showGotoInput && (
-                        <form onSubmit={handleGotoSubmit} className="flex items-center space-x-2">
+                        <form onSubmit={(e) => { e.preventDefault(); const n = parseInt(gotoValue,10); if(!isNaN(n)) goToPage(n); else { setGotoValue(''); setShowGotoInput(false); } }} className="flex items-center space-x-2">
                           <input
                             type="number"
                             className={`w-16 px-2 py-1 border rounded-md ${
@@ -913,19 +707,13 @@ export default function AllBriefs() {
                         </form>
                       )}
                       <motion.button
-                        onClick={goToNextPage}
-                        disabled={currentPage === totalPages || totalPages === 0}
-                        whileHover={{
-                          scale: currentPage === totalPages || totalPages === 0 ? 1 : 1.1,
-                        }}
-                        whileTap={{
-                          scale: currentPage === totalPages || totalPages === 0 ? 1 : 0.9,
-                        }}
+                        onClick={goNext}
+                        disabled={page === totalPages || totalPages === 0}
+                        whileHover={{ scale: page === totalPages || totalPages === 0 ? 1 : 1.1 }}
+                        whileTap={{ scale: page === totalPages || totalPages === 0 ? 1 : 0.9 }}
                         className={`px-4 py-2 font-semibold transition-colors duration-300 ${
-                          currentPage === totalPages || totalPages === 0
-                            ? isDarkMode
-                              ? 'text-gray-400'
-                              : 'text-gray-400'
+                          page === totalPages || totalPages === 0
+                            ? 'text-gray-400'
                             : isDarkMode
                             ? 'text-white'
                             : 'text-blue-900'
@@ -938,11 +726,15 @@ export default function AllBriefs() {
                 )}
               </>
             )}
+
+            {/* Case Detail Modal */}
             {selectedCase && (
               <div className="fixed inset-0 z-[190] flex items-center justify-center bg-black bg-opacity-40">
                 <motion.div
                   className={`relative w-11/12 max-w-full sm:max-w-5xl p-6 rounded-2xl shadow-2xl ${
-                    isDarkMode ? 'bg-slate-800 text-gray-100' : 'bg-gradient-to-br from-gray-50 to-gray-100 text-gray-900'
+                    isDarkMode
+                      ? 'bg-slate-800 text-gray-100'
+                      : 'bg-gradient-to-br from-gray-50 to-gray-100 text-gray-900'
                   } overflow-y-auto max-h-[90vh]`}
                   initial={{ scale: 0.7, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
@@ -955,19 +747,11 @@ export default function AllBriefs() {
                       <p className={`text-sm mt-1 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                         {selectedCase.jurisdiction || 'Unknown'} | Volume: {selectedCase.volume || 'N/A'} | Date: {selectedCase.decisionDate || 'N/A'}
                       </p>
-                      <p
-                        className={`text-sm mt-1 font-semibold ${isDarkMode ? 'text-gray-200' : 'text-gray-800'}`}
-                      >
+                      <p className={`text-sm mt-1 font-semibold ${isDarkMode ? 'text-gray-200' : 'text-gray-800'}`}>
                         Citation: <span className="font-normal">{selectedCase.citation || 'N/A'}</span>
                       </p>
                       <div className="flex items-center text-xs mt-1">
-                        {isExpert ? (
-                          <span className="verified-by text-gray-400 text-sm">
-                            Verified by LExAPI
-                          </span>
-                        ) : (
-                          <span className="verified-by text-gray-400 text-sm">Verified by LExAPI</span>
-                        )}
+                        <span className="verified-by text-gray-400 text-sm">Verified by LExAPI</span>
                         {isVerified ? (
                           <motion.div
                             initial={{ opacity: 0, scale: 0 }}
@@ -1016,24 +800,30 @@ export default function AllBriefs() {
                     <button
                       onClick={closeCase}
                       className={`inline-block px-4 py-2 rounded-full font-semibold text-sm transition-colors duration-300 ${
-                        isDarkMode ? 'bg-blue-600 gradientShadowHoverBlue text-white' : 'bg-blue-950 gradientShadowHoverWhite text-white'
+                        isDarkMode
+                          ? 'bg-blue-600 gradientShadowHoverBlue text-white'
+                          : 'bg-blue-950 gradientShadowHoverWhite text-white'
                       }`}
                       aria-label="Close Brief Modal"
                     >
                       <FaClose />
                     </button>
                   </div>
+
                   <div
                     className={`max-h-60 overflow-auto border-b pb-3 mb-4 ${
                       isDarkMode ? 'border-gray-600 text-gray-200' : 'border-gray-300 text-gray-800'
                     }`}
                   >
                     <p className="leading-relaxed whitespace-pre-wrap text-sm">
-                      {selectedCase.content && selectedCase.content.trim() !== '' ? selectedCase.content : 'No detailed content available for this case.'}
+                      {selectedCase.content?.trim() || 'No detailed content available for this case.'}
                     </p>
                   </div>
+
                   <div className="flex items-center gap-3 mb-4">
-                    <label className="font-semibold text-sm">{bulletpointView ? 'Bullet Points' : 'Classic View'}</label>
+                    <label className="font-semibold text-sm">
+                      {bulletpointView ? 'Bullet Points' : 'Classic View'}
+                    </label>
                     <div className="relative inline-block w-14 h-8 select-none transition duration-200 ease-in">
                       <input
                         type="checkbox"
@@ -1042,9 +832,13 @@ export default function AllBriefs() {
                         onChange={handleBulletpointToggle}
                         className="toggle-checkbox absolute h-0 w-0 opacity-0"
                       />
-                      <label htmlFor="bulletPointsToggle" className="toggle-label block overflow-hidden h-8 rounded-full bg-gray-300 cursor-pointer"></label>
+                      <label
+                        htmlFor="bulletPointsToggle"
+                        className="toggle-label block overflow-hidden h-8 rounded-full bg-gray-300 cursor-pointer"
+                      />
                     </div>
                   </div>
+
                   {isSummaryLoading ? (
                     <div className="flex flex-col items-center justify-center space-y-3">
                       <div className="relative w-16 h-16">
@@ -1069,9 +863,7 @@ export default function AllBriefs() {
                     </div>
                   ) : caseBrief ? (
                     caseBrief.error ? (
-                      <div className="text-sm text-red-500">
-                        {caseBrief.error || 'No summary available.'}
-                      </div>
+                      <div className="text-sm text-red-500">{caseBrief.error}</div>
                     ) : (
                       <div
                         className={`p-3 rounded-md ${
@@ -1080,68 +872,24 @@ export default function AllBriefs() {
                             : 'bg-gradient-to-br from-gray-50 to-gray-100 text-gray-900 border border-blue-200'
                         }`}
                       >
-                        <h3 className={`font-bold mb-2 ${isDarkMode ? 'text-blue-300' : 'text-blue-600'}`}>Case Brief</h3>
-                        <div className="mb-3">
-                          <strong>Rule of Law:</strong>
-                          {bulletpointView ? (
-                            <ul className="list-disc list-inside text-sm mt-1">
-                              <li>{caseBrief.ruleOfLaw || 'Not provided.'}</li>
-                            </ul>
-                          ) : (
-                            <p className="text-sm mt-1">{caseBrief.ruleOfLaw || 'Not provided.'}</p>
-                          )}
+                        <h3 className={`font-bold mb-2 ${isDarkMode ? 'text-blue-300' : 'text-blue-600'}`}>
+                          Case Brief
+                        </h3>
+                        {['ruleOfLaw','facts','issue','holding','reasoning','dissent'].map((section) => (
+                          <div className="mb-3" key={section}>
+                            <strong>{section === 'dissent' ? 'Dissent' : section.charAt(0).toUpperCase()+section.slice(1).replace(/([A-Z])/g, ' $1') }:</strong>
+                            {bulletpointView ? (
+                              <ul className="list-disc list-inside text-sm mt-1">
+                                <li>{caseBrief[section] || 'Not provided.'}</li>
+                              </ul>
+                            ) : (
+                              <p className="text-sm mt-1">{caseBrief[section] || 'Not provided.'}</p>
+                            )}
+                          </div>
+                        ))}
+                        <div className="text-xs italic text-gray-400">
+                          Still in development, information may not be fully accurate.
                         </div>
-                        <div className="mb-3">
-                          <strong>Facts:</strong>
-                          {bulletpointView ? (
-                            <ul className="list-disc list-inside text-sm mt-1">
-                              <li>{caseBrief.facts || 'Not provided.'}</li>
-                            </ul>
-                          ) : (
-                            <p className="text-sm mt-1">{caseBrief.facts || 'Not provided.'}</p>
-                          )}
-                        </div>
-                        <div className="mb-3">
-                          <strong>Issue:</strong>
-                          {bulletpointView ? (
-                            <ul className="list-disc list-inside text-sm mt-1">
-                              <li>{caseBrief.issue || 'Not provided.'}</li>
-                            </ul>
-                          ) : (
-                            <p className="text-sm mt-1">{caseBrief.issue || 'Not provided.'}</p>
-                          )}
-                        </div>
-                        <div className="mb-3">
-                          <strong>Holding:</strong>
-                          {bulletpointView ? (
-                            <ul className="list-disc list-inside text-sm mt-1">
-                              <li>{caseBrief.holding || 'Not provided.'}</li>
-                            </ul>
-                          ) : (
-                            <p className="text-sm mt-1">{caseBrief.holding || 'Not provided.'}</p>
-                          )}
-                        </div>
-                        <div className="mb-3">
-                          <strong>Reasoning:</strong>
-                          {bulletpointView ? (
-                            <ul className="list-disc list-inside text-sm mt-1">
-                              <li>{caseBrief.reasoning || 'Not provided.'}</li>
-                            </ul>
-                          ) : (
-                            <p className="text-sm mt-1">{caseBrief.reasoning || 'Not provided.'}</p>
-                          )}
-                        </div>
-                        <div>
-                          <strong>Dissent:</strong>
-                          {bulletpointView ? (
-                            <ul className="list-disc list-inside text-sm mt-1">
-                              <li>{caseBrief.dissent || 'Not provided.'}</li>
-                            </ul>
-                          ) : (
-                            <p className="text-sm mt-1">{caseBrief.dissent || 'Not provided.'}</p>
-                          )}
-                        </div>
-                        <div className="text-xs italic text-gray-400">Still in development, information may not be fully accurate.</div>
                         <motion.a
                           whileHover={{ scale: 1.0, x: 1 }}
                           whileTap={{ scale: 1 }}
@@ -1152,8 +900,7 @@ export default function AllBriefs() {
                               : 'bg-blue-100 border border-blue-600 text-blue-600'
                           }`}
                         >
-                          See full Case Brief
-                          <FaArrowRight />
+                          See full Case Brief <FaArrowRight />
                         </motion.a>
                       </div>
                     )

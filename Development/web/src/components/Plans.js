@@ -381,12 +381,11 @@ export default function Plans() {
 
       {/* Get Plan Button */}
       {selectedPlan && (
-        <div className="flex flex-col items-center w-full max-w-md mx-auto">
-          <Button
-            text={`Start 7 Day free trial`}
-            clickHandler={handleUpdatePlan}
-            additionalClasses="w-full sm:w-56 h-12 text-lg"
-          />
+           <div className="flex justify-center w-full">
+         <Button
+              clickHandler={handleUpdatePlan}
+              text="Start 7 Day Free Trial"
+            />
         </div>
       )}
 

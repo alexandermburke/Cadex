@@ -16,19 +16,24 @@ export async function POST(request) {
     const inputTitle = title.trim()
     const inputCitation = citation.trim()
     console.log(`Generating ${detailed ? 'detailed' : 'brief'} summary for: "${inputTitle}" with citation "${inputCitation}"`)
+
     let prompt
     if (detailed) {
       prompt = `
 Generate an extremely comprehensive and detailed case summary for the following case title and citation. The summary should:
 - Exceed typical expectations in accuracy and detail, with more sentences than the stated minimum.
 - Be written in a professional legal style; avoid repetitive or AI-generated phrasing and reflect the expertise of a seasoned lawyer.
+
 Include the following sections:
-1. Rule of Law: Provide a comprehensive explanation of the general legal principles, including detailed references to relevant statutory law, landmark cases, and legal doctrines. Your explanation should be at least ten sentences long.
+1. Rule of Law: Provide a comprehensive explanation of the general legal principles, including detailed references to relevant statutory law, landmark cases, and legal doctrines. Your explanation should be at least five sentences long.
 2. Facts: Enumerate at least five key facts. **List them as a numbered list** starting with "1." then "2.", etc., each fact on its own line, clearly stated and explained in detail.
 3. Issue: Analyze and describe the primary legal question(s) in at least eight sentences.
 4. Holding: Summarize the court's decision in four to five sentences.
 5. Reasoning: Provide an in-depth discussion of the court's rationale in at least ten sentences.
-6. Dissent: If applicable, summarize any dissenting opinions in at least two sentences; if no dissent exists, state "Not Provided."
+6. Majority: If applicable, summarize the majority opinion in at least three sentences; otherwise, state "Not Provided."
+7. Concurrence: If applicable, summarize any concurring opinions in at least two sentences; otherwise, state "Not Provided."
+8. Dissent: If applicable, summarize any dissenting opinions in at least two sentences; otherwise, state "Not Provided."
+9. Analysis: Provide an in-depth analysis of the case’s implications, impact on future jurisprudence, and critical commentary in at least eight sentences.
 
 Return the summary strictly in JSON format with these keys (do not include any additional text):
 {
@@ -37,7 +42,10 @@ Return the summary strictly in JSON format with these keys (do not include any a
   "issue": "",
   "holding": "",
   "reasoning": "",
-  "dissent": ""
+  "majority": "",
+  "concurrence": "",
+  "dissent": "",
+  "analysis": ""
 }
 
 Case Title:
@@ -57,7 +65,10 @@ Include the following sections:
 3. Issue: Describe the primary legal question(s) in at least four sentences.
 4. Holding: Summarize the court's decision in four sentences.
 5. Reasoning: Explain the court's rationale in at least five sentences.
-6. Dissent: If applicable, provide a brief summary of any dissenting opinions in at least three sentences; otherwise, state "None."
+6. Majority: If applicable, summarize the majority opinion in at least two sentences; otherwise, state "Not Provided."
+7. Concurrence: If applicable, summarize any concurring opinions in at least one sentence; otherwise, state "Not Provided."
+8. Dissent: If applicable, provide a brief summary of any dissenting opinions in at least one sentence; otherwise, state "Not Provided."
+9. Analysis: Provide a brief analysis of the case’s significance and implications in at least three sentences.
 
 Return the summary in JSON format with these keys (do not include any additional text):
 {
@@ -66,7 +77,10 @@ Return the summary in JSON format with these keys (do not include any additional
   "issue": "",
   "holding": "",
   "reasoning": "",
-  "dissent": ""
+  "majority": "",
+  "concurrence": "",
+  "dissent": "",
+  "analysis": ""
 }
 
 Case Title:
@@ -79,7 +93,7 @@ Case Citation:
     const messages = [
       {
         role: 'system',
-        content: `You are an expert legal summarizer. Generate a ${detailed ? 'detailed' : 'brief'} case summary in JSON format.`
+        content: `You are an expert legal summarizer. Generate a ${detailed ? 'detailed' : 'brief'} case summary in JSON format including majority, concurrence, dissent, and analysis sections.`
       },
       {
         role: 'user',
@@ -98,7 +112,7 @@ Case Citation:
         const response = await openai.chat.completions.create({
           model: 'gpt-4-turbo',
           messages,
-          max_tokens: detailed ? 3000 : 1500,
+          max_tokens: detailed ? 3500 : 1800,
           temperature: 0.7
         })
 
@@ -148,7 +162,10 @@ Case Citation:
       issue: parsedResponse.issue || '',
       holding: parsedResponse.holding || '',
       reasoning: parsedResponse.reasoning || '',
-      dissent: parsedResponse.dissent || '',
+      majority: parsedResponse.majority || 'Not Provided.',
+      concurrence: parsedResponse.concurrence || 'Not Provided.',
+      dissent: parsedResponse.dissent || 'Not Provided.',
+      analysis: parsedResponse.analysis || '',
       verified: false
     }
 

@@ -354,12 +354,11 @@ export default function Plans() {
 
       {/* Get Plan Button */}
       {selectedPlan && (
-        <div className="flex flex-col items-center w-full max-w-md mx-auto">
+        <div className="flex justify-center w-full">
           <Button
             text="Register to Complete Purchase"
             clickHandler={handleUpdatePlan}
-            additionalClasses="w-full sm:w-56 h-12 text-lg"
-          />
+            />
         </div>
       )}
 

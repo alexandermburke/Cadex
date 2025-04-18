@@ -15,7 +15,7 @@ export default function Chatbot() {
   const [showTooltip, setShowTooltip] = useState(false)
   const messagesContainerRef = useRef(null)
 
-  const words = ['Case Briefs', 'Summaries', 'Flashcards', 'AI Exams', 'Definitions', 'IRAC']
+  const words = ['Case Briefs', 'Summaries', 'Flashcards', 'Exams', 'Definitions', 'IRAC']
   const [currentWordIndex, setCurrentWordIndex] = useState(0)
 
   useEffect(() => {
