@@ -234,7 +234,7 @@ export default function Hero() {
             </span>
           </h2>
           <p className={`text-center text-2xl sm:text-2xl md:text-2xl ${isDarkMode ? 'text-white' : 'text-slate-700'} max-w-2xl mt-4 mb-14`}>
-            Access 20,000+ law school case briefs, comprehensive law school outlines, practice exams, and study aids designed for 1L, 2L & 3L U.S. law students to excel.
+            Access 20,000+ Law School Case Briefs, Comprehensive Law School outlines, Practice Exams, and Study Aids designed for all 1L, 2L & 3L U.S. Law Students to excel.
           </p>
           <div className="flex justify-center mt-6 mb-6 w-full">
             <Link
