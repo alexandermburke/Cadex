@@ -155,17 +155,6 @@ export default function Hero() {
     hidden: { opacity: 0 },
     visible: { opacity: 1, transition: { duration: 0.5 } },
   };
-  const VerticalDivider = () => (
-    <div
-      className={`mx-auto w-[2px] my-2 ${
-        isDarkMode
-          ? 'bg-white'
-          : 'bg-gradient-to-b from-transparent via-slate-500 to-blue-950'
-      } transition-all duration-700 ${
-        loaded ? 'h-12 sm:h-16 md:h-20 opacity-0' : 'h-0 opacity-0'
-      }`}
-    />
-  );
   const [featuresRef, featuresInView] = useInView({
     threshold: 0.1,
     triggerOnce: true,
@@ -245,7 +234,7 @@ export default function Hero() {
             </span>
           </h2>
           <p className={`text-center text-2xl sm:text-2xl md:text-2xl ${isDarkMode ? 'text-white' : 'text-slate-700'} max-w-2xl mt-4 mb-14`}>
-            Affordable legal study tools made by law students, for law students. Join CadexLaw to study smarter & succeed in law.
+            Access 20,000+ law school case briefs, comprehensive law school outlines, practice exams, and study aids designed for 1L, 2L & 3L U.S. law students to excel.
           </p>
           <div className="flex justify-center mt-6 mb-6 w-full">
             <Link
@@ -325,12 +314,7 @@ export default function Hero() {
             ))}
           </div>
         </div>
-        <VerticalDivider />
       </div>
     </section>
   );
 }
-
-const VerticalDivider = () => (
-  <div className="mx-auto w-[2px] my-4 bg-gray-400" />
-);
