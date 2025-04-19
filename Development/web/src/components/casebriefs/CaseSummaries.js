@@ -99,9 +99,11 @@ export default function CaseSummaries() {
   const { currentUser, userDataObj } = useAuth()
   const isLoggedIn = !!currentUser
   const plan = userDataObj?.billing?.plan?.toLowerCase() || 'free'
-  const isPro = plan === 'pro'
+  const isPro = plan === 'basic'
   const isExpert = plan === 'expert'
   const isDarkMode = userDataObj?.darkMode || false
+
+  const enableAccessControls = false
 
   const [mounted, setMounted] = useState(false)
   useEffect(() => { setMounted(true) }, [])
@@ -158,30 +160,11 @@ export default function CaseSummaries() {
     : 'Explore thousands of case brief summaries, IRAC outlines, and in‑depth legal analysis on CadexLaw.'
   const pageUrl = `https://www.cadexlaw.com/casebriefs/summaries/${caseId || ''}`
 
-  const legalCaseData = capCase && {
-    '@context': 'https://schema.org',
-    '@type': 'LegalCase',
-    name: capCase.title,
-    url: pageUrl,
-    datePublished: capCase.decisionDate,
-    court: capCase.jurisdiction,
-    description: caseBrief?.facts || caseBrief?.ruleOfLaw || ''
-  }
-  const breadcrumbData = capCase && {
-    '@context': 'https://schema.org',
-    '@type': 'BreadcrumbList',
-    itemListElement: [
-      { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://www.cadexlaw.com' },
-      { '@type': 'ListItem', position: 2, name: 'Case Brief Summaries', item: 'https://www.cadexlaw.com/casebriefs/summaries' },
-      { '@type': 'ListItem', position: 3, name: capCase.title, item: pageUrl }
-    ]
-  }
-
   const renderFactsContent = (factsText) => {
     if (!factsText) return <p className="text-base mt-2">Not provided.</p>
     const str = String(factsText).trim()
     if (viewMode === 'simplified') {
-      return <p className={`text-base mt-2 ${mounted && !isLoggedIn ? 'blur-sm' : ''}`}>{simplifyText(str)}</p>
+      return <p className={`${mounted && enableAccessControls && !isLoggedIn ? 'blur-sm' : ''} text-base mt-2`}>{simplifyText(str)}</p>
     }
     let items = str.match(/(\d+[\.\)]\s[\s\S]*?)(?=\d+[\.\)]\s|$)/g) || []
     if (items.length < 2) {
@@ -193,7 +176,7 @@ export default function CaseSummaries() {
       if (parts.length > 1) items = parts.map((p,i) => `${i+1}. ${p}`)
     }
     return (
-      <ul className={`list-disc list-inside text-base mt-2 ${mounted && !isLoggedIn ? 'blur-sm' : ''}`}>
+      <ul className={`list-disc list-inside text-base mt-2 ${mounted && enableAccessControls && !isLoggedIn ? 'blur-sm' : ''}`}>
         {items.map((it,i) => {
           const txt = it.replace(/^\d+[\.\)]\s*/, '')
           return <li key={i}>{txt}</li>
@@ -226,10 +209,15 @@ export default function CaseSummaries() {
       localStorage.setItem(`caseBrief_${caseId}`, JSON.stringify(caseBrief))
     }
   }, [caseBrief, caseId])
+
   useEffect(() => {
     if (caseId) {
       const saved = localStorage.getItem(`caseBrief_${caseId}`)
-      if (saved) setCaseBrief(JSON.parse(saved))
+      if (saved) {
+        const sb = JSON.parse(saved)
+        setCaseBrief(sb)
+        setIsVerified(sb.verified || false)
+      }
     }
   }, [caseId])
 
@@ -257,24 +245,28 @@ export default function CaseSummaries() {
       if (f) setSelectedFavorite(f)
     }
   }, [favoriteCases])
+
   useEffect(() => {
     if (selectedFavorite) {
-      fetchFavoriteCaseSummary(selectedFavorite)
+      (async () => {
+        try {
+          const snap = await getDoc(doc(db, 'capCases', selectedFavorite.id))
+          if (!snap.exists()) return setCaseBrief({ error: 'Not found.' })
+          const c = { id: snap.id, ...snap.data() }
+          setCapCase(c)
+          if (viewMode === 'simplified') {
+            setCaseBrief(c.briefSummary || { error: 'None.' })
+            setIsVerified(c.briefSummary?.verified || false)
+          } else {
+            setCaseBrief(c.detailedSummary || { error: 'None.' })
+            setIsVerified(c.detailedSummary?.verified || false)
+          }
+        } catch {
+          setCaseBrief({ error: 'Error fetching.' })
+        }
+      })()
     }
-  }, [selectedFavorite])
-
-  const fetchFavoriteCaseSummary = async (fav) => {
-    try {
-      const snap = await getDoc(doc(db, 'capCases', fav.id))
-      if (!snap.exists()) return setCaseBrief({ error: 'Not found.' })
-      const c = { id: snap.id, ...snap.data() }
-      setCapCase(c)
-      if (viewMode === 'simplified') setCaseBrief(c.briefSummary || { error: 'None.' })
-      else setCaseBrief(c.detailedSummary || { error: 'None.' })
-    } catch {
-      setCaseBrief({ error: 'Error fetching.' })
-    }
-  }
+  }, [selectedFavorite, viewMode])
 
   const shareCase = () => {
     if (!capCase) return
@@ -305,6 +297,7 @@ export default function CaseSummaries() {
       if (!res.ok) throw await res.json()
       const data = await res.json()
       setCaseBrief(data)
+      setIsVerified(false)
       await updateDoc(doc(db, 'capCases', c.id), {
         detailedSummary: { ...data, verified: false }
       })
@@ -328,6 +321,7 @@ export default function CaseSummaries() {
       if (!res.ok) throw await res.json()
       const data = await res.json()
       setCaseBrief(data)
+      setIsVerified(false)
       await updateDoc(doc(db, 'capCases', c.id), {
         briefSummary: { ...data, verified: false }
       })
@@ -410,11 +404,15 @@ export default function CaseSummaries() {
       const c = { id: snap.id, ...snap.data() }
       setCapCase(c)
       if (viewMode === 'simplified') {
-        if (c.briefSummary) setCaseBrief(c.briefSummary)
-        else await getCapCaseBriefSummary(c)
+        if (c.briefSummary) {
+          setCaseBrief(c.briefSummary)
+          setIsVerified(c.briefSummary.verified || false)
+        } else await getCapCaseBriefSummary(c)
       } else {
-        if (c.detailedSummary) setCaseBrief(c.detailedSummary)
-        else await getCapCaseSummary(c)
+        if (c.detailedSummary) {
+          setCaseBrief(c.detailedSummary)
+          setIsVerified(c.detailedSummary.verified || false)
+        } else await getCapCaseSummary(c)
       }
     })().catch(console.error)
   }, [caseId, viewMode])
@@ -463,8 +461,24 @@ export default function CaseSummaries() {
         <meta name="twitter:title" content={pageTitle} />
         <meta name="twitter:description" content={pageDescription} />
         <meta name="twitter:image" content="https://www.cadexlaw.com/images/case-brief-og.jpg" />
-        {legalCaseData && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(legalCaseData) }} />}
-        {breadcrumbData && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbData) }} />}
+        {capCase && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({
+          '@context':'https://schema.org',
+          '@type':'LegalCase',
+          name:capCase.title,
+          url:pageUrl,
+          datePublished:capCase.decisionDate,
+          court:capCase.jurisdiction,
+          description: caseBrief?.facts||caseBrief?.ruleOfLaw||''
+        })}} />}
+        {capCase && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({
+          '@context':'https://schema.org',
+          '@type':'BreadcrumbList',
+          itemListElement:[
+            { '@type':'ListItem', position:1, name:'Home', item:'https://www.cadexlaw.com' },
+            { '@type':'ListItem', position:2, name:'Case Brief Summaries', item:'https://www.cadexlaw.com/casebriefs/summaries' },
+            { '@type':'ListItem', position:3, name:capCase.title, item:pageUrl }
+          ]
+        })}} />}
       </Head>
 
       <div
@@ -618,28 +632,24 @@ export default function CaseSummaries() {
                           <span className="font-bold">Volume:</span> {capCase?.volume || 'N/A'}
                         </p>
                       </div>
-
                       {caseBrief.ruleOfLaw && (
                         <div>
                           <h4 className="font-semibold text-base">Rule of Law</h4>
                           <p className="ml-4 text-sm">{caseBrief.ruleOfLaw}</p>
                         </div>
                       )}
-
                       {caseBrief.facts && (
                         <div>
                           <h4 className="font-semibold text-base">Key Facts</h4>
                           {renderFactsContent(caseBrief.facts)}
                         </div>
                       )}
-
                       {caseBrief.issue && (
                         <div>
                           <h4 className="font-semibold text-base">Legal Issue</h4>
-                          <p className={`ml-4 text-sm ${mounted && !isLoggedIn ? 'blur-sm' : ''}`}>{caseBrief.issue}</p>
+                          <p className={`ml-4 text-sm ${mounted && enableAccessControls && !isLoggedIn ? 'blur-sm' : ''}`}>{caseBrief.issue}</p>
                         </div>
                       )}
-
                       {(caseBrief.holding || caseBrief.reasoning || caseBrief.concurrence || caseBrief.dissent) && (
                         <div className="mt-6">
                           <h4 className="font-semibold text-base">Opinions</h4>
@@ -666,7 +676,6 @@ export default function CaseSummaries() {
                           </div>
                         </div>
                       )}
-
                       <div className="mt-6">
                         <h4 className="font-semibold text-base text-blue-600">Analysis</h4>
                         <p className="ml-4 text-sm">{caseBrief.analysis}</p>
@@ -679,21 +688,17 @@ export default function CaseSummaries() {
                       <strong className="block text-lg">Rule of Law:</strong>
                       <p className="text-base mt-2">{caseBrief.ruleOfLaw}</p>
                     </div>
-
                     <div className="mb-4">
                       <strong className="block text-lg">Facts:</strong>
-                      {caseBrief.facts ? (
-                        renderFactsContent(caseBrief.facts)
-                      ) : (
-                        <p className={`text-base mt-2 ${mounted && !isLoggedIn ? 'blur-sm' : ''}`}>Not provided.</p>
-                      )}
+                      {caseBrief.facts
+                        ? renderFactsContent(caseBrief.facts)
+                        : <p className={`text-base mt-2 ${mounted && enableAccessControls && !isLoggedIn ? 'blur-sm' : ''}`}>Not provided.</p>
+                      }
                     </div>
-
                     <div className="mb-4">
                       <strong className="block text-lg">Issue:</strong>
-                      <p className={`text-base mt-2 ${mounted && !isLoggedIn ? 'blur-sm' : ''}`}>{caseBrief.issue}</p>
+                      <p className={`text-base mt-2 ${mounted && enableAccessControls && !isLoggedIn ? 'blur-sm' : ''}`}>{caseBrief.issue}</p>
                     </div>
-
                     {(caseBrief.holding || caseBrief.reasoning || caseBrief.concurrence || caseBrief.dissent) && (
                       <div className="mb-4 mt-6">
                         <strong className="block text-lg">Opinions:</strong>
@@ -725,13 +730,11 @@ export default function CaseSummaries() {
                         </div>
                       </div>
                     )}
-
                     <div className="mb-4">
                       <strong className="block text-lg text-blue-600">Analysis:</strong>
                       <p className="text-base mt-2">{caseBrief.analysis}</p>
                     </div>
-
-                    {!isLoggedIn && (
+                    {!isLoggedIn && enableAccessControls && (
                       <div className="absolute inset-0 flex flex-col items-center justify-center text-white text-xl font-bold">
                         <button
                           onClick={() => router.push('/register')}
@@ -767,7 +770,7 @@ export default function CaseSummaries() {
             </div>
 
             <div className="w-full mt-8">
-              <h2 className="text-lg font-bold mb-2 text-center">Citation Formatter</h2>
+              <h2 className="text-lg font-bold mb-2 text-center">Citation Format Preview</h2>
               <div className={`p-4 rounded-lg ${isDarkMode ? 'bg-slate-800 bg-opacity-50 border border-slate-700' : 'bg-gray-100 border border-gray-300'}`}>
                 <label htmlFor="citationStyle" className="block mb-2 font-semibold">
                   Select Citation Style:
@@ -804,3 +807,4 @@ export default function CaseSummaries() {
     </>
   )
 }
+export { CaseSummaries }
