@@ -4,6 +4,8 @@ import Head from 'next/head'
 import Sidebar from '../Sidebar'
 import { useParams, useRouter } from 'next/navigation'
 import {
+  FaAngleDoubleLeft,
+  FaAngleDoubleRight,
   FaBars,
   FaTimes,
   FaHeart,
@@ -502,23 +504,16 @@ export default function CaseSummaries() {
 
         <main className="flex-1 flex flex-col px-6 relative z-50 h-screen">
           <div className="flex items-center justify-between">
-            <button
-              onClick={toggleSidebar}
-              className="text-blue-900 dark:text-white p-2 rounded transition-colors hover:bg-black/10 focus:outline-none md:hidden"
-              aria-label={isSidebarVisible ? 'Hide Sidebar' : 'Show Sidebar'}
-            >
-              <AnimatePresence mode="wait" initial={false}>
-                {isSidebarVisible ? (
-                  <motion.div key="close-icon" initial={{ rotate: 90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: -90, opacity: 0 }} transition={{ duration: 0.3 }}>
-                    <FaTimes size={20} />
-                  </motion.div>
-                ) : (
-                  <motion.div key="bars-icon" initial={{ rotate: -90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: 90, opacity: 0 }} transition={{ duration: 0.3 }}>
-                    <FaBars size={20} />
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </button>
+          <button
+            onClick={toggleSidebar}
+            className="md:hidden self-start m-2 p-2 bg-white rounded-full shadow"
+            aria-label={isSidebarVisible?'Close menu':'Open menu'}
+          >
+            {isSidebarVisible
+              ? <FaAngleDoubleLeft size={20}/>
+              : <FaAngleDoubleRight size={20}/>
+            }
+          </button>
           </div>
 
           <div className={`flex-1 w-full rounded-2xl shadow-xl p-6 overflow-y-auto overflow-x-auto ${isDarkMode ? 'bg-slate-800 bg-opacity-50 text-white' : 'bg-white text-gray-800'} flex flex-col items-center`}>

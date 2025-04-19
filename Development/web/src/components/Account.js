@@ -23,7 +23,7 @@ export default function Account() {
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [isDarkMode, setIsDarkMode] = useState(userDataObj?.darkMode || false);
+  const [isDarkMode, setIsDarkMode] = useState(userDataObj?.darkMode || true);
   const [emailNotifications, setEmailNotifications] = useState(
     userDataObj?.emailNotifications || true
   );

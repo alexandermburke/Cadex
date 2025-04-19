@@ -194,25 +194,13 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, i
 
   return (
     <motion.aside
-      className={`z-[150] fixed top-0 left-0 w-96 h-full ${sidebarBackground} text-white flex flex-col md:relative md:translate-x-0 overflow-y-auto transition-colors duration-500 shadow-xl rounded-lg`}
+      className={`z-[150] fixed top-0 left-0 w-3/4 sm:w-80 md:w-96 h-full ${sidebarBackground} text-white flex flex-col md:relative md:translate-x-0 overflow-y-auto transition-colors duration-500 shadow-xl rounded-lg`}
       initial="hidden"
       animate={isSidebarVisible ? 'visible' : 'hidden'}
       variants={sidebarVariants}
       exit="hidden"
       aria-label="Sidebar Navigation"
     >
-      <div className="absolute top-4 right-4 md:hidden">
-        <button
-          onClick={toggleSidebar}
-          className={clsx(
-            'p-2 rounded transition-colors duration-200 focus:outline-none',
-            isDarkMode ? 'text-white hover:bg-slate-700' : 'text-gray-800 hover:bg-gray-200'
-          )}
-          aria-label="Toggle Sidebar"
-        >
-          {isSidebarVisible ? <FaTimes size={20} /> : <FaBars size={20} />}
-        </button>
-      </div>
       <div className="p-6 flex items-center justify-center bg-opacity-20">
         <IoInfiniteOutline className="text-7xl sm:text-7xl drop-shadow-lg" />
       </div>
@@ -241,7 +229,13 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, i
                 onClick={() => handleToggleShowAllApps(mode.value)}
                 className={clsx(
                   'relative z-10 flex-1 text-xs sm:text-sm font-semibold py-1 transition-colors',
-                  selectedIndex === i ? (isDarkMode ? 'text-blue-400' : 'text-blue-600') : isDarkMode ? 'text-white' : 'text-gray-700'
+                  selectedIndex === i
+                    ? isDarkMode
+                      ? 'text-blue-400'
+                      : 'text-blue-600'
+                    : isDarkMode
+                    ? 'text-white'
+                    : 'text-gray-700'
                 )}
               >
                 {mode.label}
