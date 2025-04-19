@@ -33,7 +33,7 @@ export default function AllBriefs() {
   const isExpert = plan === 'expert';
   const isDarkMode = userDataObj?.darkMode || false;
 
-  const [isSidebarVisible, setIsSidebarVisible] = useState(true);
+  const [isSidebarVisible, setIsSidebarVisible] = useState(window.innerWidth >= 768);
   const toggleSidebar = () => setIsSidebarVisible(!isSidebarVisible);
 
   const [capCases, setCapCases] = useState([]);
@@ -405,7 +405,7 @@ export default function AllBriefs() {
             </>
           )}
         </AnimatePresence>
-        <main className="flex-1 flex flex-col px-6 relative z-50 h-screen">
+        <main className="flex-1 flex flex-col px-2 relative z-50 h-screen">
           <div
             className={`flex-1 w-full rounded-2xl shadow-xl p-6 overflow-y-auto overflow-x-auto ${
               isDarkMode ? 'bg-slate-800 bg-opacity-50 text-white' : 'bg-white text-gray-800'

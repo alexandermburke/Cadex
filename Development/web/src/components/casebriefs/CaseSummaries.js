@@ -107,8 +107,8 @@ export default function CaseSummaries() {
 
   const [mounted, setMounted] = useState(false)
   useEffect(() => { setMounted(true) }, [])
-
-  const [isSidebarVisible, setIsSidebarVisible] = useState(true)
+ 
+  const [isSidebarVisible, setIsSidebarVisible] = useState(window.innerWidth >= 768);
   const toggleSidebar = () => setIsSidebarVisible(!isSidebarVisible)
 
   const [capCase, setCapCase] = useState(null)
@@ -434,9 +434,9 @@ export default function CaseSummaries() {
   }, [capCase])
 
   const headingByMode = {
-    classic: 'Case Brief (Classic)',
-    bulletpoint: 'Case Brief (Outline)',
-    simplified: 'Case Brief (Simple)'
+    classic: 'Case Brief Summary',
+    bulletpoint: 'Case Brief Summary',
+    simplified: 'Case Brief Summary'
   }
 
   return (
@@ -668,8 +668,13 @@ export default function CaseSummaries() {
                         </div>
                       )}
                       <div className="mt-6">
-                        <h4 className="font-semibold text-base text-blue-600">Analysis</h4>
-                        <p className="ml-4 text-sm">{caseBrief.analysis}</p>
+                      <h4 className="text-lg font-semibold mb-2">Analysis</h4>
+                         <p className="text-base mt-2">
+                            {caseBrief.analysis?.trim() 
+                             ? caseBrief.analysis 
+                             : 'N/A'
+                            }
+                          </p>
                       </div>
                     </div>
                   </div>
