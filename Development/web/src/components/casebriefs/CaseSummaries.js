@@ -652,7 +652,7 @@ export default function CaseSummaries() {
                       )}
                       {(caseBrief.holding || caseBrief.reasoning || caseBrief.concurrence || caseBrief.dissent) && (
                         <div className="mt-6">
-                          <h4 className="font-semibold text-base">Opinions</h4>
+                          <h4 className="font-semibold text-base mb-2">Opinions</h4>
                           <div className="ml-4 space-y-4">
                             {caseBrief.holding && (
                               <div>
@@ -701,7 +701,7 @@ export default function CaseSummaries() {
                     </div>
                     {(caseBrief.holding || caseBrief.reasoning || caseBrief.concurrence || caseBrief.dissent) && (
                       <div className="mb-4 mt-6">
-                        <strong className="block text-lg">Opinions:</strong>
+                        <strong className="block text-lg mb-2">Opinions:</strong>
                         <div className="ml-4 space-y-2">
                           {caseBrief.holding && (
                             <div>
