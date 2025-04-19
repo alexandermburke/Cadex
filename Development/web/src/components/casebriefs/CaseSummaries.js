@@ -4,8 +4,6 @@ import Head from 'next/head'
 import Sidebar from '../Sidebar'
 import { useParams, useRouter } from 'next/navigation'
 import {
-  FaAngleDoubleLeft,
-  FaAngleDoubleRight,
   FaBars,
   FaTimes,
   FaHeart,
@@ -510,8 +508,6 @@ export default function CaseSummaries() {
             aria-label={isSidebarVisible?'Close menu':'Open menu'}
           >
             {isSidebarVisible
-              ? <FaAngleDoubleLeft size={20}/>
-              : <FaAngleDoubleRight size={20}/>
             }
           </button>
           </div>
