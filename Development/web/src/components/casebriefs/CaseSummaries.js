@@ -3,14 +3,14 @@ import React, { useState, useEffect, useRef } from 'react'
 import Head from 'next/head'
 import Sidebar from '../Sidebar'
 import { useParams, useRouter } from 'next/navigation'
+import { FaChevronDown, FaChevronUp, FaCopy } from 'react-icons/fa'
 import {
   FaBars,
   FaTimes,
   FaHeart,
   FaRegHeart,
   FaSync,
-  FaShareAlt,
-  FaCopy
+  FaShareAlt
 } from 'react-icons/fa'
 import { motion, AnimatePresence } from 'framer-motion'
 import { db } from '@/firebase'
@@ -107,8 +107,8 @@ export default function CaseSummaries() {
 
   const [mounted, setMounted] = useState(false)
   useEffect(() => { setMounted(true) }, [])
- 
-  const [isSidebarVisible, setIsSidebarVisible] = useState(window.innerWidth >= 768);
+
+  const [isSidebarVisible, setIsSidebarVisible] = useState(window.innerWidth >= 768)
   const toggleSidebar = () => setIsSidebarVisible(!isSidebarVisible)
 
   const [capCase, setCapCase] = useState(null)
@@ -140,6 +140,7 @@ export default function CaseSummaries() {
   const [selectedFavorite, setSelectedFavorite] = useState(null)
   const [citationStyle, setCitationStyle] = useState('bluebook')
   const [copySuccess, setCopySuccess] = useState(false)
+  const [isHowToOpen, setIsHowToOpen] = useState(false)
 
   useEffect(() => {
     if (caseId) localStorage.setItem('lastCaseBriefId', caseId)
@@ -248,7 +249,7 @@ export default function CaseSummaries() {
 
   useEffect(() => {
     if (selectedFavorite) {
-      (async () => {
+      ;(async () => {
         try {
           const snap = await getDoc(doc(db, 'capCases', selectedFavorite.id))
           if (!snap.exists()) return setCaseBrief({ error: 'Not found.' })
@@ -502,14 +503,13 @@ export default function CaseSummaries() {
 
         <main className="flex-1 flex flex-col px-6 relative z-50 h-screen">
           <div className="flex items-center justify-between">
-          <button
-            onClick={toggleSidebar}
-            className="md:hidden self-start m-2 p-2 bg-white rounded-full shadow"
-            aria-label={isSidebarVisible?'Close menu':'Open menu'}
-          >
-            {isSidebarVisible
-            }
-          </button>
+            <button
+              onClick={toggleSidebar}
+              className="md:hidden self-start m-2 p-2 bg-white rounded-full shadow"
+              aria-label={isSidebarVisible?'Close menu':'Open menu'}
+            >
+              {isSidebarVisible ? <FaTimes /> : <FaBars />}
+            </button>
           </div>
 
           <div className={`flex-1 w-full rounded-2xl shadow-xl p-6 overflow-y-auto overflow-x-auto ${isDarkMode ? 'bg-slate-800 bg-opacity-50 text-white' : 'bg-white text-gray-800'} flex flex-col items-center`}>
@@ -544,7 +544,7 @@ export default function CaseSummaries() {
                 </motion.button>
                 {isLoggedIn && (
                   <motion.button onClick={toggleFavoriteCase} whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }} className="ml-4" aria-label="Toggle Favorite">
-                    {isFavorited ? <FaHeart size={16} className="text-red-500" /> : <FaRegHeart size={16} className="text-gray-400" />}
+                    {isFavorited ? <FaHeart size={16} className="text-red-500" /> : <FaRegHeart size={16} className="text-gray-400" /> }
                   </motion.button>
                 )}
               </div>
@@ -569,8 +569,8 @@ export default function CaseSummaries() {
                           ? 'text-blue-300'
                           : 'text-blue-600'
                         : isDarkMode
-                        ? 'text-gray-200'
-                        : 'text-gray-700'
+                          ? 'text-gray-200'
+                          : 'text-gray-700'
                     }`}
                   >
                     {mode.label}
@@ -625,19 +625,25 @@ export default function CaseSummaries() {
                       </div>
                       {caseBrief.ruleOfLaw && (
                         <div>
-                          <h4 className="font-semibold text-base">Rule of Law</h4>
+                          <div className="flex items-center justify-between">
+                            <h4 className="font-semibold text-base">Rule of Law</h4>
+                           </div>
                           <p className="ml-4 text-sm">{caseBrief.ruleOfLaw}</p>
                         </div>
                       )}
                       {caseBrief.facts && (
                         <div>
-                          <h4 className="font-semibold text-base">Key Facts</h4>
+                          <div className="flex items-center justify-between">
+                            <h4 className="font-semibold text-base">Key Facts</h4>
+                          </div>
                           {renderFactsContent(caseBrief.facts)}
                         </div>
                       )}
                       {caseBrief.issue && (
                         <div>
-                          <h4 className="font-semibold text-base">Legal Issue</h4>
+                          <div className="flex items-center justify-between">
+                            <h4 className="font-semibold text-base">Legal Issue</h4>
+                          </div>
                           <p className={`ml-4 text-sm ${mounted && enableAccessControls && !isLoggedIn ? 'blur-sm' : ''}`}>{caseBrief.issue}</p>
                         </div>
                       )}
@@ -648,53 +654,60 @@ export default function CaseSummaries() {
                             {caseBrief.holding && (
                               <div>
                                 <h5 className="font-semibold text-base">Majority</h5>
-                                <p className="ml-4 text-sm"><strong>Holding:</strong> {caseBrief.holding}</p>
-                                <p className="ml-4 text-sm"><strong>Reasoning:</strong> {caseBrief.reasoning}</p>
+                                <div className="flex items-center justify-between">
+                                  <p className="ml-4 text-sm"><strong>Holding:</strong> {caseBrief.holding}</p>
+                                 </div>
+                                <div className="flex items-center justify-between">
+                                  <p className="ml-4 text-sm"><strong>Reasoning:</strong> {caseBrief.reasoning}</p>
+                                </div>
                               </div>
                             )}
                             {caseBrief.concurrence && (
                               <div>
                                 <h5 className="font-semibold text-base">Concurrence</h5>
-                                <p className="ml-4 text-sm">{caseBrief.concurrence}</p>
+                                <div className="flex items-center justify-between">
+                                  <p className="ml-4 text-sm">{caseBrief.concurrence}</p>
+                                </div>
                               </div>
                             )}
                             {caseBrief.dissent && (
                               <div>
                                 <h5 className="font-semibold text-base">Dissent</h5>
-                                <p className="ml-4 text-sm">{caseBrief.dissent}</p>
+                                <div className="flex items-center justify-between">
+                                  <p className="ml-4 text-sm">{caseBrief.dissent}</p>
+                 </div>
                               </div>
                             )}
                           </div>
                         </div>
                       )}
                       <div className="mt-6">
-                      <h4 className="text-lg font-semibold mb-2">Analysis</h4>
-                         <p className="text-base mt-2">
-                            {caseBrief.analysis?.trim() 
-                             ? caseBrief.analysis 
-                             : 'N/A'
-                            }
-                          </p>
+                        <div className="flex items-center justify-between">
+                          <h4 className="text-lg font-semibold mb-2">Analysis</h4>
+                       </div>
+                        <p className="text-base mt-2">
+                          {caseBrief.analysis?.trim() ? caseBrief.analysis : 'N/A'}
+                        </p>
                       </div>
                     </div>
                   </div>
                 ) : (
                   <div className="p-6 rounded-xl relative z-10">
-                    <div className="mb-4">
+                    <div className="flex items-center justify-between mb-4">
                       <strong className="block text-lg">Rule of Law:</strong>
-                      <p className="text-base mt-2">{caseBrief.ruleOfLaw}</p>
                     </div>
-                    <div className="mb-4">
+                    <p className="text-base mt-2">{caseBrief.ruleOfLaw}</p>
+                    <div className="flex items-center justify-between mb-4 mt-6">
                       <strong className="block text-lg">Facts:</strong>
-                      {caseBrief.facts
-                        ? renderFactsContent(caseBrief.facts)
-                        : <p className={`text-base mt-2 ${mounted && enableAccessControls && !isLoggedIn ? 'blur-sm' : ''}`}>Not provided.</p>
-                      }
                     </div>
-                    <div className="mb-4">
+                    {caseBrief.facts
+                      ? renderFactsContent(caseBrief.facts)
+                      : <p className={`text-base mt-2 ${mounted && enableAccessControls && !isLoggedIn ? 'blur-sm' : ''}`}>Not provided.</p>
+                    }
+                    <div className="flex items-center justify-between mb-4 mt-6">
                       <strong className="block text-lg">Issue:</strong>
-                      <p className={`text-base mt-2 ${mounted && enableAccessControls && !isLoggedIn ? 'blur-sm' : ''}`}>{caseBrief.issue}</p>
                     </div>
+                    <p className={`text-base mt-2 ${mounted && enableAccessControls && !isLoggedIn ? 'blur-sm' : ''}`}>{caseBrief.issue}</p>
                     {(caseBrief.holding || caseBrief.reasoning || caseBrief.concurrence || caseBrief.dissent) && (
                       <div className="mb-4 mt-6">
                         <strong className="block text-lg mb-2">Opinions:</strong>
@@ -702,34 +715,42 @@ export default function CaseSummaries() {
                           {caseBrief.holding && (
                             <div>
                               <strong className="block text-base">Majority:</strong>
-                              <p className="mt-2">{caseBrief.holding}</p>
+                              <div className="flex items-center justify-between mt-2">
+                                <p>{caseBrief.holding}</p>
+                              </div>
                             </div>
                           )}
                           {caseBrief.reasoning && (
-                            <div>
+                            <div className="mt-2">
                               <strong className="block text-base">Reasoning:</strong>
-                              <p className="mt-2">{caseBrief.reasoning}</p>
+                              <div className="flex items-center justify-between">
+                                <p className="mt-2">{caseBrief.reasoning}</p>
+                              </div>
                             </div>
                           )}
                           {caseBrief.concurrence && (
-                            <div>
+                            <div className="mt-2">
                               <strong className="block text-base">Concurrence:</strong>
-                              <p className="mt-2">{caseBrief.concurrence}</p>
+                              <div className="flex items-center justify-between">
+                                <p className="mt-2">{caseBrief.concurrence}</p>
+                                 </div>
                             </div>
                           )}
                           {caseBrief.dissent && (
-                            <div>
+                            <div className="mt-2">
                               <strong className="block text-base">Dissent:</strong>
-                              <p className="mt-2">{caseBrief.dissent}</p>
+                              <div className="flex items-center justify-between">
+                                <p className="mt-2">{caseBrief.dissent}</p>
+                             </div>
                             </div>
                           )}
                         </div>
                       </div>
                     )}
-                    <div className="mb-4">
+                    <div className="flex items-center justify-between mb-4 mt-6">
                       <strong className="block text-lg text-blue-600">Analysis:</strong>
-                      <p className="text-base mt-2">{caseBrief.analysis}</p>
                     </div>
+                    <p className="text-base mt-2">{caseBrief.analysis}</p>
                     {!isLoggedIn && enableAccessControls && (
                       <div className="absolute inset-0 flex flex-col items-center justify-center text-white text-xl font-bold">
                         <button
@@ -766,34 +787,87 @@ export default function CaseSummaries() {
             </div>
 
             <div className="w-full mt-8">
-              <h2 className="text-lg font-bold mb-2 text-center">Citation Format Preview</h2>
-              <div className={`p-4 rounded-lg ${isDarkMode ? 'bg-slate-800 bg-opacity-50 border border-slate-700' : 'bg-gray-100 border border-gray-300'}`}>
-                <label htmlFor="citationStyle" className="block mb-2 font-semibold">
-                  Select Citation Style:
-                </label>
-                <select
-                  id="citationStyle"
-                  value={citationStyle}
-                  onChange={e => setCitationStyle(e.target.value)}
-                  className={`p-2 rounded-md ${isDarkMode ? 'bg-slate-700 border border-slate-600 text-white' : 'bg-white border border-gray-300 text-gray-800'}`}
+              <div className="flex justify-center mb-4">
+                <button
+                  onClick={() => setIsHowToOpen(!isHowToOpen)}
+                  className="flex items-center px-5 py-2 bg-indigo-600 text-white text-base font-medium rounded-full shadow-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all"
                 >
-                  <option value="bluebook">Bluebook</option>
-                  <option value="ieee">IEEE</option>
-                  <option value="apa">APA</option>
-                  <option value="mla">MLA</option>
-                  <option value="chicago">Chicago</option>
-                  <option value="ama">AMA</option>
-                </select>
-                <div className="mt-4 flex items-center">
-                  <p className="text-base italic flex-grow">
-                    {getCitation(capCase, citationStyle, '113')}
-                  </p>
-                  <motion.button onClick={copyCitationToClipboard} whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }} className="ml-4" aria-label="Copy Citation">
-                    <FaCopy size={20} className="text-gray-500" />
-                  </motion.button>
-                  {copySuccess && <span className="text-emerald-500 ml-2">Copied!</span>}
-                </div>
+                  <span className="mr-2">How to Write a Case Brief</span>
+                  {isHowToOpen ? <FaChevronUp className="w-4 h-4" /> : <FaChevronDown className="w-4 h-4" />}
+                </button>
               </div>
+              {isHowToOpen && (
+                <div className={`p-6 rounded-lg ${isDarkMode ? 'bg-slate-800 bg-opacity-50 border border-slate-700' : 'bg-gray-100 border border-gray-300'}`}>
+                  <ol className="list-decimal list-inside space-y-4">
+                    <li>
+                      <strong>Case Citation:</strong>
+                      <p className="text-base mt-1">Provide the full case citation including:</p>
+                      <ul className="list-disc list-inside ml-6">
+                        <li>Case name</li>
+                        <li>Volume number</li>
+                        <li>Reporter abbreviation</li>
+                        <li>First page of the case</li>
+                        <li>Parenthetical with the year</li>
+                      </ul>
+                    </li>
+                    <li>
+                      <strong>Facts:</strong>
+                      <p className="text-base mt-1">Summarize only the facts essential to the decision:</p>
+                      <ul className="list-disc list-inside ml-6">
+                        <li>Identify the parties involved</li>
+                        <li>Explain key events leading to the dispute</li>
+                        <li>Note relevant procedural history</li>
+                      </ul>
+                    </li>
+                    <li>
+                      <strong>Issue:</strong>
+                      <p className="text-base mt-1">Frame the precise legal question:</p>
+                      <ul className="list-disc list-inside ml-6">
+                        <li>Start with “Whether…” or “Did…”</li>
+                        <li>Focus on the point of law decided</li>
+                      </ul>
+                    </li>
+                    <li>
+                      <strong>Holding:</strong>
+                      <p className="text-base mt-1">State the court’s answer to the issue:</p>
+                      <ul className="list-disc list-inside ml-6">
+                        <li>Yes or No response</li>
+                        <li>Concise rationale</li>
+                      </ul>
+                    </li>
+                    <li>
+                      <strong>Reasoning:</strong>
+                      <p className="text-base mt-1">Outline the court’s logic:</p>
+                      <ul className="list-disc list-inside ml-6">
+                        <li>Statutes or precedents relied upon</li>
+                        <li>Key arguments and policy considerations</li>
+                        <li>Difference between majority and concurrence</li>
+                      </ul>
+                    </li>
+                    <li>
+                      <strong>Concurring and Dissenting Opinions:</strong>
+                      <p className="text-base mt-1">Highlight alternate views:</p>
+                      <ul className="list-disc list-inside ml-6">
+                        <li>Main points of concurring opinions</li>
+                        <li>Key arguments in dissents</li>
+                      </ul>
+                    </li>
+                    <li>
+                      <strong>Analysis:</strong>
+                      <p className="text-base mt-1">Discuss implications and your evaluation:</p>
+                      <ul className="list-disc list-inside ml-6">
+                        <li>Impact on future cases</li>
+                        <li>Strengths and weaknesses of the decision</li>
+                        <li>Comparisons with related cases</li>
+                      </ul>
+                    </li>
+                    <li>
+                      <strong>Conclusion:</strong>
+                      <p className="text-base mt-1">Summarize the significance and key takeaways in one or two sentences.</p>
+                    </li>
+                  </ol>
+                </div>
+              )}
             </div>
           </div>
         </main>

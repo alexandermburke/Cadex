@@ -10,7 +10,7 @@ export async function generateMetadata({ params }) {
       description:
         "Explore thousands of case brief summaries, IRAC issue‑spotter outlines, and in‑depth legal analysis on CadexLaw.",
       keywords:
-        "case brief summaries, IRAC outlines, issue spotting, legal analysis, case law, CadexLaw",
+        "case brief summaries, IRAC outlines, issue spotting, legal analysis, case law, CadexLaw, how to write a case brief",
       alternates: { canonical: "https://www.cadexlaw.com/casebriefs/summaries" },
       icons: '/favicon.png',
       openGraph: {
