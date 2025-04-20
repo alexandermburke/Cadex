@@ -1,4 +1,3 @@
-// components/HeroBackground.js
 import React from 'react';
 
 const HeroBackground = () => (
