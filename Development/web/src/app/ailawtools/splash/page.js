@@ -2,7 +2,7 @@ import Splash from '@/components/tools/Splash'
 import React from 'react'
 
 export const metadata = {
-  title: 'CadexLaw – Sign Up for 20,000+ Case Briefs, IRAC & Bar Exam Prep',
+  title: 'CadexLaw – 20,000+ Case Briefs, IRAC & Bar Exam Prep',
   description:
     'Join CadexLaw today and unlock access to 20,000+ expert case briefs, IRAC issue‑spotter outlines, cold call prep, and bar exam resources—your ultimate Quimbee & LexPlug alternative.',
   icons: '/favicon.png',

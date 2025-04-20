@@ -296,7 +296,7 @@ html {
 .flowing-line {
   stroke-dasharray: 1000;
   stroke-dashoffset: 1000;
-  animation: draw 15s linear infinite;
+  animation: draw 9s linear infinite;
 }
 
 @keyframes draw {
