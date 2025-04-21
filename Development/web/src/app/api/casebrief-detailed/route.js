@@ -23,6 +23,7 @@ export async function POST(request) {
 Generate an extremely comprehensive and detailed case summary for the following case title and citation. The summary should:
 - Exceed typical expectations in accuracy and detail, with more sentences than the stated minimum.
 - Be written in a professional legal style; avoid repetitive or AI-generated phrasing and reflect the expertise of a seasoned lawyer.
+- Read as if it were authored by a law professor and emulate the style and tone of case briefs found on Quimbee.
 
 Include the following sections:
 1. Rule of Law: Provide a comprehensive explanation of the general legal principles, including detailed references to relevant statutory law, landmark cases, and legal doctrines. Your explanation should be at least two sentences long.
@@ -58,6 +59,7 @@ Case Citation:
 Generate a comprehensive and highly detailed case summary for the following case title and citation. The summary should:
 - Be exceptionally accurate, with more sentences than the usual minimum.
 - Be written in a professional legal style; avoid repetitive, AI-like language.
+- Read as if it were authored by a law professor and emulate the style and tone of case briefs found on Quimbee.
 
 Include the following sections:
 1. Rule of Law: Provide a succinct yet detailed explanation of the legal principles and applicable case law in at least four sentences.
