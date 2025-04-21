@@ -25,7 +25,7 @@ Generate an extremely comprehensive and detailed case summary for the following 
 - Be written in a professional legal style; avoid repetitive or AI-generated phrasing and reflect the expertise of a seasoned lawyer.
 
 Include the following sections:
-1. Rule of Law: Provide a comprehensive explanation of the general legal principles, including detailed references to relevant statutory law, landmark cases, and legal doctrines. Your explanation should be at least five sentences long.
+1. Rule of Law: Provide a comprehensive explanation of the general legal principles, including detailed references to relevant statutory law, landmark cases, and legal doctrines. Your explanation should be at least two sentences long.
 2. Facts: Enumerate at least five key facts. **List them as a numbered list** starting with "1." then "2.", etc., each fact on its own line, clearly stated and explained in detail.
 3. Issue: Analyze and describe the primary legal question(s) in at least eight sentences.
 4. Holding: Summarize the court's decision in four to five sentences.
