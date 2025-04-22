@@ -110,6 +110,13 @@ export default function Header() {
       <Link
         className={`p-2 rounded-lg border-solid border duration-200 text-lg border-blue-950 border-x-4 border-y-4 
           ${isDarkMode ? 'hover:text-slate-500 hover:bg-blue-950 text-white' : 'hover:text-slate-500 hover:bg-blue-950 text-black'}`}
+        href={'/admin/account'}
+      >
+        <p>Account</p>
+      </Link>
+      <Link
+        className={`p-2 rounded-lg border-solid border duration-200 text-lg border-blue-950 border-x-4 border-y-4 
+          ${isDarkMode ? 'hover:text-slate-500 hover:bg-blue-950 text-white' : 'hover:text-slate-500 hover:bg-blue-950 text-black'}`}
         href={'/pricing'}
       >
         <p>Pricing</p>
