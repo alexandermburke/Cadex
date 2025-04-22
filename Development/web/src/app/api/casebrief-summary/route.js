@@ -26,6 +26,7 @@ Generate a brief case summary based on the following case title. The summary sho
 4. Holding
 5. Reasoning
 6. Dissent (if any)
+7. Analysis
 
 Provide the summary in JSON format with the following keys:
 {
@@ -34,7 +35,8 @@ Provide the summary in JSON format with the following keys:
   "issue": "",
   "holding": "",
   "reasoning": "",
-  "dissent": ""
+  "dissent": "",
+  "analysis": ""
 }
 
 DO NOT include any additional text, explanations, or disclaimers.
@@ -54,7 +56,8 @@ You are a concise legal summarizer. Your task is to generate a structured case b
   "issue": "",
   "holding": "",
   "reasoning": "",
-  "dissent": ""
+  "dissent": "",
+  "analysis": ""
 }
 ONLY return the JSON object. DO NOT include any additional text or commentary.
         `,
@@ -125,6 +128,7 @@ ONLY return the JSON object. DO NOT include any additional text or commentary.
       holding: parsed.holding || '',
       reasoning: parsed.reasoning || '',
       dissent: parsed.dissent || '',
+      analysis: parsed.analysis || '',
     };
 
     if (citation && citation.trim() !== '' && citation.trim().toUpperCase() !== 'N/A') {
