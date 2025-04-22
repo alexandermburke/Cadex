@@ -501,7 +501,7 @@ export default function CaseSummaries() {
           )}
         </AnimatePresence>
 
-        <main className="flex-1 flex flex-col px-6 relative z-50 h-screen">
+        <main className="flex-1 flex flex-col px-2 relative z-50 h-screen">
           <div className="flex items-center justify-between">
             <button
               onClick={toggleSidebar}

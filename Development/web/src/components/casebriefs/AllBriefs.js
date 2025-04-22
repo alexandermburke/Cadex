@@ -29,7 +29,7 @@ export default function AllBriefs() {
   const { currentUser, userDataObj } = useAuth();
   const plan = userDataObj?.billing?.plan?.toLowerCase() || 'free';
   const isFree = plan === 'free';
-  const isPro = plan === 'pro';
+  const isPro = plan === 'basic';
   const isExpert = plan === 'expert';
   const isDarkMode = userDataObj?.darkMode || false;
 
@@ -729,7 +729,7 @@ export default function AllBriefs() {
 
             {/* Case Detail Modal */}
             {selectedCase && (
-              <div className="fixed inset-0 z-[190] flex items-center justify-center bg-black bg-opacity-40">
+             <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-[99]">
                 <motion.div
                   className={`relative w-11/12 max-w-full sm:max-w-5xl p-6 rounded-2xl shadow-2xl ${
                     isDarkMode

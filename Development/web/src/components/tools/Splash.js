@@ -91,7 +91,7 @@ export default function Splash() {
           </>
         )}
       </AnimatePresence>
-      <main className="flex-1 flex flex-col px-6 relative z-200 h-screen">
+      <main className="flex-1 flex flex-col px-2 relative z-50 h-screen">
         <div className="relative flex-1 w-full bg-transparent rounded-2xl shadow-xl p-6 overflow-y-auto overflow-x-auto flex flex-col items-center">
           <div className="animatedBackground absolute inset-0" />
           <div className="relative z-10 w-full flex flex-col items-center">

@@ -582,7 +582,7 @@ export default function CaseAnalysis() {
             </>
           )}
         </AnimatePresence>
-        <div className="flex-1 px-6">
+        <div className="flex-1 px-2">
           <main className={clsx(
             'w-full rounded-2xl shadow-xl py-6 px-6 overflow-y-auto overflow-x-auto h-screen flex flex-col relative z-50',
             isDarkMode ? 'bg-slate-800 bg-opacity-50 text-white' : 'bg-white text-gray-800'
