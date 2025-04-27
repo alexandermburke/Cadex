@@ -261,7 +261,7 @@ export default function Irac() {
           </>
         )}
       </AnimatePresence>
-      <main className="flex-1 flex flex-col px-6 relative z-200 h-screen">
+      <main className="flex-1 flex flex-col px-2 relative z-200 h-screen">
         <motion.div className={clsx('flex-1 w-full rounded-2xl shadow-xl p-6 overflow-y-auto', isDarkMode ? 'bg-slate-800 bg-opacity-50 text-white' : 'bg-white text-gray-800')} variants={containerVariants} initial="hidden" animate="visible">
         <div className="flex items-center justify-between">
           <button onClick={toggleSidebar} className={clsx('text-blue-900 dark:text-white p-2 rounded transition-colors hover:bg-black/10 focus:outline-none md:hidden')} aria-label={isSidebarVisible ? 'Hide Sidebar' : 'Show Sidebar'}>

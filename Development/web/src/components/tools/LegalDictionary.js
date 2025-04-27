@@ -320,7 +320,7 @@ export default function LegalDictionary() {
         )}
       </AnimatePresence>
 
-      <main className="flex-1 flex flex-col px-6 relative z-200 h-screen">
+      <main className="flex-1 flex flex-col px-2 relative z-200 h-screen">
         <div
           className={`flex-1 w-full rounded-2xl shadow-xl p-6 overflow-y-auto overflow-x-auto ${
             isDarkMode

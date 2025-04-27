@@ -1042,7 +1042,7 @@ export default function ContractsSubjectGuide() {
           </>
         )}
       </AnimatePresence>
-      <main className="flex-1 flex flex-col px-6 relative z-200 h-screen">
+      <main className="flex-1 flex flex-col px-2 relative z-200 h-screen">
         {renderContent()}
       </main>
     </div>

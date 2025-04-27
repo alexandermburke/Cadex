@@ -587,36 +587,6 @@ export default function AiTutor() {
 
       <main className="flex-1 flex flex-col items-center p-4 sm:p-6 overflow-auto">
         <div className="w-full max-w-5xl flex flex-row flex-nowrap items-center justify-between gap-2 sm:gap-4 mb-10 sm:mb-20">
-          <button
-            onClick={toggleSidebar}
-            className="text-gray-200 hover:text-white"
-            aria-label={isSidebarVisible ? 'Hide Sidebar' : 'Show Sidebar'}
-          >
-            <AnimatePresence mode="wait" initial={false}>
-              {isSidebarVisible ? (
-                <motion.div
-                  key="close-icon"
-                  initial={{ rotate: 90, opacity: 0 }}
-                  animate={{ rotate: 0, opacity: 1 }}
-                  exit={{ rotate: -90, opacity: 0 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  <FaTimes size={24} />
-                </motion.div>
-              ) : (
-                <motion.div
-                  key="menu-icon"
-                  initial={{ rotate: -90, opacity: 0 }}
-                  animate={{ rotate: 0, opacity: 1 }}
-                  exit={{ rotate: 90, opacity: 0 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  <FaBars size={24} />
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </button>
-
           <div className="inline-flex flex-row flex-nowrap items-center gap-2 sm:gap-4">
             <button
               onClick={openLoadProgressModal}
