@@ -1,12 +1,20 @@
 'use client';
+
 import React, { useState, useEffect, useRef } from 'react';
-import clsx from 'clsx';
 import Sidebar from '../Sidebar';
 import { useRouter } from 'next/navigation';
 import { db } from '@/firebase';
-import { doc, collection, addDoc, getDocs, deleteDoc, query, where } from 'firebase/firestore';
+import {
+  doc,
+  collection,
+  addDoc,
+  getDocs,
+  deleteDoc,
+  query,
+  where,
+} from 'firebase/firestore';
 import { useAuth } from '@/context/AuthContext';
-import { FaSave, FaSyncAlt, FaBars, FaTimes, FaChevronDown } from 'react-icons/fa';
+import { FaBars, FaTimes, FaSave, FaSyncAlt } from 'react-icons/fa';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const studyMapping = {
@@ -17,12 +25,12 @@ const studyMapping = {
       { value: 'Civil Procedure', label: 'Civil Procedure' },
     ],
     subTopics: {
-      Contracts: [
+      'Contracts': [
         { value: 'Formation', label: 'Formation' },
         { value: 'Performance', label: 'Performance' },
         { value: 'Remedies', label: 'Remedies' },
       ],
-      Torts: [
+      'Torts': [
         { value: 'Negligence', label: 'Negligence' },
         { value: 'Intentional Torts', label: 'Intentional Torts' },
         { value: 'Strict Liability', label: 'Strict Liability' },
@@ -46,12 +54,12 @@ const studyMapping = {
         { value: 'Inchoate Offenses', label: 'Inchoate Offenses' },
         { value: 'Defenses', label: 'Defenses' },
       ],
-      Evidence: [
+      'Evidence': [
         { value: 'Relevance', label: 'Relevance' },
         { value: 'Hearsay', label: 'Hearsay' },
         { value: 'Privileges', label: 'Privileges' },
       ],
-      Property: [
+      'Property': [
         { value: 'Estates in Land', label: 'Estates in Land' },
         { value: 'Landlord-Tenant', label: 'Landlord-Tenant' },
         { value: 'Future Interests', label: 'Future Interests' },
@@ -88,7 +96,7 @@ const studyMapping = {
       ],
     },
   },
-  LLM: {
+  'LLM': {
     topics: [
       { value: 'International Law', label: 'International Law' },
       { value: 'Tax Law', label: 'Tax Law' },
@@ -150,7 +158,9 @@ export default function AiTutor() {
     { value: 'Expert', label: 'Expert' },
   ];
   const [topicOptions, setTopicOptions] = useState(studyMapping['1L'].topics);
-  const [subTopicOptions, setSubTopicOptions] = useState(studyMapping['1L'].subTopics['Contracts']);
+  const [subTopicOptions, setSubTopicOptions] = useState(
+    studyMapping['1L'].subTopics['Contracts']
+  );
   const visualizerCanvas = useRef(null);
   const animationFrameId = useRef(null);
   const linesRef = useRef([]);
@@ -257,7 +267,7 @@ export default function AiTutor() {
       }
       steer() {
         const distance = random(50, 200);
-        const angleOptions = [-HALF_PI, 0, HALF_PI, -Math.PI];
+        const angleOptions = [-Math.PI / 2, 0, Math.PI / 2, -Math.PI];
         const angle = random(angleOptions);
         this.path = this.path.filter((p) => p.isAnchor === true);
         this.target.x = this.x + Math.cos(angle) * distance;
@@ -266,7 +276,6 @@ export default function AiTutor() {
       }
     }
     const TWO_PI = Math.PI * 2;
-    const HALF_PI = Math.PI / 2;
     function random(min, max) {
       if (arguments.length === 0) return Math.random();
       if (Array.isArray(min)) return min[Math.floor(Math.random() * min.length)];
@@ -348,9 +357,16 @@ export default function AiTutor() {
       <div className="flex items-center justify-center h-screen bg-gray-100">
         <div className="text-center p-6 bg-white rounded shadow-md">
           <p className="text-gray-700 mb-4">
-            Please <a href="/login" className="text-blue-900 underline">log in</a> to use the AI Law Tutor.
+            Please{' '}
+            <a href="/login" className="text-blue-900 underline">
+              log in
+            </a>{' '}
+            to use the AI Law Tutor.
           </p>
-          <button onClick={() => router.push('/login')} className="px-4 py-2 bg-blue-900 text-white rounded hover:bg-blue-700">
+          <button
+            onClick={() => router.push('/login')}
+            className="px-4 py-2 bg-blue-900 text-white rounded hover:bg-blue-700"
+          >
             Go to Login
           </button>
         </div>
@@ -360,25 +376,17 @@ export default function AiTutor() {
 
   const handleConfigChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setTutorConfig((prev) => ({
-      ...prev,
+    setTutorConfig((prevConfig) => ({
+      ...prevConfig,
       [name]: type === 'checkbox' ? checked : value,
     }));
   };
 
-  const openConfigModal = () => setIsConfigModalOpen(true);
-  const closeConfigModal = () => setIsConfigModalOpen(false);
-  const openLoadProgressModal = () => {
-    fetchSavedProgresses();
-    setIsLoadProgressModalOpen(true);
-  };
-  const closeLoadProgressModal = () => setIsLoadProgressModalOpen(false);
-  const openFinalFeedbackModal = () => setIsFinalFeedbackModalOpen(true);
-  const closeFinalFeedbackModal = () => setIsFinalFeedbackModalOpen(false);
   const handleStartTutoringSession = () => {
     closeConfigModal();
     handleGetQuestion();
   };
+
   const handleGetQuestion = async () => {
     setIsLoading(true);
     setIsCommunicating(true);
@@ -408,6 +416,7 @@ export default function AiTutor() {
       setIsCommunicating(false);
     }
   };
+
   const handleSubmitAnswer = async () => {
     if (!inputText.trim()) return;
     setIsLoading(true);
@@ -453,6 +462,17 @@ export default function AiTutor() {
       setIsCommunicating(false);
     }
   };
+
+  const openConfigModal = () => setIsConfigModalOpen(true);
+  const closeConfigModal = () => setIsConfigModalOpen(false);
+  const openLoadProgressModal = () => {
+    fetchSavedProgresses();
+    setIsLoadProgressModalOpen(true);
+  };
+  const closeLoadProgressModal = () => setIsLoadProgressModalOpen(false);
+  const openFinalFeedbackModal = () => setIsFinalFeedbackModalOpen(true);
+  const closeFinalFeedbackModal = () => setIsFinalFeedbackModalOpen(false);
+
   const handleSaveProgress = async () => {
     if (!currentUser) {
       alert('You need to be logged in to save your progress.');
@@ -476,6 +496,7 @@ export default function AiTutor() {
       alert('An error occurred while saving your progress.');
     }
   };
+
   const fetchSavedProgresses = async () => {
     if (!currentUser) {
       alert('You need to be logged in to load your progress.');
@@ -494,6 +515,7 @@ export default function AiTutor() {
       alert('Error fetching saved progresses.');
     }
   };
+
   const handleLoadProgress = (progress) => {
     if (!studyMapping[progress.tutorConfig.studyYear]) {
       alert(`Invalid studyYear "${progress.tutorConfig.studyYear}" in saved progress. Resetting to default.`);
@@ -510,6 +532,7 @@ export default function AiTutor() {
     setHighlightedSections([]);
     closeLoadProgressModal();
   };
+
   const handleDeleteProgress = async (id) => {
     if (!currentUser) {
       alert('You need to be logged in to delete your progress.');
@@ -523,17 +546,25 @@ export default function AiTutor() {
       alert('An error occurred while deleting progress.');
     }
   };
+
   const isProUser = userDataObj?.billing?.plan === 'Pro' || userDataObj?.billing?.plan === 'Developer';
+  function messageDisplay() {
+    if (isCommunicating) return 'AI is communicating...';
+    return 'LExAPI';
+  }
+
   const showHighlights = tutorConfig.liveMode || answerResult;
+  const highlightColor = `hsla(${tutorConfig.highlightHue}, 100%, 50%, ${tutorConfig.highlightOpacity})`;
   const highlightedReasons = highlightedSections
     .filter((s) => s.highlight && s.reason && s.reason !== 'Not crucial')
     .map((s) => ({ text: s.text, reason: s.reason }));
 
   return (
-    <div className={clsx(
-      'flex h-screen bg-transparent rounded shadow-md z-[150] relative',
-      isDarkMode && 'dark'
-    )}>
+    <div
+      className={`relative flex h-screen transition-colors duration-500 ${
+        isDarkMode ? 'text-white' : 'text-gray-800'
+      }`}
+    >
       <AnimatePresence>
         {isSidebarVisible && (
           <>
@@ -541,7 +572,7 @@ export default function AiTutor() {
               activeLink="/ailawtools/lexapi"
               isSidebarVisible={isSidebarVisible}
               toggleSidebar={toggleSidebar}
-              isDarkMode={isDarkMode}
+              isAiTutor={true}
             />
             <motion.div
               className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
@@ -553,83 +584,121 @@ export default function AiTutor() {
           </>
         )}
       </AnimatePresence>
-      <div className="absolute top-6 left-4 z-[100] md:hidden">
-        <button
-          onClick={toggleSidebar}
-          className={clsx('text-blue-900 dark:text-white p-2 rounded transition-colors hover:bg-black/10 focus:outline-none')}
-          aria-label={isSidebarVisible ? 'Hide Sidebar' : 'Show Sidebar'}
-        >
-          <AnimatePresence mode="wait" initial={false}>
-            {isSidebarVisible ? (
-              <motion.div key="close-icon" initial={{ rotate: 90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: -90, opacity: 0 }} transition={{ duration: 0.3 }}>
-                <FaTimes size={20} />
-              </motion.div>
-            ) : (
-              <motion.div key="bars-icon" initial={{ rotate: -90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: 90, opacity: 0 }} transition={{ duration: 0.3 }}>
-                <FaBars size={20} />
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </button>
-      </div>
-      <div className="absolute top-6 right-[5%] z-[100] flex flex-col items-center gap-2">
-        <div className="flex flex-col items-center">
-          <motion.button
-            onClick={openLoadProgressModal}
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.95 }}
-            className="p-3 rounded-full bg-gradient-to-r from-blue-600 to-blue-800 text-white transition-all duration-200 shadow-lg"
-            aria-label="Load Progress"
+
+      <main className="flex-1 flex flex-col items-center p-4 sm:p-6 overflow-auto">
+        <div className="w-full max-w-5xl flex flex-row flex-nowrap items-center justify-between gap-2 sm:gap-4 mb-10 sm:mb-20">
+          <button
+            onClick={toggleSidebar}
+            className="text-gray-200 hover:text-white"
+            aria-label={isSidebarVisible ? 'Hide Sidebar' : 'Show Sidebar'}
           >
-            <FaSyncAlt size={20} />
-          </motion.button>
-          <span className="text-xs mt-1 dark:text-gray-300">Load</span>
+            <AnimatePresence mode="wait" initial={false}>
+              {isSidebarVisible ? (
+                <motion.div
+                  key="close-icon"
+                  initial={{ rotate: 90, opacity: 0 }}
+                  animate={{ rotate: 0, opacity: 1 }}
+                  exit={{ rotate: -90, opacity: 0 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <FaTimes size={24} />
+                </motion.div>
+              ) : (
+                <motion.div
+                  key="menu-icon"
+                  initial={{ rotate: -90, opacity: 0 }}
+                  animate={{ rotate: 0, opacity: 1 }}
+                  exit={{ rotate: 90, opacity: 0 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <FaBars size={24} />
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </button>
+
+          <div className="inline-flex flex-row flex-nowrap items-center gap-2 sm:gap-4">
+            <button
+              onClick={openLoadProgressModal}
+              className="relative h-10 sm:h-12 w-28 sm:w-40 overflow-hidden rounded bg-blue-700 text-white shadow-lg transition-colors duration-200 
+                         before:absolute before:right-0 before:top-0 before:h-full before:w-5 
+                         before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 
+                         before:duration-700 hover:before:-translate-x-56 text-sm sm:text-base"
+              aria-label="Load Progress"
+            >
+              Load Progress
+            </button>
+            <button
+              onClick={openConfigModal}
+              className="relative h-10 sm:h-12 w-28 sm:w-40 overflow-hidden rounded bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white shadow-lg transition-colors duration-200 
+                         before:absolute before:right-0 before:top-0 before:h-full before:w-5 
+                         before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 
+                         before:duration-700 hover:before:-translate-x-56 text-sm sm:text-base"
+              aria-label="Configure AI Tutor"
+            >
+              Configure
+            </button>
+          </div>
         </div>
-        <div className="flex flex-col items-center">
-          <motion.button
-            onClick={openConfigModal}
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.95 }}
-            className="p-3 rounded-full bg-gradient-to-r from-blue-600 to-blue-800 text-white transition-all duration-200 shadow-lg"
-            aria-label="Configure Tutor"
-          >
-            <FaChevronDown size={20} />
-          </motion.button>
-          <span className="text-xs mt-1 dark:text-gray-300">Config</span>
-        </div>
-      </div>
-      <main className="flex-1 flex flex-col items-center justify-center px-6 relative z-200 h-screen">
-        <motion.div
-          className={clsx(
-            'flex-1 w-full rounded-2xl shadow-xl p-6 overflow-y-auto',
-            isDarkMode ? 'bg-slate-800 bg-opacity-50 text-white' : 'bg-white text-gray-800',
-            'flex flex-col items-center justify-center'
-          )}
-        >
+
+        {isSessionActive && (
+          <div className="w-full max-w-5xl mb-4 p-4 bg-white bg-opacity-20 backdrop-blur-md rounded-lg shadow-md flex justify-between items-center">
+            <span className="text-white">
+              Questions Answered: {currentQuestionCount} / {tutorConfig.questionLimit}
+            </span>
+            <span
+              className={`px-3 py-1 rounded-full text-sm font-semibold uppercase ${
+                isProUser ? 'bg-blue-500 text-white' : 'bg-emerald-500 text-white'
+              }`}
+            >
+              {isProUser ? 'Pro User' : 'Base User'}
+            </span>
+          </div>
+        )}
+
+        <div className="w-full max-w-5xl flex flex-col items-center">
           <AnimatePresence>
             {!isSessionActive && (
               <motion.div
-                className="relative w-full h-64 sm:h-80 md:h-96 mb-6 flex items-center justify-center"
+                className="relative w-full h-64 sm:h-80 md:h-96 mb-6"
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.5 }}
                 transition={{ duration: 0.3 }}
               >
-                <canvas ref={visualizerCanvas} className="absolute top-0 left-0 w-full h-full rounded" aria-label="Background Animation Canvas" />
+                <canvas
+                  ref={visualizerCanvas}
+                  className="absolute top-0 left-0 w-full h-full rounded"
+                  aria-label="Background Animation Canvas"
+                ></canvas>
+                <div className="absolute inset-0 flex flex-col items-center justify-center">
+                  <textarea
+                    className="w-48 sm:w-64 h-14 bg-transparent text-center p-2 rounded-md focus:outline-none 
+                               focus:ring-2 focus:ring-blue-500 text-white font-semibold text-4xl"
+                    value={isCommunicating ? 'AI is communicating...' : 'LExAPI'}
+                    readOnly
+                    aria-label="AI Communication Status"
+                    style={{ resize: 'none' }}
+                  ></textarea>
+                  <small className="text-gray-300 italic">Version 3.0</small>
+                </div>
               </motion.div>
             )}
           </AnimatePresence>
+
           <div className="w-full max-w-5xl mb-6">
             <textarea
-              className="w-full h-48 p-4 rounded resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-200 text-white bg-transparent"
+              className="w-full h-48 p-4 rounded resize-none focus:outline-none focus:ring-2 
+                         focus:ring-blue-500 transition-colors duration-200 text-white bg-transparent"
               value={answerResult || ''}
               readOnly
               aria-label="AI Feedback"
               style={{ resize: 'none' }}
-            />
+            ></textarea>
           </div>
+
           {questionStem && (
-            <div className="w-full max-w-5xl mb-6 p-6 bg-white bg-opacity-20 backdrop-blur-md rounded-lg shadow-md overflow-y-scroll text-center">
+            <div className="w-full max-w-5xl mb-6 p-6 bg-white bg-opacity-20 backdrop-blur-md rounded-lg shadow-md overflow-y-scroll">
               <h3 className="text-2xl font-semibold text-white mb-2">Law Question</h3>
               <h3 className="text-sm font-medium text-gray-200 mb-1">LExAPI</h3>
               <small className="text-gray-300 italic">Version 3.0</small>
@@ -642,7 +711,7 @@ export default function AiTutor() {
                           style={{
                             backgroundColor: `hsla(${tutorConfig.highlightHue}, 100%, 50%, ${tutorConfig.highlightOpacity})`,
                             display: 'inline-block',
-                            transformOrigin: 'left center'
+                            transformOrigin: 'left center',
                           }}
                           title={section.reason}
                           initial={{ scaleX: 0 }}
@@ -657,9 +726,12 @@ export default function AiTutor() {
                     )
                   : questionStem}
               </div>
+
               {showHighlights && highlightedReasons.length > 0 && (
                 <div className="mt-4 p-4 bg-gray-900 bg-opacity-50 rounded">
-                  <h4 className="text-lg text-blue-300 font-semibold mb-2">Why These Areas Are Highlighted</h4>
+                  <h4 className="text-lg text-blue-300 font-semibold mb-2">
+                    Why These Areas Are Highlighted
+                  </h4>
                   <ul className="list-disc list-inside text-gray-200">
                     {highlightedReasons.map((hr, i) => (
                       <li key={i}>
@@ -671,33 +743,45 @@ export default function AiTutor() {
               )}
             </div>
           )}
+
           {questionStem && currentQuestionCount < tutorConfig.questionLimit && (
-            <div className="w-full max-w-5xl mb-6 text-center">
-              {!answerResult ? (
+            <div className="w-full max-w-5xl mb-6">
+              {!answerResult && (
                 <textarea
-                  className={clsx(
-                    'w-full p-4 border',
-                    isDarkMode ? 'border-gray-600 bg-gray-700 text-white' : 'border-gray-300 bg-white text-gray-800',
-                    'rounded resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-200'
-                  )}
+                  className={`w-full p-4 border ${
+                    isDarkMode ? 'border-gray-600 bg-gray-700 text-white' : 'border-gray-300 bg-white text-gray-800'
+                  } rounded resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-200`}
                   value={inputText}
                   onChange={(e) => setInputText(e.target.value)}
                   placeholder="Enter your answer here..."
                   rows={6}
                   disabled={isLoading}
                   aria-label="Answer Input"
-                />
-              ) : (
-                <button
-                  onClick={handleGetQuestion}
-                  className="flex-1 px-4 py-3 rounded font-semibold text-white bg-blue-600 hover:bg-blue-700 transition-colors duration-200 shadow-lg"
-                  disabled={isLoading}
-                  aria-label="Continue to Next Question"
-                >
-                  {isLoading ? 'Loading...' : 'Continue'}
-                </button>
+                ></textarea>
               )}
-              <div className="flex flex-row gap-4 mt-4">
+              <div className="flex space-x-4 mt-4">
+                {!answerResult ? (
+                  <button
+                    onClick={handleSubmitAnswer}
+                    className={`flex-1 px-4 py-3 rounded font-semibold text-white transition-colors duration-200 shadow-lg ${
+                      isLoading || !inputText.trim() ? 'bg-gray-500 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'
+                    }`}
+                    disabled={isLoading || !inputText.trim()}
+                    aria-label="Submit Answer"
+                  >
+                    {isLoading ? 'Submitting...' : 'Submit Answer'}
+                  </button>
+                ) : (
+                  <button
+                    onClick={handleGetQuestion}
+                    className="flex-1 px-4 py-3 rounded font-semibold text-white bg-blue-600 hover:bg-blue-700 transition-colors duration-200 shadow-lg"
+                    disabled={isLoading}
+                    aria-label="Continue to Next Question"
+                  >
+                    {isLoading ? 'Loading...' : 'Continue'}
+                  </button>
+                )}
+
                 <button
                   onClick={handleSaveProgress}
                   className="flex items-center justify-center px-4 py-3 bg-transparent text-blue-300 rounded font-semibold duration-200 hover:text-blue-500"
@@ -721,32 +805,59 @@ export default function AiTutor() {
               </div>
             </div>
           )}
+
           {!questionStem && !questionText && (
-            <div className={clsx(
-              "w-full max-w-5xl p-6 backdrop-blur-md rounded-lg shadow-md text-center",
-              isDarkMode ? "bg-slate-800 bg-opacity-50" : "bg-white bg-opacity-50"
-            )}>
-              <p className={clsx("mb-4", isDarkMode ? "text-white" : "text-slate-700")}>
-                Click <span className="font-semibold">&quot;Configure AI Tutor&quot;</span> to start.
+            <div className="w-full max-w-5xl p-6 bg-white bg-opacity-20 backdrop-blur-md rounded-lg shadow-md text-center">
+              <p className="text-gray-200 mb-4">
+                Click <span className="font-semibold">Configure AI Tutor</span> to start.
               </p>
-              <p className={clsx("text-sm", isDarkMode ? "text-gray-300" : "text-gray-600")}>
-                <strong>Note:</strong> This AI Tutor helps you practice law school concepts, offers structured feedback, and references key principles or statutes.
+              <p className="text-gray-400 text-sm">
+                <strong>Note:</strong> This AI Tutor helps you practice law school concepts,
+                offers structured feedback, and references key principles or statutes.
                 It’s not a substitute for professional legal advice.
               </p>
             </div>
           )}
+
           {isConfigModalOpen && (
-            <motion.div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-70 z-50" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-              <motion.div className="bg-gray-800 p-8 rounded-lg w-11/12 max-w-md shadow-lg overflow-y-auto max-h-screen" initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.8, opacity: 0 }} transition={{ duration: 0.3 }}>
+            <motion.div
+              className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-70 z-50"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+            >
+              <motion.div
+                className="bg-gray-800 p-8 rounded-lg w-11/12 max-w-md shadow-lg overflow-y-auto max-h-screen"
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.8, opacity: 0 }}
+                transition={{ duration: 0.3 }}
+              >
                 <h2 className="text-2xl font-semibold text-white mb-6">Configure AI Tutor</h2>
                 <form>
                   <div className="mb-4">
-                    <label className="block text-gray-300 mb-2">Custom Prompt / Topic (Optional):</label>
-                    <input type="text" name="userPrompt" value={tutorConfig.userPrompt} onChange={handleConfigChange} placeholder="e.g. 'Negligence in Torts' or 'Offer & Acceptance'" className="w-full p-3 border border-gray-500 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-200 bg-gray-700 text-white" aria-label="Custom Prompt" />
+                    <label className="block text-gray-300 mb-2">
+                      Custom Prompt / Topic (Optional):
+                    </label>
+                    <input
+                      type="text"
+                      name="userPrompt"
+                      value={tutorConfig.userPrompt}
+                      onChange={handleConfigChange}
+                      placeholder="e.g. 'Negligence in Torts' or 'Offer & Acceptance'"
+                      className="w-full p-3 border border-gray-500 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-200 bg-gray-700 text-white"
+                      aria-label="Custom Prompt"
+                    />
                   </div>
                   <div className="mb-4">
                     <label className="block text-gray-300 mb-2">Law School Year:</label>
-                    <select name="studyYear" value={tutorConfig.studyYear} onChange={handleConfigChange} className="w-full p-3 border border-gray-500 rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500" aria-label="Select Law School Year">
+                    <select
+                      name="studyYear"
+                      value={tutorConfig.studyYear}
+                      onChange={handleConfigChange}
+                      className="w-full p-3 border border-gray-500 rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      aria-label="Select Law School Year"
+                    >
                       {Object.keys(studyMapping).map((year) => (
                         <option key={year} value={year}>
                           {year}
@@ -756,7 +867,13 @@ export default function AiTutor() {
                   </div>
                   <div className="mb-4">
                     <label className="block text-gray-300 mb-2">Course:</label>
-                    <select name="course" value={tutorConfig.course} onChange={handleConfigChange} className="w-full p-3 border border-gray-500 rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500" aria-label="Select Course">
+                    <select
+                      name="course"
+                      value={tutorConfig.course}
+                      onChange={handleConfigChange}
+                      className="w-full p-3 border border-gray-500 rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      aria-label="Select Course"
+                    >
                       {topicOptions.map((t, idx) => (
                         <option key={idx} value={t.value}>
                           {t.label}
@@ -766,7 +883,13 @@ export default function AiTutor() {
                   </div>
                   <div className="mb-4">
                     <label className="block text-gray-300 mb-2">Sub-Topic:</label>
-                    <select name="subTopic" value={tutorConfig.subTopic} onChange={handleConfigChange} className="w-full p-3 border border-gray-500 rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500" aria-label="Select Sub-topic">
+                    <select
+                      name="subTopic"
+                      value={tutorConfig.subTopic}
+                      onChange={handleConfigChange}
+                      className="w-full p-3 border border-gray-500 rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      aria-label="Select Sub-topic"
+                    >
                       {subTopicOptions.map((sub, idx) => (
                         <option key={idx} value={sub.value}>
                           {sub.label}
@@ -776,7 +899,13 @@ export default function AiTutor() {
                   </div>
                   <div className="mb-4">
                     <label className="block text-gray-300 mb-2">Complexity Level:</label>
-                    <select name="complexity" value={tutorConfig.complexity} onChange={handleConfigChange} className="w-full p-3 border border-gray-500 rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500" aria-label="Select Complexity">
+                    <select
+                      name="complexity"
+                      value={tutorConfig.complexity}
+                      onChange={handleConfigChange}
+                      className="w-full p-3 border border-gray-500 rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      aria-label="Select Complexity"
+                    >
                       {complexityOptions.map((opt) => (
                         <option key={opt.value} value={opt.value}>
                           {opt.label}
@@ -785,48 +914,150 @@ export default function AiTutor() {
                     </select>
                   </div>
                   <div className="mb-4">
-                    <label className="block text-gray-300 mb-2 font-semibold">Additional Aids for Law Students:</label>
+                    <label className="block text-gray-300 mb-2 font-semibold">
+                      Additional Aids for Law Students:
+                    </label>
                     <div className="flex items-center mb-2">
-                      <input type="checkbox" id="showLegalReferences" name="showLegalReferences" checked={tutorConfig.showLegalReferences} onChange={handleConfigChange} className="h-5 w-5 text-blue-500 focus:ring-blue-500 border-gray-300 rounded" />
-                      <label htmlFor="showLegalReferences" className="ml-3 text-gray-300">Show references to relevant legal principles</label>
+                      <input
+                        type="checkbox"
+                        id="showLegalReferences"
+                        name="showLegalReferences"
+                        checked={tutorConfig.showLegalReferences}
+                        onChange={handleConfigChange}
+                        className="h-5 w-5 text-blue-500 focus:ring-blue-500 border-gray-300 rounded"
+                      />
+                      <label htmlFor="showLegalReferences" className="ml-3 text-gray-300">
+                        Show references to relevant legal principles
+                      </label>
                     </div>
                     <div className="flex items-center mb-2">
-                      <input type="checkbox" id="provideApproach" name="provideApproach" checked={tutorConfig.provideApproach} onChange={handleConfigChange} className="h-5 w-5 text-blue-500 focus:ring-blue-500 border-gray-300 rounded" />
-                      <label htmlFor="provideApproach" className="ml-3 text-gray-300">Provide a structured approach to solving the problem</label>
+                      <input
+                        type="checkbox"
+                        id="provideApproach"
+                        name="provideApproach"
+                        checked={tutorConfig.provideApproach}
+                        onChange={handleConfigChange}
+                        className="h-5 w-5 text-blue-500 focus:ring-blue-500 border-gray-300 rounded"
+                      />
+                      <label htmlFor="provideApproach" className="ml-3 text-gray-300">
+                        Provide a structured approach to solving the problem
+                      </label>
                     </div>
                     <div className="flex items-center mb-2">
-                      <input type="checkbox" id="includeKeyCases" name="includeKeyCases" checked={tutorConfig.includeKeyCases} onChange={handleConfigChange} className="h-5 w-5 text-blue-500 focus:ring-blue-500 border-gray-300 rounded" />
-                      <label htmlFor="includeKeyCases" className="ml-3 text-gray-300">Include references to key cases</label>
+                      <input
+                        type="checkbox"
+                        id="includeKeyCases"
+                        name="includeKeyCases"
+                        checked={tutorConfig.includeKeyCases}
+                        onChange={handleConfigChange}
+                        className="h-5 w-5 text-blue-500 focus:ring-blue-500 border-gray-300 rounded"
+                      />
+                      <label htmlFor="includeKeyCases" className="ml-3 text-gray-300">
+                        Include references to key cases
+                      </label>
                     </div>
                     <div className="flex items-center mb-2">
-                      <input type="checkbox" id="includeStatutes" name="includeStatutes" checked={tutorConfig.includeStatutes} onChange={handleConfigChange} className="h-5 w-5 text-blue-500 focus:ring-blue-500 border-gray-300 rounded" />
-                      <label htmlFor="includeStatutes" className="ml-3 text-gray-300">Include relevant statutes or code sections</label>
+                      <input
+                        type="checkbox"
+                        id="includeStatutes"
+                        name="includeStatutes"
+                        checked={tutorConfig.includeStatutes}
+                        onChange={handleConfigChange}
+                        className="h-5 w-5 text-blue-500 focus:ring-blue-500 border-gray-300 rounded"
+                      />
+                      <label htmlFor="includeStatutes" className="ml-3 text-gray-300">
+                        Include relevant statutes or code sections
+                      </label>
                     </div>
                     <div className="flex items-center mb-2">
-                      <input type="checkbox" id="liveMode" name="liveMode" checked={tutorConfig.liveMode} onChange={handleConfigChange} className="h-5 w-5 text-blue-500 focus:ring-blue-500 border-gray-300 rounded" />
-                      <label htmlFor="liveMode" className="ml-3 text-gray-300">Live Mode (Show highlights before answering)</label>
+                      <input
+                        type="checkbox"
+                        id="liveMode"
+                        name="liveMode"
+                        checked={tutorConfig.liveMode}
+                        onChange={handleConfigChange}
+                        className="h-5 w-5 text-blue-500 focus:ring-blue-500 border-gray-300 rounded"
+                      />
+                      <label htmlFor="liveMode" className="ml-3 text-gray-300">
+                        Live Mode (Show highlights before answering)
+                      </label>
                     </div>
                   </div>
                   <div className="mb-6">
                     <label className="block text-gray-300 mb-2">Highlight Color Hue:</label>
                     <div className="flex items-center space-x-4">
-                      <input type="range" min="0" max="360" value={tutorConfig.highlightHue} onChange={(e) => setTutorConfig((prev) => ({ ...prev, highlightHue: parseInt(e.target.value, 10) }))} className="h-2 w-full bg-blue-400 rounded-lg appearance-none cursor-pointer" />
-                      <div className="w-10 h-10 rounded" style={{ backgroundColor: `hsl(${tutorConfig.highlightHue}, 100%, 50%)` }} />
+                      <input
+                        type="range"
+                        min="0"
+                        max="360"
+                        value={tutorConfig.highlightHue}
+                        onChange={(e) =>
+                          setTutorConfig((prev) => ({
+                            ...prev,
+                            highlightHue: parseInt(e.target.value, 10),
+                          }))
+                        }
+                        className="h-2 w-full bg-blue-400 rounded-lg appearance-none cursor-pointer"
+                      />
+                      <div
+                        className="w-10 h-10 rounded"
+                        style={{
+                          backgroundColor: `hsl(${tutorConfig.highlightHue}, 100%, 50%)`,
+                        }}
+                      ></div>
                     </div>
-                    <p className="text-sm mt-2 text-gray-300">Adjust the hue to change the highlight color (default is neon yellow).</p>
+                    <p className="text-sm mt-2 text-gray-300">
+                      Adjust the hue to change the highlight color (default is neon yellow).
+                    </p>
                   </div>
                   <div className="mb-6">
-                    <label className="block text-gray-300 mb-2">Number of Questions per Session:</label>
+                    <label className="block text-gray-300 mb-2">
+                      Number of Questions per Session:
+                    </label>
                     <div className="flex items-center">
-                      <input type="range" min="1" max="20" value={tutorConfig.questionLimit} onChange={(e) => setTutorConfig((prev) => ({ ...prev, questionLimit: parseInt(e.target.value, 10) }))} className="w-full h-2 bg-blue-400 rounded-lg appearance-none cursor-pointer" aria-label="Set Number of Questions" />
+                      <input
+                        type="range"
+                        min="1"
+                        max="20"
+                        value={tutorConfig.questionLimit}
+                        onChange={(e) =>
+                          setTutorConfig((prev) => ({
+                            ...prev,
+                            questionLimit: parseInt(e.target.value, 10),
+                          }))
+                        }
+                        className="w-full h-2 bg-blue-400 rounded-lg appearance-none cursor-pointer"
+                        aria-label="Set Number of Questions"
+                      />
                       <span className="ml-4 text-gray-300">{tutorConfig.questionLimit}</span>
                     </div>
                   </div>
                   <div className="flex justify-end space-x-4">
-                    <button type="button" onClick={handleStartTutoringSession} className="relative h-12 w-full sm:w-56 overflow-hidden rounded bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white shadow-lg transition-colors duration-200" aria-label="Start Tutoring Session">
+                    <button
+                      type="button"
+                      onClick={handleStartTutoringSession}
+                      className="relative h-12 w-full sm:w-56 overflow-hidden rounded bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white shadow-lg transition-colors duration-200 
+                                 before:absolute before:right-0 before:top-0 before:h-12 before:w-5 
+                                 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 
+                                 before:duration-700 hover:before:-translate-x-56"
+                      aria-label="Start Tutoring Session"
+                    >
                       Start Tutoring
+                      <motion.span
+                        className="absolute right-4 top-3"
+                        initial={{ x: -10, opacity: 0 }}
+                        animate={{ x: 0, opacity: 1 }}
+                        transition={{ delay: 0.3, duration: 0.3 }}
+                      >
+                        <i className="fa-solid fa-arrow-right"></i>
+                      </motion.span>
                     </button>
-                    <button type="button" onClick={closeConfigModal} className="px-6 py-3 bg-gray-600 text-gray-200 rounded hover:bg-gray-700 transition-colors duration-200" aria-label="Cancel Configuration">
+                    <button
+                      type="button"
+                      onClick={closeConfigModal}
+                      className="px-6 py-3 bg-gray-600 text-gray-200 rounded hover:bg-gray-700 transition-colors duration-200"
+                      aria-label="Cancel Configuration"
+                    >
                       Cancel
                     </button>
                   </div>
@@ -834,6 +1065,7 @@ export default function AiTutor() {
               </motion.div>
             </motion.div>
           )}
+
           {isFinalFeedbackModalOpen && (
             <motion.div
               className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-70 z-50 overflow-y-auto"
@@ -841,27 +1073,45 @@ export default function AiTutor() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
             >
-              <motion.div className="bg-gray-800 p-8 rounded-lg w-11/12 max-w-3xl shadow-lg max-h-[80vh] overflow-y-auto" initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.8, opacity: 0 }} transition={{ duration: 0.3 }}>
+              <motion.div
+                className="bg-gray-800 p-8 rounded-lg w-11/12 max-w-3xl shadow-lg max-h-[80vh] overflow-y-auto"
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.8, opacity: 0 }}
+                transition={{ duration: 0.3 }}
+              >
                 <h2 className="text-2xl font-semibold text-white mb-6">Session Feedback</h2>
                 <ul className="space-y-4">
                   {answeredQuestions.map((item, idx) => (
                     <li key={idx} className="p-4 border border-gray-700 rounded">
                       <p className="font-semibold text-blue-300">Question {idx + 1}:</p>
                       <p className="text-gray-200 mb-2">{item.question}</p>
-                      <p className="text-gray-200 mb-1"><span className="font-semibold">Your Answer:</span> {item.answer}</p>
-                      <p className="text-gray-200 mb-1"><span className="font-semibold">Feedback:</span> {item.feedback}</p>
-                      <p className={`font-semibold ${item.correct ? 'text-emerald-400' : 'text-red-400'}`}>{item.correct ? 'Correct ✅' : 'Incorrect ❌'}</p>
+                      <p className="text-gray-200 mb-1">
+                        <span className="font-semibold">Your Answer:</span> {item.answer}
+                      </p>
+                      <p className="text-gray-200 mb-1">
+                        <span className="font-semibold">Feedback:</span> {item.feedback}
+                      </p>
+                      <p className={`font-semibold ${item.correct ? 'text-emerald-400' : 'text-red-400'}`}>
+                        {item.correct ? 'Correct ✅' : 'Incorrect ❌'}
+                      </p>
                     </li>
                   ))}
                 </ul>
-                <div className="flex justify-center mt-6">
-                  <button type="button" onClick={() => setIsFinalFeedbackModalOpen(false)} className="px-6 py-3 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors duration-200" aria-label="Close Final Feedback Modal">
+                <div className="flex justify-end mt-6">
+                  <button
+                    type="button"
+                    onClick={closeFinalFeedbackModal}
+                    className="px-6 py-3 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors duration-200"
+                    aria-label="Close Final Feedback Modal"
+                  >
                     Close
                   </button>
                 </div>
               </motion.div>
             </motion.div>
           )}
+
           {isLoadProgressModalOpen && (
             <motion.div
               className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-70 z-[151]"
@@ -870,7 +1120,7 @@ export default function AiTutor() {
               exit={{ opacity: 0 }}
             >
               <motion.div
-                className={clsx('bg-gray-800 p-8 rounded-lg w-11/12 max-w-3xl shadow-lg overflow-y-auto max-h-full', isDarkMode ? 'text-white' : 'text-gray-800')}
+                className="bg-gray-800 p-8 rounded-lg w-11/12 max-w-3xl shadow-lg overflow-y-auto max-h-full"
                 initial={{ scale: 0.8, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 exit={{ scale: 0.8, opacity: 0 }}
@@ -878,19 +1128,14 @@ export default function AiTutor() {
               >
                 <h2 className="text-2xl font-semibold text-white mb-6">Load Saved Progress</h2>
                 {savedProgresses.length === 0 ? (
-                  <p className="text-center">No saved progress found.</p>
+                  <p className="text-gray-200">No saved progress found.</p>
                 ) : (
                   <ul className="space-y-4">
                     {savedProgresses.map((prog) => (
-                      <li
-                        key={prog.id}
-                        className={clsx('p-4 border rounded', isDarkMode ? 'border-gray-700' : 'border-gray-300')}
-                      >
-                        <div className="flex flex-col sm:flex-row sm:justify-between items-center">
-                          <div className="text-center">
-                            <p className="font-semibold text-blue-300 mb-1">
-                              Law Year: {prog.tutorConfig?.studyYear}
-                            </p>
+                      <li key={prog.id} className="p-4 border border-gray-700 rounded">
+                        <div className="flex flex-col sm:flex-row sm:justify-between items-start sm:items-center">
+                          <div>
+                            <p className="font-semibold text-blue-300">Law Year: {prog.tutorConfig?.studyYear}</p>
                             <p className="text-sm text-gray-400">Course: {prog.tutorConfig?.course}</p>
                             <p className="text-sm text-gray-400">Sub-Topic: {prog.tutorConfig?.subTopic}</p>
                             <p className="text-sm text-gray-400">Complexity: {prog.tutorConfig?.complexity}</p>
@@ -898,11 +1143,19 @@ export default function AiTutor() {
                             <p className="text-sm text-gray-400">Current Question: {prog.currentQuestionCount}</p>
                             <p className="text-sm text-gray-400">Saved on: {new Date(prog.timestamp).toLocaleString()}</p>
                           </div>
-                          <div className="flex flex-col gap-2 mt-2 sm:mt-0">
-                            <button onClick={() => handleLoadProgress(prog)} className="h-10 w-24 rounded bg-blue-600 text-white text-sm flex items-center justify-center transition-colors duration-200">
+                          <div className="flex space-x-2 mt-2 sm:mt-0">
+                            <button
+                              onClick={() => handleLoadProgress(prog)}
+                              className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors duration-200"
+                              aria-label="Load Progress"
+                            >
                               Load
                             </button>
-                            <button onClick={() => handleDeleteProgress(prog.id)} className="h-10 w-24 rounded bg-red-600 text-white text-sm flex items-center justify-center transition-colors duration-200 hover:bg-red-700">
+                            <button
+                              onClick={() => handleDeleteProgress(prog.id)}
+                              className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors duration-200"
+                              aria-label="Delete Progress"
+                            >
                               Delete
                             </button>
                           </div>
@@ -911,10 +1164,12 @@ export default function AiTutor() {
                     ))}
                   </ul>
                 )}
-                <div className="text-center mt-6">
+                <div className="flex justify-end mt-6">
                   <button
+                    type="button"
                     onClick={closeLoadProgressModal}
-                    className={clsx('h-10 sm:h-12 px-4 py-2 rounded', isDarkMode ? 'bg-gray-700 hover:bg-gray-600 text-white' : 'bg-gray-300 hover:bg-gray-400 text-gray-800')}
+                    className="px-6 py-2 bg-gray-600 text-gray-200 rounded hover:bg-gray-700 transition-colors duration-200"
+                    aria-label="Close Load Progress Modal"
                   >
                     Close
                   </button>
@@ -922,7 +1177,7 @@ export default function AiTutor() {
               </motion.div>
             </motion.div>
           )}
-        </motion.div>
+        </div>
       </main>
     </div>
   );

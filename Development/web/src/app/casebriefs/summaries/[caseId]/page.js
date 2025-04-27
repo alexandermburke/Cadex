@@ -43,7 +43,7 @@ export async function generateMetadata({ params }) {
     const data = docSnap.data()
     caseName = data.title || ""
     jurisdiction = data.jurisdiction || ""
-    title = `${caseName} Case Brief Summary | CadexLaw`
+    title = `${caseName} – 20,000+ Case Briefs with Summaries | CadexLaw`
     description = `${caseName} case brief summary from ${jurisdiction}. Read the rule of law, facts, issue, holding, reasoning, and dissent in detailed IRAC format.`
   }
 

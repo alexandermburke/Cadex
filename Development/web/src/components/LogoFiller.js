@@ -36,14 +36,14 @@ export default function LogoFiller() {
             quality={'100'}
           />
         </div>
-        {/* Italian Tri-Color Flag */}
+        {/* American Tri-Color Flag */}
         <div className="flex items-center justify-center mt-2">
-        <div className="flex rounded-full overflow-hidden">
-            <span className="block w-6 h-1 bg-red-600 transform -skew-x-12"></span>
-            <span className="block w-6 h-1 bg-white transform -skew-x-12"></span>
-            <span className="block w-6 h-1 bg-blue-900 transform -skew-x-12"></span>
-          </div>
-        </div>
+  <div className="flex rounded-full overflow-hidden space-x-1">
+    <span className="block w-6 h-1 bg-red-600 transform -skew-x-12"></span>
+    <span className="block w-6 h-1 bg-white transform -skew-x-12"></span>
+    <span className="block w-6 h-1 bg-blue-900 transform -skew-x-12"></span>
+  </div>
+</div>
         {/* Slogan */}
         <p className={`mt-2 text-sm ${isDarkMode ? 'text-gray-300' : 'text-slate-500'} ${poppins.className}`}>
         Empowering your legal journey with precision and clarity.

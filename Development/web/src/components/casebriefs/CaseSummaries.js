@@ -3,7 +3,7 @@ import React, { useState, useEffect, useRef } from 'react'
 import Head from 'next/head'
 import Sidebar from '../Sidebar'
 import { useParams, useRouter } from 'next/navigation'
-import { FaChevronDown, FaChevronUp, FaCopy } from 'react-icons/fa'
+import { FaChevronDown, FaChevronUp } from 'react-icons/fa'
 import {
   FaBars,
   FaTimes,
@@ -78,9 +78,7 @@ const saveAsPDF = async (pdfRef, title) => {
     pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight)
     pdf.save(`${title || 'case-brief'}.pdf`)
     pdfRef.current.style.fontSize = originalFontSize
-  } catch (error) {
-    console.error('Error generating PDF:', error)
-  }
+  } catch {}
 }
 
 function getInitialViewMode() {
@@ -93,6 +91,8 @@ function getInitialViewMode() {
   return 'classic'
 }
 
+const MAX_FREE_VIEWS = 3
+
 export default function CaseSummaries() {
   const router = useRouter()
   const { caseId } = useParams()
@@ -101,14 +101,13 @@ export default function CaseSummaries() {
   const plan = userDataObj?.billing?.plan?.toLowerCase() || 'free'
   const isPro = plan === 'basic'
   const isExpert = plan === 'expert'
+  const isPaidUser = isPro || isExpert
   const isDarkMode = userDataObj?.darkMode || false
-
-  const enableAccessControls = false
 
   const [mounted, setMounted] = useState(false)
   useEffect(() => { setMounted(true) }, [])
 
-  const [isSidebarVisible, setIsSidebarVisible] = useState(window.innerWidth >= 768)
+  const [isSidebarVisible, setIsSidebarVisible] = useState(typeof window !== 'undefined' ? window.innerWidth >= 768 : true)
   const toggleSidebar = () => setIsSidebarVisible(!isSidebarVisible)
 
   const [capCase, setCapCase] = useState(null)
@@ -142,6 +141,21 @@ export default function CaseSummaries() {
   const [copySuccess, setCopySuccess] = useState(false)
   const [isHowToOpen, setIsHowToOpen] = useState(false)
 
+  const [viewCount, setViewCount] = useState(0)
+
+  useEffect(() => {
+    const count = parseInt(localStorage.getItem('caseBriefViewCount') || '0', 10)
+    setViewCount(count)
+  }, [])
+
+  useEffect(() => {
+    if (!caseId || isPaidUser) return
+    const count = parseInt(localStorage.getItem('caseBriefViewCount') || '0', 10)
+    const newCount = count + 1
+    localStorage.setItem('caseBriefViewCount', newCount)
+    setViewCount(newCount)
+  }, [caseId, isPaidUser])
+
   useEffect(() => {
     if (caseId) localStorage.setItem('lastCaseBriefId', caseId)
   }, [caseId])
@@ -154,12 +168,15 @@ export default function CaseSummaries() {
   }, [caseId, router])
 
   const pageTitle = capCase
-    ? `${capCase.title} Case Brief Summary – IRAC & Legal Analysis | CadexLaw`
-    : 'CadexLaw Case Brief Summary – IRAC & Legal Analysis'
+    ? `${capCase.title} Case Brief Summary – 20,000+ Case Briefs with Summaries | CadexLaw`
+    : 'CadexLaw Case Brief Summary – 20,000+ Case Briefs with Summaries'
   const pageDescription = capCase
     ? `Read our ${capCase.title} case brief summary—rule of law, facts, issue spotting, holding, reasoning & opinions.`
-    : 'Explore thousands of case brief summaries, IRAC outlines, and in‑depth legal analysis on CadexLaw.'
+    : 'Explore thousands of case brief summaries, IRAC outlines, and in-depth legal analysis on CadexLaw.'
   const pageUrl = `https://www.cadexlaw.com/casebriefs/summaries/${caseId || ''}`
+
+  const limitReached = !isPaidUser && viewCount >= MAX_FREE_VIEWS
+  const enableAccessControls = limitReached
 
   const renderFactsContent = (factsText) => {
     if (!factsText) return <p className="text-base mt-2">Not provided.</p>
@@ -273,7 +290,7 @@ export default function CaseSummaries() {
     if (!capCase) return
     const url = `${window.location.origin}/casebriefs/summaries/${capCase.id}`
     const data = { title: capCase.title, text: 'Check this case brief', url }
-    if (navigator.share) navigator.share(data).catch(console.error)
+    if (navigator.share) navigator.share(data).catch(() => {})
     else {
       navigator.clipboard.writeText(url)
       alert('URL copied')
@@ -295,7 +312,6 @@ export default function CaseSummaries() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ title: c.title, citation: c.citation, detailed: true })
       })
-      if (!res.ok) throw await res.json()
       const data = await res.json()
       setCaseBrief(data)
       setIsVerified(false)
@@ -319,7 +335,6 @@ export default function CaseSummaries() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ title: c.title, date: c.decisionDate || '' })
       })
-      if (!res.ok) throw await res.json()
       const data = await res.json()
       setCaseBrief(data)
       setIsVerified(false)
@@ -415,7 +430,7 @@ export default function CaseSummaries() {
           setIsVerified(c.detailedSummary.verified || false)
         } else await getCapCaseSummary(c)
       }
-    })().catch(console.error)
+    })()
   }, [caseId, viewMode])
 
   useEffect(() => {
@@ -431,7 +446,7 @@ export default function CaseSummaries() {
       const arr = []
       snap.forEach(d => arr.push({ id: d.id, ...d.data() }))
       setRelatedCases(arr)
-    })().catch(console.error)
+    })()
   }, [capCase])
 
   const headingByMode = {
@@ -462,24 +477,6 @@ export default function CaseSummaries() {
         <meta name="twitter:title" content={pageTitle} />
         <meta name="twitter:description" content={pageDescription} />
         <meta name="twitter:image" content="https://www.cadexlaw.com/images/case-brief-og.jpg" />
-        {capCase && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({
-          '@context':'https://schema.org',
-          '@type':'LegalCase',
-          name:capCase.title,
-          url:pageUrl,
-          datePublished:capCase.decisionDate,
-          court:capCase.jurisdiction,
-          description: caseBrief?.facts||caseBrief?.ruleOfLaw||''
-        })}} />}
-        {capCase && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({
-          '@context':'https://schema.org',
-          '@type':'BreadcrumbList',
-          itemListElement:[
-            { '@type':'ListItem', position:1, name:'Home', item:'https://www.cadexlaw.com' },
-            { '@type':'ListItem', position:2, name:'Case Brief Summaries', item:'https://www.cadexlaw.com/casebriefs/summaries' },
-            { '@type':'ListItem', position:3, name:capCase.title, item:pageUrl }
-          ]
-        })}} />}
       </Head>
 
       <div
@@ -506,24 +503,36 @@ export default function CaseSummaries() {
             <button
               onClick={toggleSidebar}
               className="md:hidden self-start m-2 p-2 bg-white rounded-full shadow"
-              aria-label={isSidebarVisible?'Close menu':'Open menu'}
+              aria-label={isSidebarVisible ? 'Close menu' : 'Open menu'}
             >
               {isSidebarVisible ? <FaTimes /> : <FaBars />}
             </button>
           </div>
 
-          <div className={`flex-1 w-full rounded-2xl shadow-xl p-6 overflow-y-auto overflow-x-auto ${isDarkMode ? 'bg-slate-800 bg-opacity-50 text-white' : 'bg-white text-gray-800'} flex flex-col items-center`}>
-            <h1 className="text-2xl font-bold mb-4">{headingByMode[viewMode]}</h1>
+          <div className={`relative flex-1 w-full rounded-2xl shadow-xl p-6 overflow-y-auto overflow-x-auto ${isDarkMode ? 'bg-slate-800 bg-opacity-50 text-white' : 'bg-white text-gray-800'} flex flex-col items-center`}>
+            {limitReached && (
+              <div className="absolute inset-0 z-40 flex flex-col items-center justify-center space-y-6 bg-white/60 dark:bg-slate-800/90 backdrop-blur-sm">
+                <p className="text-lg font-semibold text-center px-4">You have reached the limit of free case briefs.</p>
+                <button
+                  onClick={() => router.push('/register')}
+                  className="group relative h-12 w-full sm:w-56 overflow-hidden rounded bg-gradient-to-r from-blue-600 to-blue-800 text-white text-sm sm:text-base shadow transition-all duration-300 flex items-center justify-center gradientShadowHoverBlue"
+                >
+                  <span className="font-semibold">Register for unlimited access</span>
+                </button>
+              </div>
+            )}
+
+            <h1 className="text-2xl font-bold mb-8">{headingByMode[viewMode]}</h1>
 
             <div className={`p-6 rounded-xl mb-6 ${isDarkMode ? 'bg-slate-800 bg-opacity-50 text-white border border-slate-700' : 'bg-gray-100 text-gray-800 border border-gray-300'}`}>
-              <h2 className="text-xl font-semibold">{capCase?.title || 'No Title'}</h2>
-              <p className={`text-sm mt-1 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+              <h2 className={`text-xl font-semibold ${enableAccessControls && !isLoggedIn ? 'blur-sm' : ''}`}>{capCase?.title || 'No Title'}</h2>
+              <p className={`text-sm mt-1 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'} ${enableAccessControls && !isLoggedIn ? 'blur-sm' : ''}`}>
                 {capCase?.jurisdiction || 'Unknown'} | Volume: {capCase?.volume || 'N/A'} | Date: {capCase?.decisionDate || 'N/A'}
               </p>
-              <p className={`text-sm mt-1 font-semibold ${isDarkMode ? 'text-gray-200' : 'text-gray-800'}`}>
+              <p className={`text-sm mt-1 font-semibold ${isDarkMode ? 'text-gray-200' : 'text-gray-800'} ${enableAccessControls && !isLoggedIn ? 'blur-sm' : ''}`}>
                 Citation: <span className="font-normal">{capCase?.citation || 'N/A'}</span>
               </p>
-              <div className="flex items-center text-xs mt-1">
+              <div className={`flex items-center text-xs mt-1 ${enableAccessControls && !isLoggedIn ? 'blur-sm' : ''}`}>
                 <span className="text-gray-400">Verified by LExAPI 3.0</span>
                 {isVerified ? (
                   <motion.div initial={{ opacity: 0, scale: 0 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.5 }} className="ml-2 flex items-center justify-center w-6 h-6 border-2 border-emerald-500 rounded-full">
@@ -606,7 +615,7 @@ export default function CaseSummaries() {
                 </div>
               ) : caseBrief ? (
                 viewMode === 'bulletpoint' ? (
-                  <div className="p-6 rounded-xl relative z-10">
+                  <div className={`p-6 rounded-xl relative z-10 ${enableAccessControls && !isLoggedIn ? 'blur-sm' : ''}`}>
                     <h3 className={`font-bold mb-4 ${isDarkMode ? 'text-blue-300' : 'text-blue-700'} text-lg`}>
                       Detailed Outline of Case Brief
                     </h3>
@@ -675,7 +684,7 @@ export default function CaseSummaries() {
                                 <h5 className="font-semibold text-base">Dissent</h5>
                                 <div className="flex items-center justify-between">
                                   <p className="ml-4 text-sm">{caseBrief.dissent}</p>
-                 </div>
+                                </div>
                               </div>
                             )}
                           </div>
@@ -692,7 +701,7 @@ export default function CaseSummaries() {
                     </div>
                   </div>
                 ) : (
-                  <div className="p-6 rounded-xl relative z-10">
+                  <div className={`p-6 rounded-xl relative z-10 ${enableAccessControls && !isLoggedIn ? 'blur-sm' : ''}`}>
                     <div className="flex items-center justify-between mb-4">
                       <strong className="block text-lg">Rule of Law:</strong>
                     </div>
@@ -733,7 +742,7 @@ export default function CaseSummaries() {
                               <strong className="block text-base">Concurrence:</strong>
                               <div className="flex items-center justify-between">
                                 <p className="mt-2">{caseBrief.concurrence}</p>
-                                 </div>
+                              </div>
                             </div>
                           )}
                           {caseBrief.dissent && (
@@ -741,7 +750,7 @@ export default function CaseSummaries() {
                               <strong className="block text-base">Dissent:</strong>
                               <div className="flex items-center justify-between">
                                 <p className="mt-2">{caseBrief.dissent}</p>
-                             </div>
+                              </div>
                             </div>
                           )}
                         </div>
@@ -751,16 +760,6 @@ export default function CaseSummaries() {
                       <strong className="block text-lg text-blue-600">Analysis:</strong>
                     </div>
                     <p className="text-base mt-2">{caseBrief.analysis}</p>
-                    {!isLoggedIn && enableAccessControls && (
-                      <div className="absolute inset-0 flex flex-col items-center justify-center text-white text-xl font-bold">
-                        <button
-                          onClick={() => router.push('/register')}
-                          className="mt-4 px-4 py-2 bg-blue-600 hover:bg-blue-500 rounded-lg"
-                        >
-                          Register to View Full Case Brief
-                        </button>
-                      </div>
-                    )}
                   </div>
                 )
               ) : (
