@@ -93,8 +93,8 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, i
   const router = useRouter();
   const { currentUser, userDataObj } = useAuth();
   const plan = userDataObj?.billing?.plan?.toLowerCase() || 'free';
-  const isBasic = plan === 'basic';
-  const isPro = plan === 'pro' || plan === 'expert';
+  const isBasic = plan === 'expert';
+  const isPro = plan === 'pro' || plan === 'basic';
   const isExpert = false;
   const isDarkMode = userDataObj?.darkMode || false;
   const [isCaseBriefBankOpen, setIsCaseBriefBankOpen] = useState(false);
@@ -329,10 +329,10 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, i
           {(isPro || isExpert) ? (
             <>
               <NavLink
-                href="/ailawtools/lexapi"
+                href="/ailawtools/examprep"
                 icon={<FaBrain className="text-sm" />}
                 label="Practice Exams"
-                active={activeLink === '/ailawtools/lexapi'}
+                active={activeLink === '/ailawtools/examprep'}
               />
               <NavLink
                 href="/ailawtools/insights"
@@ -470,7 +470,7 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, i
             className="flex items-center gap-3 p-3 rounded transition-colors duration-200 hover:bg-blue-600 hover:bg-opacity-75 mt-6"
           >
             <FaComment className="text-lg" />
-            <span>Requests/Suggestions</span>
+            <span>Feedback</span>
           </Link>
         </section>
       </nav>
