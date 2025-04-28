@@ -392,15 +392,15 @@ export default function Account() {
 
           {/* Change Password Button */}
           <div className="mt-4">
-            <motion.button
+            <button
               onClick={handleChangePassword}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-              className="w-full px-4 py-2 rounded-md text-sm font-semibold bg-gradient-to-r from-blue-600 to-blue-500 text-white shadow-lg"
+              className="w-full px-4 py-2 rounded-md text-sm font-semibold bg-gradient-to-r from-blue-600 to-blue-500 text-white shadow-lg gradientShadowHoverBlue"
             >
               Change Password
-            </motion.button>
+            </button>
           </div>
 
           {/* Verify Email Banner */}

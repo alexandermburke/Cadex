@@ -200,7 +200,7 @@ export default function Header() {
             ${isDarkMode ? 'hover:text-slate-500 hover:bg-blue-950 text-white' : 'hover:text-slate-500 hover:bg-blue-950 text-black'}`}
         >
           <div className="flex items-center">
-            <p>Tools</p>
+            <p>Dashboard</p>
             <span
               className={`ml-2 px-2 py-1 text-xs rounded ${
                 isDarkMode ? 'bg-emerald-600 text-white' : 'bg-emerald-400 text-white'

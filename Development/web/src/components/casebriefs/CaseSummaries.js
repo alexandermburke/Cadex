@@ -509,7 +509,7 @@ export default function CaseSummaries() {
             </button>
           </div>
 
-          <div className={`relative flex-1 w-full rounded-2xl shadow-xl p-6 overflow-y-auto overflow-x-auto ${isDarkMode ? 'bg-slate-800 bg-opacity-50 text-white' : 'bg-white text-gray-800'} flex flex-col items-center`}>
+          <div className={`relative flex-1 w-full h-full rounded-2xl shadow-xl p-6 overflow-y-auto overflow-x-auto ${isDarkMode ? 'bg-slate-800 bg-opacity-50 text-white' : 'bg-white text-gray-800'} flex flex-col items-center`}>
             {limitReached && (
               <div className="absolute inset-0 z-40 flex flex-col items-center justify-center space-y-6 bg-white/60 dark:bg-slate-800/90 backdrop-blur-sm">
                 <p className="text-lg font-semibold text-center px-4">You have reached the limit of free case briefs.</p>
