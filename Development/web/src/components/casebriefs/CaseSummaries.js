@@ -3,14 +3,15 @@ import React, { useState, useEffect, useRef } from 'react'
 import Head from 'next/head'
 import Sidebar from '../Sidebar'
 import { useParams, useRouter } from 'next/navigation'
-import { FaChevronDown, FaChevronUp } from 'react-icons/fa'
 import {
   FaBars,
   FaTimes,
   FaHeart,
   FaRegHeart,
   FaSync,
-  FaShareAlt
+  FaShareAlt,
+  FaChevronDown,
+  FaChevronUp
 } from 'react-icons/fa'
 import { motion, AnimatePresence } from 'framer-motion'
 import { db } from '@/firebase'
@@ -27,7 +28,6 @@ import {
 import { useAuth } from '@/context/AuthContext'
 import html2canvas from 'html2canvas'
 import { jsPDF } from 'jspdf'
-import CaseChatbot from '../CasebriefBot'
 
 const simplifyText = (text = '', maxLength = 400) => {
   if (!text) return 'Not provided.'
@@ -84,7 +84,7 @@ const saveAsPDF = async (pdfRef, title) => {
 function getInitialViewMode() {
   if (typeof window !== 'undefined') {
     const stored = localStorage.getItem('caseBriefViewMode')
-    if (stored && ['classic', 'bulletpoint', 'simplified'].includes(stored)) {
+    if (stored && ['classic', 'chatbot', 'simplified'].includes(stored)) {
       return stored
     }
   }
@@ -107,7 +107,9 @@ export default function CaseSummaries() {
   const [mounted, setMounted] = useState(false)
   useEffect(() => { setMounted(true) }, [])
 
-  const [isSidebarVisible, setIsSidebarVisible] = useState(typeof window !== 'undefined' ? window.innerWidth >= 768 : true)
+  const [isSidebarVisible, setIsSidebarVisible] = useState(
+    typeof window !== 'undefined' ? window.innerWidth >= 768 : true
+  )
   const toggleSidebar = () => setIsSidebarVisible(!isSidebarVisible)
 
   const [capCase, setCapCase] = useState(null)
@@ -118,9 +120,9 @@ export default function CaseSummaries() {
   const pdfRef = useRef(null)
 
   const viewModes = [
-    { label: 'Classic', value: 'classic' },
-    { label: 'Outline', value: 'bulletpoint' },
-    { label: 'Simple', value: 'simplified' }
+    { label: 'Classic',   value: 'classic' },
+    { label: 'LexBot',    value: 'chatbot' },
+    { label: 'Simple',    value: 'simplified' }
   ]
   const [viewMode, setViewMode] = useState('classic')
   useEffect(() => {
@@ -177,6 +179,49 @@ export default function CaseSummaries() {
 
   const limitReached = !isPaidUser && viewCount >= MAX_FREE_VIEWS
   const enableAccessControls = limitReached
+
+  const [chatMessages, setChatMessages] = useState([])
+  const [chatInput, setChatInput] = useState('')
+  const [chatLoading, setChatLoading] = useState(false)
+  const chatContainerRef = useRef(null)
+
+  useEffect(() => {
+    if (viewMode !== 'chatbot') return
+    if (chatMessages.length === 0) {
+      setChatMessages([{
+        sender: 'bot',
+        text: `Hi! Ask me anything about ${capCase?.title || 'this case'}.`
+      }])
+    }
+  }, [viewMode, capCase])
+
+  useEffect(() => {
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight
+    }
+  }, [chatMessages])
+
+  const handleChatSend = async () => {
+    if (!chatInput.trim()) return
+    const userText = chatInput.trim()
+    setChatInput('')
+    setChatMessages(msgs => [...msgs, { sender: 'user', text: userText }])
+    setChatLoading(true)
+    try {
+      const res = await fetch('/api/Chatbot', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query: userText, caseName: capCase?.title || '' })
+      })
+      const data = await res.json()
+      const reply = data.answer || 'Sorry, no answer available.'
+      setChatMessages(msgs => [...msgs, { sender: 'bot', text: reply }])
+    } catch {
+      setChatMessages(msgs => [...msgs, { sender: 'bot', text: 'Error retrieving answer.' }])
+    } finally {
+      setChatLoading(false)
+    }
+  }
 
   const renderFactsContent = (factsText) => {
     if (!factsText) return <p className="text-base mt-2">Not provided.</p>
@@ -450,8 +495,8 @@ export default function CaseSummaries() {
   }, [capCase])
 
   const headingByMode = {
-    classic: 'Case Brief Summary',
-    bulletpoint: 'Case Brief Summary',
+    classic:    'Case Brief Summary',
+    chatbot:    'Case Brief Summary',
     simplified: 'Case Brief Summary'
   }
 
@@ -486,7 +531,12 @@ export default function CaseSummaries() {
         <AnimatePresence>
           {isSidebarVisible && (
             <>
-              <Sidebar activeLink="/casebriefs/summaries" isSidebarVisible={isSidebarVisible} toggleSidebar={toggleSidebar} isDarkMode={isDarkMode} />
+              <Sidebar
+                activeLink="/casebriefs/summaries"
+                isSidebarVisible={isSidebarVisible}
+                toggleSidebar={toggleSidebar}
+                isDarkMode={isDarkMode}
+              />
               <motion.div
                 className="fixed inset-0 bg-black bg-opacity-40 z-40 md:hidden"
                 initial={{ opacity: 0 }}
@@ -524,7 +574,7 @@ export default function CaseSummaries() {
 
             <h1 className="text-2xl font-bold mb-8">{headingByMode[viewMode]}</h1>
 
-            <div className={`p-6 rounded-xl mb-6 ${isDarkMode ? 'bg-slate-800 bg-opacity-50 text-white border border-slate-700' : 'bg-gray-100 text-gray-800 border border-gray-300'}`}>
+            <div className={`p-6 rounded-xl mb-6 ${isDarkMode ? 'bg-slate-800 bg-opacity-50 text-white border border-slate-700' : 'bg-gray-100 text-gray-800 border border-gray-300'}`} ref={pdfRef}>
               <h2 className={`text-xl font-semibold ${enableAccessControls && !isLoggedIn ? 'blur-sm' : ''}`}>{capCase?.title || 'No Title'}</h2>
               <p className={`text-sm mt-1 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'} ${enableAccessControls && !isLoggedIn ? 'blur-sm' : ''}`}>
                 {capCase?.jurisdiction || 'Unknown'} | Volume: {capCase?.volume || 'N/A'} | Date: {capCase?.decisionDate || 'N/A'}
@@ -553,7 +603,7 @@ export default function CaseSummaries() {
                 </motion.button>
                 {isLoggedIn && (
                   <motion.button onClick={toggleFavoriteCase} whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }} className="ml-4" aria-label="Toggle Favorite">
-                    {isFavorited ? <FaHeart size={16} className="text-red-500" /> : <FaRegHeart size={16} className="text-gray-400" /> }
+                    {isFavorited ? <FaHeart size={16} className="text-red-500" /> : <FaRegHeart size={16} className="text-gray-400" />}
                   </motion.button>
                 )}
               </div>
@@ -589,7 +639,61 @@ export default function CaseSummaries() {
             </div>
 
             <div className="w-full relative">
-              {isSummaryLoading ? (
+              {viewMode === 'chatbot' ? (
+                <div className={`mx-auto w-full max-w-2xl flex-1 rounded-2xl flex flex-col justify-between overflow-hidden mt-10 ${isDarkMode ? 'bg-slate-800 bg-opacity-60 border border-slate-700' : 'bg-white border border-gray-300'} shadow-lg`}>
+                  <div
+                    ref={chatContainerRef}
+                    className={`flex-1 overflow-y-auto p-6 space-y-4 ${isDarkMode ? '' : 'bg-gray-50'} scrollbar-thin scrollbar-thumb-gray-400`}
+                  >
+                    {chatMessages.map((msg, idx) => (
+                      <div
+                        key={idx}
+                        className={`w-2/3 px-4 py-3 rounded-lg break-words ${
+                          msg.sender === 'user'
+                            ? `self-end ${isDarkMode ? 'bg-green-600 text-white' : 'bg-green-200 text-gray-900'}`
+                            : `self-start ${isDarkMode ? 'bg-gray-700 text-white' : 'bg-gray-200 text-gray-900'}`
+                        }`}
+                      >
+                        {msg.text}
+                      </div>
+                    ))}
+                    {chatLoading && (
+                      <div
+                        className={`self-start px-4 py-3 rounded-lg animate-pulse ${
+                          isDarkMode ? 'bg-gray-700 text-white' : 'bg-gray-200 text-gray-900'
+                        }`}
+                      >
+                        ...
+                      </div>
+                    )}
+                  </div>
+                  <div className={`p-4 flex ${isDarkMode ? 'bg-slate-700 border-t border-slate-600' : 'bg-gray-100 border-t border-gray-200'}`}>
+                    <input
+                      type="text"
+                      value={chatInput}
+                      onChange={e => setChatInput(e.target.value)}
+                      onKeyDown={e => e.key === 'Enter' && handleChatSend()}
+                      className={`flex-1 border rounded-l-full px-4 py-2 focus:outline-none ${
+                        isDarkMode
+                          ? 'border-gray-500 bg-gray-700 text-white placeholder-gray-400'
+                          : 'border-gray-300 bg-white text-gray-900 placeholder-gray-500'
+                      }`}
+                      placeholder={`Ask about ${capCase?.title || 'this case'}...`}
+                    />
+                    <button
+                      onClick={handleChatSend}
+                      disabled={chatLoading}
+                      className={`px-4 py-2 rounded-r-full focus:outline-none text-white ${
+                        isDarkMode
+                          ? 'bg-blue-500 hover:bg-blue-400'
+                          : 'bg-blue-600 hover:bg-blue-700'
+                      }`}
+                    >
+                      Send
+                    </button>
+                  </div>
+                </div>
+              ) : isSummaryLoading ? (
                 <div className="flex flex-col items-center justify-center space-y-3">
                   <div className="relative w-16 h-16">
                     <svg className="transform -rotate-90" viewBox="0 0 36 36">
@@ -614,154 +718,66 @@ export default function CaseSummaries() {
                   </div>
                 </div>
               ) : caseBrief ? (
-                viewMode === 'bulletpoint' ? (
-                  <div className={`p-6 rounded-xl relative z-10 ${enableAccessControls && !isLoggedIn ? 'blur-sm' : ''}`}>
-                    <h3 className={`font-bold mb-4 ${isDarkMode ? 'text-blue-300' : 'text-blue-700'} text-lg`}>
-                      Detailed Outline of Case Brief
-                    </h3>
-                    <div className="space-y-4">
-                      <div>
-                        <h4 className="font-semibold text-base">Case Overview</h4>
-                        <p className="ml-4 text-sm">
-                          <span className="font-bold">Title:</span> {capCase?.title || 'N/A'}
-                          <br />
-                          <span className="font-bold">Jurisdiction:</span> {capCase?.jurisdiction || 'Unknown'}
-                          <br />
-                          <span className="font-bold">Decision Date:</span> {capCase?.decisionDate || 'N/A'}
-                          <br />
-                          <span className="font-bold">Volume:</span> {capCase?.volume || 'N/A'}
-                        </p>
-                      </div>
-                      {caseBrief.ruleOfLaw && (
-                        <div>
-                          <div className="flex items-center justify-between">
-                            <h4 className="font-semibold text-base">Rule of Law</h4>
-                           </div>
-                          <p className="ml-4 text-sm">{caseBrief.ruleOfLaw}</p>
-                        </div>
-                      )}
-                      {caseBrief.facts && (
-                        <div>
-                          <div className="flex items-center justify-between">
-                            <h4 className="font-semibold text-base">Key Facts</h4>
-                          </div>
-                          {renderFactsContent(caseBrief.facts)}
-                        </div>
-                      )}
-                      {caseBrief.issue && (
-                        <div>
-                          <div className="flex items-center justify-between">
-                            <h4 className="font-semibold text-base">Legal Issue</h4>
-                          </div>
-                          <p className={`ml-4 text-sm ${mounted && enableAccessControls && !isLoggedIn ? 'blur-sm' : ''}`}>{caseBrief.issue}</p>
-                        </div>
-                      )}
-                      {(caseBrief.holding || caseBrief.reasoning || caseBrief.concurrence || caseBrief.dissent) && (
-                        <div className="mt-6">
-                          <h4 className="font-semibold text-base mb-2">Opinions</h4>
-                          <div className="ml-4 space-y-4">
-                            {caseBrief.holding && (
-                              <div>
-                                <h5 className="font-semibold text-base">Majority</h5>
-                                <div className="flex items-center justify-between">
-                                  <p className="ml-4 text-sm"><strong>Holding:</strong> {caseBrief.holding}</p>
-                                 </div>
-                                <div className="flex items-center justify-between">
-                                  <p className="ml-4 text-sm"><strong>Reasoning:</strong> {caseBrief.reasoning}</p>
-                                </div>
-                              </div>
-                            )}
-                            {caseBrief.concurrence && (
-                              <div>
-                                <h5 className="font-semibold text-base">Concurrence</h5>
-                                <div className="flex items-center justify-between">
-                                  <p className="ml-4 text-sm">{caseBrief.concurrence}</p>
-                                </div>
-                              </div>
-                            )}
-                            {caseBrief.dissent && (
-                              <div>
-                                <h5 className="font-semibold text-base">Dissent</h5>
-                                <div className="flex items-center justify-between">
-                                  <p className="ml-4 text-sm">{caseBrief.dissent}</p>
-                                </div>
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                      )}
-                      <div className="mt-6">
-                        <div className="flex items-center justify-between">
-                          <h4 className="text-lg font-semibold mb-2">Analysis</h4>
-                       </div>
-                        <p className="text-base mt-2">
-                          {caseBrief.analysis?.trim() ? caseBrief.analysis : 'N/A'}
-                        </p>
-                      </div>
-                    </div>
+                <div className={`p-6 rounded-xl relative z-10 ${enableAccessControls && !isLoggedIn ? 'blur-sm' : ''}`}>
+                  <div className="flex items-center justify-between mb-4">
+                    <strong className="block text-lg">Rule of Law:</strong>
                   </div>
-                ) : (
-                  <div className={`p-6 rounded-xl relative z-10 ${enableAccessControls && !isLoggedIn ? 'blur-sm' : ''}`}>
-                    <div className="flex items-center justify-between mb-4">
-                      <strong className="block text-lg">Rule of Law:</strong>
-                    </div>
-                    <p className="text-base mt-2">{caseBrief.ruleOfLaw}</p>
-                    <div className="flex items-center justify-between mb-4 mt-6">
-                      <strong className="block text-lg">Facts:</strong>
-                    </div>
-                    {caseBrief.facts
-                      ? renderFactsContent(caseBrief.facts)
-                      : <p className={`text-base mt-2 ${mounted && enableAccessControls && !isLoggedIn ? 'blur-sm' : ''}`}>Not provided.</p>
-                    }
-                    <div className="flex items-center justify-between mb-4 mt-6">
-                      <strong className="block text-lg">Issue:</strong>
-                    </div>
-                    <p className={`text-base mt-2 ${mounted && enableAccessControls && !isLoggedIn ? 'blur-sm' : ''}`}>{caseBrief.issue}</p>
-                    {(caseBrief.holding || caseBrief.reasoning || caseBrief.concurrence || caseBrief.dissent) && (
-                      <div className="mb-4 mt-6">
-                        <strong className="block text-lg mb-2">Opinions:</strong>
-                        <div className="ml-4 space-y-2">
-                          {caseBrief.holding && (
-                            <div>
-                              <strong className="block text-base">Majority:</strong>
-                              <div className="flex items-center justify-between mt-2">
-                                <p>{caseBrief.holding}</p>
-                              </div>
-                            </div>
-                          )}
-                          {caseBrief.reasoning && (
-                            <div className="mt-2">
-                              <strong className="block text-base">Reasoning:</strong>
-                              <div className="flex items-center justify-between">
-                                <p className="mt-2">{caseBrief.reasoning}</p>
-                              </div>
-                            </div>
-                          )}
-                          {caseBrief.concurrence && (
-                            <div className="mt-2">
-                              <strong className="block text-base">Concurrence:</strong>
-                              <div className="flex items-center justify-between">
-                                <p className="mt-2">{caseBrief.concurrence}</p>
-                              </div>
-                            </div>
-                          )}
-                          {caseBrief.dissent && (
-                            <div className="mt-2">
-                              <strong className="block text-base">Dissent:</strong>
-                              <div className="flex items-center justify-between">
-                                <p className="mt-2">{caseBrief.dissent}</p>
-                              </div>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    )}
-                    <div className="flex items-center justify-between mb-4 mt-6">
-                      <strong className="block text-lg text-blue-600">Analysis:</strong>
-                    </div>
-                    <p className="text-base mt-2">{caseBrief.analysis}</p>
+                  <p className="text-base mt-2">{caseBrief.ruleOfLaw}</p>
+                  <div className="flex items-center justify-between mb-4 mt-6">
+                    <strong className="block text-lg">Facts:</strong>
                   </div>
-                )
+                  {caseBrief.facts
+                    ? renderFactsContent(caseBrief.facts)
+                    : <p className={`text-base mt-2 ${mounted && enableAccessControls && !isLoggedIn ? 'blur-sm' : ''}`}>Not provided.</p>
+                  }
+                  <div className="flex items-center justify-between mb-4 mt-6">
+                    <strong className="block text-lg">Issue:</strong>
+                  </div>
+                  <p className={`text-base mt-2 ${mounted && enableAccessControls && !isLoggedIn ? 'blur-sm' : ''}`}>{caseBrief.issue}</p>
+                  {(caseBrief.holding || caseBrief.reasoning || caseBrief.concurrence || caseBrief.dissent) && (
+                    <div className="mb-4 mt-6">
+                      <strong className="block text-lg mb-2">Opinions:</strong>
+                      <div className="ml-4 space-y-2">
+                        {caseBrief.holding && (
+                          <div>
+                            <strong className="block text-base">Majority:</strong>
+                            <div className="flex items-center justify-between mt-2">
+                              <p>{caseBrief.holding}</p>
+                            </div>
+                          </div>
+                        )}
+                        {caseBrief.reasoning && (
+                          <div className="mt-2">
+                            <strong className="block text-base">Reasoning:</strong>
+                            <div className="flex items-center justify-between">
+                              <p className="mt-2">{caseBrief.reasoning}</p>
+                            </div>
+                          </div>
+                        )}
+                        {caseBrief.concurrence && (
+                          <div className="mt-2">
+                            <strong className="block text-base">Concurrence:</strong>
+                            <div className="flex items-center justify-between">
+                              <p className="mt-2">{caseBrief.concurrence}</p>
+                            </div>
+                          </div>
+                        )}
+                        {caseBrief.dissent && (
+                          <div className="mt-2">
+                            <strong className="block text-base">Dissent:</strong>
+                            <div className="flex items-center justify-between">
+                              <p className="mt-2">{caseBrief.dissent}</p>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                  <div className="flex items-center justify-between mb-4 mt-6">
+                    <strong className="block text-lg text-blue-600">Analysis:</strong>
+                  </div>
+                  <p className="text-base mt-2">{caseBrief.analysis}</p>
+                </div>
               ) : (
                 <div className="w-full flex flex-col items-center">
                   <p className="text-sm text-gray-400 mb-2">View All Briefs to Select a Case Brief.</p>
@@ -871,9 +887,8 @@ export default function CaseSummaries() {
           </div>
         </main>
       </div>
-
-      {isLoggedIn && <CaseChatbot caseName={capCase?.title || 'this case'} caseId={capCase?.id || ''} />}
     </>
   )
 }
+
 export { CaseSummaries }

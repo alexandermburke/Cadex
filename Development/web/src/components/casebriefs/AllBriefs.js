@@ -61,16 +61,42 @@ export default function AllBriefs() {
   const [verificationReply, setVerificationReply] = useState('');
   const [createLoading, setCreateLoading] = useState(false);
   const [createError, setCreateError] = useState('');
+  const [isBulkLoading, setIsBulkLoading] = useState(false);
 
   const generateCaseNumber = () => {
     const num = Math.floor(Math.random() * 1000000);
     return num.toString().padStart(6, '0');
   };
-
-  // Meta description for SEO
   const metaDescription = `Browse ${capCases.length} case briefs on CadexLaw — expert‐written summaries including rule of law, facts, issues, holdings, reasoning & dissents.`;
 
-  // Fetch all cases
+  const generateMissingSummaries = async () => {
+    setIsBulkLoading(true);
+    const missing = capCases.filter(
+      c => !c.briefSummary?.facts || c.briefSummary.facts.trim() === ''
+    );
+    for (const c of missing) {
+      try {
+        const summaryRes = await fetch('/api/casebrief-summary', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            title: c.title,
+            date: c.decisionDate,
+            citation: c.citation,
+            docId: c.id
+          })
+        });
+        const summaryData = await summaryRes.json();
+        await updateDoc(doc(db, 'capCases', c.id), {
+          briefSummary: { ...summaryData, verified: false }
+        });
+      } catch (e) {
+        console.error('Batch summary error for', c.id, e);
+      }
+    }
+    setIsBulkLoading(false);
+  };
+
   useEffect(() => {
     const fetchCapCases = async () => {
       setIsLoading(true);
@@ -88,14 +114,12 @@ export default function AllBriefs() {
     fetchCapCases();
   }, [currentUser]);
 
-  // Initialize favorites
   useEffect(() => {
     if (userDataObj?.favorites) {
       setFavorites(userDataObj.favorites);
     }
   }, [userDataObj]);
 
-  // Structured data for SEO
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "ItemList",
@@ -176,7 +200,7 @@ export default function AllBriefs() {
     const updateItems = () => {
       let cols = window.innerWidth >= 1024 ? 5 : window.innerWidth >= 640 ? 3 : 2;
       const rows = Math.floor((window.innerHeight - 150) / 220);
-      setItemsPerPage(Math.max((rows * cols) - 3, 1));
+      setItemsPerPage(Math.max((rows * cols) - 3, 3));
     };
     updateItems();
     window.addEventListener('resize', updateItems);
@@ -405,6 +429,7 @@ export default function AllBriefs() {
             </>
           )}
         </AnimatePresence>
+      
         <main className="flex-1 flex flex-col px-2 relative z-50 h-screen">
           <div
             className={`flex-1 w-full rounded-2xl shadow-xl p-6 overflow-y-auto overflow-x-auto ${
@@ -445,7 +470,9 @@ export default function AllBriefs() {
                     <input
                       type="text"
                       placeholder="Search Cases..."
-                      className={`bg-transparent placeholder-gray-500 dark:placeholder-white/70 text-gray-500 dark:text-white focus:outline-none text-sm flex-1`}
+                      className={`bg-transparent placeholder-gray-500 text-gray-500 focus:outline-none text-sm flex-1 ${
+                        isDarkMode ? 'placeholder-white/70 text-white' : ''
+                      }`}                      
                       value={searchTerm}
                       onChange={(e) => {
                         setSearchTerm(e.target.value);

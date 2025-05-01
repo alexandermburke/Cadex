@@ -1,8 +1,8 @@
 'use client'
 import { Poppins } from 'next/font/google';
 import React, { useState } from 'react';
-import Image from 'next/image'; // Import the Image component
-import { useAuth } from '@/context/AuthContext'; // Import useAuth
+import Image from 'next/image';
+import { useAuth } from '@/context/AuthContext';
 
 const poppins = Poppins({ subsets: ["latin"], weight: ['400', '100', '200', '300', '500', '600', '700'] });
 
@@ -25,7 +25,6 @@ export default function Careers() {
             setMessage('Please provide both your email and resume.');
             return;
         }
-        // Create a FormData object to send the email and resume
         const formData = new FormData();
         formData.append('applicantEmail', email);
         formData.append('recipientEmail', 'alex@cadexlaw.com');
@@ -52,10 +51,10 @@ export default function Careers() {
             <div className='flex flex-col items-center gap-8 text-center w-full lg:max-w-2xl'>
                 <div className='flex flex-col items-center'>
                     <Image
-                        src="/header.avif" 
+                        src="/header.avif"
                         alt="CadexLaw Logo"
-                        width={288} 
-                        height={288} 
+                        width={288}
+                        height={288}
                         className='w-24 h-24 sm:mr-4 mb-4'
                         unoptimized={true}
                         quality={'100'}
@@ -67,26 +66,33 @@ export default function Careers() {
                 <p className={`text-base sm:text-lg md:text-xl ${isDarkMode ? 'text-white' : 'text-black'}`}>
                     At CadexLaw, we are always looking for talented individuals to join our team. Submit your resume and email for review to start your journey with us.
                 </p>
-                
+                <div className={`w-full lg:max-w-md ${isDarkMode ? 'text-white' : 'text-black'}`}>
+                    <p className='font-semibold mb-2'>We’re hiring for:</p>
+                    <ul className='text-base sm:text-lg md:text-xl'>
+                        <li>Experienced Legal Experts</li>
+                        <li>Experienced Software Developers</li>
+                        <li>Social Media Content Creators & Partners</li>
+                    </ul>
+                </div>
                 <form onSubmit={handleSubmit} className='flex flex-col gap-4 w-full lg:max-w-md'>
-                    <input 
-                        type='email' 
-                        placeholder='Your Email' 
-                        value={email} 
-                        onChange={(e) => setEmail(e.target.value)} 
+                    <input
+                        type='email'
+                        placeholder='Your Email'
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
                         required
-                        className={`w-full p-3 border ${isDarkMode ? 'border-gray-700' : 'border-gray-300'} rounded ${isDarkMode ? 'text-white bg-gray-800' : 'text-black bg-white'}`}
+                        className={`w-full p-3 border rounded ${isDarkMode ? 'border-gray-700 text-white bg-gray-800' : 'border-gray-300 text-black bg-white'}`}
                     />
-                    <input 
-                        type='file' 
-                        onChange={handleFileChange} 
+                    <input
+                        type='file'
+                        onChange={handleFileChange}
                         required
-                        className={`w-full p-3 border ${isDarkMode ? 'border-gray-700' : 'border-gray-300'} rounded ${isDarkMode ? 'text-white bg-gray-800' : 'text-black bg-white'}`}
+                        className={`w-full p-3 border rounded ${isDarkMode ? 'border-gray-700 text-white bg-gray-800' : 'border-gray-300 text-black bg-white'}`}
                     />
                     <div className='flex justify-center'>
-                        <button 
-                            type='submit' 
-                            className={`before:ease relative h-12 w-56 overflow-hidden rounded goldBackground text-white shadow-2xl transition-all before:absolute before:right-0 before:top-0 before:h-12 before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-56`}
+                        <button
+                            type='submit'
+                            className={`relative h-12 w-56 overflow-hidden rounded goldBackground text-white shadow-2xl transition-all before:absolute before:top-0 before:right-0 before:h-12 before:w-5 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-20 before:duration-700 hover:before:-translate-x-56`}
                         >
                             Submit Application
                         </button>
