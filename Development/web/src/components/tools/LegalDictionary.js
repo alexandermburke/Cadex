@@ -519,7 +519,7 @@ export default function LegalDictionary() {
                   animate="animate"
                   exit="exit"
                   transition={{ duration: 0.5 }}
-                  className="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 overflow-auto max-h-full pr-2"
+                  className="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 overflow-visible max-h-full pr-2"
                 >
                   {paginatedTerms.map((term) => (
                     <motion.div

@@ -179,7 +179,6 @@ export default function AllBriefs() {
     }
   };
 
-  // Share case URL
   const shareCase = async () => {
     if (!selectedCase) return;
     const shareData = {
@@ -195,7 +194,6 @@ export default function AllBriefs() {
     }
   };
 
-  // Adjust items per page
   useEffect(() => {
     const updateItems = () => {
       let cols = window.innerWidth >= 1024 ? 5 : window.innerWidth >= 640 ? 3 : 2;
@@ -207,7 +205,6 @@ export default function AllBriefs() {
     return () => window.removeEventListener('resize', updateItems);
   }, []);
 
-  // Filter, sort, paginate
   const filteredCases = capCases.filter((c) => {
     const s = searchTerm.toLowerCase();
     return (
