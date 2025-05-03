@@ -304,13 +304,7 @@ export default function ExamPrep() {
   if (!currentUser) {
     return (
       <div className={clsx('flex items-center justify-center h-screen', isDarkMode ? 'bg-gray-800' : 'bg-gray-100')}>
-        <div
-          className={clsx(
-            'text-center p-6',
-            isDarkMode ? 'bg-gray-700 text-white' : 'bg-white text-gray-700',
-            'rounded shadow-md'
-          )}
-        >
+        <div className={clsx('text-center p-6', isDarkMode ? 'bg-gray-700 text-white' : 'bg-white text-gray-700', 'rounded shadow-md')}>
           <p className="mb-4">
             Please{' '}
             <a
@@ -323,10 +317,7 @@ export default function ExamPrep() {
           </p>
           <button
             onClick={() => router.push('/login')}
-            className={clsx(
-              'px-4 py-2 rounded',
-              isDarkMode ? 'bg-blue-600 text-white hover:bg-blue-500' : 'bg-blue-900 text-white hover:bg-blue-700'
-            )}
+            className={clsx('px-4 py-2 rounded', isDarkMode ? 'bg-blue-600 text-white hover:bg-blue-500' : 'bg-blue-900 text-white hover:bg-blue-700')}
           >
             Go to Login
           </button>
@@ -373,85 +364,66 @@ export default function ExamPrep() {
         >
           <div className="w-full max-w-md mx-auto mb-4 flex justify-around">
             <motion.button
-              className={clsx(
-                'px-4 py-2 font-semibold transition-colors duration-300',
-                activeTab === 'browse'
-                  ? isDarkMode
-                    ? 'text-white border-b-2 border-blue-400'
-                    : 'text-blue-900 border-b-2 border-blue-900'
-                  : isDarkMode
+              className={clsx('px-4 py-2 font-semibold transition-colors duration-300', activeTab === 'browse'
+                ? isDarkMode
+                  ? 'text-white border-b-2 border-blue-400'
+                  : 'text-blue-900 border-b-2 border-blue-900'
+                : isDarkMode
                   ? 'text-gray-400'
-                  : 'text-gray-600'
-              )}
+                  : 'text-gray-600')}
               onClick={() => setActiveTab('browse')}
             >
               Practice Exam
             </motion.button>
             <motion.button
-              className={clsx(
-                'px-4 py-2 font-semibold transition-colors duration-300',
-                activeTab === 'favorites'
-                  ? isDarkMode
-                    ? 'text-white border-b-2 border-blue-400'
-                    : 'text-blue-900 border-b-2 border-blue-900'
-                  : isDarkMode
+              className={clsx('px-4 py-2 font-semibold transition-colors duration-300', activeTab === 'favorites'
+                ? isDarkMode
+                  ? 'text-white border-b-2 border-blue-400'
+                  : 'text-blue-900 border-b-2 border-blue-900'
+                : isDarkMode
                   ? 'text-gray-400'
-                  : 'text-gray-600'
-              )}
+                  : 'text-gray-600')}
               onClick={() => setActiveTab('favorites')}
             >
               Analysis
             </motion.button>
           </div>
-            <div className="absolute top-6 right-[5%] z-[100] flex flex-col items-center gap-2 mt-4">
-                  <div className="flex flex-col items-center">
-                    <motion.button
-                      onClick={openLoadProgressModal}
-                      whileHover={{ scale: 1.1 }}
-                      whileTap={{ scale: 0.95 }}
-                      className="p-3 rounded-full bg-gradient-to-r from-blue-600 to-blue-800 text-white transition-all duration-200 gradientShadowHoverBlue"
-                    >
-                      <FaSyncAlt size={20} />
-                    </motion.button>
-                    <span className="text-xs mt-1">Load Saves</span>
-                  </div>
-                  <div className="flex flex-col items-center mt-4">
-                    <motion.button
-                      onClick={() => setIsConfigModalOpen(true)}
-                      whileHover={{ scale: 1.1 }}
-                      whileTap={{ scale: 0.95 }}
-                      className="p-3 rounded-full bg-gradient-to-r from-blue-600 to-blue-800 text-white transition-all duration-200 gradientShadowHoverBlue"
-                    >
-                      <FaChevronDown size={20} />
-                    </motion.button>
-                    <span className="text-xs mt-1">Configure</span>
-                  </div>
-                </div>
+          <div className="absolute top-6 right-[5%] z-[100] flex flex-col items-center gap-2 mt-4">
+            <div className="flex flex-col items-center">
+              <motion.button
+                onClick={openLoadProgressModal}
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.95 }}
+                className="p-3 rounded-full bg-gradient-to-r from-blue-600 to-blue-800 text-white transition-all duration-200 gradientShadowHoverBlue"
+              >
+                <FaSyncAlt size={20} />
+              </motion.button>
+              <span className="text-xs mt-1">Load Saves</span>
+            </div>
+            <div className="flex flex-col items-center mt-4">
+              <motion.button
+                onClick={() => setIsConfigModalOpen(true)}
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.95 }}
+                className="p-3 rounded-full bg-gradient-to-r from-blue-600 to-blue-800 text-white transition-all duration-200 gradientShadowHoverBlue"
+              >
+                <FaChevronDown size={20} />
+              </motion.button>
+              <span className="text-xs mt-1">Configure</span>
+            </div>
+          </div>
           {activeTab === 'browse' && (
-            <>
-              <div className="flex flex-col items-center justify-center mb-4">
-              </div>
-            </>
+            <></>
           )}
           {activeTab === 'favorites' && (
             <ExamInsight />
           )}
           {isExamStarted && (
-            <div
-              className={clsx(
-                'w-full max-w-3xl mb-4 p-4 mx-auto rounded-lg shadow-md flex items-center justify-between gap-4',
-                isDarkMode ? 'bg-gray-700' : 'bg-white'
-              )}
-            >
+            <div className={clsx('w-full max-w-3xl mb-4 p-4 mx-auto rounded-lg shadow-md flex items-center justify-between gap-4', isDarkMode ? 'bg-gray-700' : 'bg-white')}>
               <span className={isDarkMode ? 'text-white' : 'text-gray-700'}>
                 Questions Answered: {currentQuestionCount} / {examConfig.questionLimit}
               </span>
-              <span
-                className={clsx(
-                  'px-3 py-1 rounded-full text-sm font-semibold uppercase',
-                  isProUser ? 'bg-blue-100 text-blue-700' : 'bg-emerald-100 text-emerald-700'
-                )}
-              >
+              <span className={clsx('px-3 py-1 rounded-full text-sm font-semibold uppercase', isProUser ? 'bg-blue-100 text-blue-700' : 'bg-emerald-100 text-emerald-700')}>
                 {isProUser ? 'Pro User' : 'Base User'}
               </span>
             </div>
@@ -480,41 +452,11 @@ export default function ExamPrep() {
             {(questionStem || questionText) && (
               <div className="max-w-36 mb-2 flex items-center justify-center">
                 <div className={clsx('relative flex items-center rounded-full p-1', isDarkMode ? 'bg-slate-700' : 'bg-gray-200')} style={{ width: '240px' }}>
-                  <motion.div
-                    className={clsx('absolute top-0 left-0 h-full rounded-full shadow', isDarkMode ? 'bg-slate-600' : 'bg-white')}
-                    style={{ width: '50%' }}
-                    initial={false}
-                    animate={{ x: answerMode === 'written' ? '0%' : '100%' }}
-                    transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-                  />
-                  <button
-                    onClick={() => setAnswerMode('written')}
-                    className={clsx(
-                      'relative z-10 flex-1 text-xs sm:text-sm font-semibold py-1 transition-colors',
-                      answerMode === 'written'
-                        ? isDarkMode
-                          ? 'text-blue-300'
-                          : 'text-blue-600'
-                        : isDarkMode
-                          ? 'text-gray-200'
-                          : 'text-gray-700'
-                    )}
-                  >
+                  <motion.div className={clsx('absolute top-0 left-0 h-full rounded-full shadow', isDarkMode ? 'bg-slate-600' : 'bg-white')} style={{ width: '50%' }} initial={false} animate={{ x: answerMode === 'written' ? '0%' : '100%' }} transition={{ type: 'spring', stiffness: 300, damping: 30 }} />
+                  <button onClick={() => setAnswerMode('written')} className={clsx('relative z-10 flex-1 text-xs sm:text-sm font-semibold py-1 transition-colors', answerMode === 'written' ? isDarkMode ? 'text-blue-300' : 'text-blue-600' : isDarkMode ? 'text-gray-200' : 'text-gray-700')}>
                     Written
                   </button>
-                  <button
-                    onClick={() => setAnswerMode('multiple-choice')}
-                    className={clsx(
-                      'relative z-10 flex-1 text-xs sm:text-sm font-semibold py-1 transition-colors',
-                      answerMode === 'multiple-choice'
-                        ? isDarkMode
-                          ? 'text-blue-300'
-                          : 'text-blue-600'
-                        : isDarkMode
-                          ? 'text-gray-200'
-                          : 'text-gray-700'
-                    )}
-                  >
+                  <button onClick={() => setAnswerMode('multiple-choice')} className={clsx('relative z-10 flex-1 text-xs sm:text-sm font-semibold py-1 transition-colors', answerMode === 'multiple-choice' ? isDarkMode ? 'text-blue-300' : 'text-blue-600' : isDarkMode ? 'text-gray-200' : 'text-gray-700')}>
                     Multiple
                   </button>
                 </div>
@@ -523,14 +465,7 @@ export default function ExamPrep() {
             {(questionStem || questionText) && (
               <div className="w-full max-w-5xl mb-6">
                 {answerMode === 'written' ? (
-                  <textarea
-                    className={clsx('w-full p-4 border rounded resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-200', isDarkMode ? 'border-gray-600 bg-gray-700 text-white' : 'border-gray-300 bg-white text-gray-800')}
-                    value={inputText}
-                    onChange={(e) => setInputText(e.target.value)}
-                    placeholder="Enter your essay/short-answer response..."
-                    rows={6}
-                    disabled={isLoading}
-                  />
+                  <textarea className={clsx('w-full p-4 border rounded resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-200', isDarkMode ? 'border-gray-600 bg-gray-700 text-white' : 'border-gray-300 bg-white text-gray-800')} value={inputText} onChange={(e) => setInputText(e.target.value)} placeholder="Enter your essay/short-answer response..." rows={6} disabled={isLoading} />
                 ) : (
                   <div className="flex flex-col space-y-2">
                     {options.map((option, index) => {
@@ -538,15 +473,7 @@ export default function ExamPrep() {
                       if (!letter) return null;
                       return (
                         <label key={index} className={clsx('flex items-center', isDarkMode ? 'text-white' : 'text-gray-700')}>
-                          <input
-                            type="radio"
-                            name="multipleChoiceAnswer"
-                            value={letter}
-                            checked={inputText === letter}
-                            onChange={(e) => setInputText(e.target.value)}
-                            className={clsx('form-radio h-4 w-4', isDarkMode ? 'text-blue-900' : 'text-blue-900', 'focus:ring-blue-500 border-gray-300 rounded')}
-                            disabled={isLoading}
-                          />
+                          <input type="radio" name="multipleChoiceAnswer" value={letter} checked={inputText === letter} onChange={(e) => setInputText(e.target.value)} className={clsx('form-radio h-4 w-4', isDarkMode ? 'text-blue-900' : 'text-blue-900', 'focus:ring-blue-500 border-gray-300 rounded')} disabled={isLoading} />
                           <span className="ml-2">{option}</span>
                         </label>
                       );
@@ -557,47 +484,15 @@ export default function ExamPrep() {
             )}
             {(questionStem || questionText) && (
               <div className="w-full max-w-5xl flex space-x-4">
-                <button
-                  onClick={handleSubmitAnswer}
-                  className={clsx(
-                    'flex-1 px-4 py-3 rounded font-semibold transition-colors duration-200 shadow-md',
-                    isLoading || !inputText.trim()
-                      ? isDarkMode
-                        ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
-                        : 'bg-gray-300 text-gray-600 cursor-not-allowed'
-                      : isDarkMode
-                      ? 'bg-blue-600 hover:bg-blue-700 text-white'
-                      : 'bg-blue-900 hover:bg-blue-950 text-white'
-                  )}
-                  disabled={isLoading || !inputText.trim()}
-                  aria-label="Submit Answer"
-                >
+                <button onClick={handleSubmitAnswer} className={clsx('flex-1 px-4 py-3 rounded font-semibold transition-colors duration-200 shadow-md', isLoading || !inputText.trim() ? isDarkMode ? 'bg-gray-600 text-gray-400 cursor-not-allowed' : 'bg-gray-300 text-gray-600 cursor-not-allowed' : isDarkMode ? 'bg-blue-600 hover:bg-blue-700 text-white' : 'bg-blue-900 hover:bg-blue-950 text-white')} disabled={isLoading || !inputText.trim()} aria-label="Submit Answer">
                   {isLoading ? 'Submitting...' : 'Submit Answer'}
                 </button>
-                <button
-                  onClick={handleSaveProgress}
-                  className={clsx(
-                    'flex items-center justify-center px-4 py-3 rounded',
-                    isDarkMode ? 'bg-transparent text-white hover:text-slate-500' : 'bg-transparent text-blue-950 hover:text-slate-500',
-                    'transition-colors duration-200'
-                  )}
-                  disabled={!currentUser}
-                  aria-label="Save Progress"
-                >
+                <button onClick={handleSaveProgress} className={clsx('flex items-center justify-center px-4 py-3 rounded', isDarkMode ? 'bg-transparent text-white hover:text-slate-500' : 'bg-transparent text-blue-950 hover:text-slate-500', 'transition-colors duration-200')} disabled={!currentUser} aria-label="Save Progress">
                   <motion.div whileHover={{ scale: 1.2, rotate: 360 }} transition={{ duration: 0.5 }}>
                     <FaSave size={24} />
                   </motion.div>
                 </button>
-                <button
-                  onClick={handleGetQuestion}
-                  className={clsx(
-                    'flex items-center justify-center px-4 py-3 rounded',
-                    isDarkMode ? 'bg-transparent text-white hover:text-slate-500' : 'bg-transparent text-blue-950 hover:text-slate-500',
-                    'transition-colors duration-200'
-                  )}
-                  disabled={isLoading}
-                  aria-label="Generate New Question"
-                >
+                <button onClick={handleGetQuestion} className={clsx('flex items-center justify-center px-4 py-3 rounded', isDarkMode ? 'bg-transparent text-white hover:text-slate-500' : 'bg-transparent text-blue-950 hover=text-slate-500', 'transition-colors duration-200')} disabled={isLoading} aria-label="Generate New Question">
                   <motion.div whileHover={{ scale: 1.2, rotate: -360 }} transition={{ duration: 0.5 }}>
                     <FaSyncAlt size={24} />
                   </motion.div>
@@ -605,14 +500,7 @@ export default function ExamPrep() {
               </div>
             )}
             {activeTab === 'browse' && !questionStem && !questionText && (
-              <div
-                className={clsx(
-                                   'w-full max-w-3xl p-6 rounded-lg shadow-md text-center mx-auto',
-                                   isDarkMode
-                                     ? 'bg-slate-800 bg-opacity-50 text-white'
-                                     : 'bg-white text-gray-800'
-                                 )}
-              >
+              <div className={clsx('w-full max-w-3xl p-6 rounded-lg shadow-md text-center mx-auto', isDarkMode ? 'bg-slate-800 bg-opacity-50 text-white' : 'bg-white text-gray-800')}>
                 <p className={clsx('mb-4', isDarkMode ? 'text-gray-300' : 'text-gray-600')}>
                   Click <span className="font-semibold">Configure</span> to begin your Practice Exam.
                 </p>
@@ -622,50 +510,17 @@ export default function ExamPrep() {
               </div>
             )}
             {isResultModalOpen && (
-              <motion.div
-                className={clsx('fixed inset-0 flex items-center justify-center', isDarkMode ? 'bg-black bg-opacity-70' : 'bg-black bg-opacity-50', 'z-50')}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-              >
-                <motion.div
-                  className={clsx('p-8 rounded-lg w-11/12 max-w-md shadow-lg overflow-y-auto', isDarkMode ? 'bg-gray-700 text-white' : 'bg-white text-black')}
-                  initial={{ scale: 0.8, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  exit={{ scale: 0.8, opacity: 0 }}
-                  transition={{ duration: 0.3 }}
-                >
+              <motion.div className={clsx('fixed inset-0 flex items-center justify-center', isDarkMode ? 'bg-black bg-opacity-70' : 'bg-black bg-opacity-50', 'z-50')} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+                <motion.div className={clsx('p-8 rounded-lg w-11/12 max-w-md shadow-lg overflow-y-auto', isDarkMode ? 'bg-gray-700 text-white' : 'bg-white text-black')} initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.8, opacity: 0 }} transition={{ duration: 0.3 }}>
                   <h2 className={clsx('text-2xl font-semibold mb-6', isDarkMode ? 'text-white' : 'text-gray-800')}>
                     Answer Feedback
                   </h2>
                   <p className={clsx('mb-6', isDarkMode ? 'text-gray-300' : 'text-gray-800')}>{answerResult}</p>
                   <div className="flex justify-end space-x-4">
-                    <button
-                      type="button"
-                      onClick={closeResultModal}
-                      className={clsx(
-                        'h-10 sm:h-12 px-4 py-2 rounded',
-                        isDarkMode ? 'bg-red-600 text-white hover:bg-red-700' : 'bg-red-600 text-white hover:bg-red-700',
-                        'transition-colors duration-200 text-sm sm:text-base'
-                      )}
-                      aria-label="Close Feedback Modal"
-                    >
+                    <button type="button" onClick={closeResultModal} className={clsx('h-10 sm:h-12 px-4 py-2 rounded', isDarkMode ? 'bg-red-600 text-white hover:bg-red-700' : 'bg-red-600 text-white hover:bg-red-700', 'transition-colors duration-200 text-sm sm:text-base')} aria-label="Close Feedback Modal">
                       Close
                     </button>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        closeResultModal();
-                        handleGetQuestion();
-                      }}
-                      className={clsx(
-                        'h-10 sm:h-12 px-4 py-2 rounded',
-                        isDarkMode ? 'bg-blue-600 hover:bg-blue-700 text-white' : 'bg-blue-900 hover:bg-blue-950 text-white',
-                        'transition-colors duration-200 text-sm sm:text-base'
-                      )}
-                      disabled={isLoading}
-                      aria-label="Next Question"
-                    >
+                    <button type="button" onClick={() => { closeResultModal(); handleGetQuestion(); }} className={clsx('h-10 sm:h-12 px-4 py-2 rounded', isDarkMode ? 'bg-blue-600 hover:bg-blue-700 text-white' : 'bg-blue-900 hover:bg-blue-950 text-white', 'transition-colors duration-200 text-sm sm:text-base')} disabled={isLoading} aria-label="Next Question">
                       {isLoading ? 'Loading...' : 'Next Question'}
                     </button>
                   </div>
@@ -676,19 +531,8 @@ export default function ExamPrep() {
         </motion.div>
       </main>
       {isLoadProgressModalOpen && (
-        <motion.div
-          className={clsx('fixed inset-0 flex items-center justify-center', isDarkMode ? 'bg-black bg-opacity-70' : 'bg-black bg-opacity-50', 'z-[151]')}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-        >
-          <motion.div
-            className={clsx('p-8 rounded-lg w-11/12 max-w-3xl shadow-lg overflow-y-auto max-h-screen', isDarkMode ? 'bg-gray-700 text-white' : 'bg-white text-black')}
-            initial={{ scale: 0.8, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            exit={{ scale: 0.8, opacity: 0 }}
-            transition={{ duration: 0.3 }}
-          >
+        <motion.div className={clsx('fixed inset-0 flex items-center justify-center', isDarkMode ? 'bg-black bg-opacity-70' : 'bg-black bg-opacity-50', 'z-[151]')} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+          <motion.div className={clsx('p-8 rounded-lg w-11/12 max-w-3xl shadow-lg overflow-y-auto max-h-screen', isDarkMode ? 'bg-gray-700 text-white' : 'bg-white text-black')} initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.8, opacity: 0 }} transition={{ duration: 0.3 }}>
             <h2 className={clsx('text-2xl font-semibold mb-6', isDarkMode ? 'text-white' : 'text-gray-800')}>
               Load Saved Progress
             </h2>
@@ -703,40 +547,41 @@ export default function ExamPrep() {
                     <div className="flex justify-between items-start">
                       <div>
                         <p className={clsx('font-semibold', isDarkMode ? 'text-blue-300' : 'text-blue-900')}>
-                          IRAC Template: {progress.examConfig.templateType}
+                          Exam Type: {progress.examConfig.examType}
                         </p>
                         <p className={clsx('text-sm', isDarkMode ? 'text-gray-300' : 'text-gray-600')}>
-                          Legal Area: {progress.examConfig.legalArea}
+                          Subject: {progress.examConfig.lawSubject}
                         </p>
                         <p className={clsx('text-sm', isDarkMode ? 'text-gray-300' : 'text-gray-600')}>
-                          Detail Level: {progress.examConfig.detailLevel}
+                          Difficulty: {progress.examConfig.difficulty}
                         </p>
                         <p className={clsx('text-sm', isDarkMode ? 'text-gray-300' : 'text-gray-600')}>
-                          Include Counter-Analysis: {progress.examConfig.includeCounterAnalysis ? 'Yes' : 'No'}
+                          Question Limit: {progress.examConfig.questionLimit}
                         </p>
                         <p className={clsx('text-sm', isDarkMode ? 'text-gray-300' : 'text-gray-600')}>
-                          Number of IRAC Entries: {progress.examConfig.numberOfIrac}
+                          Question Types: {progress.examConfig.selectedQuestionTypes.join(', ')}
                         </p>
                         <p className={clsx('text-sm', isDarkMode ? 'text-gray-300' : 'text-gray-600')}>
-                          Scenario: {progress.scenario || '(None)'}
+                          Instant Feedback: {progress.examConfig.instantFeedback ? 'Yes' : 'No'}
+                        </p>
+                        <p className={clsx('text-sm', isDarkMode ? 'text-gray-300' : 'text-gray-600')}>
+                          Include Curve Balls: {progress.examConfig.includeCurveBalls ? 'Yes' : 'No'}
+                        </p>
+                        <p className={clsx('text-sm', isDarkMode ? 'text-gray-300' : 'text-gray-600')}>
+                          Allow Multiple Choice: {progress.examConfig.allowMultipleChoice ? 'Yes' : 'No'}
+                        </p>
+                        <p className={clsx('text-sm', isDarkMode ? 'text-gray-300' : 'text-gray-600')}>
+                          Prefer Essay Style: {progress.examConfig.preferEssayStyle ? 'Yes' : 'No'}
                         </p>
                         <p className={clsx('text-sm', isDarkMode ? 'text-gray-300' : 'text-gray-600')}>
                           Saved on: {new Date(progress.timestamp).toLocaleString()}
                         </p>
                       </div>
                       <div className="flex space-x-2 mt-2">
-                        <button
-                          onClick={() => handleLoadProgress(progress)}
-                          className={clsx('h-10 w-20 sm:w-24 overflow-hidden rounded', isDarkMode ? 'bg-blue-600 hover:bg-blue-700 text-white' : 'bg-blue-900 hover:bg-blue-700 text-white', 'transition-colors duration-200 text-sm sm:text-base')}
-                          aria-label="Load Progress"
-                        >
+                        <button onClick={() => handleLoadProgress(progress)} className={clsx('h-10 w-20 sm:w-24 overflow-hidden rounded', isDarkMode ? 'bg-blue-600 hover:bg-blue-700 text-white' : 'bg-blue-900 hover:bg-blue-700 text-white', 'transition-colors duration-200 text-sm sm:text-base')} aria-label="Load Progress">
                           Load
                         </button>
-                        <button
-                          onClick={() => handleDeleteProgress(progress.id)}
-                          className={clsx('h-10 w-20 sm:w-24 overflow-hidden rounded', isDarkMode ? 'bg-red-600 hover:bg-red-700 text-white' : 'bg-red-600 hover:bg-red-700 text-white', 'transition-colors duration-200 text-sm sm:text-base')}
-                          aria-label="Delete Progress"
-                        >
+                        <button onClick={() => handleDeleteProgress(progress.id)} className={clsx('h-10 w-20 sm:w-24 overflow-hidden rounded', isDarkMode ? 'bg-red-600 hover:bg-red-700 text-white' : 'bg-red-600 hover:bg-red-700 text-white', 'transition-colors duration-200 text-sm sm:text-base')} aria-label="Delete Progress">
                           Delete
                         </button>
                       </div>
@@ -746,12 +591,7 @@ export default function ExamPrep() {
               </ul>
             )}
             <div className="flex justify-end mt-6">
-              <button
-                type="button"
-                onClick={closeLoadProgressModal}
-                className={clsx('h-10 sm:h-12 px-6 py-2 rounded', isDarkMode ? 'bg-gray-600 hover:bg-gray-500 text-gray-300' : 'bg-gray-300 hover:bg-gray-400 text-gray-700', 'transition-colors duration-200 text-sm sm:text-base')}
-                aria-label="Close Load Progress Modal"
-              >
+              <button type="button" onClick={closeLoadProgressModal} className={clsx('h-10 sm:h-12 px-6 py-2 rounded', isDarkMode ? 'bg-gray-600 hover:bg-gray-500 text-gray-300' : 'bg-gray-300 hover:bg-gray-400 text-gray-700', 'transition-colors duration-200 text-sm sm:text-base')} aria-label="Close Load Progress Modal">
                 Close
               </button>
             </div>
@@ -759,168 +599,68 @@ export default function ExamPrep() {
         </motion.div>
       )}
       {isConfigModalOpen && (
-        <motion.div
-          className={clsx('fixed inset-0 flex items-center justify-center', isDarkMode ? 'bg-black bg-opacity-70' : 'bg-black bg-opacity-50', 'z-[152]')}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-        >
-          <motion.div
-            className={clsx('p-8 rounded-lg w-11/12 max-w-2xl shadow-lg overflow-y-auto max-h-screen', isDarkMode ? 'bg-gray-700 text-white' : 'bg-white text-black')}
-            initial={{ scale: 0.8, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            exit={{ scale: 0.8, opacity: 0 }}
-            transition={{ duration: 0.3 }}
-          >
+        <motion.div className={clsx('fixed inset-0 flex items-center justify-center', isDarkMode ? 'bg-black bg-opacity-70' : 'bg-black bg-opacity-50', 'z-[152]')} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+          <motion.div className={clsx('p-8 rounded-lg w-11/12 max-w-2xl shadow-lg overflow-y-auto max-h-screen', isDarkMode ? 'bg-gray-700 text-white' : 'bg-white text-black')} initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.8, opacity: 0 }} transition={{ duration: 0.3 }}>
             <h2 className={clsx('text-2xl font-semibold mb-6', isDarkMode ? 'text-white' : 'text-gray-800')}>
               Configure Exam
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block mb-1 text-sm">Exam Type</label>
-                <select
-                  name="examType"
-                  value={examConfig.examType}
-                  onChange={handleConfigChange}
-                  className={clsx('w-full p-2 rounded border', isDarkMode ? 'bg-gray-600 border-gray-500 text-white' : 'bg-white border-gray-300 text-gray-800')}
-                >
+                <select name="examType" value={examConfig.examType} onChange={handleConfigChange} className={clsx('w-full p-2 rounded border', isDarkMode ? 'bg-gray-600 border-gray-500 text-white' : 'bg-white border-gray-300 text-gray-800')}>
                   {examTypeOptions.map((opt) => (
-                    <option key={opt} value={opt}>
-                      {opt}
-                    </option>
+                    <option key={opt} value={opt}>{opt}</option>
                   ))}
                 </select>
               </div>
               <div>
                 <label className="block mb-1 text-sm">Subject</label>
-                <select
-                  name="lawSubject"
-                  value={examConfig.lawSubject}
-                  onChange={handleConfigChange}
-                  className={clsx('w-full p-2 rounded border', isDarkMode ? 'bg-gray-600 border-gray-500 text-white' : 'bg-white border-gray-300 text-gray-800')}
-                >
+                <select name="lawSubject" value={examConfig.lawSubject} onChange={handleConfigChange} className={clsx('w-full p-2 rounded border', isDarkMode ? 'bg-gray-600 border-gray-500 text-white' : 'bg-white border-gray-300 text-gray-800')}>
                   {lawSubjectOptions.map((opt) => (
-                    <option key={opt} value={opt}>
-                      {opt}
-                    </option>
+                    <option key={opt} value={opt}>{opt}</option>
                   ))}
                 </select>
               </div>
               <div>
                 <label className="block mb-1 text-sm">Difficulty</label>
-                <select
-                  name="difficulty"
-                  value={examConfig.difficulty}
-                  onChange={handleConfigChange}
-                  className={clsx('w-full p-2 rounded border', isDarkMode ? 'bg-gray-600 border-gray-500 text-white' : 'bg-white border-gray-300 text-gray-800')}
-                >
+                <select name="difficulty" value={examConfig.difficulty} onChange={handleConfigChange} className={clsx('w-full p-2 rounded border', isDarkMode ? 'bg-gray-600 border-gray-500 text-white' : 'bg-white border-gray-300 text-gray-800')}>
                   {difficultyOptions.map((opt) => (
-                    <option key={opt} value={opt}>
-                      {opt}
-                    </option>
+                    <option key={opt} value={opt}>{opt}</option>
                   ))}
                 </select>
               </div>
               <div>
                 <label className="block mb-1 text-sm">Question Limit</label>
-                <input
-                  type="number"
-                  name="questionLimit"
-                  min="1"
-                  max="100"
-                  value={examConfig.questionLimit}
-                  onChange={handleConfigChange}
-                  className={clsx('w-full p-2 rounded border', isDarkMode ? 'bg-gray-600 border-gray-500 text-white' : 'bg-white border-gray-300 text-gray-800')}
-                />
+                <input type="number" name="questionLimit" min="1" max="100" value={examConfig.questionLimit} onChange={handleConfigChange} className={clsx('w-full p-2 rounded border', isDarkMode ? 'bg-gray-600 border-gray-500 text-white' : 'bg-white border-gray-300 text-gray-800')} />
               </div>
               <div className="col-span-1 sm:col-span-2">
                 <label className="block mb-1 text-sm">Question Types</label>
-                <select
-                  multiple
-                  name="selectedQuestionTypes"
-                  value={examConfig.selectedQuestionTypes}
-                  onChange={(e) =>
-                    setExamConfig((prev) => ({
-                      ...prev,
-                      selectedQuestionTypes: Array.from(e.target.selectedOptions, (o) => o.value)
-                    }))
-                  }
-                  className={clsx('w-full p-2 rounded border h-28', isDarkMode ? 'bg-gray-600 border-gray-500 text-white' : 'bg-white border-gray-300 text-gray-800')}
-                >
+                <select multiple name="selectedQuestionTypes" value={examConfig.selectedQuestionTypes} onChange={(e) => setExamConfig((prev) => ({ ...prev, selectedQuestionTypes: Array.from(e.target.selectedOptions, (o) => o.value) }))} className={clsx('w-full p-2 rounded border h-28', isDarkMode ? 'bg-gray-600 border-gray-500 text-white' : 'bg-white border-gray-300 text-gray-800')}>
                   {questionTypeOptions.map((opt) => (
-                    <option key={opt} value={opt}>
-                      {opt}
-                    </option>
+                    <option key={opt} value={opt}>{opt}</option>
                   ))}
                 </select>
               </div>
               <div className="flex items-center space-x-2">
-                <input
-                  type="checkbox"
-                  name="instantFeedback"
-                  checked={examConfig.instantFeedback}
-                  onChange={handleConfigChange}
-                  className="form-checkbox h-4 w-4"
-                />
+                <input type="checkbox" name="instantFeedback" checked={examConfig.instantFeedback} onChange={handleConfigChange} className="form-checkbox h-4 w-4" />
                 <span className="text-sm">Instant Feedback</span>
               </div>
               <div className="flex items-center space-x-2">
-                <input
-                  type="checkbox"
-                  name="includeCurveBalls"
-                  checked={examConfig.includeCurveBalls}
-                  onChange={handleConfigChange}
-                  className="form-checkbox h-4 w-4"
-                />
+                <input type="checkbox" name="includeCurveBalls" checked={examConfig.includeCurveBalls} onChange={handleConfigChange} className="form-checkbox h-4 w-4" />
                 <span className="text-sm">Include Curve Balls</span>
               </div>
               <div className="flex items-center space-x-2">
-                <input
-                  type="checkbox"
-                  name="allowMultipleChoice"
-                  checked={examConfig.allowMultipleChoice}
-                  onChange={handleConfigChange}
-                  className="form-checkbox h-4 w-4"
-                />
+                <input type="checkbox" name="allowMultipleChoice" checked={examConfig.allowMultipleChoice} onChange={handleConfigChange} className="form-checkbox h-4 w-4" />
                 <span className="text-sm">Allow Multiple Choice</span>
               </div>
               <div className="flex items-center space-x-2">
-                <input
-                  type="checkbox"
-                  name="preferEssayStyle"
-                  checked={examConfig.preferEssayStyle}
-                  onChange={handleConfigChange}
-                  className="form-checkbox h-4 w-4"
-                />
+                <input type="checkbox" name="preferEssayStyle" checked={examConfig.preferEssayStyle} onChange={handleConfigChange} className="form-checkbox h-4 w-4" />
                 <span className="text-sm">Prefer Essay Style</span>
               </div>
             </div>
             <div className="flex justify-end space-x-4 mt-6">
-              <button
-                type="button"
-                onClick={closeConfigModal}
-                className={clsx(
-                  'h-10 sm:h-12 px-6 py-2 rounded',
-                  isDarkMode ? 'bg-gray-600 hover:bg-gray-500 text-gray-200' : 'bg-gray-300 hover:bg-gray-400 text-gray-800',
-                  'transition-colors duration-200 text-sm sm:text-base gradientShadowHoverWhite'
-                )}
-              >
-                Close
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  closeConfigModal();
-                  handleGetQuestion();
-                }}
-                className={clsx(
-                  'h-10 sm:h-12 px-6 py-2 rounded',
-                  isDarkMode ? 'bg-blue-600 hover:bg-blue-700 text-white' : 'bg-blue-900 hover:bg-blue-950 text-white',
-                  'transition-colors duration-200 text-sm sm:text-base gradientShadowHoverBlue'
-                )}
-              >
-                Start Exam
-              </button>
+              <button type="button" onClick={closeConfigModal} className={clsx('h-10 sm:h-12 px-6 py-2 rounded', isDarkMode ? 'bg-gray-600 hover:bg-gray-500 text-gray-200' : 'bg-gray-300 text-gray-800', 'transition-colors duration-200 text-sm sm:text-base gradientShadowHoverWhite')}>Close</button>
+              <button type="button" onClick={() => { closeConfigModal(); handleGetQuestion(); }} className={clsx('h-10 sm:h-12 px-6 py-2 rounded', isDarkMode ? 'bg-blue-600 hover:bg-blue-700 text-white' : 'bg-blue-600 text-white', 'transition-colors duration-200 text-sm sm:text-base gradientShadowHoverBlue')}>Start Exam</button>
             </div>
           </motion.div>
         </motion.div>

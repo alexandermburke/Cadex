@@ -8,7 +8,7 @@ import { collection, getDocs, query, where } from 'firebase/firestore';
 
 const containerVariants = {
   hidden: { opacity: 0, y: 50 },
-  visible: { opacity: 1, y: 0, transition: { duration: 1.0, ease: 'easeInOut' } }
+  visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: 'easeInOut' } }
 };
 
 const lawSubjects = [
@@ -22,10 +22,32 @@ const lawSubjects = [
   'BusinessAssociations'
 ];
 
+const displayLabels = {
+  ConstitutionalLaw: 'Constitutional',
+  CivilProcedure:    'Civil',
+  CriminalLaw:       'Criminal',
+  BusinessAssociations: 'Business'
+};
+
 const CircleBar = ({ percentage, size = 100, strokeWidth = 2, textSize = 16, color, label, isDarkMode }) => {
+  const [trigger, setTrigger] = useState(true);
   const radius = (size - strokeWidth) / 2;
   const circumference = 2 * Math.PI * radius;
   const offset = circumference - (percentage / 100) * circumference;
+
+  useEffect(() => {
+    let timer2;
+    const timer1 = setTimeout(() => {
+      setTrigger(false);
+      timer2 = setTimeout(() => {
+        setTrigger(true);
+      }, 100);
+    }, 10000);
+    return () => {
+      clearTimeout(timer1);
+      clearTimeout(timer2);
+    };
+  }, []);
 
   return (
     <div className="flex flex-col items-center">
@@ -47,8 +69,8 @@ const CircleBar = ({ percentage, size = 100, strokeWidth = 2, textSize = 16, col
           fill="transparent"
           strokeDasharray={circumference}
           initial={{ strokeDashoffset: circumference }}
-          animate={{ strokeDashoffset: offset }}
-          transition={{ duration: 3.0, ease: 'easeInOut' }}
+          animate={{ strokeDashoffset: trigger ? offset : circumference }}
+          transition={{ duration: 2.4, ease: 'easeInOut' }}
           strokeLinecap="round"
           transform={`rotate(-90 ${size / 2} ${size / 2})`}
         />
@@ -65,18 +87,33 @@ const CircleBar = ({ percentage, size = 100, strokeWidth = 2, textSize = 16, col
         </text>
       </svg>
       <p className={`mt-2 text-sm font-semibold ${isDarkMode ? 'text-gray-200' : 'text-gray-800'}`}>
-        {label}
+        {displayLabels[label] || label}
       </p>
     </div>
   );
 };
 
 const OverallProgress = ({ percentage, isDarkMode }) => {
+  const [trigger, setTrigger] = useState(true);
   const size = 240;
   const strokeWidth = 2;
   const radius = (size - strokeWidth) / 2;
   const circumference = 2 * Math.PI * radius;
   const offset = circumference - (percentage / 100) * circumference;
+
+  useEffect(() => {
+    let timer2;
+    const timer1 = setTimeout(() => {
+      setTrigger(false);
+      timer2 = setTimeout(() => {
+        setTrigger(true);
+      }, 100);
+    }, 10000);
+    return () => {
+      clearTimeout(timer1);
+      clearTimeout(timer2);
+    };
+  }, []);
 
   return (
     <div className="flex flex-col items-center">
@@ -98,7 +135,7 @@ const OverallProgress = ({ percentage, isDarkMode }) => {
           fill="transparent"
           strokeDasharray={circumference}
           initial={{ strokeDashoffset: circumference }}
-          animate={{ strokeDashoffset: offset }}
+          animate={{ strokeDashoffset: trigger ? offset : circumference }}
           transition={{ duration: 1.2, ease: 'easeInOut' }}
           strokeLinecap="round"
           transform={`rotate(-90 ${size / 2} ${size / 2})`}
@@ -142,7 +179,7 @@ export default function ExamInsightsPanel() {
       setIsLoading(false);
     })();
   }, [currentUser]);
-  
+
   useEffect(() => {
     if (!isLoading && progresses.length) {
       (async () => {
@@ -165,7 +202,6 @@ export default function ExamInsightsPanel() {
     let totalCorrect = 0, total = 0;
     const subjectTotals = {};
     lawSubjects.forEach(sub => (subjectTotals[sub] = { correct: 0, total: 0 }));
-
     data.forEach(prog => {
       totalCorrect += prog.overallCorrect || 0;
       total += prog.overallTotal || 0;
@@ -177,14 +213,12 @@ export default function ExamInsightsPanel() {
         }
       });
     });
-
     const overallPct = total > 0 ? Math.round((totalCorrect / total) * 100) : 0;
     const subjectScores = {};
     lawSubjects.forEach(sub => {
       const { correct, total } = subjectTotals[sub];
       subjectScores[sub] = total > 0 ? Math.round((correct / total) * 100) : 0;
     });
-
     setScores({ overall: overallPct, subjects: subjectScores });
   };
 
@@ -254,10 +288,16 @@ export default function ExamInsightsPanel() {
               Reset Statistics
             </button>
           </div>
-          {/* Improvement Section */}
-          <div className="mt-8 p-6 bg-gradient-to-r from-indigo-500 to-indigo-700 rounded-xl text-white shadow-lg">
-            <h3 className="text-xl font-semibold mb-4">Areas for Improvement</h3>
-            <p className="text-sm leading-relaxed">
+          <div className={clsx(
+            'mt-8 p-6 rounded-2xl',
+            isDarkMode
+              ? 'border border-gray-700'
+              : 'border border-gray-700 '
+          )}>
+            <h3 className={clsx('text-xl font-semibold mb-3', isDarkMode ? 'text-white' : 'text-gray-900')}>
+              Areas for Improvement
+            </h3>
+            <p className={clsx('text-sm leading-relaxed', isDarkMode ? 'text-gray-300' : 'text-gray-700')}>
               {improvementText || 'Analyzing your performance to provide personalized suggestions...'}
             </p>
           </div>

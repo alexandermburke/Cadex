@@ -8,7 +8,7 @@ import { collection, getDocs, query, where } from 'firebase/firestore';
 
 const containerVariants = {
   hidden: { opacity: 0, y: 50 },
-  visible: { opacity: 1, y: 0, transition: { duration: 1.0, ease: 'easeInOut' } }
+  visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: 'easeInOut' } }
 };
 
 const lawSubjects = [
@@ -22,99 +22,154 @@ const lawSubjects = [
   'BusinessAssociations'
 ];
 
+const displayLabels = {
+  ConstitutionalLaw: 'Constitutional',
+  CivilProcedure:    'Civil',
+  CriminalLaw:       'Criminal',
+  BusinessAssociations: 'Business'
+};
+
 const CircleBar = ({ percentage, size = 100, strokeWidth = 2, textSize = 16, color, label, isDarkMode }) => {
+  const [trigger, setTrigger] = useState(true);
+  const [pulse, setPulse] = useState(false);
   const radius = (size - strokeWidth) / 2;
   const circumference = 2 * Math.PI * radius;
   const offset = circumference - (percentage / 100) * circumference;
 
+  useEffect(() => {
+    let fillTimer;
+    let pulseEndTimer;
+    const idleTimer = setTimeout(() => {
+      setTrigger(false);
+      setPulse(true);
+      fillTimer = setTimeout(() => {
+        setTrigger(true);
+      }, 100);
+      pulseEndTimer = setTimeout(() => {
+        setPulse(false);
+      }, 2000);
+    }, 10000);
+    return () => {
+      clearTimeout(idleTimer);
+      clearTimeout(fillTimer);
+      clearTimeout(pulseEndTimer);
+    };
+  }, []);
+
   return (
     <div className="flex flex-col items-center">
-      <svg width={size} height={size} className="relative">
-        <circle
-          cx={size / 2}
-          cy={size / 2}
-          r={radius}
-          stroke={isDarkMode ? '#444' : '#eee'}
-          strokeWidth={0}
-          fill="transparent"
-        />
-        <motion.circle
-          cx={size / 2}
-          cy={size / 2}
-          r={radius}
-          stroke={color}
-          strokeWidth={strokeWidth}
-          fill="transparent"
-          strokeDasharray={circumference}
-          initial={{ strokeDashoffset: circumference }}
-          animate={{ strokeDashoffset: offset }}
-          transition={{ duration: 3.0, ease: 'easeInOut' }}
-          strokeLinecap="round"
-          transform={`rotate(-90 ${size / 2} ${size / 2})`}
-        />
-        <text
-          x="50%"
-          y="50%"
-          textAnchor="middle"
-          dominantBaseline="middle"
-          fill={isDarkMode ? '#fff' : '#333'}
-          fontSize={textSize}
-          fontWeight="bold"
-        >
-          {percentage}%
-        </text>
-      </svg>
+      <motion.div animate={{ scale: pulse ? 1.05 : 1 }} transition={{ duration: 0.6, ease: 'easeInOut' }} className="relative">
+        <svg width={size} height={size}>
+          <circle
+            cx={size / 2}
+            cy={size / 2}
+            r={radius}
+            stroke={isDarkMode ? '#444' : '#eee'}
+            strokeWidth={0}
+            fill="transparent"
+          />
+          <motion.circle
+            cx={size / 2}
+            cy={size / 2}
+            r={radius}
+            stroke={color}
+            strokeWidth={strokeWidth}
+            fill="transparent"
+            strokeDasharray={circumference}
+            initial={{ strokeDashoffset: circumference }}
+            animate={{ strokeDashoffset: trigger ? offset : circumference }}
+            transition={{ duration: 2.4, ease: 'easeInOut' }}
+            strokeLinecap="round"
+            transform={`rotate(-90 ${size / 2} ${size / 2})`}
+          />
+          <text
+            x="50%"
+            y="50%"
+            textAnchor="middle"
+            dominantBaseline="middle"
+            fill={isDarkMode ? '#fff' : '#333'}
+            fontSize={textSize}
+            fontWeight="bold"
+          >
+            {percentage}%
+          </text>
+        </svg>
+      </motion.div>
       <p className={`mt-2 text-sm font-semibold ${isDarkMode ? 'text-gray-200' : 'text-gray-800'}`}>
-        {label}
+        {displayLabels[label] || label}
       </p>
     </div>
   );
 };
 
 const OverallProgress = ({ percentage, isDarkMode }) => {
+  const [trigger, setTrigger] = useState(true);
+  const [pulse, setPulse] = useState(false);
   const size = 240;
   const strokeWidth = 2;
   const radius = (size - strokeWidth) / 2;
   const circumference = 2 * Math.PI * radius;
   const offset = circumference - (percentage / 100) * circumference;
 
+  useEffect(() => {
+    let fillTimer;
+    let pulseEndTimer;
+    const idleTimer = setTimeout(() => {
+      setTrigger(false);
+      setPulse(true);
+      fillTimer = setTimeout(() => {
+        setTrigger(true);
+      }, 100);
+      pulseEndTimer = setTimeout(() => {
+        setPulse(false);
+      }, 2000);
+    }, 10000);
+    return () => {
+      clearTimeout(idleTimer);
+      clearTimeout(fillTimer);
+      clearTimeout(pulseEndTimer);
+    };
+  }, []);
+
   return (
     <div className="flex flex-col items-center">
-      <svg width={size} height={size}>
-        <circle
-          cx={size / 2}
-          cy={size / 2}
-          r={radius}
-          stroke={isDarkMode ? '#444' : '#eee'}
-          strokeWidth={0}
-          fill="transparent"
-        />
-        <motion.circle
-          cx={size / 2}
-          cy={size / 2}
-          r={radius}
-          stroke={isDarkMode ? '#4ade80' : '#10b981'}
-          strokeWidth={strokeWidth}
-          fill="transparent"
-          strokeDasharray={circumference}
-          initial={{ strokeDashoffset: circumference }}
-          animate={{ strokeDashoffset: offset }}
-          transition={{ duration: 1.2, ease: 'easeInOut' }}
-          strokeLinecap="round"
-          transform={`rotate(-90 ${size / 2} ${size / 2})`}
-        />
-        <text
-          x="50%"
-          y="50%"
-          textAnchor="middle"
-          dominantBaseline="middle"
-          fill={isDarkMode ? '#fff' : '#333'}
-          fontSize="24"
-          fontWeight="bold"
-        >
-          {percentage}%
-        </text>
-      </svg>
+      <motion.div animate={{ scale: pulse ? 1.05 : 1 }} transition={{ duration: 0.6, ease: 'easeInOut' }} className="relative">
+        <svg width={size} height={size}>
+          <circle
+            cx={size / 2}
+            cy={size / 2}
+            r={radius}
+            stroke={isDarkMode ? '#444' : '#eee'}
+            strokeWidth={0}
+            fill="transparent"
+          />
+          <motion.circle
+            cx={size / 2}
+            cy={size / 2}
+            r={radius}
+            stroke={isDarkMode ? '#4ade80' : '#10b981'}
+            strokeWidth={strokeWidth}
+            fill="transparent"
+            strokeDasharray={circumference}
+            initial={{ strokeDashoffset: circumference }}
+            animate={{ strokeDashoffset: trigger ? offset : circumference }}
+            transition={{ duration: 1.2, ease: 'easeInOut' }}
+            strokeLinecap="round"
+            transform={`rotate(-90 ${size / 2} ${size / 2})`}
+          />
+          <text
+            x="50%"
+            y="50%"
+            textAnchor="middle"
+            dominantBaseline="middle"
+            fill={isDarkMode ? '#fff' : '#333'}
+            fontSize="24"
+            fontWeight="bold"
+          >
+            {percentage}%
+          </text>
+        </svg>
+      </motion.div>
       <p className={`mt-4 text-base font-semibold ${isDarkMode ? 'text-gray-200' : 'text-gray-800'}`}>
         Overall Performance
       </p>
@@ -143,7 +198,6 @@ export default function ExamInsightsPanel() {
     })();
   }, [currentUser]);
 
-  // call AI to generate improvement suggestions once scores update
   useEffect(() => {
     if (!isLoading && progresses.length) {
       (async () => {
@@ -163,10 +217,9 @@ export default function ExamInsightsPanel() {
   }, [scores, isLoading, progresses.length]);
 
   const computeScores = (data) => {
-    let totalCorrect = 0, total = 0;
+    let totalCorrect = 0; let total = 0;
     const subjectTotals = {};
     lawSubjects.forEach(sub => (subjectTotals[sub] = { correct: 0, total: 0 }));
-
     data.forEach(prog => {
       totalCorrect += prog.overallCorrect || 0;
       total += prog.overallTotal || 0;
@@ -178,14 +231,12 @@ export default function ExamInsightsPanel() {
         }
       });
     });
-
     const overallPct = total > 0 ? Math.round((totalCorrect / total) * 100) : 0;
     const subjectScores = {};
     lawSubjects.forEach(sub => {
       const { correct, total } = subjectTotals[sub];
       subjectScores[sub] = total > 0 ? Math.round((correct / total) * 100) : 0;
     });
-
     setScores({ overall: overallPct, subjects: subjectScores });
   };
 
@@ -255,10 +306,16 @@ export default function ExamInsightsPanel() {
               Reset Statistics
             </button>
           </div>
-          {/* Improvement Section */}
-          <div className="mt-8 p-6 bg-gradient-to-r from-indigo-500 to-indigo-700 rounded-xl text-white shadow-lg">
-            <h3 className="text-xl font-semibold mb-4">Areas for Improvement</h3>
-            <p className="text-sm leading-relaxed">
+          <div className={clsx(
+            'mt-8 p-6 rounded-2xl',
+            isDarkMode
+              ? 'border border-gray-700'
+              : 'border border-gray-700 '
+          )}>
+            <h3 className={clsx('text-xl font-semibold mb-3', isDarkMode ? 'text-white' : 'text-gray-900')}>
+              Areas for Improvement
+            </h3>
+            <p className={clsx('text-sm leading-relaxed', isDarkMode ? 'text-gray-300' : 'text-gray-700')}>
               {improvementText || 'Analyzing your performance to provide personalized suggestions...'}
             </p>
           </div>
