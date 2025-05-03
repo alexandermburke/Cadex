@@ -8,7 +8,7 @@ import { collection, getDocs, query, where } from 'firebase/firestore';
 
 const containerVariants = {
   hidden: { opacity: 0, y: 50 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: 'easeInOut' } }
+  visible: { opacity: 1, y: 0, transition: { duration: 1.0, ease: 'easeInOut' } }
 };
 
 const lawSubjects = [
@@ -48,7 +48,7 @@ const CircleBar = ({ percentage, size = 100, strokeWidth = 2, textSize = 16, col
           strokeDasharray={circumference}
           initial={{ strokeDashoffset: circumference }}
           animate={{ strokeDashoffset: offset }}
-          transition={{ duration: 1.2, ease: 'easeInOut' }}
+          transition={{ duration: 3.0, ease: 'easeInOut' }}
           strokeLinecap="round"
           transform={`rotate(-90 ${size / 2} ${size / 2})`}
         />
@@ -128,6 +128,7 @@ export default function ExamInsightsPanel() {
   const [isLoading, setIsLoading] = useState(false);
   const [progresses, setProgresses] = useState([]);
   const [scores, setScores] = useState({ overall: 0, subjects: {} });
+  const [improvementText, setImprovementText] = useState('');
 
   useEffect(() => {
     if (!currentUser) return;
@@ -141,6 +142,25 @@ export default function ExamInsightsPanel() {
       setIsLoading(false);
     })();
   }, [currentUser]);
+
+  // call AI to generate improvement suggestions once scores update
+  useEffect(() => {
+    if (!isLoading && progresses.length) {
+      (async () => {
+        try {
+          const res = await fetch('/api/generate-improvements', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ overall: scores.overall, subjects: scores.subjects })
+          });
+          const { text } = await res.json();
+          setImprovementText(text);
+        } catch (err) {
+          console.error(err);
+        }
+      })();
+    }
+  }, [scores, isLoading, progresses.length]);
 
   const computeScores = (data) => {
     let totalCorrect = 0, total = 0;
@@ -176,6 +196,7 @@ export default function ExamInsightsPanel() {
       zeroSubjects[sub] = 0;
     });
     setScores({ overall: 0, subjects: zeroSubjects });
+    setImprovementText('');
   };
 
   return (
@@ -233,6 +254,13 @@ export default function ExamInsightsPanel() {
             >
               Reset Statistics
             </button>
+          </div>
+          {/* Improvement Section */}
+          <div className="mt-8 p-6 bg-gradient-to-r from-indigo-500 to-indigo-700 rounded-xl text-white shadow-lg">
+            <h3 className="text-xl font-semibold mb-4">Areas for Improvement</h3>
+            <p className="text-sm leading-relaxed">
+              {improvementText || 'Analyzing your performance to provide personalized suggestions...'}
+            </p>
           </div>
         </>
       )}

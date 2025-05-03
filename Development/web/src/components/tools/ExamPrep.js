@@ -902,7 +902,7 @@ export default function ExamPrep() {
                 className={clsx(
                   'h-10 sm:h-12 px-6 py-2 rounded',
                   isDarkMode ? 'bg-gray-600 hover:bg-gray-500 text-gray-200' : 'bg-gray-300 hover:bg-gray-400 text-gray-800',
-                  'transition-colors duration-200 text-sm sm:text-base'
+                  'transition-colors duration-200 text-sm sm:text-base gradientShadowHoverWhite'
                 )}
               >
                 Close
@@ -916,7 +916,7 @@ export default function ExamPrep() {
                 className={clsx(
                   'h-10 sm:h-12 px-6 py-2 rounded',
                   isDarkMode ? 'bg-blue-600 hover:bg-blue-700 text-white' : 'bg-blue-900 hover:bg-blue-950 text-white',
-                  'transition-colors duration-200 text-sm sm:text-base'
+                  'transition-colors duration-200 text-sm sm:text-base gradientShadowHoverBlue'
                 )}
               >
                 Start Exam
