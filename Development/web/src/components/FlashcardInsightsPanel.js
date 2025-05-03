@@ -1,20 +1,26 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import clsx from 'clsx';
-import { motion, AnimatePresence } from 'framer-motion';
-import { FaBars, FaTimes } from 'react-icons/fa';
+import { motion } from 'framer-motion';
 import { useAuth } from '@/context/AuthContext';
 import { db } from '@/firebase';
-import { collection, getDocs, query, where, deleteDoc, doc } from 'firebase/firestore';
+import { collection, getDocs, query, where } from 'firebase/firestore';
 
-const mainContainerVariants = {
+const containerVariants = {
   hidden: { opacity: 0, y: 50 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.4, ease: 'easeInOut' },
-  },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: 'easeInOut' } }
 };
+
+const lawSubjects = [
+  'Contracts',
+  'Torts',
+  'CriminalLaw',
+  'Property',
+  'Evidence',
+  'ConstitutionalLaw',
+  'CivilProcedure',
+  'BusinessAssociations'
+];
 
 const CircleBar = ({ percentage, size = 100, strokeWidth = 4, textSize = 16, color, label, isDarkMode }) => {
   const radius = (size - strokeWidth) / 2;
@@ -27,7 +33,7 @@ const CircleBar = ({ percentage, size = 100, strokeWidth = 4, textSize = 16, col
           cx={size / 2}
           cy={size / 2}
           r={radius}
-          stroke={isDarkMode ? "#444" : "#eee"}
+          stroke={isDarkMode ? '#444' : '#eee'}
           strokeWidth={0}
           fill="transparent"
         />
@@ -48,18 +54,16 @@ const CircleBar = ({ percentage, size = 100, strokeWidth = 4, textSize = 16, col
           y="50%"
           textAnchor="middle"
           dominantBaseline="middle"
-          fill={isDarkMode ? "#fff" : "#333"}
+          fill={isDarkMode ? '#fff' : '#333'}
           fontSize={textSize}
           fontWeight="bold"
         >
           {percentage}%
         </text>
       </svg>
-      {label && (
-        <p className={`mt-2 text-sm font-semibold ${isDarkMode ? 'text-gray-200' : 'text-gray-800'}`}>
-          {label}
-        </p>
-      )}
+      <p className={`mt-2 text-sm font-semibold ${isDarkMode ? 'text-gray-200' : 'text-gray-800'}`}>
+        {label}
+      </p>
     </div>
   );
 };
@@ -72,41 +76,39 @@ const OverallProgress = ({ percentage, isDarkMode }) => {
   const offset = circumference - (percentage / 100) * circumference;
   return (
     <div className="flex flex-col items-center">
-      <div style={{ position: 'relative', width: size, height: size }}>
-        <svg width={size} height={size}>
-          <circle
-            cx={size / 2}
-            cy={size / 2}
-            r={radius}
-            stroke={isDarkMode ? "#444" : "#eee"}
-            strokeWidth={0}
-            fill="transparent"
-          />
-          <circle
-            cx={size / 2}
-            cy={size / 2}
-            r={radius}
-            stroke={isDarkMode ? "#4ade80" : "#10b981"}
-            strokeWidth={strokeWidth}
-            fill="transparent"
-            strokeDasharray={circumference}
-            strokeDashoffset={offset}
-            strokeLinecap="round"
-            transform={`rotate(-90 ${size / 2} ${size / 2})`}
-          />
-          <text
-            x="50%"
-            y="50%"
-            textAnchor="middle"
-            dominantBaseline="middle"
-            fill={isDarkMode ? "#fff" : "#333"}
-            fontSize="24"
-            fontWeight="bold"
-          >
-            {percentage}%
-          </text>
-        </svg>
-      </div>
+      <svg width={size} height={size}>
+        <circle
+          cx={size / 2}
+          cy={size / 2}
+          r={radius}
+          stroke={isDarkMode ? '#444' : '#eee'}
+          strokeWidth={0}
+          fill="transparent"
+        />
+        <circle
+          cx={size / 2}
+          cy={size / 2}
+          r={radius}
+          stroke={isDarkMode ? '#4ade80' : '#10b981'}
+          strokeWidth={strokeWidth}
+          fill="transparent"
+          strokeDasharray={circumference}
+          strokeDashoffset={offset}
+          strokeLinecap="round"
+          transform={`rotate(-90 ${size / 2} ${size / 2})`}
+        />
+        <text
+          x="50%"
+          y="50%"
+          textAnchor="middle"
+          dominantBaseline="middle"
+          fill={isDarkMode ? '#fff' : '#333'}
+          fontSize="24"
+          fontWeight="bold"
+        >
+          {percentage}%
+        </text>
+      </svg>
       <p className={`mt-4 text-base font-semibold ${isDarkMode ? 'text-gray-200' : 'text-gray-800'}`}>
         Overall Performance
       </p>
@@ -114,125 +116,96 @@ const OverallProgress = ({ percentage, isDarkMode }) => {
   );
 };
 
-export default function ExamInsight() {
+export default function ExamInsightsPanel() {
   const { currentUser, userDataObj } = useAuth();
   const isDarkMode = userDataObj?.darkMode || false;
   const [isLoading, setIsLoading] = useState(false);
-  const [savedProgresses, setSavedProgresses] = useState([]);
-  const [aggregatedScores, setAggregatedScores] = useState({ overall: 0, subjects: {} });
-
-  const lawSubjects = [
-    'Contracts',
-    'Torts',
-    'CriminalLaw',
-    'Property',
-    'Evidence',
-    'ConstitutionalLaw',
-    'CivilProcedure',
-    'BusinessAssociations',
-  ];
-
-  const mainContainerClass = clsx('flex-1 flex flex-col px-6 relative z-200 h-screen');
-  const contentContainerClass = clsx(
-    'flex-1 w-full rounded-2xl p-6',
-    isDarkMode ? 'bg-transparent text-white' : 'bg-transparent text-gray-800'
-  );
+  const [progresses, setProgresses] = useState([]);
+  const [scores, setScores] = useState({ overall: 0, subjects: {} });
 
   useEffect(() => {
-    const fetchProgress = async () => {
-      setIsLoading(true);
-      try {
-        const q = query(collection(db, 'examProgress'), where('userId', '==', currentUser.uid));
-        const snap = await getDocs(q);
-        const progresses = [];
-        snap.forEach((docSnapshot) => {
-          progresses.push({ id: docSnapshot.id, ...docSnapshot.data() });
-        });
-        setSavedProgresses(progresses);
-        computeAggregatedScores(progresses);
-      } catch (error) {
-        console.error('Error fetching exam progress:', error);
-        alert('Error fetching exam progress data.');
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    if (currentUser) {
-      fetchProgress();
-    }
+    if (!currentUser) return;
+    setIsLoading(true);
+    (async () => {
+      const q = query(collection(db, 'flashProgress'), where('userId', '==', currentUser.uid));
+      const snap = await getDocs(q);
+      const data = snap.docs.map(d => d.data());
+      setProgresses(data);
+      computeScores(data);
+      setIsLoading(false);
+    })();
   }, [currentUser]);
 
-  const computeAggregatedScores = (progresses) => {
-    let overallCorrect = 0, overallTotal = 0;
+  const computeScores = (data) => {
+    let totalCorrect = 0, total = 0;
     const subjectTotals = {};
-    lawSubjects.forEach((subject) => {
-      subjectTotals[subject] = { correct: 0, total: 0 };
-    });
-    progresses.forEach((prog) => {
-      overallCorrect += prog.overallCorrect || 0;
-      overallTotal += prog.overallTotal || 0;
-      const categories = prog.categories || {};
-      lawSubjects.forEach((subject) => {
-        if (categories[subject]) {
-          subjectTotals[subject].correct += categories[subject].correct || 0;
-          subjectTotals[subject].total += categories[subject].total || 0;
+    lawSubjects.forEach(sub => (subjectTotals[sub] = { correct: 0, total: 0 }));
+    data.forEach(prog => {
+      totalCorrect += prog.overallCorrect || 0;
+      total += prog.overallTotal || 0;
+      const cats = prog.categories || {};
+      lawSubjects.forEach(sub => {
+        if (cats[sub]) {
+          subjectTotals[sub].correct += cats[sub].correct || 0;
+          subjectTotals[sub].total += cats[sub].total || 0;
         }
       });
     });
-    const overallPct = overallTotal > 0 ? Math.round((overallCorrect / overallTotal) * 100) : 0;
-    const subjects = {};
-    lawSubjects.forEach((subject) => {
-      const { correct, total } = subjectTotals[subject];
-      subjects[subject] = total > 0 ? Math.round((correct / total) * 100) : 0;
+    const overallPct = total > 0 ? Math.round((totalCorrect / total) * 100) : 0;
+    const subjectScores = {};
+    lawSubjects.forEach(sub => {
+      const { correct, total } = subjectTotals[sub];
+      subjectScores[sub] = total > 0 ? Math.round((correct / total) * 100) : 0;
     });
-    setAggregatedScores({ overall: overallPct, subjects });
+    setScores({ overall: overallPct, subjects: subjectScores });
   };
 
   return (
-    <div className={clsx('relative flex h-screen transition-colors duration-500', isDarkMode ? 'text-white' : 'text-gray-800')}>
-      <main className={mainContainerClass}>
-        <motion.div className={contentContainerClass} variants={mainContainerVariants} initial="hidden" animate="visible">
-          {!currentUser ? (
-            <div className="flex items-center justify-center h-64">
-              <div className="text-center">
-                <p className={isDarkMode ? 'text-gray-300' : 'text-gray-700'}>Please log in to view Exam Insights.</p>
-                <button
-                  onClick={() => window.location.assign('/login')}
-                  className={clsx('mt-4 px-4 py-2 rounded', isDarkMode ? 'bg-blue-700 hover:bg-blue-600 text-white' : 'bg-blue-600 hover:bg-blue-700 text-white')}
-                >
-                  Go to Login
-                </button>
-              </div>
-            </div>
-          ) : (
-            <>
-              {isLoading ? (
-                <div className="flex items-center justify-center h-64">
-                  <p className={isDarkMode ? 'text-gray-300' : 'text-gray-700'}>Loading...</p>
-                </div>
-              ) : (
-                <div className="space-y-8">
-                  <OverallProgress percentage={aggregatedScores.overall} isDarkMode={isDarkMode} />
-                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
-                    {lawSubjects.map((subject) => (
-                      <CircleBar
-                        key={subject}
-                        percentage={aggregatedScores.subjects[subject] || 0}
-                        size={100}
-                        strokeWidth={4}
-                        textSize={16}
-                        color={isDarkMode ? "#4ade80" : "#10b981"}
-                        label={subject}
-                        isDarkMode={isDarkMode}
-                      />
-                    ))}
-                  </div>
-                </div>
+    <motion.div
+      variants={containerVariants}
+      initial="hidden"
+      animate="visible"
+      className="flex-1 overflow-y-auto p-6"
+    >
+      {!currentUser ? (
+        <div className="flex items-center justify-center h-full">
+          <div className="text-center">
+            <p className={isDarkMode ? 'text-gray-300' : 'text-gray-700'}>
+              Please log in to view Exam Insights.
+            </p>
+            <button
+              onClick={() => window.location.assign('/login')}
+              className={clsx(
+                'mt-4 px-4 py-2 rounded',
+                isDarkMode ? 'bg-blue-700 hover:bg-blue-600 text-white' : 'bg-blue-600 hover:bg-blue-700 text-white'
               )}
-            </>
-          )}
-        </motion.div>
-      </main>
-    </div>
+            >
+              Go to Login
+            </button>
+          </div>
+        </div>
+      ) : isLoading ? (
+        <div className="flex items-center justify-center h-full">
+          <p className={isDarkMode ? 'text-gray-300' : 'text-gray-700'}>Loading...</p>
+        </div>
+      ) : (
+        <>
+          <div className="flex justify-center">
+            <OverallProgress percentage={scores.overall} isDarkMode={isDarkMode} />
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 mt-8">
+            {lawSubjects.map((sub) => (
+              <CircleBar
+                key={sub}
+                percentage={scores.subjects[sub]}
+                color={isDarkMode ? '#4ade80' : '#10b981'}
+                label={sub}
+                isDarkMode={isDarkMode}
+              />
+            ))}
+          </div>
+        </>
+      )}
+    </motion.div>
   );
 }

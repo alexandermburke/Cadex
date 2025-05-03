@@ -204,11 +204,11 @@ export default function AIExamFlashCard() {
     }
   };
 
-  const saveExamProgress = async () => {
+  const saveflashProgress = async () => {
     const correct = answeredFlashcards.filter((c) => c.isCorrect).length;
     const total = answeredFlashcards.length;
     try {
-      await addDoc(collection(db, 'examProgress'), {
+      await addDoc(collection(db, 'flashProgress'), {
         userId: currentUser.uid,
         examConfig: studyConfig,
         overallCorrect: correct,
@@ -222,13 +222,13 @@ export default function AIExamFlashCard() {
 
   useEffect(() => {
     if (isFinalFeedbackModalOpen && !hasSavedProgress) {
-      saveExamProgress();
+      saveflashProgress();
     }
   }, [isFinalFeedbackModalOpen, hasSavedProgress]);
 
   const fetchSavedProgresses = async () => {
     try {
-      const q = query(collection(db, 'examProgress'), where('userId', '==', currentUser.uid));
+      const q = query(collection(db, 'flashProgress'), where('userId', '==', currentUser.uid));
       const snap = await getDocs(q);
       const arr = [];
       snap.forEach((d) => arr.push({ id: d.id, ...d.data() }));
@@ -249,7 +249,7 @@ export default function AIExamFlashCard() {
 
   const handleDeleteProgress = async (id) => {
     try {
-      await deleteDoc(doc(db, 'examProgress', id));
+      await deleteDoc(doc(db, 'flashProgress', id));
       fetchSavedProgresses();
     } catch {}
   };
