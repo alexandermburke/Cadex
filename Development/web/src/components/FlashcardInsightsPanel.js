@@ -134,7 +134,7 @@ export default function ExamInsight() {
 
   const mainContainerClass = clsx('flex-1 flex flex-col px-6 relative z-200 h-screen');
   const contentContainerClass = clsx(
-    'flex-1 w-full rounded-2xl shadow-xl p-6',
+    'flex-1 w-full rounded-2xl p-6',
     isDarkMode ? 'bg-transparent text-white' : 'bg-transparent text-gray-800'
   );
 

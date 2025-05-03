@@ -36,7 +36,7 @@ import {
   Tooltip,
   Legend,
 } from 'chart.js';
-import ExamInsight from '../FlashcardInsight';
+import ExamInsight from '../FlashcardInsightsPanel';
 
 ChartJS.register(
   CategoryScale,
@@ -342,7 +342,7 @@ export default function AIExamFlashCard() {
 
         <motion.div
           className={clsx(
-            'flex-1 w-full rounded-2xl shadow-xl p-6',
+            'flex-1 w-full rounded-2xl shadow-xl p-6 overflow-y-auto',
             isDarkMode ? 'bg-slate-800 bg-opacity-50 text-white' : 'bg-white text-gray-800'
           )}
           variants={mainVariants}
@@ -378,7 +378,7 @@ export default function AIExamFlashCard() {
               )}
               onClick={() => setActiveTab('favorites')}
             >
-              Insights
+              Analysis
             </motion.button>
           </div>
 

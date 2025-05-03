@@ -93,8 +93,8 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, i
   const router = useRouter();
   const { currentUser, userDataObj } = useAuth();
   const plan = userDataObj?.billing?.plan?.toLowerCase() || 'free';
-  const isBasic = plan === 'basic';
-  const isPro = plan === 'pro' || plan === 'expert';
+  const isBasic = plan === 'expert';
+  const isPro = plan === 'pro' || plan === 'basic';
   const isExpert = false;
   const isDarkMode = userDataObj?.darkMode || false;
   const [isCaseBriefBankOpen, setIsCaseBriefBankOpen] = useState(false);
@@ -335,12 +335,6 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, i
                 active={activeLink === '/ailawtools/examprep'}
               />
               <NavLink
-                href="/ailawtools/insights"
-                icon={<FaChartBar className="text-sm" />}
-                label="Exam Insights"
-                active={activeLink === '/ailawtools/insights'}
-              />
-              <NavLink
                 href="/ailawtools/examprep/mbe"
                 icon={<FaListOl className="text-sm" />}
                 label="MBE Practice"
@@ -350,9 +344,7 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, i
           ) : showAllApps ? (
             <>
               <LockedNavLink icon={<FaClipboardCheck className="text-sm" />} label="Practice Exams" />
-              <LockedNavLink icon={<FaChartBar className="text-sm" />} label="Exam Insights" />
               <LockedNavLink icon={<FaListOl className="text-sm" />} label="MBE Practice" />
-              <LockedNavLink icon={<FaBrain className="text-sm" />} label="LExAPI Tutor" />
             </>
           ) : null}
         </ToggleSection>
