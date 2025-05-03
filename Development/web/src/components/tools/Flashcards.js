@@ -19,7 +19,6 @@ import {
   doc,
   getDocs,
   query,
-  updateDoc,
   where,
 } from 'firebase/firestore';
 import { useAuth } from '@/context/AuthContext';
@@ -36,7 +35,7 @@ import {
   Tooltip,
   Legend,
 } from 'chart.js';
-import ExamInsight from '../FlashcardInsightsPanel';
+import FlashInsight from '../FlashcardInsightsPanel';
 
 ChartJS.register(
   CategoryScale,
@@ -150,7 +149,7 @@ export default function AIExamFlashCard() {
           cy={50}
           r={r}
           stroke={isDarkMode ? '#4ade80' : '#10b981'}
-          strokeWidth={4}
+          strokeWidth={2}
           fill="transparent"
           strokeDasharray={c}
           strokeDashoffset={off}
@@ -207,12 +206,15 @@ export default function AIExamFlashCard() {
   const saveflashProgress = async () => {
     const correct = answeredFlashcards.filter((c) => c.isCorrect).length;
     const total = answeredFlashcards.length;
+    const key = studyConfig.courseName.replace(/\s+/g, '');
+    const categories = { [key]: { correct, total } };
     try {
       await addDoc(collection(db, 'flashProgress'), {
         userId: currentUser.uid,
         examConfig: studyConfig,
         overallCorrect: correct,
         overallTotal: total,
+        categories,
         answeredFlashcards,
         timestamp: Date.now(),
       });
@@ -328,17 +330,17 @@ export default function AIExamFlashCard() {
       </div>
 
       <main className="flex-1 flex flex-col px-2 relative z-200 h-screen">
-        <div className="flex items-center justify-between">
-          <button
-            onClick={() => setIsSidebarVisible(!isSidebarVisible)}
-            className={clsx(
-              'text-blue-900 dark:text-white p-2 rounded transition-colors hover:bg-black/10 focus:outline-none md:hidden'
-            )}
-            aria-label="Toggle Sidebar"
-          >
-            {isSidebarVisible ? <FaTimes size={20} /> : <FaBars size={20} />}
-          </button>
-        </div>
+        <div className="flex items-center justify-between">  
+          <button  
+            onClick={() => setIsSidebarVisible(!isSidebarVisible)}  
+            className={clsx(  
+              'text-blue-900 dark:text-white p-2 rounded transition-colors hover:bg-black/10 focus:outline-none md:hidden'  
+            )}  
+            aria-label="Toggle Sidebar"  
+          >  
+            {isSidebarVisible ? <FaTimes size={20} /> : <FaBars size={20} />}  
+          </button>  
+        </div>  
 
         <motion.div
           className={clsx(
@@ -396,9 +398,11 @@ export default function AIExamFlashCard() {
                       : 'bg-white text-gray-800'
                   )}
                 >
-                  <h2 className="text-2xl mb-4">No flashcards generated yet.</h2>
-                  <p className={clsx(isDarkMode ? 'text-gray-300' : 'text-gray-500')}>
-                    Click <strong>Configure</strong> to set up your flashcards.
+                  <p className={clsx('mb-4', isDarkMode ? 'text-gray-300' : 'text-gray-600')}>
+                    Click <span className="font-semibold">Configure</span> to begin your Flashcard Practice.
+                  </p>
+                  <p className={clsx('text-sm', isDarkMode ? 'text-gray-400' : 'text-gray-500')}>
+                    <strong>Note:</strong> This is intended for law students to practice essay/MC questions.
                   </p>
                 </div>
               )}
@@ -480,7 +484,7 @@ export default function AIExamFlashCard() {
             </>
           )}
 
-          {activeTab === 'favorites' && <ExamInsight />}
+          {activeTab === 'favorites' && <FlashInsight />}
         </motion.div>
       </main>
 
@@ -566,7 +570,6 @@ export default function AIExamFlashCard() {
           </motion.div>
         )}
       </AnimatePresence>
-
       <AnimatePresence>
         {isFinalFeedbackModalOpen && (
           <motion.div
