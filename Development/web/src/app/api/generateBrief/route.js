@@ -33,7 +33,7 @@ export async function POST(request) {
     const prompt = `Create a legal case brief for a ${skillLevel.toLowerCase()} level case in ${category.toLowerCase()} law. Description: ${caseDescription}`;
 
     const completion = await openai.createChatCompletion({
-      model: 'gpt-3.5-turbo',
+      model: 'gpt-4.1-nano',
       messages: [
         { role: 'system', content: 'You are a legal expert.' },
         { role: 'user', content: prompt },

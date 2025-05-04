@@ -48,6 +48,9 @@ If there are any issues—whether the summary is missing substantial details or 
 If there is no Dissent provided, the summary can still be 100% accurate as it might not be possible to generate.
 If the jurisdiction is N/A, Unknown and/or Blank, the case may still be verified as some case's don't provide this information publicly.
 Do not include any additional text.
+Citation can be N/A or missing & the verification can still be correct.
+The Decision date is only provided in years within this application, therefore, for instance '2014' would be correct.
+If a Case summary is close to fully accurate, it may be marked as verified, also some case briefs might be significantly smaller than others, as you'll be verifying small versions too.
 
 Case Title: "${caseTitle.trim()}"
 Decision Date: ${decisionDate || 'N/A'}
@@ -75,12 +78,12 @@ ${citationLine}
       }
     ]
 
-    const openai = new OpenAI({
-    apiKey: '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',
-    })
-
+ const openai = new OpenAI({
+          apiKey: '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',
+        });
+   
     const response = await openai.chat.completions.create({
-      model: 'gpt-4',
+      model: 'gpt-4.1-mini',
       messages,
       max_tokens: 150,
       temperature: 0

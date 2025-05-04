@@ -43,7 +43,7 @@ Constraints/Instructions:
 
     // Call the OpenAI Chat Completion API
     const response = await openai.chat.completions.create({
-      model: 'gpt-3.5-turbo',
+      model: 'gpt-4.1-nano',
       messages: [
         {
           role: 'system',

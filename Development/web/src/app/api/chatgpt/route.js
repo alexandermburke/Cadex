@@ -15,7 +15,7 @@ export async function POST(req) {
     });
 
     const response = await openai.chat.completions.create({
-      model: 'gpt-3.5-turbo',
+      model: 'gpt-4.1-nano',
       messages: [
         { role: 'system', content: 'You are a legal assistant.' },
         { role: 'user', content: `Analyze this legal text: ${inputText}` },

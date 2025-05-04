@@ -54,7 +54,7 @@ Example JSON:
     });
 
     const response = await openai.chat.completions.create({
-      model: 'gpt-3.5-turbo', // or gpt-3.5-turbo
+      model: 'gpt-4.1-nano', // or gpt-4.1-nano
       messages: [{ role: 'user', content: prompt }],
       max_tokens: 1200,
       temperature: 0.6,

@@ -71,7 +71,7 @@ Example JSON:
 
     // Make the API request to OpenAI
     const response = await openai.chat.completions.create({
-      model: 'gpt-3.5-turbo',
+      model: 'gpt-4.1-nano',
       messages: [{ role: 'user', content: prompt }],
       max_tokens: 2000,
       temperature: 0.7,

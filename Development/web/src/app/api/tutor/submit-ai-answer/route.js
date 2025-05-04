@@ -60,7 +60,7 @@ No disclaimers, no extra text beyond valid JSON.
     const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
     const responseAI = await openai.chat.completions.create({
-      model: 'gpt-3.5-turbo',
+      model: 'gpt-4.1-nano',
       messages: [
         { role: 'system', content: 'You are a law tutor that evaluates a student’s answer.' },
         { role: 'user', content: evaluationPrompt },

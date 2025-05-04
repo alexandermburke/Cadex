@@ -31,7 +31,7 @@ Only return the question text, no disclaimers or intros.
     const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
     const questionResponse = await openai.chat.completions.create({
-      model: 'gpt-3.5-turbo',
+      model: 'gpt-4.1-nano',
       messages: [
         { role: 'system', content: 'You are an expert law tutor focusing on law school coursework.' },
         { role: 'user', content: prompt },
@@ -56,7 +56,7 @@ Only output valid JSON.
 `;
 
     const highlightResponse = await openai.chat.completions.create({
-      model: 'gpt-3.5-turbo',
+      model: 'gpt-4.1-nano',
       messages: [
         { role: 'system', content: 'You are a text analyst that highlights key legal question parts.' },
         { role: 'user', content: highlightPrompt },

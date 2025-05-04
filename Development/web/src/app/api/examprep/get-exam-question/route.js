@@ -89,7 +89,7 @@ Return only this question text, nothing else.
     });
 
     const response = await openai.chat.completions.create({
-      model: 'gpt-3.5-turbo',
+      model: 'gpt-4.1-nano',
       messages: [{ role: 'user', content: prompt }],
       max_tokens: 1200,
       temperature: 0.7,
