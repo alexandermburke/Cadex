@@ -44,7 +44,6 @@ ${citationCriteria}
 please also verify that the provided case title and decision date (year) are correct and well-formatted. This includes checking for proper punctuation, spelling, grammar, and capitalization.
 If the citation field is missing or its value is "N/A" (case-insensitive), disregard the citation as a method of verification.
 If the summary is fully correct and all additional fields are accurate and properly formatted, set "verified" to true and "explanation" to "Summary is fully accurate."
-If there are any issues—whether the summary is missing substantial details or if the title, date, jurisdiction, or citation (when provided) are incorrect, misspelled, or improperly formatted—set "verified" to false and provide a concise explanation stating what is wrong.
 If there is no Dissent provided, the summary can still be 100% accurate as it might not be possible to generate.
 If the jurisdiction is N/A, Unknown and/or Blank, the case may still be verified as some case's don't provide this information publicly.
 Do not include any additional text.
