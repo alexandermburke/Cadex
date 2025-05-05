@@ -85,7 +85,7 @@ Return only this question text, nothing else.
 
     // 5. Call GPT (here using GPT-4) 
     const openai = new OpenAI({
-      apiKey: process.env.OPENAI_API_KEY,
+      apiKey: process.env.OPENAI_API_KEY_CURRENT,
     });
 
     const response = await openai.chat.completions.create({

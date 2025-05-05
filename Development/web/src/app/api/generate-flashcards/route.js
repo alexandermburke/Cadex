@@ -66,7 +66,7 @@ Example JSON:
 
     // Initialize OpenAI API client
     const openai = new OpenAI({
-      apiKey: process.env.OPENAI_API_KEY,
+      apiKey: process.env.OPENAI_API_KEY_CURRENT,
     });
 
     // Make the API request to OpenAI

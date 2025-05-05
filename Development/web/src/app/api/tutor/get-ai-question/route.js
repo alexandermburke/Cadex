@@ -28,7 +28,7 @@ Only return the question text, no disclaimers or intros.
 `;
     }
 
-    const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+    const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY_CURRENT });
 
     const questionResponse = await openai.chat.completions.create({
       model: 'gpt-4.1-nano',

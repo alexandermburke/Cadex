@@ -17,7 +17,7 @@ export async function POST(request) {
     }
 
     const configuration = new Configuration({
-      apiKey: process.env.OPENAI_API_KEY,
+      apiKey: process.env.OPENAI_API_KEY_CURRENT,
     });
 
     if (!configuration.apiKey) {

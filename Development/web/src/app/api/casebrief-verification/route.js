@@ -41,7 +41,7 @@ In addition to checking that the summary includes detailed content for:
   5. Reasoning
   6. Dissent
 ${citationCriteria}
-please also verify that the provided case title, decision date (year), and jurisdiction are correct and well-formatted. This includes checking for proper punctuation, spelling, grammar, and capitalization.
+please also verify that the provided case title and decision date (year) are correct and well-formatted. This includes checking for proper punctuation, spelling, grammar, and capitalization.
 If the citation field is missing or its value is "N/A" (case-insensitive), disregard the citation as a method of verification.
 If the summary is fully correct and all additional fields are accurate and properly formatted, set "verified" to true and "explanation" to "Summary is fully accurate."
 If there are any issues—whether the summary is missing substantial details or if the title, date, jurisdiction, or citation (when provided) are incorrect, misspelled, or improperly formatted—set "verified" to false and provide a concise explanation stating what is wrong.
@@ -51,6 +51,7 @@ Do not include any additional text.
 Citation can be N/A or missing & the verification can still be correct.
 The Decision date is only provided in years within this application, therefore, for instance '2014' would be correct.
 If a Case summary is close to fully accurate, it may be marked as verified, also some case briefs might be significantly smaller than others, as you'll be verifying small versions too.
+Do not avoid verifying a case summary because of jursidcition being formatted incorrectly.
 
 Case Title: "${caseTitle.trim()}"
 Decision Date: ${decisionDate || 'N/A'}
@@ -78,9 +79,9 @@ ${citationLine}
       }
     ]
 
- const openai = new OpenAI({
-          apiKey: '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',
-        });
+  const openai = new OpenAI({
+           apiKey: process.env.OPENAI_API_KEY_CURRENT,
+         });
    
     const response = await openai.chat.completions.create({
       model: 'gpt-4.1-mini',

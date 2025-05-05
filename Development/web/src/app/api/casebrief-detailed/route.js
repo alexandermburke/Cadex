@@ -103,8 +103,8 @@ Case Citation:
       }
     ]
 
-     const openai = new OpenAI({
-             apiKey: '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',
+    const openai = new OpenAI({
+             apiKey: process.env.OPENAI_API_KEY_CURRENT,
            });
            
     let attemptCount = 0
@@ -114,7 +114,7 @@ Case Citation:
       attemptCount++
       try {
         const response = await openai.chat.completions.create({
-          model: 'gpt-4.1-mini',
+          model: 'gpt-4.1-nano',
           messages,
           max_tokens: detailed ? 3500 : 1800,
           temperature: 0.7

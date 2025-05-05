@@ -4,7 +4,7 @@ import OpenAI from 'openai';
 export async function GET() {
   try {
     const openai = new OpenAI({
-      apiKey: process.env.OPENAI_API_KEY,
+      apiKey: process.env.OPENAI_API_KEY_CURRENT,
     });
 
     // Prompt the AI to generate networking events for law students:

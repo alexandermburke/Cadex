@@ -51,7 +51,7 @@ Begin now.
     `;
 
     const openai = new OpenAI({
-      apiKey: process.env.OPENAI_API_KEY,
+      apiKey: process.env.OPENAI_API_KEY_CURRENT,
     });
     const response = await openai.chat.completions.create({
       model: 'gpt-4.1-nano',

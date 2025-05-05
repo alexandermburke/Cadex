@@ -58,11 +58,9 @@ in a valid JSON object with the key "citation". Do NOT include the case name or 
     ];
 
        const openai = new OpenAI({
-         apiKey: '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',
-       });
-       
-       const models = await openai.models.list();
-console.log(models);
+                apiKey: process.env.OPENAI_API_KEY_CURRENT_CURRENT,
+              });
+              
        const response = await openai.chat.completions.create({
          model: 'gpt-4.1-nano',
          messages: messages,

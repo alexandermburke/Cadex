@@ -16,7 +16,7 @@ export async function POST(request) {
     }
 
     const openai = new OpenAI({
-        apiKey: process.env.OPENAI_API_KEY,
+        apiKey: process.env.OPENAI_API_KEY_CURRENT,
       });
   
     // Simple system & user prompts to generate a short legal definition.
