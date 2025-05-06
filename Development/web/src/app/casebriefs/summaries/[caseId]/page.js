@@ -38,12 +38,16 @@ export async function generateMetadata({ params }) {
     "View the case brief summary on CadexLaw with key legal details: rule of law, facts, issue, holding, reasoning, and dissent."
   let caseName = ""
   let jurisdiction = ""
+  let citation = ""
+  let date = ""
 
   if (docSnap.exists()) {
     const data = docSnap.data()
     caseName = data.title || ""
     jurisdiction = data.jurisdiction || ""
-    title = `${caseName} – 20,000+ Case Briefs with Summaries | CadexLaw`
+    citation = data.citation || ""
+    date = data.decisionDate || ""
+    title = `${caseName}, ${citation} (${date}) - Case Briefs, Exam Prep, Subject Outlines | CadexLaw.com`
     description = `${caseName} case brief summary from ${jurisdiction}. Read the rule of law, facts, issue, holding, reasoning, and dissent in detailed IRAC format.`
   }
 

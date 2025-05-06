@@ -5,7 +5,7 @@ export async function POST(request) {
   console.log('Received request to /api/casebrief-summary');
 
   try {
-    const { title, citation } = await request.json();
+    const { title, citation, date } = await request.json()
 
     if (!title || typeof title !== 'string' || !title.trim()) {
       console.warn('Invalid or missing "title" in request body.');
@@ -16,7 +16,9 @@ export async function POST(request) {
     }
 
     const inputTitle = title.trim();
-    console.log(`Generating summary based on title: "${inputTitle}"`);
+    const inputCitation = citation.trim()
+    const inputDate = date.trim()
+    console.log(`Generating summary for: "${inputTitle}" with citation "${inputCitation}" in "${date}"`)
 
     const userContent = `
 Generate a brief case summary based on the following case title. The summary should include:
@@ -43,13 +45,17 @@ DO NOT include any additional text, explanations, or disclaimers.
 
 Case Title:
 "${inputTitle}"
+Case Citation:
+"${inputCitation}"
+Case Year:
+"${inputDate}"
     `;
 
     const messages = [
       {
         role: 'system',
         content: `
-You are a concise legal summarizer. Your task is to generate a structured case brief based on the provided case title. The summary must be in JSON format with the following keys:
+You are a concise legal summarizer. Your task is to generate a structured case brief based on the provided case title, citation and decision year. The summary must be in JSON format with the following keys:
 {
   "ruleOfLaw": "",
   "facts": "",
@@ -69,11 +75,11 @@ ONLY return the JSON object. DO NOT include any additional text or commentary.
     ];
 
     const openai = new OpenAI({
-             apiKey: process.env.OPENAI_API_KEY_CURRENT,
+             apiKey: process.env.OPENAI_API_KEY_FOURPOINTONE,
            });
 
     const response = await openai.chat.completions.create({
-      model: 'gpt-4.1-nano',
+      model: 'gpt-4.1',
       messages: messages,
       max_tokens: 1500,
       temperature: 0.7,

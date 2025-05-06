@@ -78,12 +78,11 @@ ${citationLine}
       }
     ]
 
-  const openai = new OpenAI({
-           apiKey: process.env.OPENAI_API_KEY_CURRENT,
-         });
+
+  const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY_FOURPOINTONE })
    
     const response = await openai.chat.completions.create({
-      model: 'gpt-4.1-mini',
+      model: 'gpt-4.1',
       messages,
       max_tokens: 150,
       temperature: 0

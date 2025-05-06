@@ -104,7 +104,7 @@ Case Citation:
     ]
 
     const openai = new OpenAI({
-             apiKey: process.env.OPENAI_API_KEY_CURRENT,
+             apiKey: process.env.OPENAI_API_KEY_FOURPOINTONE,
            });
            
     let attemptCount = 0
@@ -114,7 +114,7 @@ Case Citation:
       attemptCount++
       try {
         const response = await openai.chat.completions.create({
-          model: 'gpt-4.1-nano',
+          model: 'gpt-4.1',
           messages,
           max_tokens: detailed ? 3500 : 1800,
           temperature: 0.7
