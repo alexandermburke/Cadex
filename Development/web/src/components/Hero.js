@@ -261,7 +261,7 @@ export default function Hero() {
           <div className="relative w-full max-w-3xl mx-auto mt-4">
             <div className="relative w-full h-0 pb-[50%] overflow-hidden rounded-lg shadow-xl">
               <video
-                src="/DemoHome.mp4"
+                src="/Demo.mp4"
                 autoPlay
                 muted
                 loop
