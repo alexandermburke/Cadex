@@ -378,7 +378,7 @@ export default function CaseSummaries() {
       const res = await fetch('/api/casebrief-summary', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ title: c.title, date: c.decisionDate || '' })
+        body: JSON.stringify({ title: c.title, citation: c.citation, date: c.decisionDate || '' })
       })
       const data = await res.json()
       setCaseBrief(data)
