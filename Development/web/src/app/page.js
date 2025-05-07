@@ -89,8 +89,6 @@ export default function Page() {
     <HeroLayout>
       <Main>
         <Hero />
-        <Product />
-        <Benefits />
       </Main>
     </HeroLayout>
   );
