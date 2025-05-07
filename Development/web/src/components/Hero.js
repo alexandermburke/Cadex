@@ -146,7 +146,7 @@ export default function Hero() {
             onChange={e => setEmail(e.target.value)}
             disabled={subscribed}
             className={clsx(
-              'px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500',
+              'px-4 py-3 rounded-lg focus:outline-none ring-2 ring-blue-500',
               isDarkMode ? 'bg-gray-800 text-white placeholder-gray-400' : 'bg-white text-gray-800 placeholder-gray-500',
               'w-64'
             )}
