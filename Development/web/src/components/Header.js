@@ -75,7 +75,7 @@ export default function Header() {
       <Link
         href={'/ailawtools/splash'}
         className={`border border-solid duration-200 border-transparent px-4 grid place-items-center rounded 
-          ${isDarkMode ? 'hover:text-slate-500' : 'hover:text-slate-200'} text-${isDarkMode ? 'white' : 'black'}`}
+          ${isDarkMode ? 'hover:text-slate-500' : 'hover:text-slate-500'} text-${isDarkMode ? 'white' : 'white'}`}
       >
         <div className="flex items-center">
           <p>Dashboard</p>
@@ -84,14 +84,14 @@ export default function Header() {
       <Link
         href={'/pricing'}
         className={`mx-2 p-2 px-2 grid place-items-center relative z-10 rounded-lg bg-transparent 
-          ${isDarkMode ? 'hover:text-slate-500' : 'hover:text-slate-200'} text-${isDarkMode ? 'white' : 'black'}`}
+          ${isDarkMode ? 'hover:text-slate-500' : 'hover:text-slate-500'} text-${isDarkMode ? 'white' : 'white'}`}
       >
         <p>Pricing</p>
       </Link>
       <Link
         href={'/admin/account'}
         className={`mx-2 p-2 px-2 grid place-items-center relative z-10 rounded-lg bg-transparent
-          ${isDarkMode ? 'hover:text-slate-500' : 'hover:text-slate-200'} text-${isDarkMode ? 'white' : 'black'}`}
+          ${isDarkMode ? 'hover:text-slate-500' : 'hover:text-slate-500'} text-${isDarkMode ? 'white' : 'white'}`}
       >
         <p>{currentUser ? 'Account' : 'Login'}</p>
       </Link>

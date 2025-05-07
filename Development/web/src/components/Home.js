@@ -10,7 +10,7 @@ import 'swiper/css';
 import { Autoplay } from 'swiper/modules';
 import { useInView } from 'react-intersection-observer';
 import { useAuth } from '@/context/AuthContext';
-import { useRouter } from 'next/navigation'; // Import router to navigate on button click
+import { useRouter } from 'next/navigation';
 
 const targetStats = {
   cases: 400,
@@ -26,7 +26,7 @@ const poppins = Poppins({
 export default function Home() {
   const router = useRouter();
   const { currentUser, userDataObj } = useAuth();
-  const isDarkMode = userDataObj?.darkMode || false;
+  const isDarkMode = userDataObj?.darkMode || true;
 
   const [loaded, setLoaded] = useState(false);
   const [stats, setStats] = useState({
@@ -35,7 +35,6 @@ export default function Home() {
     statsProvided: 0,
   });
 
-  // Animate stats function
   const animateStats = (start, end, setter) => {
     let startTime;
     const duration = 7500;

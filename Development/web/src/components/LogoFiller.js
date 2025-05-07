@@ -45,7 +45,7 @@ export default function LogoFiller() {
   </div>
 </div>
         {/* Slogan */}
-        <p className={`mt-2 text-sm ${isDarkMode ? 'text-gray-300' : 'text-slate-500'} ${poppins.className}`}>
+        <p className={`mt-2 text-sm ${isDarkMode ? 'text-white' : 'text-slate-500'} ${poppins.className}`}>
         Empowering your legal journey with precision and clarity.
         </p>
       </div>

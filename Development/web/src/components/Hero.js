@@ -37,7 +37,7 @@ const poppins = Poppins({
 
 export default function Hero() {
   const { currentUser, userDataObj } = useAuth();
-  const isDarkMode = userDataObj?.darkMode || false;
+  const isDarkMode = userDataObj?.darkMode || true;
   const [loaded, setLoaded] = useState(false);
   const [stats, setStats] = useState({
     cases: 0,
@@ -63,7 +63,7 @@ export default function Hero() {
   useEffect(() => {
     const hasSeenDisclaimer = localStorage.getItem('hasSeenDisclaimer');
     if (!hasSeenDisclaimer) {
-      setShowDisclaimer(true);
+      setShowDisclaimer(false);
     }
     setLoaded(true);
     animateStats(0, 400, (value) =>

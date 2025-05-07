@@ -8,13 +8,10 @@ import { Analytics } from "@vercel/analytics/react"
 
 export default function CoolLayout({ children }) {
     const { userDataObj } = useAuth();
-
-    // Determine if dark mode is enabled
     const isDarkMode = userDataObj?.darkMode || false;
     const canvasRef = useRef(null);
 
     useEffect(() => {
-        // Toggle the 'dark' class on the root element based on dark mode state
         if (isDarkMode) {
             document.documentElement.classList.add('dark');
         } else {
@@ -34,31 +31,28 @@ export default function CoolLayout({ children }) {
             resizeCanvas();
             window.addEventListener('resize', resizeCanvas);
 
-            // Generate a star field with random positions, sizes, and twinkle speeds
             const numStars = 200;
             const stars = [];
             for (let i = 0; i < numStars; i++) {
                 stars.push({
                     x: Math.random() * canvas.width,
                     y: Math.random() * canvas.height,
-                    radius: Math.random() * 1.5 + 0.5, // Radius between 0.5 and 2
-                    twinkleSpeed: Math.random() * 1 + 0.5, // Speed between 0.5 and 1.5
-                    offset: Math.random() * Math.PI * 2,  // Random initial phase
+                    radius: Math.random() * 1.5 + 0.5, 
+                    twinkleSpeed: Math.random() * 1 + 0.5, 
+                    offset: Math.random() * Math.PI * 2, 
                 });
             }
 
-            // Array for shooting stars
             const shootingStars = [];
 
-            // Helper function to spawn a single shooting star
             function spawnShootingStar() {
                 return {
-                    x: Math.random() * canvas.width,       // Random starting X
-                    y: Math.random() * canvas.height,      // Random starting Y
-                    length: Math.random() * 80 + 20,       // Trail length
-                    speed: Math.random() * 2 + 2,          // Speed
-                    angle: Math.random() * Math.PI * 2,    // Random direction
-                    opacity: 1                             // Start fully visible
+                    x: Math.random() * canvas.width,   
+                    y: Math.random() * canvas.height,  
+                    length: Math.random() * 80 + 20,     
+                    speed: Math.random() * 2 + 2,      
+                    angle: Math.random() * Math.PI * 2, 
+                    opacity: 1                        
                 };
             }
 
@@ -74,8 +68,7 @@ export default function CoolLayout({ children }) {
                     ctx.fill();
                 });
 
-                // Occasionally spawn a new shooting star
-                if (Math.random() < 0.003) { 
+                 if (Math.random() < 0.003) { 
                     shootingStars.push(spawnShootingStar());
                 }
 

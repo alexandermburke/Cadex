@@ -94,7 +94,7 @@ No extra text.
       attempt++
       try {
         const response = await openai.chat.completions.create({
-          model: 'gpt-4.1',
+          model: 'gpt-4.1-nano',
           messages,
           max_tokens: detailed ? 3500 : 1800,
           temperature: 0.7
