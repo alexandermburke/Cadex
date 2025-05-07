@@ -113,10 +113,13 @@ export default function Hero() {
             const key = ['days','hours','minutes','seconds'][idx];
             return (
               <div key={label} className="flex flex-col items-center">
-                <span className={clsx(
-                  'text-9xl',
-                  isDarkMode ? 'text-white' : 'text-blue-950'
-                )}>
+                <span
+                  className={clsx(
+                    'text-9xl',
+                    isDarkMode ? 'text-white' : 'text-blue-950'
+                  )}
+                  style={{ textShadow: '0 0 12px rgba(255,255,255,0.5)' }}
+                >
                   {String(timeLeft[key]).padStart(2, '0')}
                 </span>
                 <span className={clsx(
