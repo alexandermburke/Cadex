@@ -93,8 +93,8 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, i
   const router = useRouter();
   const { currentUser, userDataObj } = useAuth();
   const plan = userDataObj?.billing?.plan?.toLowerCase() || 'free';
-  const isBasic = plan === 'expert';
-  const isPro = plan === 'pro' || plan === 'basic';
+  const isBasic = plan === 'basic';
+  const isPro = plan === 'pro' || plan === 'expert';
   const isExpert = false;
   const isDarkMode = userDataObj?.darkMode || false;
   const [isCaseBriefBankOpen, setIsCaseBriefBankOpen] = useState(false);
