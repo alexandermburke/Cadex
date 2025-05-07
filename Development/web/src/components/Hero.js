@@ -104,7 +104,7 @@ export default function Hero() {
           Launching June 15, 2025 at 12:00 AM MST
         </p>
         <motion.div
-          className="flex space-x-12 mb-12"
+          className="flex space-x-4 sm:space-x-12 mb-12"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.5 }}
@@ -115,7 +115,7 @@ export default function Hero() {
               <div key={label} className="flex flex-col items-center">
                 <span
                   className={clsx(
-                    'text-9xl',
+                    'text-7xl sm:text-9xl',
                     isDarkMode ? 'text-white' : 'text-blue-950'
                   )}
                   style={{ textShadow: '0 0 12px rgba(255,255,255,0.5)' }}
