@@ -529,7 +529,7 @@ export default function AllBriefs() {
                       isDarkMode ? 'bg-slate-800 bg-opacity-50 text-white' : 'bg-white text-gray-800'
                     } p-6 rounded-2xl shadow-md`}
                   >
-                    <h2 className="text-2xl font-bold mb-4 text-center">Create New Case Brief</h2>
+                    <h2 className="text-2xl font-bold mb-4 text-center gradientShadowHoverBlue">Create New Case Brief</h2>
                     <div className="mb-4">
                       <label className="block text-sm font-semibold mb-1">Title</label>
                       <input
