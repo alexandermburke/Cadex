@@ -56,7 +56,7 @@ export default function Hero() {
       <div className="relative z-10 flex flex-col items-center justify-center text-center px-4">
         <h2 className={clsx(
           'text-7xl sm:text-7xl font-semibold py-2 mb-6',
-          isDarkMode ? 'text-white' : 'text-blue-950',
+          isDarkMode ? 'text-white' : 'text-white',
           poppins.className
         )}>
           <span className="block mb-3">
@@ -79,7 +79,7 @@ export default function Hero() {
         </h2>
         <p className={clsx(
           'mb-12 mt-4 uppercase tracking-wide',
-          isDarkMode ? 'text-gray-300' : 'text-gray-700'
+          isDarkMode ? 'text-gray-300' : 'text-gray-300'
         )}>
           Launching June 15, 2025 at 12:00 AM MST
         </p>
@@ -96,7 +96,7 @@ export default function Hero() {
                 <span
                   className={clsx(
                     'text-7xl sm:text-9xl',
-                    isDarkMode ? 'text-white' : 'text-blue-950'
+                    isDarkMode ? 'text-white' : 'text-white'
                   )}
                   style={{ textShadow: '0 0 12px rgba(255,255,255,0.5)' }}
                 >
@@ -104,7 +104,7 @@ export default function Hero() {
                 </span>
                 <span className={clsx(
                   'uppercase mt-2',
-                  isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                  isDarkMode ? 'text-gray-300' : 'text-gray-300'
                 )}>
                   {label}
                 </span>
