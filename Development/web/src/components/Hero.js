@@ -5,6 +5,7 @@ import { useAuth } from '@/context/AuthContext';
 import HeroBackground from './HeroBackground';
 import clsx from 'clsx';
 import { motion } from 'framer-motion';
+import Link from 'next/link';
 
 const poppins = Poppins({
   subsets: ['latin'],
@@ -23,9 +24,6 @@ export default function Hero() {
     minutes: 0,
     seconds: 0,
   });
-  const [email, setEmail] = useState('');
-  const [submitting, setSubmitting] = useState(false);
-  const [subscribed, setSubscribed] = useState(false);
 
   useEffect(() => {
     setLoaded(true);
@@ -49,24 +47,6 @@ export default function Hero() {
     const aInt = setInterval(() => setAnimationTrigger(t => t + 1), 12000);
     return () => { clearInterval(cInt); clearInterval(aInt); };
   }, []);
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!email) return;
-    setSubmitting(true);
-    try {
-      await fetch('/api/subscribe', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email }),
-      });
-      setSubscribed(true);
-    } catch {
-      // ignore
-    } finally {
-      setSubmitting(false);
-    }
-  };
 
   return (
     <section className="w-full h-screen relative overflow-hidden">
@@ -132,38 +112,20 @@ export default function Hero() {
             );
           })}
         </motion.div>
-        <motion.form
-          onSubmit={handleSubmit}
-          className="flex space-x-4"
+        <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.8, delay: 0.8 }}
         >
-          <input
-            type="email"
-            placeholder="Your email"
-            value={email}
-            onChange={e => setEmail(e.target.value)}
-            disabled={subscribed}
-            className={clsx(
-              'px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500',
-              isDarkMode ? 'bg-gray-800 text-white placeholder-gray-400' : 'bg-white text-gray-800 placeholder-gray-500',
-              'w-64'
-            )}
-          />
-          <button
-            type="submit"
-            disabled={submitting || subscribed}
-            className={clsx(
-              'px-6 py-3 rounded-lg font-semibold transition gradientShadowHoverBlue',
-              subscribed
-                ? 'bg-green-600 text-white cursor-default'
-                : 'bg-blue-600 hover:bg-blue-700 text-white'
-            )}
-          >
-            {subscribed ? 'Subscribed' : 'Notify Me'}
-          </button>
-        </motion.form>
+          <Link href="/ailawtools/splash">
+            <button className={clsx(
+              'px-10 py-3 rounded-lg font-semibold transition gradientShadowHoverBlue',
+              isDarkMode ? 'bg-blue-600 hover:bg-blue-700 text-white' : 'bg-blue-600 hover:bg-blue-700 text-white'
+            )}>
+              Preview Beta
+            </button>
+          </Link>
+        </motion.div>
       </div>
     </section>
   );
