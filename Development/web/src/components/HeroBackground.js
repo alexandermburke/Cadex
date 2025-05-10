@@ -1,7 +1,7 @@
 import React from 'react';
 
 const HeroBackground = () => (
-  <div className="absolute inset-0 w-full h-full flex items-start justify-center overflow-hidden opacity-55 drop-shadow-lg">
+  <div className="absolute inset-0 w-full h-full flex items-start justify-center overflow-hidden opacity-55 drop-shadow-lg scale-125">
     <svg
       className="absolute w-[1520px] h-full left-1/2 -translate-x-1/2 -translate-y-1/4"
       viewBox="0 0 1520 448"
