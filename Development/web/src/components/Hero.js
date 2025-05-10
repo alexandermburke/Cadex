@@ -48,7 +48,7 @@ export default function Hero() {
           poppins.className,
           'font-semibold mb-8',
           isDarkMode ? 'text-white' : 'text-white',
-          'text-[clamp(5rem,8vw,8rem)]',
+          'text-[clamp(4rem,8vw,8rem)]',
           'leading-tight'
         )}>
           <span className="block mb-2">
@@ -79,7 +79,7 @@ export default function Hero() {
         </h2>
 
         <p className={clsx(
-          'uppercase tracking-wide text-xl mb-12',
+          'uppercase tracking-wide text-2xl mb-12',
           isDarkMode ? 'text-gray-300' : 'text-gray-300'
         )}>
           Launching June 15, 2025 at 12:00 AM MST
@@ -132,6 +132,7 @@ export default function Hero() {
           </Link>
         </motion.div>
       </div>
+      <div className='mt-20'></div>
     </section>
   );
 }
