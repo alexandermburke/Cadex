@@ -48,7 +48,7 @@ export default function Hero() {
           poppins.className,
           'font-semibold mb-8',
           isDarkMode ? 'text-white' : 'text-white',
-          'text-[clamp(5rem,8vw,12rem)]',
+          'text-[clamp(5rem,8vw,8rem)]',
           'leading-tight'
         )}>
           <span className="block mb-2">
