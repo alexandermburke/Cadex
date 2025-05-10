@@ -8,6 +8,15 @@ module.exports = {
   ],
   theme: {
     extend: {
+      scale: {
+        '175': '1.75',
+        '200': '2',
+      },
+      spacing: {
+        '128': '28rem',
+        '144': '36rem',
+        // etc.
+      },
       height: {
         '128': '48rem',
         '100': '46rem'

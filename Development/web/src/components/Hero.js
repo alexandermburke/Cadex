@@ -49,7 +49,7 @@ export default function Hero() {
   }, []);
 
   return (
-    <section className="w-full h-screen relative overflow-hidden">
+    <section className="w-full h-screen scale-175 mt-128 relative overflow-hidden">
       <div className="absolute inset-0 z-0 pointer-events-none">
         <HeroBackground />
       </div>
