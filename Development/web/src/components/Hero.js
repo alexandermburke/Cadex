@@ -39,26 +39,38 @@ export default function Hero() {
   }, []);
 
   return (
-    <section className="w-full h-screen relative overflow-visible transform scale-100 md:scale-125 lg:scale-150 lg:mt-96 mt-20">
+    <section className="w-full h-screen relative overflow-hidden">
       <div className="absolute inset-0 z-0 pointer-events-none">
         <HeroBackground />
       </div>
       <div className="relative z-10 flex flex-col items-center justify-center text-center px-4">
         <h2 className={clsx(
-          'text-6xl sm:text-8xl md:text-8xl lg:text-8xl font-semibold py-4 mb-8',
           poppins.className,
-          isDarkMode ? 'text-white' : 'text-white'
+          'font-semibold mb-8',
+          isDarkMode ? 'text-white' : 'text-white',
+          'text-[clamp(5rem,8vw,12rem)]',
+          'leading-tight'
         )}>
-          <span className="block mb-4">
+          <span className="block mb-2">
             Welcome to the{' '}
-            <span key={animationTrigger} className="relative inline-block overflow-hidden align-middle" aria-hidden="true">
-              {animatedWord.split('').map((l, i) => (
-                l === ' ' ? <span key={i}>&nbsp;</span> : (
-                  <span key={i} className="flare-letter" style={{ '--animation-delay': `${i * 150}ms` }}>
+            <span
+              key={animationTrigger}
+              className="relative inline-block overflow-hidden align-middle"
+              aria-hidden="true"
+            >
+              {animatedWord.split('').map((l, i) =>
+                l === ' ' ? (
+                  <span key={i}>&nbsp;</span>
+                ) : (
+                  <span
+                    key={i}
+                    className="flare-letter"
+                    style={{ '--animation-delay': `${i * 150}ms` }}
+                  >
                     {l}
                   </span>
                 )
-              ))}
+              )}
             </span>
           </span>
           <span className="block">
@@ -67,26 +79,27 @@ export default function Hero() {
         </h2>
 
         <p className={clsx(
-          'mb-16 mt-6 uppercase tracking-wide text-xl',
+          'uppercase tracking-wide text-xl mb-12',
           isDarkMode ? 'text-gray-300' : 'text-gray-300'
         )}>
           Launching June 15, 2025 at 12:00 AM MST
         </p>
 
         <motion.div
-          className="flex space-x-4 sm:space-x-12 mb-12"
+          className="flex space-x-6 mb-12"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.5 }}
         >
-          {['Days','Hours','Minutes','Seconds'].map((label, idx) => {
-            const key = ['days','hours','minutes','seconds'][idx];
+          {['Days', 'Hours', 'Minutes', 'Seconds'].map((label, idx) => {
+            const key = ['days', 'hours', 'minutes', 'seconds'][idx];
             return (
               <div key={label} className="flex flex-col items-center">
                 <span
                   className={clsx(
-                    'text-[4rem] sm:text-[8rem] md:text-[8rem] lg:text-[10rem] leading-none',
-                    isDarkMode ? 'text-white' : 'text-white'
+                    isDarkMode ? 'text-white' : 'text-white',
+                    'text-[clamp(6rem,8vw,14rem)]',
+                    'leading-none'
                   )}
                   style={{ textShadow: '0 0 12px rgba(255,255,255,0.5)' }}
                 >
@@ -110,8 +123,9 @@ export default function Hero() {
         >
           <Link href="/ailawtools/splash">
             <button className={clsx(
-              'px-10 py-3 rounded-lg font-semibold transition gradientShadowHoverBlue text-2xl',
-              isDarkMode ? 'bg-blue-600 hover:bg-blue-700 text-white' : 'bg-blue-600 hover:bg-blue-700 text-white'
+              'px-12 py-4 rounded-lg font-semibold transition gradientShadowHoverBlue',
+              isDarkMode ? 'bg-blue-600 hover:bg-blue-700 text-white' : 'bg-blue-600 hover:bg-blue-700 text-white',
+              'text-xl'
             )}>
               Preview Beta
             </button>
