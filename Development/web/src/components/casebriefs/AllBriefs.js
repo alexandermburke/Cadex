@@ -138,7 +138,6 @@ export default function AllBriefs() {
     }))
   };
 
-  // Update citation for a case
   const updateCitationForCase = async (c) => {
     try {
       const payload = { title: c.title, date: c.decisionDate || '', citation: c.citation };
@@ -158,7 +157,6 @@ export default function AllBriefs() {
     }
   };
 
-  // Toggle favorite
   const toggleFavorite = async (caseId) => {
     if (!currentUser) {
       const updated = favorites.includes(caseId)
@@ -243,7 +241,6 @@ export default function AllBriefs() {
   const goPrev = () => page > 1 && setCurrentPage(page - 1);
   const goNext = () => page < totalPages && setCurrentPage(page + 1);
 
-  // Open a case
   const openCase = async (c) => {
     setSelectedCase(c);
     setCaseBrief(null);
@@ -318,7 +315,6 @@ export default function AllBriefs() {
 
   const handleBulletpointToggle = (e) => setBulletpointView(e.target.checked);
 
-  // Create new brief
   const createNewCaseBrief = async (e) => {
     e.preventDefault();
     setCreateError('');
@@ -366,7 +362,6 @@ export default function AllBriefs() {
     }
   };
 
-  // Listen for caseId param
   useEffect(() => {
     const caseIdParam = searchParams.get('caseId');
     if (caseIdParam && capCases.length) {
@@ -384,26 +379,17 @@ export default function AllBriefs() {
         <meta name="author" content="CadexLaw" />
         <meta name="robots" content="index, follow" />
         <link rel="canonical" href="https://www.cadexlaw.com/casebriefs/allbriefs" />
-
-        {/* Open Graph */}
         <meta property="og:title" content="All Case Briefs – CadexLaw" />
         <meta property="og:description" content={metaDescription} />
         <meta property="og:url" content="https://www.cadexlaw.com/casebriefs/allbriefs" />
         <meta property="og:type" content="website" />
         <meta property="og:site_name" content="CadexLaw" />
         <meta property="og:image" content="https://www.cadexlaw.com/images/all-briefs-og.jpg" />
-
-        {/* Twitter Card */}
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="All Case Briefs – CadexLaw" />
         <meta name="twitter:description" content={metaDescription} />
         <meta name="twitter:image" content="https://www.cadexlaw.com/images/all-briefs-og.jpg" />
-
-        {/* JSON-LD Structured Data */}
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
-        />
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
       </Head>
 
       <div className="relative flex h-screen transition-colors duration-500 bg-transparent">
@@ -433,7 +419,6 @@ export default function AllBriefs() {
               isDarkMode ? 'bg-slate-800 bg-opacity-50 text-white' : 'bg-white text-gray-800'
             } flex flex-col items-center`}
           >
-            {/* Tab Buttons */}
             <div className="w-full max-w-md mx-auto mb-4 flex justify-around">
               {['browse','favorites','create'].map((tab) => (
                 <motion.button
@@ -454,7 +439,6 @@ export default function AllBriefs() {
               ))}
             </div>
 
-            {/* Search + Sort */}
             {(activeTab === 'browse' || activeTab === 'favorites') && (
               <>
                 <div className="mb-6 w-full flex justify-center items-center gap-4">
@@ -519,7 +503,6 @@ export default function AllBriefs() {
               </>
             )}
 
-            {/* Create Tab */}
             {activeTab === 'create' ? (
               <div className="w-full flex justify-center">
                 <div className="max-w-md w-full">
@@ -603,13 +586,12 @@ export default function AllBriefs() {
                   <div className="w-full h-1 bg-blue-500 animate-pulse" />
                 ) : (
                   <>
-                    {/* Case Cards Grid */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 w-full relative">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 w-full relative items-stretch">
                       {paginatedCases.map((c) => (
                         <div
                           key={c.id}
                           onClick={() => openCase(c)}
-                          className={`p-4 rounded-xl shadow-lg transition-transform transform hover:scale-105 cursor-pointer group flex flex-col ${
+                          className={`h-full p-4 rounded-xl shadow-lg transition-transform transform hover:scale-105 cursor-pointer group flex flex-col ${
                             isDarkMode
                               ? 'bg-slate-800 bg-opacity-50 border border-slate-700 text-white'
                               : 'bg-white border border-gray-300 text-gray-800'
@@ -619,7 +601,7 @@ export default function AllBriefs() {
                             <h3 className="text-md font-semibold line-clamp-1">{c.title}</h3>
                             <div className="flex items-center space-x-2">
                               <span
-                                className={`text-xs py-1 px-2 rounded-full ${
+                                className={`text-xs py-1 px-2 rounded-full truncate max-w-[80px] overflow-hidden whitespace-nowrap ${
                                   isDarkMode ? 'bg-blue-200 text-blue-900' : 'bg-blue-900 text-white'
                                 }`}
                               >
@@ -657,7 +639,6 @@ export default function AllBriefs() {
                       ))}
                     </div>
 
-                    {/* Pagination */}
                     <div className="mt-6 flex items-center justify-center gap-2">
                       <motion.button
                         onClick={goPrev}
@@ -751,7 +732,6 @@ export default function AllBriefs() {
               </>
             )}
 
-            {/* Case Detail Modal */}
             {selectedCase && (
              <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-[99]">
                 <motion.div
