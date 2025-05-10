@@ -98,7 +98,7 @@ export default function Hero() {
                 <span
                   className={clsx(
                     isDarkMode ? 'text-white' : 'text-white',
-                    'text-[clamp(6rem,8vw,14rem)]',
+                    'text-[clamp(4rem,8vw,14rem)]',
                     'leading-none'
                   )}
                   style={{ textShadow: '0 0 12px rgba(255,255,255,0.5)' }}
