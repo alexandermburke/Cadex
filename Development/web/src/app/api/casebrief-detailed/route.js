@@ -29,6 +29,7 @@ Generate an ultra-detailed case summary for "${inputTitle}" (${inputCitation}). 
 7. Concurrence: exactly 2 sentences or "Not Provided."
 8. Dissent: exactly 2 sentences or "Not Provided."
 9. Analysis: exactly 8 sentences.
+Don't use em dashes.
 
 Return only a JSON object with keys:
 {
