@@ -19,11 +19,11 @@ const poppins = Poppins({
 
 const plans = [
   {
-    name: 'Basic',
+    name: 'Case Brief Lite',
     description: 'Perfect for 1L or Students that only need Case Briefs.',
-    price: 8,
+    price: 9,
     interval: 'Per month',
-    promotion: 'First 7 days free',
+    promotion: 'First 14 days free',
     features: [
       {
         text: 'Instant Access to 20,000+ Briefs',
@@ -47,9 +47,9 @@ const plans = [
     recommended: false,
   },
   {
-    name: 'Pro',
+    name: 'Exam Ace',
     description: 'Robust preparation for law students needing advanced tools.',
-    price: 20,
+    price: 15,
     interval: 'Per month',
     features: [
       { text: 'All Basic Plan Features' },
@@ -81,9 +81,9 @@ const plans = [
     recommended: true,
   },
   {
-    name: 'Expert',
+    name: 'Career Accelerator',
     description: 'Best for 2L & 3L students or those seeking top performance.',
-    price: 30,
+    price: 25,
     interval: 'Per month',
     features: [
       { text: 'All Pro Plan Features' },
@@ -167,7 +167,6 @@ export default function Plans() {
   }
 
   async function handleUpdatePlan() {
-    // Instead of processing a checkout, just redirect to the registration page.
     window.location.href = 'https://www.cadexlaw.com/register';
   }
 
