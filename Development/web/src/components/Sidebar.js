@@ -335,16 +335,16 @@ export default function Sidebar({ activeLink, isSidebarVisible, toggleSidebar, i
                 active={activeLink === '/ailawtools/examprep'}
               />
               <NavLink
-                href="/ailawtools/examprep/mbe"
-                icon={<FaListOl className="text-sm" />}
+                href="/lawtools/mbe"
+                icon={<FaClock className="text-sm" />}
                 label="MBE Practice"
-                active={activeLink === '/ailawtools/examprep/mbe'}
+                active={activeLink === '/lawtools/mbe'}
               />
             </>
           ) : showAllApps ? (
             <>
               <LockedNavLink icon={<FaClipboardCheck className="text-sm" />} label="Practice Exams" />
-              <LockedNavLink icon={<FaListOl className="text-sm" />} label="MBE Practice" />
+              <LockedNavLink icon={<FaClock className="text-sm" />} label="MBE Practice" />
             </>
           ) : null}
         </ToggleSection>

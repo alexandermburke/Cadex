@@ -1,4 +1,4 @@
-import Casemanagement from '@/components/tools/CaseManagement'
+import Casemanagement from '@/components/tools/MBE'
 import CoolLayout from '@/components/CoolLayout'
 import Main from '@/components/Main'
 import React from 'react'
