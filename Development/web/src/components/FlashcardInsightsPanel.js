@@ -35,6 +35,9 @@ const CircleBar = ({ percentage, size = 100, strokeWidth = 2, textSize = 16, col
   const radius = (size - strokeWidth) / 2;
   const circumference = 2 * Math.PI * radius;
   const offset = circumference - (percentage / 100) * circumference;
+  const red = isDarkMode ? '#f87171' : '#ef4444';
+  const strokeColor = percentage < 30 ? red : color;
+  const glow = 'drop-shadow(0 0 0px white)';
 
   useEffect(() => {
     let fillTimer;
@@ -42,12 +45,8 @@ const CircleBar = ({ percentage, size = 100, strokeWidth = 2, textSize = 16, col
     const idleTimer = setTimeout(() => {
       setTrigger(false);
       setPulse(true);
-      fillTimer = setTimeout(() => {
-        setTrigger(true);
-      }, 100);
-      pulseEndTimer = setTimeout(() => {
-        setPulse(false);
-      }, 2000);
+      fillTimer = setTimeout(() => setTrigger(true), 100);
+      pulseEndTimer = setTimeout(() => setPulse(false), 2000);
     }, 10000);
     return () => {
       clearTimeout(idleTimer);
@@ -58,7 +57,12 @@ const CircleBar = ({ percentage, size = 100, strokeWidth = 2, textSize = 16, col
 
   return (
     <div className="flex flex-col items-center">
-      <motion.div animate={{ scale: pulse ? 1.05 : 1 }} transition={{ duration: 0.6, ease: 'easeInOut' }} className="relative">
+      <motion.div
+        initial={{ filter: 'none' }}
+        animate={pulse ? { filter: ['none', glow, 'none'] } : { filter: 'none' }}
+        transition={pulse ? { duration: 2, ease: 'easeInOut', times: [0, 0.5, 1] } : {}}
+        className="relative"
+      >
         <svg width={size} height={size}>
           <circle
             cx={size / 2}
@@ -72,7 +76,7 @@ const CircleBar = ({ percentage, size = 100, strokeWidth = 2, textSize = 16, col
             cx={size / 2}
             cy={size / 2}
             r={radius}
-            stroke={color}
+            stroke={strokeColor}
             strokeWidth={strokeWidth}
             fill="transparent"
             strokeDasharray={circumference}
@@ -110,6 +114,10 @@ const OverallProgress = ({ percentage, isDarkMode }) => {
   const radius = (size - strokeWidth) / 2;
   const circumference = 2 * Math.PI * radius;
   const offset = circumference - (percentage / 100) * circumference;
+  const red = isDarkMode ? '#f87171' : '#ef4444';
+  const green = isDarkMode ? '#4ade80' : '#10b981';
+  const strokeColor = percentage < 30 ? red : green;
+  const glow = 'drop-shadow(0 0 0px white)';
 
   useEffect(() => {
     let fillTimer;
@@ -117,12 +125,8 @@ const OverallProgress = ({ percentage, isDarkMode }) => {
     const idleTimer = setTimeout(() => {
       setTrigger(false);
       setPulse(true);
-      fillTimer = setTimeout(() => {
-        setTrigger(true);
-      }, 100);
-      pulseEndTimer = setTimeout(() => {
-        setPulse(false);
-      }, 2000);
+      fillTimer = setTimeout(() => setTrigger(true), 100);
+      pulseEndTimer = setTimeout(() => setPulse(false), 2000);
     }, 10000);
     return () => {
       clearTimeout(idleTimer);
@@ -133,7 +137,12 @@ const OverallProgress = ({ percentage, isDarkMode }) => {
 
   return (
     <div className="flex flex-col items-center">
-      <motion.div animate={{ scale: pulse ? 1.05 : 1 }} transition={{ duration: 0.6, ease: 'easeInOut' }} className="relative">
+      <motion.div
+        initial={{ filter: 'none' }}
+        animate={pulse ? { filter: ['none', glow, 'none'] } : { filter: 'none' }}
+        transition={pulse ? { duration: 2, ease: 'easeInOut', times: [0, 0.5, 1] } : {}}
+        className="relative"
+      >
         <svg width={size} height={size}>
           <circle
             cx={size / 2}
@@ -147,7 +156,7 @@ const OverallProgress = ({ percentage, isDarkMode }) => {
             cx={size / 2}
             cy={size / 2}
             r={radius}
-            stroke={isDarkMode ? '#4ade80' : '#10b981'}
+            stroke={strokeColor}
             strokeWidth={strokeWidth}
             fill="transparent"
             strokeDasharray={circumference}
@@ -306,12 +315,7 @@ export default function ExamInsightsPanel() {
               Reset Statistics
             </button>
           </div>
-          <div className={clsx(
-            'mt-8 p-6 rounded-2xl',
-            isDarkMode
-              ? 'border border-gray-700'
-              : 'border border-gray-700 '
-          )}>
+          <div className={clsx( 'mt-8 p-6 rounded-2xl', isDarkMode ? 'border border-gray-700' : 'border border-gray-700' )}>
             <h3 className={clsx('text-xl font-semibold mb-3', isDarkMode ? 'text-white' : 'text-gray-900')}>
               Areas for Improvement
             </h3>

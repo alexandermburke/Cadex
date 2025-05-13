@@ -19,7 +19,7 @@ const poppins = Poppins({
 
 const plans = [
   {
-    name: 'Case Brief Lite',
+    name: 'Basic',
     description: 'Perfect for 1L or Students that only need Case Briefs.',
     price: 9,
     interval: 'Per month',
@@ -47,7 +47,7 @@ const plans = [
     recommended: false,
   },
   {
-    name: 'Exam Ace',
+    name: 'Pro',
     description: 'Robust preparation for law students needing advanced tools.',
     price: 15,
     interval: 'Per month',
@@ -81,7 +81,7 @@ const plans = [
     recommended: true,
   },
   {
-    name: 'Career Accelerator',
+    name: 'Expert',
     description: 'Best for 2L & 3L students or those seeking top performance.',
     price: 25,
     interval: 'Per month',
